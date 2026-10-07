@@ -137,7 +137,7 @@ export function MissionControlConsole() {
   return (
     <div className='relative flex flex-1 min-w-0 max-w-full flex-col gap-6 md:gap-8 p-3.5 sm:p-5 md:p-8 bg-background text-foreground min-h-screen selection:bg-primary/20 selection:text-foreground'>
 
-      {/* Flagship Product Feature Banner: Autonomous Learning & Live What-If Simulator */}
+      {/* Flagship Product Feature Banner */}
       <div className='rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 via-card to-card p-5 font-mono shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4'>
         <div className='space-y-1 max-w-2xl'>
           <div className='flex items-center gap-2'>
@@ -170,22 +170,22 @@ export function MissionControlConsole() {
         channel={channel}
       />
 
-      {/* 4. Scenario Controller (Operational Shock Simulator) */}
+      {/* 3. Scenario Controller (Operational Shock Simulator) */}
       <ScenarioController
         scenarios={state.scenarios}
         onTriggerScenario={handleTriggerScenario}
         onResetBaseline={handleResetBaseline}
       />
 
-      {/* 3.5. Live 3D Global Telemetry & Heatmap Command Center */}
-      <div className='rounded border border-border bg-card p-6 shadow-none text-card-foreground flex flex-col 2xl:flex-row items-start justify-between gap-6 relative min-h-[460px] min-w-0 max-w-full overflow-hidden'>
-        {/* Left Column: Telemetry info, tabs, region tiles, SKU chips */}
+      {/* 4. Global Ad & Sales Telemetry */}
+      <div className='rounded-xl border border-border bg-card p-5 sm:p-6 shadow-none text-card-foreground flex flex-col 2xl:flex-row items-start justify-between gap-6 relative min-h-[440px] min-w-0 max-w-full overflow-hidden'>
+        {/* Left Column: Controls, Regions, Active Products */}
         <div className='flex-1 space-y-3.5 w-full min-w-0'>
-          <div className='flex flex-wrap items-center justify-between gap-2 border-b border-border pb-2.5'>
+          <div className='flex flex-wrap items-center justify-between gap-2 border-b border-border/70 pb-2.5'>
             <div className='flex items-center gap-2'>
-              <Icons.globe className='size-5 text-foreground' />
-              <h3 className='font-mono text-sm font-bold text-foreground uppercase tracking-tight'>
-                Live 3D Global Ad &amp; Sales Telemetry
+              <Icons.globe className='size-4 text-foreground' />
+              <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
+                GLOBAL SALES PULSE
               </h3>
             </div>
             <div className='flex items-center gap-2'>
@@ -195,7 +195,7 @@ export function MissionControlConsole() {
                   type='button'
                   onClick={() => setConsoleGlobeMode('pulse')}
                   className={cn(
-                    'px-2.5 py-1 rounded font-semibold transition-all',
+                    'px-2.5 py-0.5 rounded font-semibold transition-all text-[11px]',
                     consoleGlobeMode === 'pulse'
                       ? 'bg-background text-foreground shadow-2xs font-bold'
                       : 'text-muted-foreground hover:text-foreground'
@@ -207,19 +207,19 @@ export function MissionControlConsole() {
                   type='button'
                   onClick={() => setConsoleGlobeMode('arcs')}
                   className={cn(
-                    'px-2.5 py-1 rounded font-semibold transition-all',
+                    'px-2.5 py-0.5 rounded font-semibold transition-all text-[11px]',
                     consoleGlobeMode === 'arcs'
                       ? 'bg-background text-foreground shadow-2xs font-bold'
                       : 'text-muted-foreground hover:text-foreground'
                   )}
                 >
-                  Analysing Arcs
+                  Analyzing Arcs
                 </button>
               </div>
 
               <Link
                 href='/dashboard/globe'
-                className='px-2.5 py-1 rounded bg-background border border-border text-xs font-mono text-foreground hover:bg-muted transition-colors flex items-center gap-1.5'
+                className='px-2.5 py-0.5 rounded bg-background border border-border text-[11px] font-mono text-foreground hover:bg-muted transition-colors flex items-center gap-1.5'
               >
                 <span>Full Globe Hub</span>
                 <Icons.arrowRight className='size-3' />
@@ -227,15 +227,9 @@ export function MissionControlConsole() {
             </div>
           </div>
 
-          <p className='text-xs font-mono text-muted-foreground leading-relaxed'>
-            {consoleGlobeMode === 'pulse'
-              ? 'Real-time customer interaction pulse: High engagement rendered via mechanical telemetry contrast. Powered by cobe-globe-pulse.'
-              : 'WebGL ad delivery vectors across Meta, Google, Amazon & Shopify. Visualizing network latency and delivery hops via github.com/globe.'}
-          </p>
-
-          {/* Region Status Tiles with Clear Status Dot and Readable Contrast */}
+          {/* Region Cards Prioritizing: REGION / STATUS / % */}
           <div className='grid grid-cols-2 lg:grid-cols-4 gap-2 pt-1 font-mono text-xs'>
-            {/* Tile 1: US-EAST / WEST (High Sales - Red) */}
+            {/* Tile 1: US-EAST / WEST */}
             <button
               type='button'
               onClick={() => {
@@ -243,20 +237,22 @@ export function MissionControlConsole() {
                 if (match) setSelectedGlobeMarker((prev) => (prev?.id === 'us-east' ? null : match));
               }}
               className={cn(
-                'p-2.5 rounded bg-muted/30 border transition-all text-left cursor-pointer group',
+                'p-2.5 rounded-lg bg-muted/20 border transition-all text-left cursor-pointer group space-y-0.5',
                 selectedGlobeMarker?.id === 'us-east'
                   ? 'border-red-500 ring-1 ring-red-500/50 bg-red-500/10'
                   : 'border-border hover:border-foreground/40'
               )}
             >
-              <div className='flex items-center gap-1.5 text-[10px] text-muted-foreground'>
-                <span className='size-2 rounded-full bg-red-500 shrink-0 shadow-[0_0_6px_#ef4444]' />
-                <span>US-EAST / WEST</span>
+              <div className='text-[10px] text-muted-foreground font-semibold truncate'>US-EAST / WEST</div>
+              <div className='flex items-center justify-between text-xs font-bold text-foreground'>
+                <span className='flex items-center gap-1 text-red-500'>
+                  ● HIGH
+                </span>
+                <span>78%</span>
               </div>
-              <div className='text-foreground font-bold mt-0.5'>High Sales (78%)</div>
             </button>
 
-            {/* Tile 2: WESTERN EUROPE (Strong - Amber) */}
+            {/* Tile 2: WESTERN EUROPE */}
             <button
               type='button'
               onClick={() => {
@@ -264,20 +260,22 @@ export function MissionControlConsole() {
                 if (match) setSelectedGlobeMarker((prev) => (prev?.id === 'eu-west' ? null : match));
               }}
               className={cn(
-                'p-2.5 rounded bg-muted/30 border transition-all text-left cursor-pointer group',
+                'p-2.5 rounded-lg bg-muted/20 border transition-all text-left cursor-pointer group space-y-0.5',
                 selectedGlobeMarker?.id === 'eu-west'
                   ? 'border-amber-500 ring-1 ring-amber-500/50 bg-amber-500/10'
                   : 'border-border hover:border-foreground/40'
               )}
             >
-              <div className='flex items-center gap-1.5 text-[10px] text-muted-foreground'>
-                <span className='size-2 rounded-full bg-amber-400 shrink-0 shadow-[0_0_6px_#f59e0b]' />
-                <span>WESTERN EUROPE</span>
+              <div className='text-[10px] text-muted-foreground font-semibold truncate'>WESTERN EUROPE</div>
+              <div className='flex items-center justify-between text-xs font-bold text-foreground'>
+                <span className='flex items-center gap-1 text-amber-400'>
+                  ● STRONG
+                </span>
+                <span>56%</span>
               </div>
-              <div className='text-foreground font-bold mt-0.5'>Strong (56%)</div>
             </button>
 
-            {/* Tile 3: ASIA-PACIFIC (Moderate - Readable Amber/Yellow Text) */}
+            {/* Tile 3: ASIA-PACIFIC */}
             <button
               type='button'
               onClick={() => {
@@ -285,20 +283,22 @@ export function MissionControlConsole() {
                 if (match) setSelectedGlobeMarker((prev) => (prev?.id === 'apac' ? null : match));
               }}
               className={cn(
-                'p-2.5 rounded bg-muted/30 border transition-all text-left cursor-pointer group',
+                'p-2.5 rounded-lg bg-muted/20 border transition-all text-left cursor-pointer group space-y-0.5',
                 selectedGlobeMarker?.id === 'apac'
                   ? 'border-amber-500 ring-1 ring-amber-500/50 bg-amber-500/10'
                   : 'border-border hover:border-foreground/40'
               )}
             >
-              <div className='flex items-center gap-1.5 text-[10px] text-muted-foreground'>
-                <span className='size-2 rounded-full bg-amber-400 shrink-0 shadow-[0_0_6px_#f59e0b]' />
-                <span>ASIA-PACIFIC</span>
+              <div className='text-[10px] text-muted-foreground font-semibold truncate'>ASIA-PACIFIC</div>
+              <div className='flex items-center justify-between text-xs font-bold text-foreground'>
+                <span className='flex items-center gap-1 text-amber-400'>
+                  ● MODERATE
+                </span>
+                <span>44%</span>
               </div>
-              <div className='text-foreground font-bold mt-0.5'>Moderate (44%)</div>
             </button>
 
-            {/* Tile 4: LATAM & SEA (RL Suppressed - Grey) */}
+            {/* Tile 4: LATAM & SEA */}
             <button
               type='button'
               onClick={() => {
@@ -306,22 +306,25 @@ export function MissionControlConsole() {
                 if (match) setSelectedGlobeMarker((prev) => (prev?.id === 'latam' ? null : match));
               }}
               className={cn(
-                'p-2.5 rounded bg-muted/30 border transition-all text-left cursor-pointer group',
+                'p-2.5 rounded-lg bg-muted/20 border transition-all text-left cursor-pointer group space-y-0.5',
                 selectedGlobeMarker?.id === 'latam'
                   ? 'border-zinc-400 ring-1 ring-zinc-400/50 bg-muted/60'
                   : 'border-border hover:border-foreground/40'
               )}
             >
-              <div className='flex items-center gap-1.5 text-[10px] text-muted-foreground'>
-                <span className='size-2 rounded-full bg-muted-foreground shrink-0' />
-                <span>LATAM &amp; SEA</span>
+              <div className='text-[10px] text-muted-foreground font-semibold truncate'>LATAM &amp; SEA</div>
+              <div className='flex items-center justify-between text-xs font-bold text-muted-foreground'>
+                <span className='flex items-center gap-1 text-muted-foreground'>
+                  ● SUPPRESSED
+                </span>
+                <span>12%</span>
               </div>
-              <div className='text-muted-foreground font-bold mt-0.5'>RL Suppressed</div>
             </button>
           </div>
 
+          {/* Active Products List */}
           <div className='pt-1 flex flex-wrap items-center gap-2'>
-            <span className='text-[11px] font-mono text-muted-foreground'>Click any active SKU to open 3D Analysis Modal:</span>
+            <span className='text-[10px] font-mono text-muted-foreground uppercase font-bold'>Active Products:</span>
             {state.campaigns.slice(0, 3).map((c: any) => (
               <button
                 key={c.campaign}
@@ -339,7 +342,7 @@ export function MissionControlConsole() {
                     severity: c.inventory === 0 ? 'CRITICAL' : 'HEALTHY'
                   });
                 }}
-                className='px-2.5 py-1 rounded bg-muted/40 border border-border hover:border-foreground/40 text-xs font-mono text-foreground transition-colors flex items-center gap-1.5'
+                className='px-2.5 py-0.5 rounded bg-muted/40 border border-border hover:border-foreground/40 text-xs font-mono text-foreground transition-colors flex items-center gap-1.5'
               >
                 <PlatformLogo platform={c.platform} size={12} className='shrink-0' />
                 <span>{c.productName || c.sku}</span>
@@ -348,8 +351,8 @@ export function MissionControlConsole() {
           </div>
         </div>
 
-        {/* Right Column: 3D Interactive Globe centered with Clean Non-Disruptive Overlay Panel */}
-        <div className='w-full xl:w-[420px] 2xl:w-[440px] shrink-0 flex items-center justify-center relative min-h-[360px]'>
+        {/* Right Column: 3D Globe Visualizer */}
+        <div className='w-full xl:w-[420px] 2xl:w-[440px] shrink-0 flex items-center justify-center relative min-h-[340px]'>
           <div className='size-[340px] flex items-center justify-center shrink-0 relative'>
             {consoleGlobeMode === 'arcs' ? (
               <GithubGlobe
@@ -369,7 +372,7 @@ export function MissionControlConsole() {
             )}
           </div>
 
-          {/* Regional Telemetry Detail Overlay Panel */}
+          {/* Non-Disruptive Region Detail Drawer Panel */}
           {selectedGlobeMarker && (
             <div className='absolute top-0 right-0 z-50 w-full max-w-[340px] sm:max-w-[380px] shadow-2xl transition-all duration-200 animate-in fade-in-0 slide-in-from-right-4'>
               <RegionDetailPanel
@@ -392,8 +395,10 @@ export function MissionControlConsole() {
           ]}
         />
       </div>
-      <div className='space-y-3.5'>
-        <div className='flex items-center justify-between border-b border-border pb-2.5'>
+
+      {/* 6. Active Diagnostic Anomalies */}
+      <div className='space-y-3'>
+        <div className='flex items-center justify-between border-b border-border/70 pb-2.5'>
           <div className='flex items-center gap-2'>
             <Icons.warning className='size-3.5 text-foreground' />
             <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
@@ -408,8 +413,9 @@ export function MissionControlConsole() {
           </span>
         </div>
 
-        <div className='grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4'>
-          {state.anomalies.slice(0, 3).map((anom: any) => (
+        {/* 6-Card Quick Scan Grid */}
+        <div className='grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-3.5'>
+          {state.anomalies.slice(0, 6).map((anom: any) => (
             <AnomalyCard
               key={anom.id}
               anomaly={anom}
@@ -571,7 +577,7 @@ export function MissionControlConsole() {
       {/* 11. Closed-Loop Decision Ledger & Audit Trail */}
       <DecisionLedgerTable entries={ledger} />
 
-      {/* 9. Analysing Phase Modal featuring 3D GitHub Globe */}
+      {/* Product Analysis Modal */}
       <ProductAnalysisModal
         product={analyzingProduct}
         isOpen={!!analyzingProduct}
