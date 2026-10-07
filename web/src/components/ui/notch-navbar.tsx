@@ -3,11 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
+  Home,
   Zap,
-  Cpu,
-  Workflow,
-  Fingerprint,
-  FileText,
+  SquareX,
+  Layers,
   Menu,
   X,
   Sun,
@@ -24,6 +23,7 @@ export interface NavItem {
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   isExternal?: boolean;
+  isSpecial?: boolean;
 }
 
 export interface NotchNavbarProps extends React.HTMLAttributes<HTMLElement> {
@@ -31,11 +31,10 @@ export interface NotchNavbarProps extends React.HTMLAttributes<HTMLElement> {
   leftItems?: NavItem[];
   rightItems?: NavItem[];
   showThemeToggle?: boolean;
-  ctaText?: string;
-  ctaHref?: string;
   githubHref?: string;
 }
 
+// GitHub Icon
 const GithubIcon = ({ className }: { className?: string }) => (
   <svg
     className={className}
@@ -51,37 +50,23 @@ const GithubIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-// Helper component for navigation links
-const NavLink = ({ item }: { item: NavItem }) => {
-  const Icon = item.icon;
-  const isHash = item.href.startsWith('#');
+// Terminal prompt icon for Console
+const TerminalPromptIcon = ({ className }: { className?: string }) => (
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <polyline points="4 17 10 11 4 5" />
+    <line x1="12" y1="19" x2="20" y2="19" />
+  </svg>
+);
 
-  if (isHash) {
-    return (
-      <a
-        href={item.href}
-        className="group flex items-center gap-1.5 text-xs font-mono font-medium text-foreground/75 hover:text-foreground transition-colors whitespace-nowrap"
-      >
-        <Icon className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 transition-opacity" />
-        <span>{item.label}</span>
-      </a>
-    );
-  }
-
-  return (
-    <Link
-      href={item.href}
-      target={item.isExternal ? '_blank' : undefined}
-      rel={item.isExternal ? 'noopener noreferrer' : undefined}
-      className="group flex items-center gap-1.5 text-xs font-mono font-medium text-foreground/75 hover:text-foreground transition-colors whitespace-nowrap"
-    >
-      <Icon className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 transition-opacity" />
-      <span>{item.label}</span>
-    </Link>
-  );
-};
-
-// Theme Toggle with smooth circular transition support
+// Theme Toggle with circular transition
 const NotchThemeToggle = () => {
   const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -105,24 +90,28 @@ const NotchThemeToggle = () => {
     <button
       onClick={toggleTheme}
       type="button"
-      className="flex items-center justify-center w-8 h-8 rounded-full border border-border/80 bg-background/80 hover:bg-muted text-foreground/80 hover:text-foreground transition-colors"
+      className="flex items-center justify-center w-8 h-8 rounded-full border border-border/80 bg-background/80 hover:bg-muted text-foreground/80 hover:text-foreground transition-colors cursor-pointer"
       aria-label="Toggle color theme"
       title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
     >
-      {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-zinc-700" />}
+      {isDark ? (
+        <Sun className="w-4 h-4 text-amber-400" />
+      ) : (
+        <Moon className="w-4 h-4 text-zinc-700" />
+      )}
     </button>
   );
 };
 
 const DEFAULT_LEFT_ITEMS: NavItem[] = [
-  { label: 'Crisis Scenarios', href: '#shocks', icon: Zap },
-  { label: 'Engine Architecture', href: '#bento', icon: Cpu },
-  { label: '4-Phase Flow', href: '#pipeline', icon: Workflow }
+  { label: 'Overview', href: '#overview', icon: Home },
+  { label: 'Workflow', href: '#workflow', icon: Zap },
+  { label: 'Features', href: '#features', icon: SquareX }
 ];
 
 const DEFAULT_RIGHT_ITEMS: NavItem[] = [
-  { label: 'Identity Graph', href: '/dashboard/fingerprint', icon: Fingerprint },
-  { label: 'Decision Ledger', href: '/dashboard/ledger', icon: FileText }
+  { label: 'Stack', href: '#stack', icon: Layers },
+  { label: 'Console', href: '/dashboard/overview', icon: TerminalPromptIcon, isSpecial: true }
 ];
 
 export function NotchNavbar({
@@ -131,12 +120,31 @@ export function NotchNavbar({
   leftItems = DEFAULT_LEFT_ITEMS,
   rightItems = DEFAULT_RIGHT_ITEMS,
   showThemeToggle = true,
-  ctaText = 'Enter Mission Control →',
-  ctaHref = '/dashboard/overview',
   githubHref = 'https://github.com/Hustkers/NEXUS-DQPS',
   ...props
 }: NotchNavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeItem, setActiveItem] = useState('Overview');
+
+  // Track active anchor based on hash or scroll position
+  useEffect(() => {
+    const updateActiveByHash = () => {
+      const hash = window.location.hash;
+      if (hash === '#workflow' || hash === '#pipeline' || hash === '#shocks') {
+        setActiveItem('Workflow');
+      } else if (hash === '#features' || hash === '#bento') {
+        setActiveItem('Features');
+      } else if (hash === '#stack') {
+        setActiveItem('Stack');
+      } else {
+        setActiveItem('Overview');
+      }
+    };
+
+    updateActiveByHash();
+    window.addEventListener('hashchange', updateActiveByHash);
+    return () => window.removeEventListener('hashchange', updateActiveByHash);
+  }, []);
 
   // Close mobile menu on resize to desktop
   useEffect(() => {
@@ -149,22 +157,77 @@ export function NotchNavbar({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Target style logo from Screenshot 1: [NX] nexusdqps (matching [CG] contextgc)
   const defaultLogo = (
-    <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-      <div className="size-8 rounded-lg bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 flex items-center justify-center font-mono font-bold text-sm shadow-xs group-hover:scale-105 transition-transform">
-        N
+    <Link href="/" className="flex items-center gap-2 group shrink-0 mb-0.5">
+      <div className="bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 rounded-lg px-2 py-0.5 font-bold font-sans text-xs tracking-tight flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+        NX
       </div>
-      <div className="flex flex-col text-left">
-        <div className="font-mono font-extrabold text-xs tracking-tight flex items-center gap-1.5 leading-none">
-          <span>NEXUS-DQPS</span>
-          <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-        </div>
-        <span className="text-[9px] text-muted-foreground font-mono leading-none tracking-tighter mt-0.5">
-          AUTONOMOUS AD ENGINE
-        </span>
-      </div>
+      <span className="font-bold text-sm sm:text-base tracking-tight text-foreground font-sans">
+        nexusdqps
+      </span>
     </Link>
   );
+
+  const renderNavLink = (item: NavItem) => {
+    const Icon = item.icon;
+    const isHash = item.href.startsWith('#');
+    const isActive = activeItem === item.label;
+
+    if (item.isSpecial) {
+      // Special Console link (vibrant blue with prompt icon from Screenshot 1)
+      return (
+        <Link
+          key={item.label}
+          href={item.href}
+          className="group flex items-center gap-1.5 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-500 transition-colors whitespace-nowrap"
+        >
+          <Icon className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+          <span>{item.label}</span>
+        </Link>
+      );
+    }
+
+    const content = (
+      <>
+        <Icon className={cn('w-4 h-4', isActive ? 'opacity-100' : 'opacity-70 group-hover:opacity-100')} />
+        <span>{item.label}</span>
+      </>
+    );
+
+    const baseClasses = cn(
+      'group flex items-center gap-1.5 text-sm transition-all whitespace-nowrap select-none',
+      isActive
+        ? 'bg-neutral-100 dark:bg-zinc-800 text-neutral-900 dark:text-white font-semibold px-3 py-1 rounded-lg shadow-2xs'
+        : 'text-neutral-600 dark:text-zinc-400 hover:text-neutral-900 dark:hover:text-white font-medium px-2 py-1'
+    );
+
+    if (isHash) {
+      return (
+        <a
+          key={item.label}
+          href={item.href}
+          onClick={() => setActiveItem(item.label)}
+          className={baseClasses}
+        >
+          {content}
+        </a>
+      );
+    }
+
+    return (
+      <Link
+        key={item.label}
+        href={item.href}
+        onClick={() => setActiveItem(item.label)}
+        target={item.isExternal ? '_blank' : undefined}
+        rel={item.isExternal ? 'noopener noreferrer' : undefined}
+        className={baseClasses}
+      >
+        {content}
+      </Link>
+    );
+  };
 
   return (
     <>
@@ -181,7 +244,7 @@ export function NotchNavbar({
               x2="100%"
               y2="39.5"
               stroke="currentColor"
-              strokeOpacity={0.12}
+              strokeOpacity={0.14}
               strokeWidth={0.75}
               className="text-foreground"
             />
@@ -216,7 +279,7 @@ export function NotchNavbar({
                 d="M0 39.5 C25 39.5 25 63.5 50 63.5"
                 fill="none"
                 stroke="currentColor"
-                strokeOpacity={0.12}
+                strokeOpacity={0.14}
                 strokeWidth={0.75}
                 className="text-foreground"
               />
@@ -245,7 +308,7 @@ export function NotchNavbar({
                   x2="100%"
                   y2="63.5"
                   stroke="currentColor"
-                  strokeOpacity={0.12}
+                  strokeOpacity={0.14}
                   strokeWidth={0.75}
                   className="text-foreground"
                 />
@@ -262,13 +325,11 @@ export function NotchNavbar({
               </svg>
             </div>
 
-            {/* Content Layer */}
-            <div className="relative w-full h-full flex items-end justify-between pb-2 px-3 sm:px-6 md:px-8 gap-4 md:gap-8">
-              {/* Desktop Left Nav */}
-              <nav className="hidden md:flex gap-6 mb-1 shrink-0 items-center">
-                {leftItems.map((item) => (
-                  <NavLink key={item.label} item={item} />
-                ))}
+            {/* Content Layer (Screenshot 1 alignment) */}
+            <div className="relative w-full h-full flex items-end justify-between pb-2.5 px-3 sm:px-6 md:px-8 gap-4 md:gap-7">
+              {/* Desktop Left Nav: Overview (Active pill), Workflow, Features */}
+              <nav className="hidden md:flex gap-3 lg:gap-4 mb-0.5 shrink-0 items-center">
+                {leftItems.map((item) => renderNavLink(item))}
               </nav>
 
               {/* Mobile Menu Button (Left) */}
@@ -281,39 +342,33 @@ export function NotchNavbar({
                 {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
 
-              {/* Logo (Center) */}
-              <div className="flex justify-center shrink-0 mx-2 md:mx-4 mb-0.5">
+              {/* Logo (Center - Single Line Horizontal Lockup: [NX] nexusdqps) */}
+              <div className="flex justify-center shrink-0 mx-2 md:mx-4 mb-1">
                 {logo || defaultLogo}
               </div>
 
-              {/* Desktop Right Nav & Actions */}
-              <nav className="hidden md:flex gap-6 items-center shrink-0 mb-0.5">
-                {rightItems.map((item) => (
-                  <NavLink key={item.label} item={item} />
-                ))}
+              {/* Desktop Right Nav: Stack, >_ Console (Blue), | , Moon Toggle, GitHub */}
+              <nav className="hidden md:flex gap-4 lg:gap-5 items-center shrink-0 mb-0.5">
+                {rightItems.map((item) => renderNavLink(item))}
 
-                <div className="flex gap-3 pl-4 border-l border-border/70 shrink-0 items-center">
-                  {showThemeToggle && <NotchThemeToggle />}
+                {/* Vertical Divider Line */}
+                <div className="h-4 w-px bg-border/70 mx-0.5 shrink-0" />
 
-                  {githubHref && (
-                    <a
-                      href={githubHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="size-8 rounded-full border border-border/80 bg-background/80 hover:bg-muted flex items-center justify-center text-foreground/80 hover:text-foreground transition-colors"
-                      title="GitHub Repository"
-                    >
-                      <GithubIcon className="size-4" />
-                    </a>
-                  )}
+                {/* Circular Theme Toggle */}
+                {showThemeToggle && <NotchThemeToggle />}
 
-                  <Link
-                    href={ctaHref}
-                    className="px-3.5 py-1.5 text-xs font-mono font-medium text-white bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200 rounded-full transition-all shadow-xs hover:shadow-sm whitespace-nowrap"
+                {/* Circular GitHub Repo Button */}
+                {githubHref && (
+                  <a
+                    href={githubHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="size-8 rounded-full border border-border/80 bg-background/80 hover:bg-muted flex items-center justify-center text-foreground/80 hover:text-foreground transition-colors cursor-pointer"
+                    title="GitHub Repository"
                   >
-                    {ctaText}
-                  </Link>
-                </div>
+                    <GithubIcon className="size-4" />
+                  </a>
+                )}
               </nav>
 
               {/* Mobile Right Actions */}
@@ -339,7 +394,7 @@ export function NotchNavbar({
                 d="M0 63.5 C25 63.5 25 39.5 50 39.5"
                 fill="none"
                 stroke="currentColor"
-                strokeOpacity={0.12}
+                strokeOpacity={0.14}
                 strokeWidth={0.75}
                 className="text-foreground"
               />
@@ -364,7 +419,7 @@ export function NotchNavbar({
               x2="100%"
               y2="39.5"
               stroke="currentColor"
-              strokeOpacity={0.12}
+              strokeOpacity={0.14}
               strokeWidth={0.75}
               className="text-foreground"
             />
@@ -396,27 +451,38 @@ export function NotchNavbar({
               {[...leftItems, ...rightItems].map((item) => {
                 const Icon = item.icon;
                 const isHash = item.href.startsWith('#');
+                const isConsole = item.isSpecial;
+
                 if (isHash) {
                   return (
                     <a
                       key={item.label}
                       href={item.href}
-                      className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/60 transition-colors font-mono text-xs font-medium text-foreground/80 hover:text-foreground"
-                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/60 transition-colors font-sans text-sm font-medium text-foreground/85 hover:text-foreground"
+                      onClick={() => {
+                        setActiveItem(item.label);
+                        setIsMobileMenuOpen(false);
+                      }}
                     >
                       <Icon className="w-4 h-4 opacity-70" />
                       <span>{item.label}</span>
                     </a>
                   );
                 }
+
                 return (
                   <Link
                     key={item.label}
                     href={item.href}
-                    className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/60 transition-colors font-mono text-xs font-medium text-foreground/80 hover:text-foreground"
+                    className={cn(
+                      'flex items-center gap-3 p-2.5 rounded-lg transition-colors font-sans text-sm font-medium',
+                      isConsole
+                        ? 'text-blue-600 dark:text-blue-400 font-semibold bg-blue-50/50 dark:bg-blue-950/20'
+                        : 'text-foreground/85 hover:text-foreground hover:bg-muted/60'
+                    )}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <Icon className="w-4 h-4 opacity-70" />
+                    <Icon className="w-4 h-4 opacity-80" />
                     <span>{item.label}</span>
                   </Link>
                 );
@@ -430,7 +496,7 @@ export function NotchNavbar({
                     href={githubHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between p-2.5 rounded-lg hover:bg-muted/60 transition-colors font-mono text-xs text-foreground/80"
+                    className="flex items-center justify-between p-2.5 rounded-lg hover:bg-muted/60 transition-colors font-sans text-sm text-foreground/80"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <span className="flex items-center gap-2.5">
@@ -442,11 +508,12 @@ export function NotchNavbar({
                 )}
 
                 <Link
-                  href={ctaHref}
-                  className="flex items-center justify-center gap-2 p-2.5 rounded-lg bg-foreground text-background font-mono text-xs font-medium mt-1 shadow-xs"
+                  href="/dashboard/overview"
+                  className="flex items-center justify-center gap-2 p-2.5 rounded-lg bg-blue-600 text-white font-sans text-sm font-semibold mt-1 shadow-xs hover:bg-blue-500 transition-colors"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  <span>{ctaText}</span>
+                  <TerminalPromptIcon className="w-4 h-4" />
+                  <span>Launch Mission Control Console</span>
                 </Link>
               </div>
             </nav>

@@ -49,7 +49,7 @@ export function LandingPageView() {
       <NotchNavbar />
 
       {/* 2. HERO SECTION WITH VGPU CANVAS BACKGROUND */}
-      <section className='relative pt-24 pb-20 md:pt-28 md:pb-28 overflow-hidden border-b border-border/60'>
+      <section id='overview' className='relative pt-24 pb-20 md:pt-28 md:pb-28 overflow-hidden border-b border-border/60 scroll-mt-16'>
         {/* VGPU Canvas Dynamic Waveform */}
         <VGPUCanvas className='opacity-80' intensity={1.1} />
 
@@ -108,8 +108,9 @@ export function LandingPageView() {
         </div>
       </section>
 
-      {/* 3. SHOCK SIMULATOR SHOWCASE (THE 4 CRISIS SCENARIOS) */}
-      <section id='shocks' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto'>
+      {/* 3. SHOCK SIMULATOR SHOWCASE (WORKFLOW & SCENARIOS) */}
+      <section id='workflow' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-16 relative'>
+        <span id='shocks' className='absolute -top-20' />
         <div className='text-center max-w-3xl mx-auto mb-12'>
           <div className='font-mono text-xs font-bold text-primary uppercase tracking-widest mb-2'>
             STRESS TEST BENCHMARK
@@ -126,8 +127,9 @@ export function LandingPageView() {
         <ShockSimulatorShowcase />
       </section>
 
-      {/* 4. EXPANDABLE / AGENT BENTO GRID (VENGENCE & ACETERNITY) */}
-      <section id='bento' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-muted/20 border-y border-border/60'>
+      {/* 4. EXPANDABLE / AGENT BENTO GRID (FEATURES & ARCHITECTURE) */}
+      <section id='features' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-muted/20 border-y border-border/60 scroll-mt-16 relative'>
+        <span id='bento' className='absolute -top-20' />
         <div className='text-center max-w-3xl mx-auto mb-14'>
           <div className='font-mono text-xs font-bold text-primary uppercase tracking-widest mb-2'>
             CORE SYSTEM PILLARS
@@ -287,8 +289,9 @@ export function LandingPageView() {
         </BentoGrid>
       </section>
 
-      {/* 5. 4-PHASE ARCHITECTURAL FLOW */}
-      <section id='pipeline' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto'>
+      {/* 5. 4-PHASE ARCHITECTURAL FLOW (STACK & PIPELINE) */}
+      <section id='stack' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-16 relative'>
+        <span id='pipeline' className='absolute -top-20' />
         <div className='text-center max-w-3xl mx-auto mb-16'>
           <div className='font-mono text-xs font-bold text-primary uppercase tracking-widest mb-2'>
             CLOSED LOOP EXECUTION
