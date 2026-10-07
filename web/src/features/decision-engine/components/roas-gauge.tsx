@@ -150,7 +150,7 @@ export function RoasGauge({
   return (
     <div
       className={cn(
-        'relative flex flex-col justify-between rounded-xl border border-[#222222] bg-[#0E0E0E] p-4 transition-all duration-200 hover:border-[#404040] hover:bg-[#121212] font-mono shadow-sm min-h-[380px]',
+        'relative flex flex-col justify-between rounded-xl border border-[#222222] bg-[#0E0E0E] p-4 transition-all duration-200 hover:border-[#404040] hover:bg-[#121212] font-mono shadow-sm min-h-[380px] min-w-0',
         className
       )}
     >

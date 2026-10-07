@@ -136,7 +136,7 @@ export function MissionControlConsole() {
   );
 
   return (
-    <div className='relative flex flex-1 flex-col gap-8 p-5 md:p-8 bg-background text-foreground min-h-screen selection:bg-primary/20 selection:text-foreground'>
+    <div className='relative flex flex-1 min-w-0 max-w-full flex-col gap-6 md:gap-8 p-3.5 sm:p-5 md:p-8 bg-background text-foreground min-h-screen selection:bg-primary/20 selection:text-foreground'>
 
       {/* Flagship Product Feature Banner: Autonomous Learning & Live What-If Simulator */}
       <div className='rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 via-card to-card p-5 font-mono shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4'>
@@ -384,7 +384,7 @@ export function MissionControlConsole() {
       </div>
 
       {/* 5. Causal DAG Visualizer & RCA Waterfall Decomposition */}
-      <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
+      <div className='grid grid-cols-1 xl:grid-cols-2 gap-4 min-w-0 max-w-full'>
         <CausalDagVisualizer activeAnomaly={hasCriticalAnomaly} />
         <RcaWaterfallChart
           totalLoss={hasCriticalAnomaly ? 3008.25 : 0}
@@ -492,7 +492,7 @@ export function MissionControlConsole() {
         </div>
 
         {/* Gauges Grid */}
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4'>
           {products
             .filter((p) => (activeTab === 'all' ? true : p.channel.toLowerCase() === activeTab.toLowerCase()))
             .slice(0, 8)
