@@ -12,6 +12,7 @@ import {
   IconMicrophone,
   IconMessageChatbot,
   IconCompass,
+  IconCpu,
 } from '@tabler/icons-react';
 import { navGroups } from '@/config/nav-config';
 import { ASSISTANT_TOOLS } from './tools';
@@ -130,6 +131,18 @@ export function AssistantSearch() {
       category: 'Voice & AI',
       icon: <IconMessageChatbot className="size-4 text-cyan-400" />,
       action: () => {
+        setActiveTab('chat');
+      },
+    });
+
+    items.push({
+      id: 'tool-vertex-ai',
+      title: 'Google Cloud Vertex AI Telemetry',
+      subtitle: 'Inspect Vertex AI reasoning status (gemini-2.5-flash via ADC)',
+      category: 'Voice & AI',
+      icon: <IconCpu className="size-4 text-emerald-400" />,
+      action: () => {
+        setSearchQuery('Check Google Cloud Vertex AI status');
         setActiveTab('chat');
       },
     });
