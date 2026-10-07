@@ -149,7 +149,7 @@ export async function fetchVertexAiStatus(): Promise<VertexAiStatus> {
       connected: true,
       project_id: 'velvety-carving-494308-c5',
       location: 'us-central1',
-      model_name: 'gemini-2.5-flash',
+      model_name: 'gemini-3.8-flash',
       has_adc: true,
       token_valid: true,
     };
