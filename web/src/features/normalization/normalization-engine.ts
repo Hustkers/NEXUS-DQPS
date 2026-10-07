@@ -1,6 +1,8 @@
 /**
  * Normalization Engine & Schema Types
  * Converts raw platform API partials into Canonical Unified Commerce Records
+ * Supporting Enterprise Telemetry: Frequency Wearout, Video Retention, Auction Lost IS,
+ * Buy-Box Win Rate, Catalog Halo Sales, and True Net Contribution Margin (CM3/POAS).
  */
 
 export interface UnifiedCommerceRecord {
@@ -27,6 +29,25 @@ export interface UnifiedCommerceRecord {
   gross_margin: number;
   gross_margin_pct: number;
   inventory_on_hand: number;
+
+  // Extraordinary Enterprise Attributes
+  frequency?: number;
+  reach?: number;
+  learning_phase_status?: string;
+  quality_ranking?: string;
+  video_hook_rate_pct?: number; // Video 3s views / impressions
+  search_impression_share_pct?: number;
+  search_budget_lost_is_pct?: number; // Crucial for autonomous budget scaling
+  search_rank_lost_is_pct?: number;
+  quality_score?: number; // Google 1-10
+  buy_box_win_pct?: number; // Amazon Buy Box ownership
+  halo_attributed_revenue?: number; // Amazon Other-SKU sales spillover
+  fba_fees?: number;
+  customer_acquisition_type?: 'NEW_ACQUISITION' | 'RETURNING_VIP';
+  payment_gateway_fee?: number;
+  net_contribution_margin?: number; // True Contribution Margin 3 (CM3)
+  poas?: number; // Profit on Ad Spend: net_margin / spend
+
   raw_payload_snippet: string;
 }
 
@@ -68,11 +89,18 @@ export const CATALOG_LOOKUP: Record<
     cogs: 69.0,
     asin: 'B07Q8Z9107',
     variantId: 'gid://shopify/ProductVariant/41007'
+  },
+  'AO2924-401': {
+    name: 'Nike Air Zoom Pegasus 36',
+    price: 120.00,
+    cogs: 42.0,
+    asin: 'B07Q8Z9105',
+    variantId: 'gid://shopify/ProductVariant/41005'
   }
 };
 
 export function extractSkuFromText(text: string): string {
-  const known = ['310805-137', '880848-005', 'AH8050-100', '315122-001', 'CD4371-001'];
+  const known = ['310805-137', '880848-005', 'AH8050-100', '315122-001', 'CD4371-001', 'AO2924-401'];
   for (const k of known) {
     if (text.includes(k)) return k;
   }
@@ -114,6 +142,20 @@ export function normalizeMetaInsights(item: any, inventoryMap: Record<string, nu
   const gross_margin_pct = attributed_revenue > 0 ? (gross_margin / attributed_revenue) * 100 : 60.0;
   const inventory_on_hand = inventoryMap[sku] ?? (sku === '310805-137' ? 0 : 420);
 
+  // Extraordinary Meta Telemetry
+  const frequency = Number(item.frequency) || 1.0;
+  const reach = Number(item.reach) || (impressions > 0 ? Math.round(impressions / frequency) : 0);
+  const learning_phase_status = item.learning_phase_status || 'SUCCESS';
+  const quality_ranking = item.quality_ranking || 'AVERAGE';
+  
+  // Video 3s hook rate
+  const video3s = Number(item.video_play_actions?.video_3_sec_watched_actions) || 0;
+  const video_hook_rate_pct = impressions > 0 && video3s > 0 ? Number(((video3s / impressions) * 100).toFixed(1)) : undefined;
+
+  // Net Contribution Margin & POAS
+  const net_contribution_margin = Math.max(0, gross_margin - spend);
+  const poas = spend > 0 ? Number((gross_margin / spend).toFixed(2)) : undefined;
+
   return {
     id: `meta_${item.ad_id || item.campaign_id}`,
     timestamp: item.date_start ? `${item.date_start}T00:00:00Z` : new Date().toISOString(),
@@ -138,6 +180,13 @@ export function normalizeMetaInsights(item: any, inventoryMap: Record<string, nu
     gross_margin: Number(gross_margin.toFixed(2)),
     gross_margin_pct: Number(gross_margin_pct.toFixed(1)),
     inventory_on_hand,
+    frequency,
+    reach,
+    learning_phase_status,
+    quality_ranking,
+    video_hook_rate_pct,
+    net_contribution_margin: Number(net_contribution_margin.toFixed(2)),
+    poas,
     raw_payload_snippet: JSON.stringify(item, null, 2)
   };
 }
@@ -170,6 +219,22 @@ export function normalizeGoogleAdsRow(item: any, inventoryMap: Record<string, nu
   const gross_margin_pct = attributed_revenue > 0 ? (gross_margin / attributed_revenue) * 100 : 60.0;
   const inventory_on_hand = inventoryMap[sku] ?? (sku === '310805-137' ? 0 : 380);
 
+  // Extraordinary Google Auction Intelligence
+  const isMetrics = item.metrics || {};
+  const search_impression_share_pct = isMetrics.searchImpressionShare != null
+    ? Number((isMetrics.searchImpressionShare * 100).toFixed(1))
+    : undefined;
+  const search_budget_lost_is_pct = isMetrics.searchBudgetLostImpressionShare != null
+    ? Number((isMetrics.searchBudgetLostImpressionShare * 100).toFixed(1))
+    : undefined;
+  const search_rank_lost_is_pct = isMetrics.searchRankLostImpressionShare != null
+    ? Number((isMetrics.searchRankLostImpressionShare * 100).toFixed(1))
+    : undefined;
+
+  const quality_score = item.ad_group_criterion?.qualityInfo?.qualityScore ?? undefined;
+  const net_contribution_margin = Math.max(0, gross_margin - spend);
+  const poas = spend > 0 ? Number((gross_margin / spend).toFixed(2)) : undefined;
+
   return {
     id: `google_${item.campaign?.id || Math.random()}`,
     timestamp: item.segments?.date ? `${item.segments.date}T00:00:00Z` : new Date().toISOString(),
@@ -194,6 +259,12 @@ export function normalizeGoogleAdsRow(item: any, inventoryMap: Record<string, nu
     gross_margin: Number(gross_margin.toFixed(2)),
     gross_margin_pct: Number(gross_margin_pct.toFixed(1)),
     inventory_on_hand,
+    search_impression_share_pct,
+    search_budget_lost_is_pct,
+    search_rank_lost_is_pct,
+    quality_score,
+    net_contribution_margin: Number(net_contribution_margin.toFixed(2)),
+    poas,
     raw_payload_snippet: JSON.stringify(item, null, 2)
   };
 }
@@ -223,9 +294,20 @@ export function normalizeAmazonSponsoredProducts(
   const roas = spend > 0 ? attributed_revenue / spend : 0;
 
   const total_cogs = conversions * catalog.cogs;
-  const gross_margin = Math.max(0, attributed_revenue - total_cogs);
+  const fba_fees_per_unit = Number(item.fbaFeesEstimate) || 6.50;
+  const total_fba_fees = conversions * fba_fees_per_unit;
+  const referral_fees = attributed_revenue * (Number(item.referralFeeRate) || 0.15);
+  const gross_margin = Math.max(0, attributed_revenue - total_cogs - total_fba_fees - referral_fees);
   const gross_margin_pct = attributed_revenue > 0 ? (gross_margin / attributed_revenue) * 100 : 60.0;
   const inventory_on_hand = inventoryMap[sku] ?? (sku === '310805-137' ? 0 : 510);
+
+  // Extraordinary Amazon SP-API & Placement Metrics
+  const buy_box_win_pct = item.buyBoxWinPercentage != null
+    ? Number((item.buyBoxWinPercentage * 100).toFixed(1))
+    : 95.0;
+  const halo_attributed_revenue = Number(item.attributedSalesOtherSku14d) || 0;
+  const net_contribution_margin = Math.max(0, gross_margin - spend);
+  const poas = spend > 0 ? Number((gross_margin / spend).toFixed(2)) : undefined;
 
   return {
     id: `amazon_${item.campaignId}_${sku}`,
@@ -251,6 +333,11 @@ export function normalizeAmazonSponsoredProducts(
     gross_margin: Number(gross_margin.toFixed(2)),
     gross_margin_pct: Number(gross_margin_pct.toFixed(1)),
     inventory_on_hand,
+    buy_box_win_pct,
+    halo_attributed_revenue,
+    fba_fees: Number(total_fba_fees.toFixed(2)),
+    net_contribution_margin: Number(net_contribution_margin.toFixed(2)),
+    poas,
     raw_payload_snippet: JSON.stringify(item, null, 2)
   };
 }
@@ -279,9 +366,16 @@ export function normalizeShopifyOrder(item: any, inventoryMap: Record<string, nu
   const roas = spend > 0 ? revenue / spend : 0;
 
   const total_cogs = conversions * catalog.cogs;
-  const gross_margin = Math.max(0, revenue - total_cogs);
+  const payment_gateway_fee = Number(item.processing_fee) || Number((revenue * 0.029 + 0.30).toFixed(2));
+  const taxes = Number(item.total_tax) || 0;
+  const gross_margin = Math.max(0, revenue - total_cogs - payment_gateway_fee - taxes);
   const gross_margin_pct = revenue > 0 ? (gross_margin / revenue) * 100 : 60.0;
   const inventory_on_hand = inventoryMap[sku] ?? (sku === '310805-137' ? 0 : 490);
+
+  // Extraordinary Shopify D2C Customer Economics
+  const customer_acquisition_type = item.customer?.orders_count === 1 ? 'NEW_ACQUISITION' : 'RETURNING_VIP';
+  const net_contribution_margin = Math.max(0, gross_margin - spend);
+  const poas = spend > 0 ? Number((gross_margin / spend).toFixed(2)) : undefined;
 
   return {
     id: `shopify_${item.id}`,
@@ -307,6 +401,10 @@ export function normalizeShopifyOrder(item: any, inventoryMap: Record<string, nu
     gross_margin: Number(gross_margin.toFixed(2)),
     gross_margin_pct: Number(gross_margin_pct.toFixed(1)),
     inventory_on_hand,
+    customer_acquisition_type,
+    payment_gateway_fee,
+    net_contribution_margin: Number(net_contribution_margin.toFixed(2)),
+    poas,
     raw_payload_snippet: JSON.stringify(item, null, 2)
   };
 }

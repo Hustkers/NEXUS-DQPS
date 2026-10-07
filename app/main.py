@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from diagnose.router import router as anomalies_router
 from execute.router import router as directives_router
 from agents.mcp_server import mcp_router
+from agents.router import ai_router
 
 app = FastAPI(
     title="NEXUS-DQPS Decision Engine API",
@@ -26,6 +27,7 @@ app.add_middleware(
 app.include_router(anomalies_router)
 app.include_router(directives_router)
 app.include_router(mcp_router)
+app.include_router(ai_router)
 
 
 @app.get("/health")

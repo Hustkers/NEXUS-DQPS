@@ -3,7 +3,7 @@
  * Provides self-contained tools that directly execute mutations and analytics queries.
  */
 
-import { approveDirective, fetchKPIOverview, OFFLINE_KPIS } from '@/lib/api-adapter';
+import { approveDirective, fetchKPIOverview, fetchVertexAiStatus, OFFLINE_KPIS } from '@/lib/api-adapter';
 import { toast } from 'sonner';
 
 export interface ToolDefinition {
@@ -218,6 +218,20 @@ export const ASSISTANT_TOOLS: Record<string, ToolDefinition> = {
       };
     },
   },
+
+  check_vertex_ai_status: {
+    name: 'check_vertex_ai_status',
+    description: 'Queries connection telemetry for Google Cloud Vertex AI authenticated via Application Default Credentials (ADC).',
+    parameters: {},
+    execute: async () => {
+      const status = await fetchVertexAiStatus();
+      return {
+        success: true,
+        data: status,
+        summary: `Connected to ${status.provider} (${status.model_name}) in ${status.location} under Project: ${status.project_id} using ${status.auth_method}.`,
+      };
+    },
+  },
 };
 
 /**
@@ -329,8 +343,25 @@ export async function executeAssistantTurn(
     };
   }
 
+  // 6. Google Cloud Vertex AI Status & Reasoning
+  if (
+    text.includes('vertex') ||
+    text.includes('google cloud') ||
+    text.includes('gemini') ||
+    text.includes('adc') ||
+    text.includes('credential')
+  ) {
+    const tool = ASSISTANT_TOOLS.check_vertex_ai_status;
+    const result = await tool.execute({});
+    const d = result.data;
+    return {
+      replyText: `Google Cloud Vertex AI is linked and active via **${d.auth_method}**.\n\n• **Provider**: ${d.provider}\n• **Project ID**: \`${d.project_id}\`\n• **Location**: \`${d.location}\`\n• **Reasoning Model**: \`${d.model_name}\`\n• **Status**: Connected & Token Authenticated`,
+      toolCall: { name: tool.name, args: {}, result },
+    };
+  }
+
   // Default General Assistant Response
   return {
-    replyText: `I am the NEXUS AppWide Copilot. I can query real-time ROAS telemetry, inspect SKU inventories, simulate operational shocks, and execute budget reallocations across Meta & Google Ads via autonomous function calling.\n\nTry asking:\n• *"What is our blended ROAS?"*\n• *"Authorize reallocation directive"*\n• *"Check inventory stockout risk"*\n• *"Inject a stockout crisis scenario"*`,
+    replyText: `I am the NEXUS AppWide Copilot. I can query real-time ROAS telemetry, inspect SKU inventories, simulate operational shocks, execute budget reallocations, and run Google Cloud Vertex AI reasoning via autonomous function calling.\n\nTry asking:\n• *"Check Google Cloud Vertex AI status"*\n• *"What is our blended ROAS?"*\n• *"Authorize reallocation directive"*\n• *"Check inventory stockout risk"*\n• *"Inject a stockout crisis scenario"*`,
   };
 }

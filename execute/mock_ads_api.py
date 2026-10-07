@@ -176,6 +176,9 @@ def update_amazon_campaigns(payload: AmazonSPBatchUpdateRequest):
     return AmazonSPBatchUpdateResponse(responses=responses)
 
 
+update_amazon_sp_campaigns = update_amazon_campaigns
+
+
 @app.get("/execution/log")
 def get_execution_log():
     return {"count": len(_execution_log), "events": _execution_log}

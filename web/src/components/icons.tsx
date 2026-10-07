@@ -1,4 +1,11 @@
 import {
+  GoogleLogo,
+  MetaLogo,
+  AmazonLogo,
+  ShopifyLogo,
+  PlatformLogo
+} from '@/components/icons/platform-logos';
+import {
   IconAdjustmentsHorizontal,
   IconAlertCircle,
   IconAlertTriangle,
@@ -245,10 +252,14 @@ export const Icons = {
   galleryVerticalEnd: IconStack2,
   moreHorizontal: IconDots,
 
-  // Identity & Tracking
+  // Identity & Tracking & Platforms
   fingerprint: IconFingerprint,
   youtube: IconBrandYoutube,
-  amazon: IconBrandAmazon,
+  amazon: AmazonLogo,
+  google: GoogleLogo,
+  meta: MetaLogo,
+  shopify: ShopifyLogo,
+  platformLogo: PlatformLogo,
   topology: IconTopologyComplex,
   play: IconPlayerPlay,
   cart: IconShoppingCart,
@@ -261,3 +272,5 @@ export const Icons = {
   bot: IconRobot,
   messageSquare: IconMessage2
 };
+
+export { GoogleLogo, MetaLogo, AmazonLogo, ShopifyLogo, PlatformLogo };

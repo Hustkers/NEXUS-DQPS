@@ -4,6 +4,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { IconWorld } from '@tabler/icons-react';
+import { PlatformLogo } from '@/components/icons/platform-logos';
 import { cn } from '@/lib/utils';
 
 export interface FactorDecomp {
@@ -45,7 +46,7 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, className }: Anoma
   return (
     <div
       className={cn(
-        'group relative flex flex-col justify-between rounded border border-[#8A8A8A] bg-[#1A1A1A] p-4 text-[#FFFFFF] transition-all hover:border-[#FFFFFF] shadow-none',
+        'group relative flex flex-col justify-between rounded border border-[#1A1A1A] bg-[#1A1A1A] p-4 text-[#FFFFFF] transition-all hover:border-[#8A8A8A] shadow-none',
         className
       )}
     >
@@ -56,6 +57,7 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, className }: Anoma
             <span className='text-xs font-mono font-bold text-[#FFFFFF]'>
               {isCritical ? '■' : '○'}
             </span>
+            <PlatformLogo platform={anomaly.platform} size={14} className='shrink-0' />
             <span className='capitalize font-semibold text-[#FFFFFF]'>{anomaly.platform}</span>
             <span className='text-[#8A8A8A]'>/</span>
             <span className='text-[#8A8A8A] text-[11px]'>{anomaly.date}</span>
@@ -65,7 +67,7 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, className }: Anoma
               'font-mono font-bold text-[10px] px-1.5 py-0.5 rounded',
               isCritical
                 ? 'bg-[#FFFFFF] text-[#000000]'
-                : 'bg-[#1A1A1A] text-[#FFFFFF] border border-[#8A8A8A]'
+                : 'bg-[#000000] text-[#FFFFFF]'
             )}
           >
             {isCritical ? '[CRITICAL] ' : '[WARN] '}Z {anomaly.zScore > 0 ? `+${anomaly.zScore}` : anomaly.zScore}
@@ -79,7 +81,7 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, className }: Anoma
           title='Click to inspect product telemetry'
         >
           {anomaly.photoUrl && (
-            <div className='relative size-10 rounded border border-[#8A8A8A] bg-[#000000] overflow-hidden shrink-0 group-hover/shoe:border-[#FFFFFF] transition-colors'>
+            <div className='relative size-10 rounded border border-[#1A1A1A] bg-[#000000] overflow-hidden shrink-0 group-hover/shoe:border-[#FFFFFF] transition-colors'>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={anomaly.photoUrl}
@@ -115,7 +117,7 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, className }: Anoma
         </p>
 
         {/* Minimal Factor Waterfall: hairline bars in monochrome */}
-        <div className='space-y-1.5 mb-3 pt-2.5 border-t border-[#8A8A8A]/40'>
+        <div className='space-y-1.5 mb-3 pt-2.5 border-t border-[#000000]'>
           {anomaly.factors.slice(0, 2).map((f, i) => {
             const barWidth = Math.min(Math.abs(f.impactPts) * 1.3, 100);
             return (
@@ -126,7 +128,7 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, className }: Anoma
                     {f.impactPts > 0 ? `+${f.impactPts.toFixed(1)}` : f.impactPts.toFixed(1)} pts
                   </span>
                 </div>
-                <div className='h-1.5 w-full bg-[#000000] border border-[#1A1A1A] overflow-hidden'>
+                <div className='h-1.5 w-full bg-[#000000] overflow-hidden'>
                   <div
                     className={cn('h-full', isCritical ? 'bg-[#FFFFFF]' : 'bg-[#8A8A8A]')}
                     style={{ width: `${barWidth}%` }}
@@ -144,7 +146,7 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, className }: Anoma
           size='sm'
           variant='outline'
           onClick={() => onAnalyze?.(anomaly)}
-          className='flex-1 text-xs font-mono h-8 border border-[#8A8A8A] bg-[#1A1A1A] text-[#FFFFFF] hover:bg-[#000000] hover:border-[#FFFFFF] font-semibold active:scale-[0.98]'
+          className='flex-1 text-xs font-mono h-8 border border-[#1A1A1A] bg-[#000000] text-[#FFFFFF] hover:bg-[#1A1A1A] hover:border-[#FFFFFF] font-semibold active:scale-[0.98]'
         >
           <IconWorld className='mr-1.5 size-3.5 text-[#FFFFFF]' />
           Analyse Globe

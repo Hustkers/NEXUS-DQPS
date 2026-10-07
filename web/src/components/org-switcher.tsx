@@ -19,11 +19,9 @@ import {
 import React, { useState } from 'react';
 
 export function OrgSwitcher() {
-  const [activeBrand, setActiveBrand] = useState('Nike Direct (Footwear & Apparel)');
+  const [activeBrand, setActiveBrand] = useState('Nike');
   const brands = [
-    { name: 'Nike Direct (Footwear & Apparel)', channels: 'Meta • Google • Amazon • TikTok (Postgres 16)', active: true },
-    { name: 'Jordan Brand D2C', channels: 'Meta Advantage+ • TikTok Shop', active: false },
-    { name: 'Nike Training & Running Club', channels: 'Google Shopping • Amazon Ads', active: false }
+    { name: 'Nike', channels: 'Meta • Google • Amazon • TikTok (Postgres 16)', active: true }
   ];
 
   return (
@@ -34,7 +32,7 @@ export function OrgSwitcher() {
             render={
               <SidebarMenuButton
                 size='lg'
-                tooltip='Nike Direct D2C Catalogs'
+                tooltip='Nike Catalogs'
                 className='data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground border border-emerald-500/30 bg-emerald-50/80 dark:bg-emerald-950/20 hover:bg-emerald-100/80 dark:hover:bg-emerald-900/30 transition-all shadow-2xs'
               />
             }

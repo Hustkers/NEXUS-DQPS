@@ -107,7 +107,15 @@ def test_google_cloud_client_fallback_and_rate_limiter():
     # Should acquire instantly
     limiter.acquire()
 
-    client = GoogleCloudClient(api_key=None)
+    client = GoogleCloudClient(api_key=None, force_fallback=True)
     # Test fallback reasoning
     resp = client.generate_content("The inventory has suffered a stockout.")
     assert "stockout" in resp.lower() or "inventory" in resp.lower()
+
+
+def test_vertex_ai_adc_status():
+    client = GoogleCloudClient()
+    status = client.get_status()
+    assert status["provider"] == "Google Cloud Vertex AI"
+    assert "project_id" in status
+    assert status["model_name"] in ("gemini-3.8-flash", "gemini-2.5-flash", "gemini-2.5-pro", "gemini-1.5-flash")

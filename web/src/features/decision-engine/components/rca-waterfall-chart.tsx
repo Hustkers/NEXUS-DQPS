@@ -47,8 +47,8 @@ export function RcaWaterfallChart({
   const breakdown = items || defaultItems;
 
   return (
-    <Card className="p-5 border border-[#8A8A8A] bg-[#1A1A1A] shadow-none rounded text-[#FFFFFF]">
-      <div className="flex items-center justify-between mb-4 border-b border-[#8A8A8A]/40 pb-3">
+    <Card className="p-5 border border-[#1A1A1A] bg-[#1A1A1A] shadow-none rounded text-[#FFFFFF]">
+      <div className="flex items-center justify-between mb-4 border-b border-[#000000] pb-3">
         <div>
           <h3 className="text-sm font-semibold text-[#FFFFFF] tracking-tight flex items-center gap-2 font-mono">
             <IconChartBar className="h-4 w-4 text-[#FFFFFF]" />
@@ -77,13 +77,13 @@ export function RcaWaterfallChart({
               </span>
               <div className="flex items-center gap-3 font-mono">
                 <span className="text-[#FFFFFF] font-bold">-${item.dollarImpact.toFixed(2)}</span>
-                <Badge variant="outline" className="text-[11px] font-mono px-1.5 py-0 border-[#8A8A8A] text-[#FFFFFF] bg-[#000000]">
+                <Badge variant="outline" className="text-[11px] font-mono px-1.5 py-0 border-none text-[#FFFFFF] bg-[#000000]">
                   {item.percentageShare.toFixed(1)}%
                 </Badge>
               </div>
             </div>
 
-            <div className="w-full bg-[#000000] border border-[#1A1A1A] h-2 overflow-hidden flex">
+            <div className="w-full bg-[#000000] h-2 overflow-hidden flex">
               <div
                 className={`h-full ${item.color.startsWith('bg-[') ? item.color : idx === 0 ? 'bg-[#FFFFFF]' : 'bg-[#8A8A8A]'} transition-all duration-500`}
                 style={{ width: `${item.percentageShare}%` }}
@@ -93,7 +93,7 @@ export function RcaWaterfallChart({
         ))}
       </div>
 
-      <div className="mt-4 pt-3 border-t border-[#8A8A8A]/40 flex items-center justify-between text-[11px] text-[#8A8A8A] font-mono">
+      <div className="mt-4 pt-3 border-t border-[#000000] flex items-center justify-between text-[11px] text-[#8A8A8A] font-mono">
         <span>Attribution Model: DoWhy-GCM Shapley</span>
         <span className="text-[#FFFFFF] font-bold">● Sum: 100.0% Reconciled</span>
       </div>

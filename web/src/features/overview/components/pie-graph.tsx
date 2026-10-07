@@ -48,11 +48,11 @@ const chartConfig = {
 
 export function PieGraph() {
   return (
-    <Card className='flex h-full flex-col bg-[#1A1A1A] border-[#8A8A8A] shadow-none'>
+    <Card className='flex h-full flex-col bg-[#1A1A1A] border-[#1A1A1A] shadow-none'>
       <CardHeader className='items-center pb-0'>
         <CardTitle className='text-white font-mono flex items-center justify-between w-full'>
           <span>Device Distribution</span>
-          <Badge variant='outline' className='border-[#8A8A8A] text-white bg-transparent font-mono'>
+          <Badge variant='outline' className='border-none text-white bg-[#000000] font-mono'>
             <Icons.trendingUp className='text-white' />
             +5.2%
           </Badge>

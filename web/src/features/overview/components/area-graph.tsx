@@ -41,11 +41,11 @@ const chartConfig = {
 
 export function AreaGraph() {
   return (
-    <Card className='bg-[#1A1A1A] border-[#8A8A8A] shadow-none'>
+    <Card className='bg-[#1A1A1A] border-[#1A1A1A] shadow-none'>
       <CardHeader>
         <CardTitle className='text-white font-mono flex items-center justify-between'>
           <span>Traffic Telemetry Area</span>
-          <Badge variant='outline' className='border-[#8A8A8A] text-white bg-transparent font-mono'>
+          <Badge variant='outline' className='border-none text-white bg-[#000000] font-mono'>
             <Icons.trendingUp className='text-white' />
             +5.2%
           </Badge>

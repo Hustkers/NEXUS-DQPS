@@ -1,5 +1,14 @@
 import type { NextConfig } from 'next';
 import path from 'path';
+import { createRequire } from 'node:module';
+
+let rawLoader = 'raw-loader';
+try {
+  const require = createRequire(import.meta.url);
+  rawLoader = require.resolve('raw-loader');
+} catch {
+  // raw-loader not found directly, fallback to name
+}
 
 const nextConfig: NextConfig = {
   output: process.env.BUILD_STANDALONE === 'true' ? 'standalone' : undefined,
@@ -16,10 +25,10 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true
   },
   turbopack: {
-    root: path.resolve(__dirname),
+    root: path.resolve(__dirname, '..'),
     rules: {
       '*.html': {
-        loaders: ['raw-loader'],
+        loaders: [rawLoader],
         as: '*.js',
       },
     },

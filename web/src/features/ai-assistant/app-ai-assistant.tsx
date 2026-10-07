@@ -177,7 +177,7 @@ export function AppAiAssistant() {
           <div className="px-4 py-1.5 bg-zinc-900/40 border-t border-zinc-800/60 flex items-center justify-between text-[10px] font-mono text-zinc-400">
             <span className="flex items-center gap-1">
               <span className="size-1 rounded-full bg-emerald-500" />
-              Omnibar Search · ElevenLabs Voice · Autonomous Tools
+              Omnibar Search · ElevenLabs Voice · Vertex AI (ADC)
             </span>
             <button
               type="button"

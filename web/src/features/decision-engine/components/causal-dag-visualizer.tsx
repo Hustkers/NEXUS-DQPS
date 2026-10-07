@@ -42,10 +42,10 @@ export function CausalDagVisualizer({ activeAnomaly = true }: { activeAnomaly?: 
   const nodeMap = new Map(nodes.map((n) => [n.id, n]));
 
   return (
-    <Card className="p-5 border border-[#8A8A8A] bg-[#1A1A1A] shadow-none rounded text-[#FFFFFF] relative overflow-hidden">
-      <div className="flex items-center justify-between mb-4 border-b border-[#8A8A8A]/40 pb-3">
+    <Card className="p-5 border border-[#1A1A1A] bg-[#1A1A1A] shadow-none rounded text-[#FFFFFF] relative overflow-hidden">
+      <div className="flex items-center justify-between mb-4 border-b border-[#000000] pb-3">
         <div className="flex items-center gap-2.5">
-          <div className="h-8 w-8 rounded bg-[#000000] flex items-center justify-center border border-[#8A8A8A]">
+          <div className="h-8 w-8 rounded bg-[#000000] flex items-center justify-center border border-[#1A1A1A]">
             <IconGitBranch className="h-4 w-4 text-[#FFFFFF]" />
           </div>
           <div>
@@ -73,7 +73,7 @@ export function CausalDagVisualizer({ activeAnomaly = true }: { activeAnomaly?: 
         </div>
       </div>
 
-      <div className="w-full h-72 border border-[#8A8A8A]/40 rounded bg-[#000000] relative overflow-hidden flex items-center justify-center">
+      <div className="w-full h-72 border border-[#1A1A1A] rounded bg-[#000000] relative overflow-hidden flex items-center justify-center">
         <svg className="w-full h-full absolute inset-0 pointer-events-none">
           <defs>
             <marker id="arrow" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
@@ -136,7 +136,7 @@ export function CausalDagVisualizer({ activeAnomaly = true }: { activeAnomaly?: 
       </div>
 
       {selectedNode === 'orders' && activeAnomaly && (
-        <div className="mt-3 p-3 rounded bg-[#000000] border border-[#8A8A8A] text-xs font-mono flex items-center justify-between">
+        <div className="mt-3 p-3 rounded bg-[#000000] border border-[#1A1A1A] text-xs font-mono flex items-center justify-between">
           <div className="flex items-center gap-2">
             <IconAlertCircle className="h-4 w-4 text-[#FFFFFF] shrink-0" />
             <span className="text-[#FFFFFF]">
