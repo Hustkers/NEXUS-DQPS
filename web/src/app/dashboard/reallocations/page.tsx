@@ -47,7 +47,7 @@ export default function ReallocationsPage() {
   }, []);
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen min-w-0 max-w-full overflow-hidden'>
+    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen min-w-0 max-w-full overflow-x-hidden'>
       <div className='flex flex-wrap items-center justify-between gap-4 border-b border-border/80 pb-4'>
         <div>
           <h1 className='text-xl font-mono font-bold text-foreground uppercase tracking-tight flex items-center gap-2'>

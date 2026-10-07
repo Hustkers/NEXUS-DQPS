@@ -362,7 +362,7 @@ function SimulationLabContent() {
   }, [selectedScenarioId, simStage, inputs, computedResult]);
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen font-mono min-w-0 max-w-full overflow-hidden'>
+    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen font-mono min-w-0 max-w-full overflow-x-hidden'>
       {/* Header Banner */}
       <div className='flex flex-wrap items-center justify-between gap-4 border-b border-border/80 pb-4'>
         <div>
