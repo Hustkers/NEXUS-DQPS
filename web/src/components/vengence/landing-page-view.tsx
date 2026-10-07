@@ -44,29 +44,29 @@ const HERO_STATS = [
 
 export function LandingPageView() {
   return (
-    <div className='relative min-h-screen bg-[#000000] text-[#FFFFFF] selection:bg-[#FFFFFF] selection:text-[#000000]'>
+    <div className='relative min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-foreground'>
       {/* 1. VENGEANCE UI NOTCH NAVIGATION BAR */}
       <NotchNavbar />
 
       {/* 2. HERO SECTION WITH VGPU CANVAS BACKGROUND */}
-      <section className='relative pt-24 pb-20 md:pt-28 md:pb-28 overflow-hidden border-b border-[#1A1A1A]'>
+      <section id='overview' className='relative pt-24 pb-20 md:pt-28 md:pb-28 overflow-hidden border-b border-border/60 scroll-mt-16'>
         {/* VGPU Canvas Dynamic Waveform */}
         <VGPUCanvas className='opacity-80' intensity={1.1} />
 
         <div className='relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center'>
           {/* Hackathon Pill */}
-          <div className='inline-flex items-center gap-2 px-3 py-1 rounded-[4px] border border-[#8A8A8A] bg-[#1A1A1A] text-[#FFFFFF] text-xs font-mono font-medium mb-6 animate-in fade-in slide-in-from-top-2 duration-500'>
-            <span className='size-1.5 rounded-full bg-[#FFFFFF]' />
-            <span>DATAQUEST 3.0 • PROBLEM STATEMENT FINALIST</span>
+          <div className='inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-mono font-medium mb-6 animate-in fade-in slide-in-from-top-2 duration-500'>
+            <span className='size-1.5 rounded-full bg-emerald-500' />
+            <span>DataQuest 3.0 • Problem Statement Finalist</span>
           </div>
 
           {/* Master Headline with High-Impact Typography */}
-          <h1 className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-[#FFFFFF] max-w-4xl leading-[1.08] mb-6'>
+          <h1 className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground max-w-4xl leading-[1.08] mb-6'>
             Next-Generation Autonomous D2C Ad Intelligence & Decision Engine
           </h1>
 
           {/* Subtitle */}
-          <p className='text-base sm:text-lg md:text-xl text-[#8A8A8A] max-w-2xl font-normal leading-relaxed mb-8'>
+          <p className='text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl font-normal leading-relaxed mb-8'>
             Stops ad budget hemorrhaging from stockouts, CPM spikes, and walled-garden attribution blind spots.
             NEXUS decouples deterministic convex budget math from causal LLM diagnostics to guarantee positive contribution profit.
           </p>
@@ -77,7 +77,7 @@ export function LandingPageView() {
               href='/dashboard/overview'
               size='lg'
               variant='default'
-              className='font-mono text-sm shadow-none'
+              className='font-mono text-sm shadow-md'
             >
               Launch Mission Control Cockpit →
             </GlowButton>
@@ -108,16 +108,17 @@ export function LandingPageView() {
         </div>
       </section>
 
-      {/* 3. SHOCK SIMULATOR SHOWCASE (THE 4 CRISIS SCENARIOS) */}
-      <section id='shocks' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto'>
+      {/* 3. SHOCK SIMULATOR SHOWCASE (WORKFLOW & SCENARIOS) */}
+      <section id='workflow' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-16 relative'>
+        <span id='shocks' className='absolute -top-20' />
         <div className='text-center max-w-3xl mx-auto mb-12'>
-          <div className='font-mono text-xs font-bold text-[#8A8A8A] uppercase tracking-widest mb-2'>
+          <div className='font-mono text-xs font-bold text-primary uppercase tracking-widest mb-2'>
             STRESS TEST BENCHMARK
           </div>
-          <h2 className='text-3xl md:text-4xl font-extrabold tracking-tight text-[#FFFFFF] mb-4'>
+          <h2 className='text-3xl md:text-4xl font-extrabold tracking-tight text-foreground mb-4'>
             Four Real-World Crisis Scenarios
           </h2>
-          <p className='text-sm md:text-base text-[#8A8A8A] leading-relaxed'>
+          <p className='text-sm md:text-base text-muted-foreground leading-relaxed'>
             Standard marketers take 48–72 hours to diagnose inventory and auction anomalies.
             NEXUS intervenes in sub-15 minutes with automated circuit breakers and Scipy convex reallocation.
           </p>
@@ -126,17 +127,17 @@ export function LandingPageView() {
         <ShockSimulatorShowcase />
       </section>
 
-      {/* 4. EXPANDABLE / AGENT BENTO GRID (VENGENCE & ACETERNITY) */}
-      {/* 4. EXPANDABLE / AGENT BENTO GRID */}
-      <section id='bento' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-[#000000] border-y border-[#1A1A1A]'>
+      {/* 4. EXPANDABLE / AGENT BENTO GRID (FEATURES & ARCHITECTURE) */}
+      <section id='features' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-muted/20 border-y border-border/60 scroll-mt-16 relative'>
+        <span id='bento' className='absolute -top-20' />
         <div className='text-center max-w-3xl mx-auto mb-14'>
-          <div className='font-mono text-xs font-bold text-[#8A8A8A] uppercase tracking-widest mb-2'>
+          <div className='font-mono text-xs font-bold text-primary uppercase tracking-widest mb-2'>
             CORE SYSTEM PILLARS
           </div>
-          <h2 className='text-3xl md:text-4xl font-extrabold tracking-tight text-[#FFFFFF] mb-4'>
+          <h2 className='text-3xl md:text-4xl font-extrabold tracking-tight text-foreground mb-4'>
             Engineered for Ground-Truth Profitability
           </h2>
-          <p className='text-sm md:text-base text-[#8A8A8A] leading-relaxed'>
+          <p className='text-sm md:text-base text-muted-foreground leading-relaxed'>
             Why generic LLM agents fail: LLMs cannot perform multi-variable bounded convex optimization reliably.
             NEXUS decouples mathematical rigor from narrative root-cause diagnostics.
           </p>
@@ -151,22 +152,22 @@ export function LandingPageView() {
             description='Solves the Karush-Kuhn-Tucker (KKT) constrained optimization problem across channels. Reallocates capital to equalize marginal contribution profit under strict ±20% daily liquidity stability bounds to preserve ad platform algorithmic learning phases.'
             icon={<Icons.trendingUp className='size-5' />}
             badge={
-              <span className='font-mono text-[10px] px-2 py-0.5 rounded-[2px] bg-[#FFFFFF] text-[#000000] font-bold'>
+              <span className='font-mono text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold'>
                 KKT CONVEX SOLVER
               </span>
             }
             header={
-              <div className='h-40 rounded-[4px] bg-[#000000] border border-[#8A8A8A] p-4 font-mono text-xs flex flex-col justify-between'>
-                <div className='flex items-center justify-between text-[#8A8A8A] border-b border-[#1A1A1A] pb-2'>
+              <div className='h-40 rounded-xl bg-card border border-border/80 p-4 font-mono text-xs flex flex-col justify-between'>
+                <div className='flex items-center justify-between text-muted-foreground border-b border-border/60 pb-2'>
                   <span>PULP / SCIPY FORMULATION</span>
-                  <span className='text-[#FFFFFF] font-semibold'>STATUS: OPTIMAL</span>
+                  <span className='text-emerald-600 dark:text-emerald-400 font-semibold'>STATUS: OPTIMAL</span>
                 </div>
-                <div className='bg-[#1A1A1A] p-3 rounded-[4px] text-[11px] leading-relaxed text-[#FFFFFF] font-mono space-y-1'>
+                <div className='bg-muted/40 p-3 rounded-lg text-[11px] leading-relaxed text-foreground font-mono space-y-1'>
                   <div>max ∑ POAS_k(S_k) • GrossMargin_k</div>
-                  <div className='text-[#8A8A8A]'>s.t. ∑ S_k ≤ B_total | S_k(1-0.20) ≤ S_k^new ≤ S_k(1+0.20)</div>
-                  <div className='text-[#FFFFFF] font-semibold'>Circuit Breaker: if Inventory_k == 0 ⇒ S_k^new = 0 (Kill-Switch)</div>
+                  <div className='text-muted-foreground'>s.t. ∑ S_k ≤ B_total | S_k(1-0.20) ≤ S_k^new ≤ S_k(1+0.20)</div>
+                  <div className='text-emerald-600 dark:text-emerald-400'>Circuit Breaker: if Inventory_k == 0 ⇒ S_k^new = 0 (Kill-Switch)</div>
                 </div>
-                <div className='text-[10px] text-[#8A8A8A] flex justify-between'>
+                <div className='text-[10px] text-muted-foreground flex justify-between'>
                   <span>Execution: 1-Click Rollback Enabled</span>
                   <span>Solves in 18ms</span>
                 </div>
@@ -181,36 +182,36 @@ export function LandingPageView() {
             description='Separates ad copy failures from external confounders. When ROAS drops, factor decomposition isolates website latency, buy-box undercutting, and ERP stockouts before touching creative spend.'
             icon={<Icons.checkCircle className='size-5' />}
             badge={
-              <span className='font-mono text-[10px] px-2 py-0.5 rounded-[2px] bg-[#000000] border border-[#8A8A8A] text-[#FFFFFF] font-bold'>
+              <span className='font-mono text-[10px] px-2 py-0.5 rounded bg-sky-500/10 text-sky-600 dark:text-sky-400 font-bold'>
                 DAG CAUSALITY
               </span>
             }
             header={
-              <div className='h-40 rounded-[4px] bg-[#000000] border border-[#8A8A8A] p-4 font-mono text-xs flex flex-col justify-between'>
-                <div className='text-[#8A8A8A] text-[10px] uppercase font-bold'>
+              <div className='h-40 rounded-xl bg-card border border-border/80 p-4 font-mono text-xs flex flex-col justify-between'>
+                <div className='text-muted-foreground text-[10px] uppercase font-bold'>
                   Factor Decomposition
                 </div>
                 <div className='space-y-2'>
                   <div>
                     <div className='flex justify-between text-[11px] mb-0.5'>
-                      <span className='text-[#FFFFFF]'>Inventory Depletion</span>
-                      <span className='text-[#FFFFFF] font-bold'>-18 pts</span>
+                      <span>Inventory Depletion</span>
+                      <span className='text-destructive font-bold'>-18 pts</span>
                     </div>
-                    <div className='w-full h-1.5 rounded-[2px] bg-[#1A1A1A] border border-[#8A8A8A]/30 overflow-hidden'>
-                      <div className='h-full bg-[#FFFFFF] w-[65%]' />
+                    <div className='w-full h-1.5 rounded-full bg-muted overflow-hidden'>
+                      <div className='h-full bg-destructive w-[65%]' />
                     </div>
                   </div>
                   <div>
                     <div className='flex justify-between text-[11px] mb-0.5'>
-                      <span className='text-[#8A8A8A]'>Auction CPM Inflation</span>
-                      <span className='text-[#8A8A8A] font-bold'>+9 pts</span>
+                      <span>Auction CPM Inflation</span>
+                      <span className='text-amber-500 font-bold'>+9 pts</span>
                     </div>
-                    <div className='w-full h-1.5 rounded-[2px] bg-[#1A1A1A] border border-[#8A8A8A]/30 overflow-hidden'>
-                      <div className='h-full bg-[#8A8A8A] w-[35%]' />
+                    <div className='w-full h-1.5 rounded-full bg-muted overflow-hidden'>
+                      <div className='h-full bg-amber-500 w-[35%]' />
                     </div>
                   </div>
                 </div>
-                <div className='text-[10px] text-[#8A8A8A]'>
+                <div className='text-[10px] text-muted-foreground'>
                   Result: Zero Creative Blame
                 </div>
               </div>
@@ -224,22 +225,22 @@ export function LandingPageView() {
             description='99.8% deterministic hardware entropy fingerprinting stitches YouTube impressions, TikTok ads, and Amazon marketplace checkouts without 3rd-party cookies or UTM parameters.'
             icon={<Icons.lock className='size-5' />}
             badge={
-              <span className='font-mono text-[10px] px-2 py-0.5 rounded-[2px] bg-[#000000] border border-[#8A8A8A] text-[#FFFFFF] font-bold'>
+              <span className='font-mono text-[10px] px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold'>
                 ZERO COOKIES
               </span>
             }
             header={
-              <div className='h-40 rounded-[4px] bg-[#000000] border border-[#8A8A8A] p-4 font-mono text-xs flex flex-col justify-between'>
-                <div className='text-[#8A8A8A] text-[10px] uppercase font-bold flex justify-between'>
+              <div className='h-40 rounded-xl bg-card border border-border/80 p-4 font-mono text-xs flex flex-col justify-between'>
+                <div className='text-muted-foreground text-[10px] uppercase font-bold flex justify-between'>
                   <span>Deterministic Entropy</span>
-                  <span className='text-[#FFFFFF] font-bold'>99.8% MATCH</span>
+                  <span className='text-emerald-500 font-bold'>99.8% MATCH</span>
                 </div>
-                <div className='p-2 rounded-[4px] bg-[#1A1A1A] font-mono text-[10px] space-y-1 text-[#8A8A8A] truncate'>
+                <div className='p-2 rounded bg-muted/40 font-mono text-[10px] space-y-1 text-muted-foreground truncate'>
                   <div>HASH: d8a9f24b-321a</div>
                   <div>DEVICE: Apple M-Series GPU</div>
                   <div>CANVAS: Canvas2D SHA256 Match</div>
                 </div>
-                <div className='text-[11px] font-bold text-[#FFFFFF]'>
+                <div className='text-[11px] font-bold text-foreground'>
                   YouTube (10:14) → Amazon Buy (16:35)
                 </div>
               </div>
@@ -254,31 +255,31 @@ export function LandingPageView() {
             description='Every single budget shift is committed to an immutable ledger with predicted vs realized contribution margin. Model weights and adstock decay curves automatically tune in DuckDB/PostgreSQL based on accuracy variances.'
             icon={<Icons.clipboardText className='size-5' />}
             badge={
-              <span className='font-mono text-[10px] px-2 py-0.5 rounded-[2px] bg-[#000000] border border-[#8A8A8A] text-[#FFFFFF] font-bold'>
+              <span className='font-mono text-[10px] px-2 py-0.5 rounded bg-primary/10 text-primary font-bold'>
                 DUCKDB + POSTGRES
               </span>
             }
             header={
-              <div className='h-40 rounded-[4px] bg-[#000000] border border-[#8A8A8A] p-4 font-mono text-xs flex flex-col justify-between'>
-                <div className='flex items-center justify-between text-[#8A8A8A] text-[10px] uppercase font-bold border-b border-[#1A1A1A] pb-1.5'>
+              <div className='h-40 rounded-xl bg-card border border-border/80 p-4 font-mono text-xs flex flex-col justify-between'>
+                <div className='flex items-center justify-between text-muted-foreground text-[10px] uppercase font-bold border-b border-border/60 pb-1.5'>
                   <span>Historical Variance Telemetry</span>
-                  <span className='text-[#FFFFFF] font-bold'>ACCURACY: 96.8%</span>
+                  <span className='text-emerald-600 dark:text-emerald-400'>ACCURACY: 96.8%</span>
                 </div>
                 <div className='grid grid-cols-3 gap-2 text-center'>
-                  <div className='p-2 rounded-[4px] bg-[#1A1A1A] border border-[#1A1A1A]'>
-                    <div className='text-[10px] text-[#8A8A8A]'>Predicted Lift</div>
-                    <div className='text-sm font-bold text-[#FFFFFF]'>+₹3,450/d</div>
+                  <div className='p-2 rounded bg-muted/40'>
+                    <div className='text-[10px] text-muted-foreground'>Predicted Lift</div>
+                    <div className='text-sm font-bold text-foreground'>+₹3,450/d</div>
                   </div>
-                  <div className='p-2 rounded-[4px] bg-[#1A1A1A] border border-[#1A1A1A]'>
-                    <div className='text-[10px] text-[#8A8A8A]'>Realized Lift</div>
-                    <div className='text-sm font-bold text-[#FFFFFF]'>+₹3,610/d</div>
+                  <div className='p-2 rounded bg-muted/40'>
+                    <div className='text-[10px] text-muted-foreground'>Realized Lift</div>
+                    <div className='text-sm font-bold text-emerald-600 dark:text-emerald-400'>+₹3,610/d</div>
                   </div>
-                  <div className='p-2 rounded-[4px] bg-[#1A1A1A] border border-[#1A1A1A]'>
-                    <div className='text-[10px] text-[#8A8A8A]'>Variance</div>
-                    <div className='text-sm font-bold text-[#FFFFFF]'>+4.7%</div>
+                  <div className='p-2 rounded bg-muted/40'>
+                    <div className='text-[10px] text-muted-foreground'>Variance</div>
+                    <div className='text-sm font-bold text-foreground'>+4.7%</div>
                   </div>
                 </div>
-                <div className='text-[10px] text-[#8A8A8A] flex justify-between'>
+                <div className='text-[10px] text-muted-foreground flex justify-between'>
                   <span>Reinforcement: Adstock weights updated</span>
                   <span>Audit Trail: Immutable</span>
                 </div>
@@ -288,16 +289,17 @@ export function LandingPageView() {
         </BentoGrid>
       </section>
 
-      {/* 5. 4-PHASE ARCHITECTURAL FLOW */}
-      <section id='pipeline' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto'>
+      {/* 5. 4-PHASE ARCHITECTURAL FLOW (STACK & PIPELINE) */}
+      <section id='stack' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-16 relative'>
+        <span id='pipeline' className='absolute -top-20' />
         <div className='text-center max-w-3xl mx-auto mb-16'>
-          <div className='font-mono text-xs font-bold text-[#8A8A8A] uppercase tracking-widest mb-2'>
+          <div className='font-mono text-xs font-bold text-primary uppercase tracking-widest mb-2'>
             CLOSED LOOP EXECUTION
           </div>
-          <h2 className='text-3xl md:text-4xl font-extrabold tracking-tight text-[#FFFFFF] mb-4'>
+          <h2 className='text-3xl md:text-4xl font-extrabold tracking-tight text-foreground mb-4'>
             From Ingestion to Closed-Loop Ledger
           </h2>
-          <p className='text-sm md:text-base text-[#8A8A8A] leading-relaxed'>
+          <p className='text-sm md:text-base text-muted-foreground leading-relaxed'>
             How NEXUS operates from end-to-end without human friction while keeping full human-in-the-loop control.
           </p>
         </div>
@@ -331,23 +333,23 @@ export function LandingPageView() {
           ].map((phase, idx) => (
             <CardSpotlight
               key={idx}
-              className='p-6 flex flex-col justify-between space-y-4 border border-[#8A8A8A] bg-[#1A1A1A] rounded-[6px]'
+              className='p-6 flex flex-col justify-between space-y-4 border-border/80'
             >
               <div>
-                <div className='font-mono text-2xl font-extrabold text-[#FFFFFF] mb-2'>
+                <div className='font-mono text-2xl font-extrabold text-primary mb-2'>
                   {phase.step}
                 </div>
-                <div className='font-mono text-[10px] px-2 py-0.5 rounded-[2px] bg-[#000000] border border-[#8A8A8A] text-[#8A8A8A] uppercase font-bold inline-block mb-3'>
+                <div className='font-mono text-[10px] px-2 py-0.5 rounded bg-muted text-muted-foreground uppercase font-bold inline-block mb-3'>
                   {phase.badge}
                 </div>
-                <h3 className='font-bold text-base text-[#FFFFFF] mb-2'>
+                <h3 className='font-bold text-base text-foreground mb-2'>
                   {phase.title}
                 </h3>
-                <p className='text-xs text-[#8A8A8A] leading-relaxed'>
+                <p className='text-xs text-muted-foreground leading-relaxed'>
                   {phase.desc}
                 </p>
               </div>
-              <div className='pt-2 border-t border-[#1A1A1A] text-[11px] font-mono text-[#FFFFFF] font-semibold'>
+              <div className='pt-2 border-t border-border/60 text-[11px] font-mono text-primary font-semibold'>
                 Active Phase →
               </div>
             </CardSpotlight>
@@ -357,16 +359,16 @@ export function LandingPageView() {
 
       {/* 6. CALL TO ACTION SPOTLIGHT BANNER */}
       <section className='py-16 md:py-24 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto'>
-        <CardSpotlight className='p-8 md:p-12 text-center bg-[#1A1A1A] border border-[#8A8A8A] rounded-[6px] shadow-none space-y-6'>
-          <div className='inline-flex items-center gap-2 px-3 py-1 rounded-[4px] border border-[#8A8A8A] bg-[#000000] text-[#FFFFFF] text-xs font-mono font-medium'>
+        <CardSpotlight className='p-8 md:p-12 text-center bg-card border-primary/30 shadow-xl space-y-6'>
+          <div className='inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-mono font-medium'>
             <span>Ready for Live Hackathon Demonstration</span>
           </div>
 
-          <h2 className='text-3xl md:text-5xl font-extrabold tracking-tight text-[#FFFFFF] max-w-2xl mx-auto leading-tight'>
+          <h2 className='text-3xl md:text-5xl font-extrabold tracking-tight text-foreground max-w-2xl mx-auto leading-tight'>
             Experience Autonomous Ad Capital Interventions Live
           </h2>
 
-          <p className='text-sm md:text-base text-[#8A8A8A] max-w-xl mx-auto leading-relaxed'>
+          <p className='text-sm md:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed'>
             Dive into the interactive mission control console, inspect simulated anomalies, view the KKT optimization vectors, and approve budget reallocations.
           </p>
 
@@ -375,7 +377,7 @@ export function LandingPageView() {
               href='/dashboard/overview'
               size='lg'
               variant='default'
-              className='font-mono text-sm shadow-none'
+              className='font-mono text-sm shadow-md'
             >
               Launch Mission Control →
             </GlowButton>
@@ -393,32 +395,32 @@ export function LandingPageView() {
       </section>
 
       {/* 7. CLEAN SYSTEM FOOTER */}
-      <footer className='border-t border-[#1A1A1A] bg-[#000000] py-12 px-4 sm:px-6 lg:px-8 text-xs font-mono text-[#8A8A8A]'>
+      <footer className='border-t border-border/80 bg-muted/20 py-12 px-4 sm:px-6 lg:px-8 text-xs font-mono text-muted-foreground'>
         <div className='max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6'>
           <div className='flex items-center gap-3'>
-            <span className='font-bold text-[#FFFFFF]'>NEXUS-DQPS</span>
+            <span className='font-bold text-foreground'>NEXUS-DQPS</span>
             <span>•</span>
             <span>DataQuest 3.0 Hackathon Master Submission</span>
           </div>
 
           <div className='flex flex-wrap items-center gap-6'>
-            <Link href='/dashboard/overview' className='hover:text-[#FFFFFF] transition-colors'>
+            <Link href='/dashboard/overview' className='hover:text-foreground transition-colors'>
               Mission Control
             </Link>
-            <Link href='/dashboard/matrix' className='hover:text-[#FFFFFF] transition-colors'>
+            <Link href='/dashboard/matrix' className='hover:text-foreground transition-colors'>
               SKU Matrix
             </Link>
-            <Link href='/dashboard/fingerprint' className='hover:text-[#FFFFFF] transition-colors'>
+            <Link href='/dashboard/fingerprint' className='hover:text-foreground transition-colors'>
               Identity Graph
             </Link>
-            <Link href='/dashboard/ledger' className='hover:text-[#FFFFFF] transition-colors'>
+            <Link href='/dashboard/ledger' className='hover:text-foreground transition-colors'>
               Decision Ledger
             </Link>
             <a
               href='https://github.com/Hustkers/NEXUS-DQPS'
               target='_blank'
               rel='noopener noreferrer'
-              className='hover:text-[#FFFFFF] transition-colors flex items-center gap-1'
+              className='hover:text-foreground transition-colors flex items-center gap-1'
             >
               <Icons.brandGithub className='size-3.5' /> GitHub
             </a>
