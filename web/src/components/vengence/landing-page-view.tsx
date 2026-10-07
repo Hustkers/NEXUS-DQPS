@@ -11,6 +11,7 @@ import { ShockSimulatorShowcase } from './shock-simulator-showcase';
 import { NotchNavbar } from './notch-navbar';
 import { IsometricTelemetryPanel } from './isometric-telemetry-panel';
 import { PlotFigure, BranchesFigure, PhosphorFigure, RiffleFigure } from './hairline-figures';
+import { AnimatedFooter } from '@/components/ui/animated-footer';
 
 const HERO_STATS = [
   {
@@ -62,7 +63,7 @@ export function LandingPageView() {
 
           {/* Proposed Solution Subtitle */}
           <p className='text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl font-normal leading-relaxed mb-8 apple-subhead'>
-            <span className='text-foreground font-semibold'>The NEXUS Solution:</span> An AI-native closed loop pairing causal diagnostics with Scipy convex optimization — halting stockout waste in &lt;15 minutes to guarantee positive net contribution profit.
+            <span className='text-foreground font-semibold'>The NEXUS:</span> An AI-native closed loop pairing causal diagnostics with Scipy convex optimization — halting stockout waste in &lt;15 minutes to guarantee positive net contribution profit.
           </p>
 
           {/* Primary Button Group with VengenceUI Button Forge Styling */}
@@ -285,7 +286,7 @@ export function LandingPageView() {
       </section>
 
       {/* 5. 4-PHASE ARCHITECTURAL FLOW (STACK & PIPELINE) */}
-      <section id='stack' className='pt-20 pb-28 md:pt-28 md:pb-36 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-16 relative'>
+      <section id='stack' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-16 relative'>
         <span id='pipeline' className='absolute -top-20' />
         <div className='text-center max-w-3xl mx-auto mb-16'>
           <div className='font-mono text-xs font-bold text-primary uppercase tracking-widest mb-2'>
@@ -351,6 +352,14 @@ export function LandingPageView() {
           ))}
         </div>
       </section>
+
+      {/* CINEMATIC ASCII ANIMATED FOOTER (NEXUS ONLY) */}
+      <AnimatedFooter
+        headingLines={['NEXUS']}
+        leftImage='/animated-footer/hand-left.jpg'
+        rightImage='/animated-footer/hand-right.jpg'
+        className='h-[420px] sm:h-[520px] md:h-[620px] border-t border-border/80'
+      />
     </div>
   );
 }
