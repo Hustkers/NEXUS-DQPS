@@ -6,9 +6,7 @@ settings:
 
 importers:
 
-  .: {}
-
-  web:
+  .:
     dependencies:
       '@ai-sdk/react':
         specifier: ^4.0.47
@@ -206,6 +204,8 @@ importers:
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0
+
+  ..: {}
 
 packages:
 
