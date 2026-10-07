@@ -32,22 +32,22 @@ export function GlowButton({
   ...props
 }: GlowButtonProps) {
   const sizeClasses = {
-    sm: 'h-9 px-3.5 text-xs',
-    md: 'h-11 px-5 text-sm',
-    lg: 'h-13 px-7 text-base'
+    sm: 'h-9 px-4 text-xs rounded-lg',
+    md: 'h-11 px-5 text-sm rounded-xl',
+    lg: 'h-13 px-7 text-base rounded-2xl'
   }[size];
 
   const variantClasses = {
     default:
-      'bg-primary text-primary-foreground font-semibold hover:bg-primary/90 border-0 shadow-sm',
+      'bg-primary text-primary-foreground font-semibold shadow-[0_2px_12px_rgba(0,0,0,0.1)] hover:brightness-105 active:brightness-95 border border-primary/20',
     shimmer:
-      'relative bg-secondary text-secondary-foreground font-medium overflow-hidden border border-border hover:border-foreground/80 shadow-none group',
+      'relative bg-secondary/80 backdrop-blur-xs text-secondary-foreground font-medium overflow-hidden border border-border/80 hover:border-foreground/60 shadow-xs group',
     glow:
-      'bg-primary text-primary-foreground font-semibold hover:bg-primary/90 border-0 shadow-sm',
+      'bg-primary text-primary-foreground font-semibold hover:brightness-105 active:brightness-95 border border-primary/20 shadow-[0_4px_20px_rgba(0,0,0,0.15)] dark:shadow-[0_4px_24px_rgba(255,255,255,0.12)]',
     outline:
-      'bg-background text-foreground border border-border hover:bg-muted hover:border-foreground/80 font-mono shadow-none',
+      'bg-background/80 backdrop-blur-xs text-foreground border border-border/80 hover:bg-muted/60 hover:border-foreground/40 font-mono shadow-xs',
     pill:
-      'rounded-[6px] bg-background text-foreground border border-border hover:bg-muted hover:border-foreground/80 font-mono text-xs shadow-none'
+      'rounded-full bg-background/80 backdrop-blur-xs text-foreground border border-border/80 hover:bg-muted/60 hover:border-foreground/40 font-mono text-xs shadow-xs'
   }[variant];
 
   const content = (
@@ -74,18 +74,26 @@ export function GlowButton({
   );
 
   const buttonClasses = cn(
-    'relative inline-flex items-center justify-center cursor-pointer select-none rounded-[6px] transition-all duration-150 outline-none focus-visible:ring-1 focus-visible:ring-[#FFFFFF] disabled:pointer-events-none disabled:bg-[#1A1A1A] disabled:text-[#8A8A8A] disabled:border-[#1A1A1A] disabled:cursor-not-allowed',
+    'relative inline-flex items-center justify-center cursor-pointer select-none transition-all duration-150 outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:bg-muted disabled:text-muted-foreground disabled:border-border disabled:cursor-not-allowed',
     sizeClasses,
     variantClasses,
     className
   );
 
+  const springTransition = {
+    type: 'spring' as const,
+    damping: 26,
+    stiffness: 380,
+    mass: 0.8
+  };
+
   if (href) {
     return (
       <Link href={href} className={buttonClasses}>
         <motion.span
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.98 }}
+          whileHover={{ scale: 1.015 }}
+          whileTap={{ scale: 0.96 }}
+          transition={springTransition}
           className='flex items-center gap-2 size-full justify-center'
         >
           {content}
@@ -96,8 +104,9 @@ export function GlowButton({
 
   return (
     <motion.button
-      whileHover={{ scale: 1.01 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={{ scale: 1.015 }}
+      whileTap={{ scale: 0.96 }}
+      transition={springTransition}
       disabled={disabled}
       onClick={onClick}
       className={buttonClasses}
