@@ -83,7 +83,7 @@ export function ScenarioController({
         </div>
 
         {/* Enhanced interactive shock tiles */}
-        <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-3'>
           {scenarios.map((s) => {
             const isActive = activeScenarioId === s.id;
             const isCritical = s.severity === 'CRITICAL';

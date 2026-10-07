@@ -268,7 +268,7 @@ export default function MatrixPage() {
   };
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen'>
+    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen min-w-0 max-w-full overflow-hidden'>
       {/* Top Header */}
       <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
         <div>
@@ -372,7 +372,7 @@ export default function MatrixPage() {
 
       {/* Main SKU Economics Matrix Table */}
       <div className='rounded-xl border border-border bg-card p-5 shadow-xs overflow-x-auto' ref={dropdownRef}>
-        <table className='w-full text-left text-xs font-mono'>
+        <table className='w-full min-w-[960px] text-left text-xs font-mono'>
           <thead>
             <tr className='border-b border-border text-[11px] text-muted-foreground uppercase tracking-wider bg-slate-50/50 dark:bg-zinc-900/40'>
               <th className='py-3 px-3'>Shoe / Model</th>

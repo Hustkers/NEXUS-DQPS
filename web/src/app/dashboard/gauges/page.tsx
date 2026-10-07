@@ -89,7 +89,7 @@ export default function GaugesPage() {
   };
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#000000] text-white min-h-screen font-mono'>
+    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#000000] text-white min-h-screen font-mono min-w-0 max-w-full overflow-hidden'>
       {/* Header Bar */}
       <div className='flex flex-wrap items-center justify-between gap-4 border-b border-[#1A1A1A] pb-4'>
         <div>
@@ -119,7 +119,7 @@ export default function GaugesPage() {
       </div>
 
       {/* TOP DYNAMIC KPIS (all computed purely from data) */}
-      <div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
+      <div className='grid grid-cols-2 lg:grid-cols-4 gap-3'>
         {/* Blended ROAS */}
         <div className='rounded-xl border border-[#222222] bg-[#0E0E0E] p-4 flex flex-col justify-between'>
           <span className='text-[10px] text-[#8A8A8A] uppercase font-semibold'>
@@ -264,7 +264,7 @@ export default function GaugesPage() {
           </button>
         </div>
       ) : (
-        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-4 gap-4'>
           {filteredProducts.map((p) => (
             <RoasGauge
               key={p.id}
