@@ -4,6 +4,7 @@ import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import Image from 'next/image';
 import { useChannel, AdChannel } from '@/context/channel-context';
 import { PlatformLogo } from '@/components/icons/platform-logos';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 // ============================================================================
