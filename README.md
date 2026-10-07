@@ -2,7 +2,7 @@
 
 **Next-Generation Autonomous D2C Advertising Intelligence & Decision Engine**
 
-[![Live on Vercel](https://img.shields.io/badge/Live_Deployment-nexus--dqps.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://nexus-dqps.vercel.app/dashboard/overview)
+[![Live on Vercel](https://img.shields.io/badge/Live_Deployment-nexus--dqps.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://nexus-dqps.vercel.app)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
 [![DataQuest 3.0](https://img.shields.io/badge/Hackathon-DataQuest_3.0-06b6d4?style=for-the-badge)](https://github.com/Hustkers/NEXUS-DQPS)
 
