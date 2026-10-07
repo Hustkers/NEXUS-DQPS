@@ -3,6 +3,7 @@ import {
   MetaLogo,
   AmazonLogo,
   ShopifyLogo,
+  TikTokLogo,
   PlatformLogo
 } from '@/components/icons/platform-logos';
 import {
@@ -267,6 +268,7 @@ export const Icons = {
   google: GoogleLogo,
   meta: MetaLogo,
   shopify: ShopifyLogo,
+  tiktok: TikTokLogo,
   platformLogo: PlatformLogo,
   topology: IconTopologyComplex,
   play: IconPlayerPlay,
@@ -283,4 +285,4 @@ export const Icons = {
   messageSquare: IconMessage2
 };
 
-export { GoogleLogo, MetaLogo, AmazonLogo, ShopifyLogo, PlatformLogo };
+export { GoogleLogo, MetaLogo, AmazonLogo, ShopifyLogo, TikTokLogo, PlatformLogo };
