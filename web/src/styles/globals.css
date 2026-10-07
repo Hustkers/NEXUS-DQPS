@@ -16,11 +16,14 @@
   * {
     @apply border-border outline-ring;
   }
-  html,
+  html {
+    @apply bg-background text-foreground;
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-background text-foreground;
-    max-width: 100%;
-    overflow-x: clip;
+    min-height: 100vh;
+    min-height: 100dvh;
   }
 
   /* Global scrollbar styling to match ScrollArea */

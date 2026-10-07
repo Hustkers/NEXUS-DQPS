@@ -88,7 +88,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body
         className={cn(
-          'bg-background overflow-x-hidden overscroll-none font-sans antialiased',
+          'bg-background font-sans antialiased',
           fontVariables
         )}
       >
