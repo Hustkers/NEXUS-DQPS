@@ -5,14 +5,6 @@ export const navGroups: NavGroup[] = [
     label: 'Autonomous Decision Engine',
     items: [
       {
-        title: 'Pitch & Overview',
-        url: '/',
-        icon: 'externalLink',
-        isActive: false,
-        shortcut: ['h', 'o'],
-        items: []
-      },
-      {
         title: 'Mission Control',
         url: '/dashboard/overview',
         icon: 'dashboard',
