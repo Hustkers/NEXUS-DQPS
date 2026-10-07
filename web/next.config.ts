@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import path from 'path';
 
 const nextConfig: NextConfig = {
   output: process.env.BUILD_STANDALONE === 'true' ? 'standalone' : undefined,
@@ -15,6 +16,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true
   },
   turbopack: {
+    root: path.resolve(__dirname),
     rules: {
       '*.html': {
         loaders: ['raw-loader'],
