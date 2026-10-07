@@ -358,7 +358,7 @@ export function ScenarioSandbox({
   const amazonShare = scenario.totalSpend > 0 ? (scenario.amazon / scenario.totalSpend) * 100 : 0;
 
   return (
-    <Card className='p-5 border border-border bg-card shadow-none rounded-xl text-card-foreground font-mono'>
+    <Card className='p-5 border border-border bg-card shadow-none rounded-xl text-card-foreground font-mono min-w-0 max-w-full overflow-hidden'>
       {/* Header Bar */}
       <div className='flex flex-wrap items-center justify-between gap-3 mb-5 border-b border-border pb-3.5'>
         <div>

@@ -154,7 +154,7 @@ export function ReallocationFeed({ className, initialItems, campaigns, onExecute
   const totalLiftAll = reallocations.reduce((acc, it) => acc + it.netRevenueLift, 0);
 
   return (
-    <div className={cn('rounded-xl border border-border bg-card p-5 shadow-none text-card-foreground font-mono', className)}>
+    <div className={cn('rounded-xl border border-border bg-card p-5 shadow-none text-card-foreground font-mono min-w-0 max-w-full', className)}>
       {/* Header */}
       <div className='flex flex-wrap items-center justify-between gap-4 border-b border-border pb-3 mb-4'>
         <div className='flex items-center gap-2'>

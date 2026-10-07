@@ -280,7 +280,7 @@ export function ExecutiveGraphBanner({
       </div>
 
       {/* 2. Five Bento Sparkline Graph Cards with Mission Control Blueprint Grid */}
-      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5'>
+      <div className='grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5'>
         {cardsConfig.map((card, idx) => (
           <motion.div
             key={card.id}
@@ -293,7 +293,7 @@ export function ExecutiveGraphBanner({
             }}
             onClick={() => setExpandedMetric(expandedMetric === card.id ? null : card.id)}
             className={cn(
-              'group relative rounded-xl border border-border bg-card p-4 transition-all cursor-pointer hover:shadow-md flex flex-col justify-between overflow-hidden',
+              'group relative rounded-xl border border-border bg-card p-4 transition-all cursor-pointer hover:shadow-md flex flex-col justify-between overflow-hidden min-w-0',
               expandedMetric === card.id && 'ring-2 ring-emerald-500/50 shadow-sm'
             )}
           >
