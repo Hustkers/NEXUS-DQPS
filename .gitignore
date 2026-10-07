@@ -234,3 +234,5 @@ build/
 /*.png
 
 
+.vercel
+.env*
