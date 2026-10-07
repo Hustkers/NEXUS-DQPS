@@ -4,13 +4,12 @@ import React, { useState, useMemo } from 'react';
 import { toast } from 'sonner';
 import { AutonomousBudgetEngineHero } from './autonomous-budget-engine-hero';
 import { BudgetFlowVisualizer } from './budget-flow-visualizer';
+import { BudgetResponseCurvePanel } from './budget-response-curve-panel';
 import { LiveWhatIfControlPanel } from './live-what-if-control-panel';
-import { CampaignRankingMatrix } from './campaign-ranking-matrix';
-import { StrategyOptimizerComparison } from './strategy-optimizer-comparison';
-import { DiminishingReturnsCurveModal } from './diminishing-returns-curve-modal';
+import { CampaignDecisionCockpit } from './campaign-decision-cockpit';
 import { ModelLearningHistorySection } from './model-learning-history-section';
 import { RedTeamValidationDrawer } from './red-team-validation-drawer';
-import { PortfolioOpportunityMap } from './portfolio-opportunity-map';
+import { DiminishingReturnsCurveModal } from './diminishing-returns-curve-modal';
 import {
   DEFAULT_WHAT_IF_INPUTS,
   optimizeAutonomousBudget
@@ -70,7 +69,7 @@ export function AutonomousLearningConsole() {
 
   return (
     <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen font-mono min-w-0 max-w-full'>
-      {/* 1. MASTER BANNER: Autonomous Budget Engine */}
+      {/* 1. DECISION HEADER & PRIMARY KPIS */}
       <AutonomousBudgetEngineHero
         result={result}
         onApplyRecommendation={handleApplyRecommendation}
@@ -81,10 +80,19 @@ export function AutonomousLearningConsole() {
         isApplying={isApplying}
       />
 
-      {/* 2. BUDGET FLOW DIAGRAM: Visual movement of money */}
+      {/* 2. CAPITAL REALLOCATION & FLOW VISUALIZER */}
       <BudgetFlowVisualizer channels={result.channels} />
 
-      {/* 3. LIVE WHAT-IF CONTROLS */}
+      {/* 3. BUDGET VS PROFIT RESPONSE CURVE (HILL SATURATION) */}
+      <BudgetResponseCurvePanel
+        result={result}
+        selectedCampaignId={selectedCampaignId}
+        onSelectCampaign={(c) => {
+          setSelectedCampaignId(c.id);
+        }}
+      />
+
+      {/* 4. SCENARIO ASSUMPTION CONTROLS */}
       <div id='what-if-panel'>
         <LiveWhatIfControlPanel
           inputs={inputs}
@@ -93,61 +101,22 @@ export function AutonomousLearningConsole() {
         />
       </div>
 
-      {/* 4. CAMPAIGN RANKING & PORTFOLIO MAP SPLIT GRID */}
-      <div className='grid grid-cols-1 lg:grid-cols-12 gap-6'>
-        {/* Left Column: Ranked List (7 cols) */}
-        <div className='lg:col-span-7'>
-          <CampaignRankingMatrix
-            campaigns={result.campaigns}
-            selectedCampaignId={selectedCampaignId}
-            onSelectCampaign={(c) => {
-              setSelectedCampaignId(c.id);
-              setCurveModalCampaign(c);
-            }}
-          />
-        </div>
-
-        {/* Right Column: Portfolio Opportunity Map (5 cols) */}
-        <div className='lg:col-span-5'>
-          <PortfolioOpportunityMap
-            campaigns={result.campaigns}
-            selectedCampaignId={selectedCampaignId}
-            onSelectCampaign={(c) => {
-              setSelectedCampaignId(c.id);
-              setCurveModalCampaign(c);
-            }}
-          />
-        </div>
-      </div>
-
-      {/* 5. STRATEGY WHAT-IF OPTIMIZER (Current vs AI Recommended) */}
-      <StrategyOptimizerComparison
-        campaign={activeInspectedCampaign}
+      {/* 5. CONSOLIDATED CAMPAIGN TARGETING & STRATEGY COCKPIT */}
+      <CampaignDecisionCockpit
+        campaigns={result.campaigns}
+        selectedCampaign={activeInspectedCampaign}
+        onSelectCampaign={(c) => {
+          setSelectedCampaignId(c.id);
+        }}
         onChangeStrategy={handleStrategyChange}
       />
 
-      {/* 6. CONTINUOUS MODEL LEARNING & VERIFICATION LOG */}
-      <ModelLearningHistorySection />
+      {/* 6. PREDICTED VS ACTUAL PERFORMANCE & MODEL LEARNING */}
+      <ModelLearningHistorySection
+        onOpenRedTeam={() => setIsRedTeamOpen(true)}
+      />
 
-      {/* 7. RED TEAM VALIDATION CALLOUT BUTTON */}
-      <div className='rounded-xl border border-border/80 bg-muted/20 p-4 flex flex-wrap items-center justify-between gap-3 text-xs'>
-        <div className='flex items-center gap-2'>
-          <span className='size-2 rounded-full bg-emerald-500 animate-pulse' />
-          <span className='text-muted-foreground'>AI Red Team Validation Status:</span>
-          <span className='font-bold text-foreground'>
-            {result.validationDecision.status === 'PASSED' ? 'PASSED (0 Guardrail Breaches)' : 'CAUTION (Constraint Active)'}
-          </span>
-        </div>
-
-        <button
-          onClick={() => setIsRedTeamOpen(true)}
-          className='text-xs font-bold text-primary hover:underline flex items-center gap-1'
-        >
-          Inspect Red Team Stress-Test Challenge →
-        </button>
-      </div>
-
-      {/* Modals & Drawers */}
+      {/* Deep Inspection Drawers / Modals (Progressive Disclosure) */}
       {curveModalCampaign && (
         <DiminishingReturnsCurveModal
           campaign={curveModalCampaign}
@@ -160,7 +129,6 @@ export function AutonomousLearningConsole() {
         validation={result.validationDecision}
         isOpen={isRedTeamOpen}
         onClose={() => setIsRedTeamOpen(false)}
-        onConfirmApprove={handleApplyRecommendation}
       />
     </div>
   );

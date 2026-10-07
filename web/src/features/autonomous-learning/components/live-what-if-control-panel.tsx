@@ -87,19 +87,20 @@ export function LiveWhatIfControlPanel({
   };
 
   return (
-    <div className={cn('rounded-2xl border border-border/80 bg-card p-5 font-mono shadow-xs space-y-4', className)}>
+    <div className={cn('rounded-2xl border border-border/80 bg-card p-5 sm:p-6 font-mono shadow-xs space-y-4', className)}>
+      {/* Header */}
       <div className='flex items-center justify-between border-b border-border/60 pb-3'>
         <div className='flex items-center gap-2'>
-          <Icons.sliders className='size-4 text-primary' />
-          <h3 className='text-xs font-bold uppercase tracking-wider text-foreground'>
-            Live What-If Ad Simulator Controls
-          </h3>
+          <Icons.sliders className='size-4 text-emerald-500' />
+          <h2 className='text-xs font-bold uppercase tracking-wider text-foreground'>
+            SCENARIO ASSUMPTION CONTROLS
+          </h2>
         </div>
         <Button
           size='sm'
           variant='outline'
           onClick={onResetDefaults}
-          className='h-7 text-[11px] border-border text-muted-foreground hover:text-foreground'
+          className='h-7 text-[11px] border-border text-muted-foreground hover:text-foreground hover:border-foreground/40'
         >
           <Icons.clock className='mr-1 size-3' />
           Reset Baseline
@@ -107,39 +108,34 @@ export function LiveWhatIfControlPanel({
       </div>
 
       {/* Preset Scenario Buttons */}
-      <div className='space-y-1.5'>
-        <div className='text-[10px] text-muted-foreground uppercase font-bold tracking-wider'>
-          Instant Scenario Presets
-        </div>
-        <div className='flex flex-wrap gap-1.5'>
-          {[
-            { id: 'NORMAL', label: 'Normal' },
-            { id: 'HIGH_DEMAND', label: 'High Demand' },
-            { id: 'LOW_INVENTORY', label: 'Low Inventory' },
-            { id: 'CPC_SPIKE', label: 'CPC Spike (+45%)' },
-            { id: 'CREATIVE_FATIGUE', label: 'Creative Fatigue' },
-            { id: 'HIGH_MARGIN', label: 'High Margin (+12%)' },
-            { id: 'AGGRESSIVE_GROWTH', label: 'Aggressive Growth' },
-            { id: 'CONSERVATIVE_GROWTH', label: 'Conservative' }
-          ].map((p) => (
-            <button
-              key={p.id}
-              onClick={() => applyPreset(p.id)}
-              className='px-2.5 py-1 rounded-md text-[10px] font-bold border border-border/70 bg-muted/30 text-foreground hover:bg-card hover:border-foreground transition-all active:scale-[0.98]'
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
+      <div className='flex flex-wrap gap-1.5'>
+        {[
+          { id: 'NORMAL', label: 'Baseline' },
+          { id: 'HIGH_DEMAND', label: 'High Demand' },
+          { id: 'LOW_INVENTORY', label: 'Low Inventory' },
+          { id: 'CPC_SPIKE', label: 'CPC Spike (+45%)' },
+          { id: 'CREATIVE_FATIGUE', label: 'Creative Fatigue' },
+          { id: 'HIGH_MARGIN', label: 'High Margin (+12%)' },
+          { id: 'AGGRESSIVE_GROWTH', label: 'Aggressive' },
+          { id: 'CONSERVATIVE_GROWTH', label: 'Conservative' }
+        ].map((p) => (
+          <button
+            key={p.id}
+            onClick={() => applyPreset(p.id)}
+            className='px-2.5 py-1 rounded-md text-[10px] font-bold border border-border/70 bg-muted/20 text-foreground hover:bg-card hover:border-foreground transition-all active:scale-[0.98] cursor-pointer'
+          >
+            {p.label}
+          </button>
+        ))}
       </div>
 
-      {/* Interactive Variable Sliders */}
-      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-1 text-xs'>
-        {/* Total Budget Slider */}
-        <div className='rounded-lg border border-border/60 bg-muted/10 p-3 space-y-1.5'>
+      {/* 6 Minimal, High-Precision Sliders */}
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-1 text-xs'>
+        {/* 1. Total Budget Slider */}
+        <div className='rounded-xl border border-border/70 bg-muted/15 p-3 space-y-2 hover:border-foreground/30 transition-all'>
           <div className='flex justify-between items-center text-[10px] font-bold uppercase'>
             <span className='text-muted-foreground'>Total Budget</span>
-            <span className='text-foreground font-bold'>
+            <span className='font-mono font-bold text-foreground px-1.5 py-0.2 rounded bg-muted border border-border'>
               ₹{(inputs.totalBudget / 100000).toFixed(2)}L
             </span>
           </div>
@@ -152,14 +148,26 @@ export function LiveWhatIfControlPanel({
             onChange={(e) => updateField('totalBudget', Number(e.target.value))}
             className='w-full accent-primary h-1 bg-border rounded-lg cursor-pointer'
           />
-          <span className='text-[9px] text-muted-foreground block'>Range: ₹2.0L to ₹25.0L</span>
+          <div className='flex justify-between text-[9px] text-muted-foreground'>
+            <span>₹2.0L</span>
+            <span>₹25.0L</span>
+          </div>
         </div>
 
-        {/* Expected CPC Shift Slider */}
-        <div className='rounded-lg border border-border/60 bg-muted/10 p-3 space-y-1.5'>
+        {/* 2. Expected CPC Shift Slider */}
+        <div className='rounded-xl border border-border/70 bg-muted/15 p-3 space-y-2 hover:border-foreground/30 transition-all'>
           <div className='flex justify-between items-center text-[10px] font-bold uppercase'>
             <span className='text-muted-foreground'>Market CPC Shift</span>
-            <span className={cn('font-bold', inputs.cpcShiftPct > 0 ? 'text-rose-500' : 'text-emerald-500')}>
+            <span
+              className={cn(
+                'font-mono font-bold text-[10px] px-1.5 py-0.2 rounded border',
+                inputs.cpcShiftPct > 0
+                  ? 'border-rose-500/30 text-rose-500 bg-rose-500/10'
+                  : inputs.cpcShiftPct < 0
+                  ? 'border-emerald-500/30 text-emerald-500 bg-emerald-500/10'
+                  : 'border-border text-foreground bg-muted'
+              )}
+            >
               {inputs.cpcShiftPct > 0 ? '+' : ''}{inputs.cpcShiftPct}%
             </span>
           </div>
@@ -172,14 +180,26 @@ export function LiveWhatIfControlPanel({
             onChange={(e) => updateField('cpcShiftPct', Number(e.target.value))}
             className='w-full accent-primary h-1 bg-border rounded-lg cursor-pointer'
           />
-          <span className='text-[9px] text-muted-foreground block'>Simulates auction bid pressure</span>
+          <div className='flex justify-between text-[9px] text-muted-foreground'>
+            <span>-40%</span>
+            <span>+80%</span>
+          </div>
         </div>
 
-        {/* Conversion Rate Shift Slider */}
-        <div className='rounded-lg border border-border/60 bg-muted/10 p-3 space-y-1.5'>
+        {/* 3. Conversion Rate Shift Slider */}
+        <div className='rounded-xl border border-border/70 bg-muted/15 p-3 space-y-2 hover:border-foreground/30 transition-all'>
           <div className='flex justify-between items-center text-[10px] font-bold uppercase'>
             <span className='text-muted-foreground'>Conversion Rate (CVR)</span>
-            <span className={cn('font-bold', inputs.cvrShiftPct >= 0 ? 'text-emerald-500' : 'text-rose-500')}>
+            <span
+              className={cn(
+                'font-mono font-bold text-[10px] px-1.5 py-0.2 rounded border',
+                inputs.cvrShiftPct > 0
+                  ? 'border-emerald-500/30 text-emerald-500 bg-emerald-500/10'
+                  : inputs.cvrShiftPct < 0
+                  ? 'border-rose-500/30 text-rose-500 bg-rose-500/10'
+                  : 'border-border text-foreground bg-muted'
+              )}
+            >
               {inputs.cvrShiftPct > 0 ? '+' : ''}{inputs.cvrShiftPct}%
             </span>
           </div>
@@ -192,14 +212,26 @@ export function LiveWhatIfControlPanel({
             onChange={(e) => updateField('cvrShiftPct', Number(e.target.value))}
             className='w-full accent-primary h-1 bg-border rounded-lg cursor-pointer'
           />
-          <span className='text-[9px] text-muted-foreground block'>Audience intent lift / decay</span>
+          <div className='flex justify-between text-[9px] text-muted-foreground'>
+            <span>-50%</span>
+            <span>+50%</span>
+          </div>
         </div>
 
-        {/* Gross Margin Shift Slider */}
-        <div className='rounded-lg border border-border/60 bg-muted/10 p-3 space-y-1.5'>
+        {/* 4. Gross Margin Shift Slider */}
+        <div className='rounded-xl border border-border/70 bg-muted/15 p-3 space-y-2 hover:border-foreground/30 transition-all'>
           <div className='flex justify-between items-center text-[10px] font-bold uppercase'>
             <span className='text-muted-foreground'>Gross Margin Shift</span>
-            <span className={cn('font-bold', inputs.grossMarginShiftPct >= 0 ? 'text-emerald-500' : 'text-rose-500')}>
+            <span
+              className={cn(
+                'font-mono font-bold text-[10px] px-1.5 py-0.2 rounded border',
+                inputs.grossMarginShiftPct > 0
+                  ? 'border-emerald-500/30 text-emerald-500 bg-emerald-500/10'
+                  : inputs.grossMarginShiftPct < 0
+                  ? 'border-rose-500/30 text-rose-500 bg-rose-500/10'
+                  : 'border-border text-foreground bg-muted'
+              )}
+            >
               {inputs.grossMarginShiftPct > 0 ? '+' : ''}{inputs.grossMarginShiftPct}%
             </span>
           </div>
@@ -212,14 +244,26 @@ export function LiveWhatIfControlPanel({
             onChange={(e) => updateField('grossMarginShiftPct', Number(e.target.value))}
             className='w-full accent-primary h-1 bg-border rounded-lg cursor-pointer'
           />
-          <span className='text-[9px] text-muted-foreground block'>COGS / product pricing shift</span>
+          <div className='flex justify-between text-[9px] text-muted-foreground'>
+            <span>-20%</span>
+            <span>+20%</span>
+          </div>
         </div>
 
-        {/* Inventory Shock Slider */}
-        <div className='rounded-lg border border-border/60 bg-muted/10 p-3 space-y-1.5'>
+        {/* 5. Inventory Shock Slider */}
+        <div className='rounded-xl border border-border/70 bg-muted/15 p-3 space-y-2 hover:border-foreground/30 transition-all'>
           <div className='flex justify-between items-center text-[10px] font-bold uppercase'>
             <span className='text-muted-foreground'>Inventory Availability</span>
-            <span className={cn('font-bold', inputs.inventoryShockPct < 0 ? 'text-amber-500' : 'text-foreground')}>
+            <span
+              className={cn(
+                'font-mono font-bold text-[10px] px-1.5 py-0.2 rounded border',
+                inputs.inventoryShockPct < 0
+                  ? 'border-amber-500/30 text-amber-500 bg-amber-500/10'
+                  : inputs.inventoryShockPct > 0
+                  ? 'border-emerald-500/30 text-emerald-500 bg-emerald-500/10'
+                  : 'border-border text-foreground bg-muted'
+              )}
+            >
               {inputs.inventoryShockPct > 0 ? '+' : ''}{inputs.inventoryShockPct}%
             </span>
           </div>
@@ -232,14 +276,24 @@ export function LiveWhatIfControlPanel({
             onChange={(e) => updateField('inventoryShockPct', Number(e.target.value))}
             className='w-full accent-primary h-1 bg-border rounded-lg cursor-pointer'
           />
-          <span className='text-[9px] text-muted-foreground block'>Warehouse physical stock coupling</span>
+          <div className='flex justify-between text-[9px] text-muted-foreground'>
+            <span>-100%</span>
+            <span>+50%</span>
+          </div>
         </div>
 
-        {/* Creative Fatigue Days Slider */}
-        <div className='rounded-lg border border-border/60 bg-muted/10 p-3 space-y-1.5'>
+        {/* 6. Creative Fatigue Days Slider */}
+        <div className='rounded-xl border border-border/70 bg-muted/15 p-3 space-y-2 hover:border-foreground/30 transition-all'>
           <div className='flex justify-between items-center text-[10px] font-bold uppercase'>
-            <span className='text-muted-foreground'>Creative Wearout Age</span>
-            <span className={cn('font-bold', inputs.creativeFatigueDays > 7 ? 'text-rose-500' : 'text-foreground')}>
+            <span className='text-muted-foreground'>Creative Wearout</span>
+            <span
+              className={cn(
+                'font-mono font-bold text-[10px] px-1.5 py-0.2 rounded border',
+                inputs.creativeFatigueDays > 7
+                  ? 'border-rose-500/30 text-rose-500 bg-rose-500/10'
+                  : 'border-border text-foreground bg-muted'
+              )}
+            >
               {inputs.creativeFatigueDays} Days
             </span>
           </div>
@@ -252,7 +306,10 @@ export function LiveWhatIfControlPanel({
             onChange={(e) => updateField('creativeFatigueDays', Number(e.target.value))}
             className='w-full accent-primary h-1 bg-border rounded-lg cursor-pointer'
           />
-          <span className='text-[9px] text-muted-foreground block'>Frequency saturation decay factor</span>
+          <div className='flex justify-between text-[9px] text-muted-foreground'>
+            <span>0d</span>
+            <span>30d</span>
+          </div>
         </div>
       </div>
     </div>
