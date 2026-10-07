@@ -1,28 +1,57 @@
 /**
- * Animate a theme (mode or palette) change with a circular reveal from the
- * pointer position, using the View Transitions API. Falls back to an instant
- * change where the API is unavailable or no origin is given. The reveal
- * keyframes live in `src/styles/globals.css`.
+ * Animate a theme change with a circular ripple reveal expanding from the pointer position,
+ * matching context-hackdevengers (https://context-hackdevengers.vercel.app/) and Vengeance UI.
+ * Uses View Transitions API with Web Animations API clipPath animation on ::view-transition-new(root).
  */
 export function startThemeTransition(
   apply: () => void,
-  origin?: { clientX: number; clientY: number }
+  origin?: { clientX?: number; clientY?: number }
 ) {
-  if (typeof document === 'undefined' || !('startViewTransition' in document)) {
+  if (
+    typeof document === 'undefined' ||
+    !(document as any).startViewTransition ||
+    (typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+  ) {
     apply();
     return;
   }
 
-  try {
-    const root = document.documentElement;
-    if (origin) {
-      root.style.setProperty('--x', `${origin.clientX}px`);
-      root.style.setProperty('--y', `${origin.clientY}px`);
-    }
+  const x =
+    origin?.clientX ??
+    (typeof window !== 'undefined' ? window.innerWidth - 48 : 0);
+  const y = origin?.clientY ?? 32;
+  const endRadius =
+    typeof window !== 'undefined'
+      ? Math.hypot(
+          Math.max(x, window.innerWidth - x),
+          Math.max(y, window.innerHeight - y)
+        )
+      : 1000;
 
-    document.startViewTransition(() => {
+  try {
+    const transition = (document as any).startViewTransition(() => {
       apply();
     });
+
+    transition.ready
+      .then(() => {
+        document.documentElement.animate(
+          {
+            clipPath: [
+              `circle(0px at ${x}px ${y}px)`,
+              `circle(${endRadius}px at ${x}px ${y}px)`
+            ]
+          },
+          {
+            duration: 380,
+            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+            pseudoElement: '::view-transition-new(root)'
+          } as any
+        );
+      })
+      .catch(() => {});
   } catch {
     apply();
   }

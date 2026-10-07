@@ -1,7 +1,7 @@
-'use client';
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Icons } from '@/components/icons';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 export interface LedgerItem {
@@ -93,6 +93,39 @@ function parseDecisionString(raw: string) {
 }
 
 export function DecisionLedgerTable({ entries, className, showHeader = false }: DecisionLedgerTableProps) {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filtered = entries.filter((item) =>
+    item.decision.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.timestamp.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleExportCSV = () => {
+    const headers = ['ID', 'Timestamp', 'Allocation Action', 'Expected Margin (INR)', 'Realized Margin (INR)', 'Accuracy (%)', 'Confidence (%)'];
+    const rows = filtered.map((e) => [
+      e.id,
+      e.timestamp,
+      `"${e.decision.replace(/"/g, '""')}"`,
+      e.expectedMargin,
+      e.realizedMargin,
+      e.accuracyPct.toFixed(1),
+      (e.confidence * 100).toFixed(0)
+    ]);
+    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `nexus-decision-ledger-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success('Decision Ledger exported to CSV', {
+      description: `Downloaded ${filtered.length} audited decisions.`
+    });
+  };
+
   // Deterministic summary KPI calculations from existing ledger entries
   const metrics = React.useMemo(() => {
     if (!entries || entries.length === 0) {
@@ -131,6 +164,34 @@ export function DecisionLedgerTable({ entries, className, showHeader = false }: 
           </span>
         </div>
       )}
+
+      {/* Filter and Export Toolbar */}
+      <div className='flex flex-wrap items-center justify-between gap-3 p-3 rounded-lg border border-border bg-card'>
+        <div className='flex items-center gap-2 flex-1 max-w-sm'>
+          <Icons.search className='size-3.5 text-muted-foreground shrink-0' />
+          <input
+            type='text'
+            placeholder='Search directives (e.g. Meta, Shift, Zoom)...'
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className='w-full text-xs font-mono bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-hidden'
+          />
+        </div>
+        <div className='flex items-center gap-3'>
+          <Button
+            size='sm'
+            variant='outline'
+            onClick={handleExportCSV}
+            className='h-7 px-2.5 text-xs font-mono font-semibold text-foreground border-border bg-background hover:bg-muted active:scale-[0.98]'
+          >
+            <Icons.download className='size-3 mr-1.5' />
+            Export CSV
+          </Button>
+          <span className='text-xs font-mono text-muted-foreground'>
+            {filtered.length} / {entries.length} decisions
+          </span>
+        </div>
+      </div>
 
       {/* Compact KPI Strip */}
       <div className='grid grid-cols-3 gap-2.5 sm:gap-3'>

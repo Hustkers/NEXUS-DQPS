@@ -57,7 +57,7 @@ export default function AppSidebar() {
         {filteredGroups.map((group) => (
           <SidebarGroup key={group.label || 'ungrouped'} className='py-1.5'>
             {group.label && (
-              <SidebarGroupLabel className='font-mono text-[10px] uppercase tracking-wider text-[#8A8A8A] font-semibold px-2'>
+              <SidebarGroupLabel className='font-mono text-[10px] uppercase tracking-wider text-muted-foreground font-semibold px-2'>
                 {group.label}
               </SidebarGroupLabel>
             )}

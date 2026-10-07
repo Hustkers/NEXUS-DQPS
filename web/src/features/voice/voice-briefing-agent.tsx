@@ -56,7 +56,7 @@ export function VoiceBriefingAgent({
     setIsSpeaking(true);
 
     const briefingText =
-      'Executive Briefing: ROAS on Meta Advantage Plus collapsed by 66% due to Hero SKU stockout in Shopify. Recommending immediate reallocation: shift $800 to Google Zoom Fly and Amazon Air Max. Projected margin recovery: +$1,148. Do you authorize reallocation?';
+      'Executive Briefing: ROAS on Meta Advantage Plus collapsed by 66% due to Hero SKU stockout in Shopify. Recommending immediate reallocation: shift ₹800 to Google Zoom Fly and Amazon Air Max. Projected margin recovery: +₹1,148. Do you authorize reallocation?';
 
     setTimeout(() => {
       setMessages((prev) => [

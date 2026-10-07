@@ -8,16 +8,25 @@ import type { CampaignDataRef, ReallocationExecutionDetails } from '../types/rea
 export function buildReallocationExecutionDetails(
   item: ReallocationItem,
   campaigns: CampaignDataRef[] = [],
-  ledgerId?: string
+  ledgerId?: string,
+  anomalyMeta?: {
+    id: string;
+    campaign: string;
+    productName?: string;
+    severity: string;
+    zScore: number;
+    rootCause: string;
+    explanation: string;
+  }
 ): ReallocationExecutionDetails {
   // 1. Locate existing campaign telemetry if available
   const targetCamp = campaigns.find((c) => c.campaign === item.targetCampaign);
   const sourceCamp = campaigns.find((c) => c.campaign === item.sourceCampaign);
 
   // 2. Exact destination spend & ROAS from recommendation
-  const destOldSpend = item.currentSpend;
-  const destNewSpend = item.recommendedSpend;
-  const deltaSpend = item.deltaSpend;
+  const absDelta = Math.abs(item.deltaSpend);
+  const destOldSpend = targetCamp?.currentDailySpend ?? (item.currentSpend > 0 ? item.currentSpend : 1200);
+  const destNewSpend = destOldSpend + absDelta;
   const destNewRoas = item.predictedRoas;
   
   // Destination current ROAS from campaign data, fallback to revenue/spend or baseline
@@ -35,20 +44,18 @@ export function buildReallocationExecutionDetails(
   const destNewMargin = destOldMargin + item.expectedDailyMargin;
 
   // 3. Source allocation
-  // Source old spend equals the recommendation baseline or campaign current spend
-  const sourceOldSpend = item.currentSpend; // Matches paired capital reallocation model
-  const sourceNewSpend = Math.max(0, sourceOldSpend - deltaSpend);
+  const sourceOldSpend = sourceCamp?.currentDailySpend ?? (item.currentSpend > 0 ? item.currentSpend : 1500);
+  const sourceNewSpend = Math.max(0, +(sourceOldSpend - absDelta).toFixed(2));
   const sourceRoas = sourceCamp?.roas ?? 3.75;
 
   // 4. ROAS percentage shift
   const roasDeltaPct = destOldRoas > 0 ? ((destNewRoas - destOldRoas) / destOldRoas) * 100 : 0;
   const spendDeltaPct = destOldSpend > 0 ? ((destNewSpend - destOldSpend) / destOldSpend) * 100 : 0;
   const revenueDeltaPct = destOldRevenue > 0 ? ((destNewRevenue - destOldRevenue) / destOldRevenue) * 100 : 0;
-  const marginDeltaPct = destOldMargin > 0 ? ((item.expectedDailyMargin) / destOldMargin) * 100 : 0;
 
   // 5. Why better rationale
   const roasDifference = +(destNewRoas - sourceRoas).toFixed(2);
-  const liftPerRupee = deltaSpend > 0 ? +(item.expectedDailyMargin / deltaSpend).toFixed(2) : 0;
+  const liftPerRupee = absDelta > 0 ? +(item.expectedDailyMargin / absDelta).toFixed(2) : 0;
 
   const whyBetter = {
     sourceRoas,
@@ -65,7 +72,7 @@ export function buildReallocationExecutionDetails(
       label: 'Target Daily Spend',
       beforeFormatted: `₹${Math.round(destOldSpend).toLocaleString('en-IN')}`,
       afterFormatted: `₹${Math.round(destNewSpend).toLocaleString('en-IN')}`,
-      changeFormatted: `+₹${Math.round(deltaSpend).toLocaleString('en-IN')}`,
+      changeFormatted: `+₹${Math.round(absDelta).toLocaleString('en-IN')}`,
       pctChangeFormatted: `+${spendDeltaPct.toFixed(1)}%`,
       isPositive: true,
       beforeValue: Math.round(destOldSpend),
@@ -158,7 +165,7 @@ export function buildReallocationExecutionDetails(
       photoUrl: sourceCamp?.photoUrl,
       currentSpend: sourceOldSpend,
       newSpend: sourceNewSpend,
-      deltaSpend: -deltaSpend,
+      deltaSpend: -absDelta,
       roas: sourceRoas,
       inventory: sourceCamp?.inventory
     },
@@ -169,7 +176,7 @@ export function buildReallocationExecutionDetails(
       photoUrl: targetCamp?.photoUrl,
       currentSpend: destOldSpend,
       newSpend: destNewSpend,
-      deltaSpend,
+      deltaSpend: absDelta,
       currentRoas: destOldRoas,
       predictedRoas: destNewRoas,
       roasDeltaPct,
@@ -181,7 +188,7 @@ export function buildReallocationExecutionDetails(
       marginLift: item.expectedDailyMargin,
       inventory: targetCamp?.inventory
     },
-    capitalMoved: deltaSpend,
+    capitalMoved: absDelta,
     expectedDailyLift: item.expectedDailyMargin,
     predictedRoas: destNewRoas,
     confidencePct: Math.round(Math.abs(item.confidence) * 100),
@@ -194,6 +201,8 @@ export function buildReallocationExecutionDetails(
       id,
       timestamp,
       statusText: 'Audited & Recorded in Decision Ledger'
-    }
+    },
+    anomaly: anomalyMeta,
+    recommendedAction: `REDUCE ₹${Math.round(absDelta).toLocaleString('en-IN')}/day`
   };
 }

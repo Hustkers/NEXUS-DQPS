@@ -129,15 +129,15 @@ export function RoasGauge({
   return (
     <div
       className={cn(
-        'relative flex flex-col justify-between rounded-xl border border-[#222222] bg-[#0E0E0E] p-4 transition-all duration-200 hover:border-[#404040] hover:bg-[#121212] font-mono shadow-sm',
+        'relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card text-card-foreground p-4 transition-all duration-200 hover:border-foreground/40 hover:bg-muted/15 font-mono shadow-[0_2px_12px_-2px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_-4px_rgba(0,0,0,0.35)] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/25 dark:before:via-white/15 before:to-transparent before:pointer-events-none',
         className
       )}
     >
       {/* 1. PRODUCT + CHANNEL + STOCK & 2. HEALTH SCORE */}
-      <div className='flex w-full items-start justify-between gap-2 border-b border-[#1A1A1A] pb-3 mb-2'>
+      <div className='flex w-full items-start justify-between gap-2 border-b border-border pb-3 mb-2'>
         <div className='flex items-center gap-2.5 min-w-0'>
           {photoUrl ? (
-            <div className='relative size-8 rounded bg-[#171717] overflow-hidden shrink-0 border border-[#222222]'>
+            <div className='relative size-8 rounded-lg bg-muted/40 overflow-hidden shrink-0 border border-border'>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={photoUrl}
@@ -150,18 +150,18 @@ export function RoasGauge({
             <span
               onClick={onAnalyze}
               className={cn(
-                'text-xs font-semibold text-white truncate max-w-[150px]',
+                'text-xs font-semibold text-foreground truncate max-w-[150px]',
                 onAnalyze && 'cursor-pointer hover:underline'
               )}
               title={displayName}
             >
               {displayName}
             </span>
-            <span className='text-[10px] text-[#8A8A8A] uppercase tracking-wider truncate flex items-center gap-1.5 mt-0.5'>
+            <span className='text-[10px] text-muted-foreground uppercase tracking-wider truncate flex items-center gap-1.5 mt-0.5'>
               <PlatformLogo platform={displayChannel.toLowerCase()} size={11} className='shrink-0' />
               <span>{displayChannel}</span>
               <span>•</span>
-              <span className={cn(inventory <= 0 ? 'text-red-400 font-bold' : 'text-[#A3A3A3]')}>
+              <span className={cn(inventory <= 0 ? 'text-destructive font-bold' : 'text-foreground/70')}>
                 {inventory <= 0 ? '0 in stock' : `${inventory} stock`}
               </span>
             </span>
@@ -171,7 +171,7 @@ export function RoasGauge({
         {/* 2. Health Score */}
         <div
           className={cn(
-            'flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] shrink-0 font-bold',
+            'flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] shrink-0 font-bold',
             healthBadgeStyle
           )}
           title={`Health Score: ${healthScore}/100`}
@@ -194,7 +194,8 @@ export function RoasGauge({
               radius * 2 + strokeWidth
             } ${radius + strokeWidth}`}
             fill='none'
-            stroke='#1A1A1A'
+            stroke='currentColor'
+            className='text-muted/60 dark:text-muted/80'
             strokeWidth={strokeWidth}
             strokeLinecap='round'
           />
@@ -264,19 +265,19 @@ export function RoasGauge({
         <div className='absolute bottom-0 flex flex-col items-center justify-center text-center'>
           {paused ? (
             <div className='flex flex-col items-center -mb-1'>
-              <span className='font-bold text-white tracking-wider text-base uppercase font-mono'>
+              <span className='font-bold text-foreground tracking-wider text-base uppercase font-mono'>
                 Paused
               </span>
-              <span className='text-[10px] text-emerald-400 font-mono mt-0.5 truncate max-w-[130px]'>
+              <span className='text-[10px] text-emerald-600 dark:text-emerald-400 font-mono mt-0.5 truncate max-w-[130px]'>
                 Restock: {restockUnitsOrdered ?? 0} units ordered
               </span>
             </div>
           ) : (
             <div className='flex flex-col items-center -mb-0.5'>
-              <span className='font-bold tracking-tight text-white text-xl font-mono'>
+              <span className='font-bold tracking-tight text-foreground text-xl font-mono'>
                 {currentRoas.toFixed(2)}x
               </span>
-              <span className='text-[10px] text-[#8A8A8A] font-mono -mt-0.5'>
+              <span className='text-[10px] text-muted-foreground font-mono -mt-0.5'>
                 ROAS
               </span>
             </div>
@@ -285,17 +286,17 @@ export function RoasGauge({
       </div>
 
       {/* 4. SPEND/DAY + DAYS OF COVER */}
-      <div className='mt-3 flex w-full items-center justify-between text-xs text-[#A3A3A3] font-mono px-0.5'>
-        <span className='text-white font-medium'>
+      <div className='mt-3 flex w-full items-center justify-between text-xs text-muted-foreground font-mono px-0.5'>
+        <span className='text-foreground font-semibold'>
           ₹{dailySpend.toLocaleString('en-IN')}/day
         </span>
-        <span className={cn(effectiveCoverDays < 7 ? 'text-amber-400 font-semibold' : 'text-[#8A8A8A]')}>
+        <span className={cn(effectiveCoverDays < 7 ? 'text-amber-500 font-semibold' : 'text-muted-foreground')}>
           {inventory <= 0 ? '0d cover' : `${effectiveCoverDays.toFixed(1)}d cover`}
         </span>
       </div>
 
       {/* 5. "1.8x floor · 3.2x target" */}
-      <div className='mt-1.5 flex w-full items-center justify-center text-[10px] font-mono text-[#737373]'>
+      <div className='mt-1.5 flex w-full items-center justify-center text-[10px] font-mono text-muted-foreground/80'>
         <span>1.8x floor · 3.2x target</span>
       </div>
 
@@ -313,7 +314,7 @@ export function RoasGauge({
       </div>
 
       {/* 7. FIX BUTTON / VIEW FIX BUTTON */}
-      <div className='mt-3 w-full pt-2.5 border-t border-[#1A1A1A]'>
+      <div className='mt-3 w-full pt-2.5 border-t border-border'>
         {isFixed ? (
           <button
             type='button'
@@ -321,7 +322,7 @@ export function RoasGauge({
               e.stopPropagation();
               onViewFix?.();
             }}
-            className='w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg border border-emerald-700/60 bg-emerald-950/30 text-emerald-300 font-mono text-xs font-semibold uppercase tracking-wider hover:bg-emerald-900/40 hover:border-emerald-600 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400'
+            className='w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg border border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono text-xs font-semibold uppercase tracking-wider hover:bg-emerald-500/20 active:scale-[0.97] transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400'
           >
             <span>View fix</span>
           </button>
@@ -332,12 +333,12 @@ export function RoasGauge({
               e.stopPropagation();
               onFix?.();
             }}
-            className='w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-white text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-neutral-200 transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white'
+            className='w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-primary text-primary-foreground font-mono text-xs font-bold uppercase tracking-wider shadow-xs hover:brightness-110 active:brightness-95 active:scale-[0.97] transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
           >
             <span>Fix</span>
           </button>
         ) : (
-          <div className='w-full flex items-center justify-center py-1.5 text-[11px] text-[#737373] font-mono'>
+          <div className='w-full flex items-center justify-center py-1.5 text-[11px] text-muted-foreground font-mono'>
             <span>Optimal Performance</span>
           </div>
         )}

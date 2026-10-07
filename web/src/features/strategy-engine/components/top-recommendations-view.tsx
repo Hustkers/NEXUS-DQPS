@@ -51,7 +51,7 @@ export function TopRecommendationsView({
 
   const bestStrat = top3[0];
   const evBest = bestStrat?.evaluation;
-  const curSym = evBest?.modelMetadata.currency === 'INR' ? '₹' : '$';
+  const curSym = '₹';
 
   const rankBadges = [
     {

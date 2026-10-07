@@ -17,49 +17,51 @@ export function ReallocationWhyBetter({
   const { source, destination, whyBetter, item } = details;
 
   return (
-    <div className={cn('rounded-lg border border-border/80 bg-slate-50/50 dark:bg-zinc-950/40 p-4 font-mono space-y-3', className)}>
-      <div className='flex items-center gap-2 border-b border-border/60 pb-2'>
-        <Icons.help className='size-3.5 text-cyan-600 dark:text-cyan-400' />
-        <h4 className='text-xs font-bold text-foreground uppercase tracking-wider'>
+    <div className={cn('rounded border border-[#1A1A1A] bg-[#000000] p-4 font-mono space-y-3 text-[#FFFFFF]', className)}>
+      <div className='flex items-center gap-2 border-b border-[#1A1A1A] pb-2'>
+        <Icons.help className='size-3.5 text-[#FFFFFF]' />
+        <h4 className='text-xs font-bold text-[#FFFFFF] uppercase tracking-wider'>
           Why This Reallocation?
         </h4>
-        <span className='text-[10px] text-muted-foreground ml-auto'>
+        <span className='text-[10px] text-[#8A8A8A] ml-auto font-mono'>
           Convex Optimization Rationale
         </span>
       </div>
 
       <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs'>
         {/* Source ROAS Card */}
-        <div className='rounded-md border border-border/60 bg-card p-2.5 space-y-1'>
-          <div className='text-[10px] text-muted-foreground uppercase flex items-center justify-between'>
+        <div className='rounded border border-[#1A1A1A] bg-[#1A1A1A] p-2.5 space-y-1'>
+          <div className='text-[10px] text-[#8A8A8A] uppercase flex items-center justify-between'>
             <span>Source Operating Level</span>
-            <span className='px-1 py-0.2 rounded bg-muted text-[9px] uppercase'>{source.platform}</span>
+            <span className='px-1 py-0.2 rounded bg-[#000000] text-[#8A8A8A] text-[9px] uppercase border border-[#1A1A1A]'>
+              {source.platform}
+            </span>
           </div>
-          <div className='font-bold text-foreground truncate'>
+          <div className='font-bold text-[#FFFFFF] truncate'>
             {source.productName}
           </div>
           <div className='flex items-baseline justify-between pt-1'>
-            <span className='text-[11px] text-muted-foreground'>Operating ROAS:</span>
-            <span className='text-sm font-bold text-amber-600 dark:text-amber-400'>
+            <span className='text-[11px] text-[#8A8A8A]'>Operating ROAS:</span>
+            <span className='text-sm font-bold text-[#8A8A8A]'>
               {whyBetter.sourceRoas.toFixed(2)}x
             </span>
           </div>
         </div>
 
         {/* Destination ROAS Card */}
-        <div className='rounded-md border border-emerald-500/30 bg-emerald-500/5 p-2.5 space-y-1 shadow-2xs'>
-          <div className='text-[10px] text-muted-foreground uppercase flex items-center justify-between'>
-            <span className='text-emerald-700 dark:text-emerald-400 font-semibold'>Superior Target Convexity</span>
-            <span className='px-1 py-0.2 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[9px] uppercase border border-emerald-500/20'>
+        <div className='rounded border border-[#8A8A8A] bg-[#1A1A1A] p-2.5 space-y-1 shadow-none'>
+          <div className='text-[10px] text-[#FFFFFF] uppercase flex items-center justify-between font-bold'>
+            <span>Superior Target Convexity</span>
+            <span className='px-1 py-0.2 rounded bg-[#FFFFFF] text-[#000000] text-[9px] uppercase font-bold'>
               {destination.platform}
             </span>
           </div>
-          <div className='font-bold text-foreground truncate'>
+          <div className='font-bold text-[#FFFFFF] truncate'>
             {destination.productName}
           </div>
           <div className='flex items-baseline justify-between pt-1'>
-            <span className='text-[11px] text-muted-foreground'>Marginal Target ROAS:</span>
-            <span className='text-sm font-bold text-emerald-600 dark:text-emerald-400'>
+            <span className='text-[11px] text-[#8A8A8A]'>Marginal Target ROAS:</span>
+            <span className='text-sm font-bold text-[#FFFFFF]'>
               {whyBetter.destinationRoas.toFixed(2)}x
             </span>
           </div>
@@ -67,12 +69,12 @@ export function ReallocationWhyBetter({
       </div>
 
       {/* Optimizer explanation */}
-      <div className='rounded-md bg-muted/40 p-2.5 text-[11px] space-y-1'>
-        <div className='text-[10px] font-bold uppercase text-foreground/80 flex items-center gap-1.5'>
-          <Icons.check className='size-3 text-emerald-600' />
+      <div className='rounded bg-[#1A1A1A] border border-[#1A1A1A] p-2.5 text-[11px] space-y-1'>
+        <div className='text-[10px] font-bold uppercase text-[#FFFFFF] flex items-center gap-1.5'>
+          <Icons.check className='size-3 text-[#FFFFFF]' />
           Marginal Return Headroom (+₹{Math.round(details.expectedDailyLift).toLocaleString('en-IN')}/day lift)
         </div>
-        <p className='text-muted-foreground leading-relaxed'>
+        <p className='text-[#8A8A8A] leading-relaxed'>
           {item.reason}
         </p>
       </div>

@@ -29,13 +29,13 @@ export function CausalDagVisualizer({ activeAnomaly = false }: CausalDagVisualiz
   const [selectedNode, setSelectedNode] = useState<string | null>('orders');
 
   const nodes: DagNode[] = [
-    { id: 'spend', label: 'Meta Ad Spend', metric: '$4,200/d', status: 'nominal', x: 20, y: 110 },
+    { id: 'spend', label: 'Meta Ad Spend', metric: '₹4,200/d', status: 'nominal', x: 20, y: 110 },
     { id: 'impressions', label: 'Impressions', metric: '312k', status: 'nominal', x: 190, y: 35 },
     { id: 'clicks', label: 'Clicks (CTR 1.8%)', metric: '5,616', status: 'nominal', x: 190, y: 185 },
     { id: 'inventory', label: 'Shopify Stock Gate', metric: activeAnomaly ? '0 units' : '420 units', status: activeAnomaly ? 'critical' : 'nominal', x: 380, y: 35 },
     { id: 'cvr', label: 'Conversion Rate', metric: activeAnomaly ? '0.12% (down 94%)' : '2.8%', status: activeAnomaly ? 'critical' : 'nominal', x: 380, y: 185 },
     { id: 'orders', label: 'Net Orders', metric: activeAnomaly ? '7 units' : '157 units', status: activeAnomaly ? 'critical' : 'nominal', x: 570, y: 110 },
-    { id: 'profit', label: 'Net Margin (POAS)', metric: activeAnomaly ? '-$3,008' : '+$5,140', status: activeAnomaly ? 'critical' : 'nominal', x: 750, y: 110 },
+    { id: 'profit', label: 'Net Margin (POAS)', metric: activeAnomaly ? '-₹3,008' : '+₹5,140', status: activeAnomaly ? 'critical' : 'nominal', x: 750, y: 110 },
   ];
 
   const edges: DagEdge[] = [
@@ -150,7 +150,7 @@ export function CausalDagVisualizer({ activeAnomaly = false }: CausalDagVisualiz
           <div className="flex items-center gap-2">
             <IconAlertCircle className="h-4 w-4 text-foreground shrink-0" />
             <span className="text-foreground">
-              <strong>Counterfactual Structural Intervention:</strong> Orders node conditioned on physical stockout: Q = min(0, page_views &times; cvr) = 0. Ad spend continues burning with $0 conversions.
+              <strong>Counterfactual Structural Intervention:</strong> Orders node conditioned on physical stockout: Q = min(0, page_views &times; cvr) = 0. Ad spend continues burning with ₹0 conversions.
             </span>
           </div>
           <Badge className="bg-foreground text-background border-none font-bold shrink-0 ml-3">66% Shapley Share</Badge>

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { IconAdjustmentsHorizontal } from '@tabler/icons-react';
 import { MetaLogo, GoogleLogo, AmazonLogo } from '@/components/icons/platform-logos';
+import { toast } from 'sonner';
 
 export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?: (alloc: any) => void }) {
   const [metaSpend, setMetaSpend] = useState(0); // Shifted away from stockout
@@ -30,6 +31,9 @@ export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?:
     if (onApplyReallocation) {
       onApplyReallocation({ meta: metaSpend, google: googleSpend, amazon: amazonSpend });
     }
+    toast.success('Applied Scenario Reallocation Vector', {
+      description: `Meta: ₹${metaSpend}/d • Google: ₹${googleSpend}/d • Amazon: ₹${amazonSpend}/d. Net Margin Lift: +₹${Math.round(netContribution).toLocaleString()}.`
+    });
   };
 
   return (
@@ -56,7 +60,7 @@ export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?:
             <span className="flex items-center gap-1.5 text-foreground">
               <MetaLogo size={14} className="shrink-0" /> Meta Ads
             </span>
-            <span className="font-mono text-foreground font-bold">${metaSpend} / day</span>
+            <span className="font-mono text-foreground font-bold">₹{metaSpend} / day</span>
           </div>
           <input
             type="range"
@@ -68,7 +72,7 @@ export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?:
             className="w-full accent-foreground cursor-pointer"
           />
           <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground">
-            <span>Forecasted Rev: ${metaRev.toFixed(0)}</span>
+            <span>Forecasted Rev: ₹{metaRev.toFixed(0)}</span>
             <Badge variant="outline" className="text-[10px] font-mono border border-border text-muted-foreground bg-muted">Stockout Throttled</Badge>
           </div>
         </div>
@@ -79,7 +83,7 @@ export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?:
             <span className="flex items-center gap-1.5 text-foreground">
               <GoogleLogo size={14} className="shrink-0" /> Google Search
             </span>
-            <span className="font-mono text-foreground font-bold">${googleSpend} / day</span>
+            <span className="font-mono text-foreground font-bold">₹{googleSpend} / day</span>
           </div>
           <input
             type="range"
@@ -91,7 +95,7 @@ export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?:
             className="w-full accent-foreground cursor-pointer"
           />
           <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground">
-            <span>Forecasted Rev: ${googleRev.toFixed(0)}</span>
+            <span>Forecasted Rev: ₹{googleRev.toFixed(0)}</span>
             <Badge variant="outline" className="text-[10px] font-mono border border-border text-foreground bg-muted">In-Stock Hero</Badge>
           </div>
         </div>
@@ -102,7 +106,7 @@ export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?:
             <span className="flex items-center gap-1.5 text-foreground">
               <AmazonLogo size={14} className="shrink-0" /> Amazon SP
             </span>
-            <span className="font-mono text-foreground font-bold">${amazonSpend} / day</span>
+            <span className="font-mono text-foreground font-bold">₹{amazonSpend} / day</span>
           </div>
           <input
             type="range"
@@ -114,7 +118,7 @@ export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?:
             className="w-full accent-foreground cursor-pointer"
           />
           <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground">
-            <span>Forecasted Rev: ${amazonRev.toFixed(0)}</span>
+            <span>Forecasted Rev: ₹{amazonRev.toFixed(0)}</span>
             <Badge variant="outline" className="text-[10px] font-mono border border-border text-foreground bg-muted">High Buy-Box</Badge>
           </div>
         </div>
@@ -124,7 +128,7 @@ export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?:
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-3 border-t border-border text-xs font-mono">
         <div className="p-2.5 rounded bg-muted/40 border border-border">
           <span className="text-muted-foreground block text-[11px]">Total Budget</span>
-          <span className="text-sm font-mono font-bold text-foreground">${totalSpend.toLocaleString()}</span>
+          <span className="text-sm font-mono font-bold text-foreground">₹{totalSpend.toLocaleString()}</span>
         </div>
         <div className="p-2.5 rounded bg-muted/40 border border-border">
           <span className="text-muted-foreground block text-[11px]">Forecasted Blended ROAS</span>
@@ -136,7 +140,7 @@ export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?:
         </div>
         <div className="p-2.5 rounded bg-muted/40 border border-border">
           <span className="text-muted-foreground block text-[11px]">Net Contribution Margin</span>
-          <span className="text-sm font-mono font-bold text-foreground">+${netContribution.toFixed(2)}</span>
+          <span className="text-sm font-mono font-bold text-foreground">+₹{netContribution.toFixed(2)}</span>
         </div>
       </div>
     </Card>

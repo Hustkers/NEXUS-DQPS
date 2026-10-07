@@ -3,7 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import initialTrackingData from '@/data/visitor-tracking-state.json';
 
@@ -78,6 +80,54 @@ export function TrackingDashboard() {
     }
   };
 
+  // Enforce GDPR / CCPA 30-Day Data Retention Window
+  const handleEnforceRetention = async () => {
+    try {
+      const res = await fetch('/api/privacy/retention', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ days: 30 })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        toast.success('GDPR Data Retention Enforced', {
+          description: data.message || `Purged ${data.events_purged || 0} events older than 30 days.`
+        });
+        loadPerformance(model);
+      } else {
+        toast.error('Retention enforcement returned non-200');
+      }
+    } catch {
+      toast.error('Failed to enforce retention window');
+    }
+  };
+
+  // GDPR Art. 17: Right to be Forgotten Purge Handler
+  const handlePurgeVisitor = async () => {
+    if (!timelineData?.visitor_id) return;
+    try {
+      const targetVid = timelineData.visitor_id;
+      const res = await fetch('/api/privacy/forget', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: targetVid })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        toast.success('Visitor Record Purged (GDPR Art. 17)', {
+          description: `Permanently removed personal records & raw events for ID: ${maskId(targetVid)}.`
+        });
+        setTimelineData(null);
+        setVisitorIdInput('');
+        loadPerformance(model);
+      } else {
+        toast.error('Purge request failed');
+      }
+    } catch {
+      toast.error('Failed to execute purge request');
+    }
+  };
+
   useEffect(() => {
     Promise.all([
       loadPerformance(model),
@@ -132,36 +182,50 @@ export function TrackingDashboard() {
           </p>
         </div>
 
-        {/* Model Switcher */}
-        <div className="flex items-center gap-2 bg-muted p-1 rounded-lg border">
-          <button
-            onClick={() => {
-              setModel('last_touch');
-              loadPerformance('last_touch');
-            }}
-            className={cn(
-              'px-3 py-1.5 text-xs font-medium rounded-md transition-all',
-              model === 'last_touch'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            )}
+        {/* Action Controls & Model Switcher */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleEnforceRetention}
+            className="text-xs h-8 flex items-center gap-1.5 border-border hover:bg-muted font-mono"
+            title="Enforce 30-day GDPR data retention window"
           >
-            Last-Touch (Default)
-          </button>
-          <button
-            onClick={() => {
-              setModel('first_touch');
-              loadPerformance('first_touch');
-            }}
-            className={cn(
-              'px-3 py-1.5 text-xs font-medium rounded-md transition-all',
-              model === 'first_touch'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            )}
-          >
-            First-Touch
-          </button>
+            <Icons.clock className="size-3.5 text-muted-foreground" />
+            <span>Enforce Retention (30d)</span>
+          </Button>
+
+          {/* Model Switcher */}
+          <div className="flex items-center gap-2 bg-muted p-1 rounded-lg border">
+            <button
+              onClick={() => {
+                setModel('last_touch');
+                loadPerformance('last_touch');
+              }}
+              className={cn(
+                'px-3 py-1.5 text-xs font-medium rounded-md transition-all',
+                model === 'last_touch'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              Last-Touch (Default)
+            </button>
+            <button
+              onClick={() => {
+                setModel('first_touch');
+                loadPerformance('first_touch');
+              }}
+              className={cn(
+                'px-3 py-1.5 text-xs font-medium rounded-md transition-all',
+                model === 'first_touch'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              First-Touch
+            </button>
+          </div>
         </div>
       </div>
 
@@ -399,12 +463,12 @@ export function TrackingDashboard() {
                 <div className="text-xs space-y-1.5 pt-1">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Attributed Revenue:</span>
-                    <span className="font-semibold">${activeCampPerf.revenue.toLocaleString()}</span>
+                    <span className="font-semibold">₹{activeCampPerf.revenue.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">True Contribution Profit:</span>
                     <span className={cn('font-semibold', activeCampPerf.profit >= 0 ? 'text-emerald-600' : 'text-rose-500')}>
-                      ${activeCampPerf.profit.toLocaleString()}
+                      ₹{activeCampPerf.profit.toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -474,11 +538,11 @@ export function TrackingDashboard() {
                     <td className="py-2.5 px-3 text-right">{c.add_to_carts}</td>
                     <td className="py-2.5 px-3 text-right font-semibold text-emerald-600">{c.purchases}</td>
                     <td className="py-2.5 px-3 text-right font-medium">{(c.conversion_rate * 100).toFixed(1)}%</td>
-                    <td className="py-2.5 px-3 text-right text-muted-foreground">${c.spend.toLocaleString()}</td>
-                    <td className="py-2.5 px-3 text-right font-medium">${c.revenue.toLocaleString()}</td>
+                    <td className="py-2.5 px-3 text-right text-muted-foreground">₹{c.spend.toLocaleString()}</td>
+                    <td className="py-2.5 px-3 text-right font-medium">₹{c.revenue.toLocaleString()}</td>
                     <td className="py-2.5 px-3 text-right font-semibold">
                       <span className={c.profit >= 0 ? 'text-emerald-600' : 'text-rose-500'}>
-                        ${c.profit.toLocaleString()}
+                        ₹{c.profit.toLocaleString()}
                       </span>
                     </td>
                     <td className="py-2.5 px-3 text-center">
@@ -663,7 +727,18 @@ export function TrackingDashboard() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Completed Purchases:</span>
-                    <span className="font-semibold text-emerald-600">{timelineData.total_orders} (${timelineData.total_spend})</span>
+                    <span className="font-semibold text-emerald-600">{timelineData.total_orders} (₹{Number(timelineData.total_spend || 0).toLocaleString()})</span>
+                  </div>
+                  <div className="pt-2 border-t flex justify-end">
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={handlePurgeVisitor}
+                      className="h-7 text-[10px] font-mono flex items-center gap-1.5"
+                    >
+                      <Icons.trash className="size-3" />
+                      GDPR Art. 17: Purge Record
+                    </Button>
                   </div>
                 </div>
 
@@ -693,7 +768,7 @@ export function TrackingDashboard() {
                       {e.product_id && (
                         <div className="text-muted-foreground">
                           Product: <span className="font-semibold text-foreground">{e.product_id}</span>
-                          {e.value && ` ($${e.value})`}
+                          {e.value && ` (₹${Number(e.value).toLocaleString()})`}
                         </div>
                       )}
                       {e.campaign_id && (

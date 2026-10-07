@@ -580,7 +580,7 @@ export const STRATEGIC_ARCHETYPES: StrategicArchetype[] = [
     retargetingType: 'Intent-Led Video Prospecting',
     demographicTargeting: 'Ages 18-40, Mobile YouTube app users',
     timingStrategy: 'Leisure viewing hours: Late afternoons and weekend mornings',
-    offerStrategy: 'Exclusive YouTube Viewer Link with Instant $15 Off Promo',
+    offerStrategy: 'Exclusive YouTube Viewer Link with Instant ₹500 Off Promo',
     keywordInterestTargeting: 'Shoe review queries, fitness YouTube channels, running advice',
     baseCtr: 0.015,
     baseCpcRatio: 0.6,

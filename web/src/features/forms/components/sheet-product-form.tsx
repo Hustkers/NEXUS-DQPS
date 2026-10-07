@@ -14,6 +14,7 @@ import {
   SheetTrigger
 } from '@/components/ui/sheet';
 import { Icons } from '@/components/icons';
+import { toast } from 'sonner';
 import { useState } from 'react';
 
 const productSchema = z.object({
@@ -44,7 +45,9 @@ export default function SheetProductForm() {
       onSubmit: productSchema
     },
     onSubmit: () => {
-      alert('Product created successfully!');
+      toast.success('Product created successfully!', {
+        description: 'New catalog item saved to database.'
+      });
       setOpen(false);
       form.reset();
     }

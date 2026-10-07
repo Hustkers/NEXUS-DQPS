@@ -35,7 +35,7 @@ export function CampaignLaunchModal({
   if (!isOpen || !strategy) return null;
 
   const ev = strategy.evaluation;
-  const curSym = ev?.modelMetadata.currency === 'INR' ? '₹' : '$';
+  const curSym = '₹';
 
   const handleAuthorize = async () => {
     if (!confirmedRiskUnderstood) {
