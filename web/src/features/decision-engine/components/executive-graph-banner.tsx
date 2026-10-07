@@ -233,17 +233,7 @@ export function ExecutiveGraphBanner({
   return (
     <div className='flex flex-col gap-4'>
       {/* 1. Header Bar with Time Range Selector & Comparative Detail Toggle */}
-      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-[#1A1A1A] pb-3'>
-        <div className='flex items-center gap-2.5'>
-          <h2 className='font-mono text-xs font-bold uppercase tracking-wider text-foreground'>
-            Executive Financial &amp; Efficiency Trajectories
-          </h2>
-          <span className='font-mono text-[11px] text-muted-foreground'>
-            ({timeRange.toUpperCase()} Trailing •{' '}
-            {channel === 'all' ? 'Blended Omnichannel' : channel.toUpperCase()})
-          </span>
-        </div>
-
+      <div className='flex items-center justify-end gap-2'>
         <div className='flex items-center gap-2'>
           {/* Timeframe pill selector */}
           <div className='flex items-center rounded-lg border border-[#1A1A1A] bg-card p-0.5 text-[11px] font-mono shadow-2xs'>
