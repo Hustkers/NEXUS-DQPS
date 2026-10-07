@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
@@ -15,10 +15,14 @@ import {
   Tooltip,
   CartesianGrid,
   BarChart,
-  Bar,
-  Legend
+  Bar
 } from 'recharts';
 
+/**
+ * 1. DETERMINISTIC HARDWARE SIGNATURES
+ * A hardware profile only provides entropy signals for deterministic matching.
+ * It does NOT dictate financial transactions.
+ */
 export interface DeviceProfile {
   id: string;
   name: string;
@@ -35,15 +39,9 @@ export interface DeviceProfile {
   ipSubnet: string;
   fingerprintId: string;
   confidenceScore: number;
-  orderRevenue: number;
-  grossMargin: number;
-  adSpend: number;
-  productTitle: string;
-  sku: string;
-  asin: string;
 }
 
-const SAMPLE_DEVICES: DeviceProfile[] = [
+export const SAMPLE_DEVICES: DeviceProfile[] = [
   {
     id: 'macbook-m3',
     name: 'MacBook Pro 16" (M3 Max)',
@@ -59,13 +57,7 @@ const SAMPLE_DEVICES: DeviceProfile[] = [
     deviceMemoryGb: 36,
     ipSubnet: '198.51.100.0/24 (Comcast Cable)',
     fingerprintId: 'FP-8F92-A74B-M3MAX',
-    confidenceScore: 99.8,
-    orderRevenue: 170.0,
-    grossMargin: 93.5,
-    adSpend: 0.874,
-    productTitle: "Nike Men's Air Max Dn Running Shoes - Triple Black",
-    sku: 'AH8050-100',
-    asin: 'B0CWV8N21K'
+    confidenceScore: 99.8
   },
   {
     id: 'iphone-16',
@@ -82,13 +74,7 @@ const SAMPLE_DEVICES: DeviceProfile[] = [
     deviceMemoryGb: 8,
     ipSubnet: '172.56.21.0/24 (T-Mobile 5G)',
     fingerprintId: 'FP-3C81-992F-A18PRO',
-    confidenceScore: 99.4,
-    orderRevenue: 145.0,
-    grossMargin: 82.65,
-    adSpend: 0.725,
-    productTitle: "Nike Air Max 270 React Lifestyle Sneaker",
-    sku: 'CD4371-001',
-    asin: 'B07PK6G8L2'
+    confidenceScore: 99.4
   },
   {
     id: 'thinkpad-x1',
@@ -105,17 +91,51 @@ const SAMPLE_DEVICES: DeviceProfile[] = [
     deviceMemoryGb: 32,
     ipSubnet: '108.162.193.0/24 (AT&T Fiber)',
     fingerprintId: 'FP-D489-B015-INTEL',
-    confidenceScore: 99.1,
-    orderRevenue: 195.0,
-    grossMargin: 111.15,
-    adSpend: 1.05,
-    productTitle: "Nike Air Force 1 '07 Premium Craft Edition",
-    sku: '315122-001',
-    asin: 'B08F91M14J'
+    confidenceScore: 99.1
   }
 ];
 
-interface JourneyStepDef {
+/**
+ * 2. DETERMINISTIC TRANSACTION & AD EVENT FIXTURE
+ * Consistent e-commerce transaction across cross-channel attribution tests.
+ * Financial metrics stem from the actual purchase event and campaign ledger,
+ * NOT the hardware platform.
+ */
+export interface TransactionFixture {
+  orderId: string;
+  productTitle: string;
+  sku: string;
+  asin: string;
+  itemPrice: number;
+  quantity: number;
+  grossRevenue: number;
+  cogs: number;
+  realizedGrossMargin: number;
+  grossMarginPct: number;
+  youtubeImpressionCpmCost: number; // CPM ₹24 / 1000 = ₹0.024
+  youtubeClickCpcCost: number;      // CPC ₹0.850
+  totalAttributedAdSpend: number;   // ₹0.024 + ₹0.850 = ₹0.874
+  assistedRoas: number;             // Gross Revenue / Total Ad Spend = 170.00 / 0.874 = 194.51
+}
+
+export const DETERMINISTIC_TRANSACTION: TransactionFixture = {
+  orderId: 'AMZ-9482-DN77',
+  productTitle: "Nike Men's Air Max Dn Running & Street Shoes (Triple Black)",
+  sku: 'AH8050-100',
+  asin: 'B0CWV8N21K',
+  itemPrice: 170.0,
+  quantity: 1,
+  grossRevenue: 170.0,
+  cogs: 76.5,
+  realizedGrossMargin: 93.5, // 170.00 - 76.50 = 93.50 (55.0% margin)
+  grossMarginPct: 55.0,
+  youtubeImpressionCpmCost: 0.024,
+  youtubeClickCpcCost: 0.85,
+  totalAttributedAdSpend: 0.874,
+  assistedRoas: 194.5 // Explicitly: ₹170.00 revenue ÷ ₹0.874 ad spend = 194.5x
+};
+
+export interface JourneyStepDef {
   stepNumber: number;
   title: string;
   platform: 'youtube' | 'amazon' | 'nexus';
@@ -129,18 +149,18 @@ interface JourneyStepDef {
 
 export function FingerprintTrackerDemo() {
   const [selectedDevice, setSelectedDevice] = useState<DeviceProfile>(SAMPLE_DEVICES[0]);
-  const [currentStep, setCurrentStep] = useState<number>(5); // Default to full confirmed journey on initial load
+  const [currentStep, setCurrentStep] = useState<number>(5); // Default to full confirmed journey on load
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [showTechnicalSignals, setShowTechnicalSignals] = useState<boolean>(false);
+  const [showDataLineage, setShowDataLineage] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'visual' | 'graph' | 'telemetry' | 'code'>('visual');
   const [copiedFp, setCopiedFp] = useState<boolean>(false);
 
-  // Derive ROAS deterministically
-  const realizedRoas = useMemo(() => {
-    return Number((selectedDevice.orderRevenue / selectedDevice.adSpend).toFixed(1));
-  }, [selectedDevice.orderRevenue, selectedDevice.adSpend]);
+  // Exact deterministic financial derivations from transaction fixture
+  const txn = DETERMINISTIC_TRANSACTION;
+  const realizedRoas = Number((txn.grossRevenue / txn.totalAttributedAdSpend).toFixed(1)); // 194.5
 
-  // Derive timeline steps dynamically for current device
+  // Derive timeline steps dynamically bound to active fingerprint identity and transaction fixture
   const journeySteps: JourneyStepDef[] = useMemo(() => [
     {
       stepNumber: 1,
@@ -153,7 +173,7 @@ export function FingerprintTrackerDemo() {
       details: [
         `Client hardware & canvas entropy evaluated on YouTube page via NEXUS cookieless pixel.`,
         `Deterministic device fingerprint generated: ${selectedDevice.fingerprintId}`,
-        `Impression logged: Campaign "YT_Brand_AirMaxDn_Q4", Cost CPM ₹0.024`,
+        `Impression logged: Campaign "YT_Brand_AirMaxDn_Q4", Cost CPM ₹${txn.youtubeImpressionCpmCost.toFixed(3)}`,
         `Zero reliance on 3rd-party tracking cookies (bypasses browser cookie blocking & Safari ITP).`
       ],
       eventPayload: {
@@ -165,8 +185,8 @@ export function FingerprintTrackerDemo() {
         entropy_match_score: `${selectedDevice.confidenceScore}%`,
         ad_campaign: 'YT_Brand_AirMaxDn_Q4',
         creative: 'Nike_AirMaxDn_FeelTheUnreal_15s.mp4',
-        sku_promoted: selectedDevice.sku,
-        cost_usd: 0.024,
+        sku_promoted: txn.sku,
+        cost_usd: txn.youtubeImpressionCpmCost,
         device_meta: {
           os: selectedDevice.os,
           gpu: selectedDevice.gpuRenderer,
@@ -185,9 +205,10 @@ export function FingerprintTrackerDemo() {
       timestamp: 'Today, 10:14:18 AM',
       details: [
         `Click event registered with matching Fingerprint ID: ${selectedDevice.fingerprintId}`,
-        `Ad interaction logged: Cost CPC ₹${(selectedDevice.adSpend - 0.024).toFixed(3)}`,
+        `Ad interaction logged: Cost CPC ₹${txn.youtubeClickCpcCost.toFixed(3)}`,
         `User lands on campaign landing page, explores colorways, but closes browser tab.`,
-        `Traditional ad networks now classify this user as "lost / bounced" with 0.0x ROAS.`
+        `Cumulative ad spend: ₹${txn.totalAttributedAdSpend.toFixed(3)} (CPM + CPC).`,
+        `Traditional ad networks classify this user as "bounced" with 0.0x ROAS.`
       ],
       eventPayload: {
         event_id: 'evt_yt_clk_4810',
@@ -196,7 +217,8 @@ export function FingerprintTrackerDemo() {
         timestamp: '2026-10-07T10:14:18.012Z',
         fingerprint_id: selectedDevice.fingerprintId,
         ad_campaign: 'YT_Brand_AirMaxDn_Q4',
-        cost_usd: Number((selectedDevice.adSpend - 0.024).toFixed(3)),
+        cost_usd: txn.youtubeClickCpcCost,
+        cumulative_spend_usd: txn.totalAttributedAdSpend,
         click_target: 'https://nike.com/campaign/airmax-dn?utm_source=youtube',
         dwell_time_seconds: 14.2,
         action_outcome: 'TAB_CLOSED_NO_CONVERSION'
@@ -214,7 +236,7 @@ export function FingerprintTrackerDemo() {
         `Crucial Gap: User did NOT click a referral link or ad. They typed "amazon.com" directly into their browser.`,
         `Zero UTM parameters. Zero referral headers. Zero 3rd-party cookies (blocked by Chrome/Safari/Brave).`,
         `NEXUS Amazon Storefront Tag executes client-side WebGL + Canvas + Audio fingerprinting.`,
-        `IDENTICAL Fingerprint ID computed: ${selectedDevice.fingerprintId} (Hardware signature matches 100%)!`,
+        `IDENTICAL Fingerprint ID computed: ${selectedDevice.fingerprintId} (${selectedDevice.confidenceScore}% confidence match)!`,
         `NEXUS Identity Graph stitches the independent Amazon session directly to the YouTube ad exposure!`
       ],
       eventPayload: {
@@ -225,9 +247,9 @@ export function FingerprintTrackerDemo() {
         fingerprint_id: selectedDevice.fingerprintId,
         cross_channel_stitched_to: 'evt_yt_imp_9921',
         referrer_type: 'DIRECT_ORGANIC_SEARCH',
-        sku_viewed: selectedDevice.sku,
-        product_title: selectedDevice.productTitle,
-        marketplace_price_usd: selectedDevice.orderRevenue,
+        sku_viewed: txn.sku,
+        product_title: txn.productTitle,
+        marketplace_price_usd: txn.itemPrice,
         graph_identity_confidence: `${selectedDevice.confidenceScore}% (DETERMINISTIC_HARDWARE_MATCH)`
       }
     },
@@ -237,10 +259,10 @@ export function FingerprintTrackerDemo() {
       platform: 'amazon',
       shortStage: 'Purchase',
       badgeLabel: 'STAGE 4: PURCHASE CONVERSION',
-      summary: `User completes 1-Click Buy on Amazon for ₹${selectedDevice.orderRevenue.toFixed(2)}.`,
+      summary: `User completes 1-Click Buy on Amazon for Order #${txn.orderId} (₹${txn.grossRevenue.toFixed(2)}).`,
       timestamp: 'Today, 04:35:10 PM',
       details: [
-        `Order confirmed: Order #AMZ-9482-DN77 for ₹${selectedDevice.orderRevenue.toFixed(2)}.`,
+        `Order confirmed: Order #${txn.orderId} for ₹${txn.grossRevenue.toFixed(2)}.`,
         `Conversion telemetry sent to NEXUS Ingestion Engine with Fingerprint ID: ${selectedDevice.fingerprintId}`,
         `Amazon internal seller analytics attributes this as: "Direct Amazon Organic Search / Unpaid Traffic".`,
         `NEXUS Identity Graph unlocks the full truth: YouTube Ad generated the demand!`
@@ -251,10 +273,10 @@ export function FingerprintTrackerDemo() {
         platform: 'amazon',
         timestamp: '2026-10-07T16:35:10.420Z',
         fingerprint_id: selectedDevice.fingerprintId,
-        order_id: 'AMZ-9482-DN77',
-        sku: selectedDevice.sku,
-        revenue_usd: selectedDevice.orderRevenue,
-        estimated_gross_margin_usd: selectedDevice.grossMargin,
+        order_id: txn.orderId,
+        sku: txn.sku,
+        revenue_usd: txn.grossRevenue,
+        estimated_gross_margin_usd: txn.realizedGrossMargin,
         payment_method: 'Amazon Pay (1-Click)'
       }
     },
@@ -267,9 +289,10 @@ export function FingerprintTrackerDemo() {
       summary: `The deterministic Fingerprint links the siloed platforms: YouTube ROAS jumps to ${realizedRoas}x!`,
       timestamp: 'Real-Time Sync • Just Now',
       details: [
-        `Without Fingerprint: Marketer sees ₹${selectedDevice.adSpend.toFixed(3)} YouTube spend with ₹0 revenue -> Cuts YouTube budget!`,
+        `Without Fingerprint: Marketer sees ₹${txn.totalAttributedAdSpend.toFixed(3)} YouTube spend with ₹0 revenue -> Cuts YouTube budget!`,
         `With NEXUS Single Fingerprint: Full cross-channel journey proven (YouTube View -> YouTube Click -> Amazon Buy).`,
-        `Assisted ROAS calculated: ₹${selectedDevice.orderRevenue.toFixed(2)} revenue / ₹${selectedDevice.adSpend.toFixed(3)} total ad spend = ${realizedRoas}x ROAS!`,
+        `Assisted ROAS calculated: ₹${txn.grossRevenue.toFixed(2)} revenue ÷ ₹${txn.totalAttributedAdSpend.toFixed(3)} total ad spend = ${realizedRoas}x ROAS!`,
+        `Realized Gross Margin: ₹${txn.realizedGrossMargin.toFixed(2)} (${txn.grossMarginPct}%).`,
         `NEXUS SLSQP Optimizer Recommendation: Scale YouTube campaign budget by +25% (₹4,500/day shift).`
       ],
       eventPayload: {
@@ -286,39 +309,68 @@ export function FingerprintTrackerDemo() {
             amazon_organic: '100% credited (Misleading: looks purely organic)'
           },
           nexus_fingerprint_stitched_roas: {
+            formula: 'attributed_revenue / attributed_ad_spend',
             youtube_assisted_roas: `${realizedRoas}x`,
-            attributed_revenue: `₹${selectedDevice.orderRevenue.toFixed(2)}`,
-            gross_margin: `₹${selectedDevice.grossMargin.toFixed(2)}`,
+            attributed_revenue: `₹${txn.grossRevenue.toFixed(2)}`,
+            attributed_ad_spend: `₹${txn.totalAttributedAdSpend.toFixed(3)}`,
+            gross_margin: `₹${txn.realizedGrossMargin.toFixed(2)}`,
             actionable_decision: 'PRESERVE & SCALE YOUTUBE AD SPEND'
           }
         }
       }
     }
-  ], [selectedDevice, realizedRoas]);
+  ], [selectedDevice, txn, realizedRoas]);
 
-  // Chart data showing the step-by-step financial accumulation across the journey
-  const journeyTimelineChartData = useMemo(() => [
-    { stage: '1. Ad View', adSpend: 0.024, unattributedRevenue: 0, attributedRevenue: 0, roas: 0 },
-    { stage: '2. Click', adSpend: selectedDevice.adSpend, unattributedRevenue: 0, attributedRevenue: 0, roas: 0 },
-    { stage: '3. Amazon Search', adSpend: selectedDevice.adSpend, unattributedRevenue: 0, attributedRevenue: 0, roas: 0 },
-    { stage: '4. Buy Box', adSpend: selectedDevice.adSpend, unattributedRevenue: 0, attributedRevenue: selectedDevice.orderRevenue * 0.5, roas: Number(((selectedDevice.orderRevenue * 0.5) / selectedDevice.adSpend).toFixed(1)) },
-    { stage: '5. Attributed', adSpend: selectedDevice.adSpend, unattributedRevenue: 0, attributedRevenue: selectedDevice.orderRevenue, roas: realizedRoas }
-  ], [selectedDevice, realizedRoas]);
+  // Chart data reflecting exact step progression
+  const journeyTimelineChartData = useMemo(() => {
+    return [
+      {
+        stage: '1. Ad View',
+        adSpend: currentStep >= 1 ? txn.youtubeImpressionCpmCost : 0,
+        unattributedRevenue: 0,
+        attributedRevenue: 0
+      },
+      {
+        stage: '2. Click',
+        adSpend: currentStep >= 2 ? txn.totalAttributedAdSpend : 0,
+        unattributedRevenue: 0,
+        attributedRevenue: 0
+      },
+      {
+        stage: '3. Amazon Search',
+        adSpend: currentStep >= 3 ? txn.totalAttributedAdSpend : 0,
+        unattributedRevenue: 0,
+        attributedRevenue: 0
+      },
+      {
+        stage: '4. Buy Box',
+        adSpend: currentStep >= 4 ? txn.totalAttributedAdSpend : 0,
+        unattributedRevenue: 0,
+        attributedRevenue: currentStep >= 4 ? txn.grossRevenue : 0
+      },
+      {
+        stage: '5. Attributed',
+        adSpend: currentStep >= 5 ? txn.totalAttributedAdSpend : 0,
+        unattributedRevenue: 0,
+        attributedRevenue: currentStep >= 5 ? txn.grossRevenue : 0
+      }
+    ];
+  }, [currentStep, txn]);
 
   const comparisonChartData = useMemo(() => [
     {
       category: 'Siloed (Last-Touch)',
-      adSpend: selectedDevice.adSpend,
+      adSpend: txn.totalAttributedAdSpend,
       recognizedRevenue: 0,
       realRoas: 0
     },
     {
-      category: 'NEXUS Fingerprint Stitched',
-      adSpend: selectedDevice.adSpend,
-      recognizedRevenue: selectedDevice.orderRevenue,
-      realRoas: realizedRoas
+      category: 'NEXUS Stitched',
+      adSpend: txn.totalAttributedAdSpend,
+      recognizedRevenue: currentStep >= 4 ? txn.grossRevenue : 0,
+      realRoas: currentStep >= 5 ? realizedRoas : 0
     }
-  ], [selectedDevice, realizedRoas]);
+  ], [currentStep, txn, realizedRoas]);
 
   // Auto-play timer for interactive journey demo
   useEffect(() => {
@@ -330,13 +382,13 @@ export function FingerprintTrackerDemo() {
         } else {
           setIsPlaying(false);
           toast.success('Journey Complete!', {
-            description: `Attributed ₹${selectedDevice.orderRevenue.toFixed(2)} revenue with ${selectedDevice.confidenceScore}% device match.`
+            description: `Attributed ₹${txn.grossRevenue.toFixed(2)} revenue with ${selectedDevice.confidenceScore}% device match.`
           });
         }
       }, 1000);
     }
     return () => clearTimeout(timer);
-  }, [isPlaying, currentStep, selectedDevice]);
+  }, [isPlaying, currentStep, selectedDevice, txn]);
 
   const handleCopyFp = () => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -362,6 +414,20 @@ export function FingerprintTrackerDemo() {
     toast.info('Journey Reset', {
       description: 'Restarted at Stage 1: YouTube Ad Impression.'
     });
+  };
+
+  const handlePrevStep = () => {
+    setIsPlaying(false);
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleNextStep = () => {
+    setIsPlaying(false);
+    if (currentStep < 5) {
+      setCurrentStep(currentStep + 1);
+    }
   };
 
   const handleFastForward = () => {
@@ -410,7 +476,7 @@ export function FingerprintTrackerDemo() {
               </div>
               <div className='flex flex-col'>
                 <span className='text-[9px] font-mono text-[#8A8A8A] uppercase tracking-wider'>
-                  Simulated Hardware Profile
+                  Active Hardware Entropy Signature
                 </span>
                 <select
                   aria-label='Select Device Profile'
@@ -419,7 +485,7 @@ export function FingerprintTrackerDemo() {
                     const dev = SAMPLE_DEVICES.find((d) => d.id === e.target.value);
                     if (dev) {
                       setSelectedDevice(dev);
-                      toast.info(`Hardware Switched: ${dev.name}`, {
+                      toast.info(`Device Identity Changed: ${dev.name}`, {
                         description: `Fingerprint ${dev.fingerprintId} (${dev.confidenceScore}% match)`
                       });
                     }
@@ -479,7 +545,7 @@ export function FingerprintTrackerDemo() {
               </div>
 
               <div className='text-[10px] font-mono text-[#8A8A8A] mt-2 pt-2 border-t border-[#8A8A8A]/30 flex items-center justify-between'>
-                <span>WebGL + Audio + Canvas</span>
+                <span>Canvas + GPU + Audio</span>
                 <span className='text-[#FFFFFF] font-bold'>VERIFIED</span>
               </div>
             </div>
@@ -509,13 +575,13 @@ export function FingerprintTrackerDemo() {
                     Preroll Video Click
                   </span>
                   <span className='text-[11px] font-mono text-[#8A8A8A]'>
-                    Cost: ₹{selectedDevice.adSpend.toFixed(3)}
+                    Cost: ₹{txn.totalAttributedAdSpend.toFixed(3)}
                   </span>
                 </div>
               </div>
 
               <div className='text-[10px] font-mono text-[#8A8A8A] mt-2 pt-2 border-t border-[#8A8A8A]/30 flex items-center justify-between'>
-                <span>No purchase yet</span>
+                <span>Ad Clicked</span>
                 <span className='text-[#8A8A8A] font-medium'>Tab Closed</span>
               </div>
             </div>
@@ -562,6 +628,8 @@ export function FingerprintTrackerDemo() {
                 'relative rounded-lg border p-4 bg-[#0A0A0A] flex flex-col justify-between transition-all duration-300',
                 currentStep >= 5
                   ? 'border-[#FFFFFF] bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A] shadow-[0_0_20px_rgba(255,255,255,0.25)] ring-2 ring-[#FFFFFF]'
+                  : currentStep === 4
+                  ? 'border-[#FFFFFF] shadow-[0_0_15px_rgba(255,255,255,0.15)]'
                   : 'border-[#8A8A8A]/30 opacity-60'
               )}
             >
@@ -569,12 +637,14 @@ export function FingerprintTrackerDemo() {
                 <span className='text-[10px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#FFFFFF] text-[#000000]'>
                   04 • REALIZED ROI
                 </span>
-                {currentStep >= 4 && (
+                {currentStep >= 5 ? (
                   <span className='text-[10px] font-mono font-bold text-[#FFFFFF] flex items-center gap-1'>
                     <Icons.circleCheck className='size-3 text-[#FFFFFF]' />
                     CONFIRMED
                   </span>
-                )}
+                ) : currentStep === 4 ? (
+                  <span className='text-[10px] font-mono font-bold text-[#8A8A8A]'>PURCHASED</span>
+                ) : null}
               </div>
 
               <div className='flex items-center gap-3 my-2'>
@@ -583,17 +653,17 @@ export function FingerprintTrackerDemo() {
                 </div>
                 <div className='flex flex-col'>
                   <span className='text-sm font-mono font-black text-[#FFFFFF]'>
-                    ₹{selectedDevice.orderRevenue.toFixed(2)} Revenue
+                    {currentStep >= 4 ? `₹${txn.grossRevenue.toFixed(2)} Revenue` : 'Pending Checkout'}
                   </span>
                   <span className='text-xs font-mono font-bold text-[#FFFFFF]'>
-                    {realizedRoas}x ROAS Lift
+                    {currentStep >= 5 ? `${realizedRoas}x ROAS Lift` : currentStep === 4 ? 'Resolving ROAS...' : '0.0x ROAS (Siloed)'}
                   </span>
                 </div>
               </div>
 
               <div className='text-[10px] font-mono text-[#8A8A8A] mt-2 pt-2 border-t border-[#8A8A8A]/30 flex items-center justify-between'>
-                <span>Margin: ₹{selectedDevice.grossMargin.toFixed(2)}</span>
-                <span className='text-[#FFFFFF] font-bold'>CLOSED-LOOP</span>
+                <span>Margin: ₹{currentStep >= 4 ? txn.realizedGrossMargin.toFixed(2) : '0.00'}</span>
+                <span className='text-[#FFFFFF] font-bold'>{currentStep >= 5 ? 'CLOSED-LOOP' : 'IN PROGRESS'}</span>
               </div>
             </div>
           </div>
@@ -617,6 +687,28 @@ export function FingerprintTrackerDemo() {
                     {currentStep >= 5 ? 'Replay Journey (3s)' : 'Play Journey (3s)'}
                   </>
                 )}
+              </Button>
+
+              <Button
+                size='sm'
+                variant='outline'
+                onClick={handlePrevStep}
+                disabled={currentStep === 1}
+                className='h-8 text-xs font-mono border border-[#8A8A8A]/60 bg-[#1A1A1A] hover:bg-[#000000] text-[#FFFFFF] disabled:opacity-40'
+              >
+                <Icons.chevronLeft className='size-3.5 mr-1 text-[#FFFFFF]' />
+                Prev
+              </Button>
+
+              <Button
+                size='sm'
+                variant='outline'
+                onClick={handleNextStep}
+                disabled={currentStep === 5}
+                className='h-8 text-xs font-mono border border-[#8A8A8A]/60 bg-[#1A1A1A] hover:bg-[#000000] text-[#FFFFFF] disabled:opacity-40'
+              >
+                Next
+                <Icons.chevronRight className='size-3.5 ml-1 text-[#FFFFFF]' />
               </Button>
 
               <Button
@@ -681,7 +773,7 @@ export function FingerprintTrackerDemo() {
               Technical Hardware Signals &amp; Entropy Vector
             </span>
             <Badge variant='outline' className='border-[#8A8A8A]/60 bg-[#000000] text-[#8A8A8A] text-[10px] font-mono'>
-              {selectedDevice.confidenceScore}% Confidence • 6 Vectors
+              {selectedDevice.confidenceScore}% Match Certainty • 6 Vectors
             </Badge>
           </div>
           <div className='flex items-center gap-2 text-xs text-[#8A8A8A]'>
@@ -737,25 +829,112 @@ export function FingerprintTrackerDemo() {
         )}
       </div>
 
-      {/* 3. CONFIRMED ATTRIBUTION HERO PANEL */}
+      {/* 3. DATA LINEAGE SECTION (Explicit Financial Traceability) */}
+      <div className='rounded-xl border border-[#8A8A8A]/50 bg-[#141414] overflow-hidden'>
+        <button
+          onClick={() => setShowDataLineage(!showDataLineage)}
+          className='w-full px-5 py-3.5 flex items-center justify-between text-left hover:bg-[#1A1A1A] transition-colors font-mono'
+        >
+          <div className='flex items-center gap-2.5'>
+            <Icons.topology className='size-4 text-[#FFFFFF]' />
+            <span className='text-xs font-bold uppercase tracking-wider text-[#FFFFFF]'>
+              Data Lineage &amp; Financial Formula Trace
+            </span>
+            <Badge variant='outline' className='border-[#8A8A8A]/60 bg-[#000000] text-[#8A8A8A] text-[10px] font-mono'>
+              ROAS Formula: Revenue ÷ Ad Spend = 194.5x
+            </Badge>
+          </div>
+          <div className='flex items-center gap-2 text-xs text-[#8A8A8A]'>
+            <span>{showDataLineage ? 'Collapse Lineage' : 'View Lineage ▾'}</span>
+            <Icons.chevronDown
+              className={cn('size-4 text-[#FFFFFF] transition-transform duration-200', showDataLineage && 'rotate-180')}
+            />
+          </div>
+        </button>
+
+        {showDataLineage && (
+          <div className='px-5 pb-5 pt-3 border-t border-[#8A8A8A]/30 font-mono text-xs'>
+            {/* Visual Lineage Chain Flow */}
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-2.5 items-stretch'>
+              <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded-lg p-2.5 flex flex-col justify-between'>
+                <span className='text-[9px] text-[#8A8A8A] uppercase font-bold'>1. Source Ad</span>
+                <span className='text-xs font-bold text-[#FFFFFF] mt-1'>YouTube Video</span>
+                <span className='text-[10px] text-[#8A8A8A] mt-0.5'>CPM ₹{txn.youtubeImpressionCpmCost.toFixed(3)} + CPC ₹{txn.youtubeClickCpcCost.toFixed(3)}</span>
+              </div>
+
+              <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded-lg p-2.5 flex flex-col justify-between'>
+                <span className='text-[9px] text-[#8A8A8A] uppercase font-bold'>2. Hardware Hash</span>
+                <span className='text-xs font-bold text-[#FFFFFF] mt-1 truncate'>{selectedDevice.fingerprintId}</span>
+                <span className='text-[10px] text-[#8A8A8A] mt-0.5'>{selectedDevice.confidenceScore}% certainty</span>
+              </div>
+
+              <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded-lg p-2.5 flex flex-col justify-between'>
+                <span className='text-[9px] text-[#8A8A8A] uppercase font-bold'>3. Marketplace</span>
+                <span className='text-xs font-bold text-[#FFFFFF] mt-1'>Amazon Direct</span>
+                <span className='text-[10px] text-[#8A8A8A] mt-0.5'>Zero UTM / Cookieless</span>
+              </div>
+
+              <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded-lg p-2.5 flex flex-col justify-between'>
+                <span className='text-[9px] text-[#8A8A8A] uppercase font-bold'>4. Order Event</span>
+                <span className='text-xs font-bold text-[#FFFFFF] mt-1'>#{txn.orderId}</span>
+                <span className='text-[10px] text-[#8A8A8A] mt-0.5'>ASIN: {txn.asin}</span>
+              </div>
+
+              <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded-lg p-2.5 flex flex-col justify-between'>
+                <span className='text-[9px] text-[#8A8A8A] uppercase font-bold'>5. Transaction Rev</span>
+                <span className='text-xs font-bold text-[#FFFFFF] mt-1'>₹{txn.grossRevenue.toFixed(2)}</span>
+                <span className='text-[10px] text-[#8A8A8A] mt-0.5'>COGS ₹{txn.cogs.toFixed(2)}</span>
+              </div>
+
+              <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded-lg p-2.5 flex flex-col justify-between'>
+                <span className='text-[9px] text-[#8A8A8A] uppercase font-bold'>6. Realized Margin</span>
+                <span className='text-xs font-bold text-[#FFFFFF] mt-1'>₹{txn.realizedGrossMargin.toFixed(2)}</span>
+                <span className='text-[10px] text-[#8A8A8A] mt-0.5'>{txn.grossMarginPct}% margin</span>
+              </div>
+
+              <div className='bg-[#000000] border border-[#FFFFFF]/60 rounded-lg p-2.5 flex flex-col justify-between bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A]'>
+                <span className='text-[9px] text-[#FFFFFF] uppercase font-bold'>7. Assisted ROAS</span>
+                <span className='text-xs font-black text-[#FFFFFF] mt-1'>{realizedRoas}x</span>
+                <span className='text-[10px] text-[#FFFFFF] mt-0.5'>₹170.00 ÷ ₹0.874</span>
+              </div>
+            </div>
+
+            <div className='mt-3 pt-2.5 border-t border-[#8A8A8A]/30 flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-[#8A8A8A] gap-2'>
+              <div>
+                <strong className='text-[#FFFFFF]'>Attribution Lineage Rule: </strong>
+                Device signals determine the <em>identity match</em>. The marketplace transaction determines <em>revenue &amp; margin</em>. ROAS is derived strictly as: <code className='text-[#FFFFFF]'>Attributed Revenue ÷ Attributed Ad Spend</code>.
+              </div>
+              <Badge variant='outline' className='text-[10px] border-[#8A8A8A]/40 text-[#FFFFFF] self-start sm:self-auto shrink-0'>
+                Deterministic Lineage Verified
+              </Badge>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 4. CONFIRMED ATTRIBUTION HERO PANEL */}
       <div className='rounded-xl border border-[#FFFFFF]/40 bg-gradient-to-r from-[#111111] via-[#1A1A1A] to-[#111111] p-6 shadow-xl'>
         <div className='flex flex-col lg:flex-row lg:items-center justify-between gap-6'>
           <div>
             <div className='flex items-center gap-2 mb-2'>
               <Badge className='bg-[#FFFFFF] text-[#000000] font-mono text-xs font-bold border-none uppercase px-2.5 py-0.5'>
-                ✓ ATTRIBUTION CONFIRMED
+                {currentStep >= 5 ? '✓ ATTRIBUTION CONFIRMED' : currentStep >= 4 ? '● ORDER DETECTED' : '○ SIMULATION IN PROGRESS'}
               </Badge>
               <span className='text-xs font-mono text-[#8A8A8A]'>
-                Cross-channel conversion resolved in 6h 21m
+                {currentStep >= 4 ? 'Cross-channel conversion resolved in 6h 21m' : 'Awaiting conversion touchpoint'}
               </span>
             </div>
             <h2 className='text-2xl md:text-3xl font-mono font-black text-[#FFFFFF] tracking-tight'>
-              ₹{selectedDevice.orderRevenue.toFixed(2)} Revenue • {realizedRoas}x Assisted ROAS
+              {currentStep >= 5
+                ? `₹${txn.grossRevenue.toFixed(2)} Revenue • ${realizedRoas}x Assisted ROAS`
+                : currentStep === 4
+                ? `₹${txn.grossRevenue.toFixed(2)} Revenue • Resolving ROAS...`
+                : `₹0.00 Revenue (Siloed 0.0x ROAS)`}
             </h2>
             <p className='text-xs font-mono text-[#8A8A8A] mt-1 max-w-2xl leading-relaxed'>
-              YouTube Ad Spend of <span className='text-[#FFFFFF] font-bold'>₹{selectedDevice.adSpend.toFixed(3)}</span> yielded{' '}
-              <span className='text-[#FFFFFF] font-bold'>₹{selectedDevice.orderRevenue.toFixed(2)}</span> Amazon checkout.
-              Siloed last-touch analytics miscredited this as 0.0x ROAS.
+              YouTube Ad Spend of <span className='text-[#FFFFFF] font-bold'>₹{txn.totalAttributedAdSpend.toFixed(3)}</span> yielded{' '}
+              <span className='text-[#FFFFFF] font-bold'>₹{txn.grossRevenue.toFixed(2)}</span> Amazon checkout.
+              Formula: <span className='text-[#FFFFFF] font-bold'>Attributed revenue ÷ Attributed ad spend</span> = {realizedRoas}x.
             </p>
           </div>
 
@@ -763,7 +942,9 @@ export function FingerprintTrackerDemo() {
           <div className='grid grid-cols-2 sm:grid-cols-3 gap-3 font-mono shrink-0'>
             <div className='bg-[#000000] border border-[#8A8A8A]/50 rounded-lg p-3 text-center'>
               <span className='text-[10px] text-[#8A8A8A] uppercase tracking-wider block'>Realized Margin</span>
-              <span className='text-base font-bold text-[#FFFFFF] mt-0.5 block'>₹{selectedDevice.grossMargin.toFixed(2)}</span>
+              <span className='text-base font-bold text-[#FFFFFF] mt-0.5 block'>
+                {currentStep >= 4 ? `₹${txn.realizedGrossMargin.toFixed(2)}` : '₹0.00'}
+              </span>
             </div>
             <div className='bg-[#000000] border border-[#8A8A8A]/50 rounded-lg p-3 text-center'>
               <span className='text-[10px] text-[#8A8A8A] uppercase tracking-wider block'>Match Certainty</span>
@@ -777,7 +958,7 @@ export function FingerprintTrackerDemo() {
         </div>
       </div>
 
-      {/* 4. ROI RECHARTS VISUALIZATION & COMPARISON */}
+      {/* 5. ROI RECHARTS VISUALIZATION & COMPARISON */}
       <div className='grid grid-cols-1 lg:grid-cols-12 gap-6'>
         {/* Left: Journey Accumulation Area Chart */}
         <div className='lg:col-span-7 rounded-xl border border-[#8A8A8A]/50 bg-[#141414] p-5 flex flex-col justify-between'>
@@ -851,8 +1032,8 @@ export function FingerprintTrackerDemo() {
           </div>
 
           <div className='mt-4 pt-3 border-t border-[#8A8A8A]/30 flex items-center justify-between text-[11px] font-mono text-[#8A8A8A]'>
-            <span>Initial YouTube Cost: <strong className='text-[#FFFFFF]'>₹{selectedDevice.adSpend.toFixed(3)}</strong></span>
-            <span>Final Conversion Yield: <strong className='text-[#FFFFFF]'>₹{selectedDevice.orderRevenue.toFixed(2)}</strong></span>
+            <span>Initial YouTube Cost: <strong className='text-[#FFFFFF]'>₹{txn.totalAttributedAdSpend.toFixed(3)}</strong></span>
+            <span>Final Conversion Yield: <strong className='text-[#FFFFFF]'>₹{currentStep >= 4 ? txn.grossRevenue.toFixed(2) : '0.00'}</strong></span>
           </div>
         </div>
 
@@ -903,12 +1084,12 @@ export function FingerprintTrackerDemo() {
 
           <div className='mt-4 pt-3 border-t border-[#8A8A8A]/30 flex items-center justify-between text-[11px] font-mono'>
             <span className='text-[#8A8A8A]'>Siloed: <strong className='text-[#8A8A8A]'>0.0x ROAS</strong></span>
-            <span className='text-[#FFFFFF]'>NEXUS: <strong className='text-[#FFFFFF]'>{realizedRoas}x ROAS</strong></span>
+            <span className='text-[#FFFFFF]'>NEXUS: <strong className='text-[#FFFFFF]'>{currentStep >= 5 ? `${realizedRoas}x ROAS` : 'Evaluating'}</strong></span>
           </div>
         </div>
       </div>
 
-      {/* 5. DEEP DIVE TABS (Visual Journey Mock, Identity Graph, DuckDB Telemetry, SDK) */}
+      {/* 6. DEEP DIVE TABS (Visual Journey Mock, Identity Graph, DuckDB Telemetry, SDK) */}
       <div className='rounded-xl border border-[#8A8A8A]/50 bg-[#141414] overflow-hidden'>
         {/* Tab navigation headers */}
         <div className='flex items-center gap-1 p-2 bg-[#000000] border-b border-[#8A8A8A]/30 text-xs font-mono overflow-x-auto'>
@@ -1008,7 +1189,7 @@ export function FingerprintTrackerDemo() {
                             Nike Sponsored Preroll Ad
                           </span>
                           <h4 className='text-lg md:text-xl font-black text-[#FFFFFF] tracking-tight mt-0.5'>
-                            {selectedDevice.productTitle}
+                            {txn.productTitle}
                           </h4>
                           <p className='text-xs text-[#8A8A8A] max-w-sm mt-0.5'>
                             Dynamic dual-chamber air cushioning delivers responsive bounce with every stride.
@@ -1036,7 +1217,7 @@ export function FingerprintTrackerDemo() {
                               {currentStep === 2 ? 'Ad Clicked (Engaged)' : 'Shop Now (Click Ad)'}
                             </Button>
                             <span className='text-[10px] font-mono text-[#8A8A8A] hidden sm:inline'>
-                              CPC Cost: ₹{(selectedDevice.adSpend - 0.024).toFixed(3)}
+                              CPC Cost: ₹{txn.youtubeClickCpcCost.toFixed(3)}
                             </span>
                           </div>
                           <span className='text-[10px] font-mono text-[#8A8A8A]'>Skip Ad in 5s</span>
@@ -1065,7 +1246,7 @@ export function FingerprintTrackerDemo() {
                         </div>
                         <div className='flex-1 max-w-sm bg-[#000000] border border-[#8A8A8A]/40 rounded px-2.5 py-1 text-xs font-mono text-[#FFFFFF] flex items-center'>
                           <Icons.search className='size-3 text-[#8A8A8A] mr-2' />
-                          <span className='truncate'>{selectedDevice.sku}</span>
+                          <span className='truncate'>{txn.sku}</span>
                         </div>
                         <span className='text-xs font-mono font-bold text-[#FFFFFF]'>Prime 1-Day</span>
                       </div>
@@ -1078,14 +1259,14 @@ export function FingerprintTrackerDemo() {
                         <div className='flex-1 flex flex-col justify-between'>
                           <div>
                             <div className='flex items-center justify-between text-[11px] font-mono text-[#8A8A8A]'>
-                              <span>ASIN: {selectedDevice.asin}</span>
+                              <span>ASIN: {txn.asin}</span>
                               <span className='text-[#FFFFFF] font-bold'>★★★★★ 4.9</span>
                             </div>
                             <h4 className='text-sm font-bold text-[#FFFFFF] mt-1 line-clamp-2'>
-                              {selectedDevice.productTitle}
+                              {txn.productTitle}
                             </h4>
                             <div className='text-base font-mono font-bold text-[#FFFFFF] mt-1'>
-                              ₹{selectedDevice.orderRevenue.toFixed(2)}
+                              ₹{txn.grossRevenue.toFixed(2)}
                             </div>
                           </div>
 
@@ -1102,15 +1283,15 @@ export function FingerprintTrackerDemo() {
                                 className='bg-[#FFFFFF] hover:bg-[#CCCCCC] text-[#000000] font-bold text-xs h-7 px-4 w-full border-none'
                               >
                                 <Icons.cart className='size-3.5 mr-1.5' />
-                                Buy Now (1-Click Checkout ₹{selectedDevice.orderRevenue.toFixed(2)})
+                                Buy Now (1-Click Checkout ₹{txn.grossRevenue.toFixed(2)})
                               </Button>
                             ) : (
                               <div className='rounded bg-[#000000] border border-[#8A8A8A] p-2 flex items-center justify-between text-xs font-mono text-[#FFFFFF]'>
                                 <span className='font-bold flex items-center gap-1.5'>
                                   <Icons.circleCheck className='size-4 text-[#FFFFFF]' />
-                                  Order Confirmed: #AMZ-9482-DN77
+                                  Order Confirmed: #{txn.orderId}
                                 </span>
-                                <span className='font-bold'>₹{selectedDevice.orderRevenue.toFixed(2)}</span>
+                                <span className='font-bold'>₹{txn.grossRevenue.toFixed(2)}</span>
                               </div>
                             )}
                           </div>
@@ -1151,7 +1332,7 @@ export function FingerprintTrackerDemo() {
                           </div>
                           <div className='bg-[#000000] border border-[#FFFFFF]/60 rounded p-2.5'>
                             <span className='text-[#FFFFFF] block text-[10px] uppercase font-bold'>NEXUS View (Real)</span>
-                            <span className='text-[#FFFFFF] block font-black mt-0.5'>{realizedRoas}x ROAS (₹{selectedDevice.orderRevenue.toFixed(2)})</span>
+                            <span className='text-[#FFFFFF] block font-black mt-0.5'>{realizedRoas}x ROAS (₹{txn.grossRevenue.toFixed(2)})</span>
                             <span className='text-[10px] text-[#FFFFFF] block mt-1 font-semibold'>Recommendation: Scale ad +25%</span>
                           </div>
                         </div>
@@ -1242,7 +1423,7 @@ export function FingerprintTrackerDemo() {
                 <h4 className='text-xs font-bold text-[#FFFFFF] mt-0.5'>YouTube Impression</h4>
                 <p className='text-[10px] text-[#8A8A8A] mt-1'>Campaign: YT_AirMaxDn_Q4</p>
                 <div className='mt-2 pt-2 border-t border-[#8A8A8A]/30 text-[10px] text-[#FFFFFF]'>
-                  Cost: ₹0.024
+                  Cost: ₹{txn.youtubeImpressionCpmCost.toFixed(3)}
                 </div>
               </div>
 
@@ -1255,7 +1436,7 @@ export function FingerprintTrackerDemo() {
                 <h4 className='text-xs font-bold text-[#FFFFFF] mt-0.5'>YouTube Ad Click</h4>
                 <p className='text-[10px] text-[#8A8A8A] mt-1'>Dwell: 14.2s (No checkout)</p>
                 <div className='mt-2 pt-2 border-t border-[#8A8A8A]/30 text-[10px] text-[#FFFFFF]'>
-                  CPC: ₹{(selectedDevice.adSpend - 0.024).toFixed(3)}
+                  CPC: ₹{txn.youtubeClickCpcCost.toFixed(3)}
                 </div>
               </div>
 
@@ -1268,7 +1449,7 @@ export function FingerprintTrackerDemo() {
                 <h4 className='text-xs font-bold text-[#FFFFFF] mt-0.5'>Amazon Search Visit</h4>
                 <p className='text-[10px] text-[#8A8A8A] mt-1'>0 UTMs • Direct typed</p>
                 <div className='mt-2 pt-2 border-t border-[#8A8A8A]/30 text-[10px] text-[#FFFFFF]'>
-                  ● Match: 100% Identical
+                  ● Match: {selectedDevice.confidenceScore}% Identical
                 </div>
               </div>
 
@@ -1279,9 +1460,9 @@ export function FingerprintTrackerDemo() {
                 </div>
                 <span className='text-[10px] text-[#8A8A8A] font-bold uppercase'>Node 04</span>
                 <h4 className='text-xs font-bold text-[#FFFFFF] mt-0.5'>Amazon 1-Click Buy</h4>
-                <p className='text-[10px] text-[#8A8A8A] mt-1'>Order #AMZ-9482-DN77</p>
+                <p className='text-[10px] text-[#8A8A8A] mt-1'>Order #{txn.orderId}</p>
                 <div className='mt-2 pt-2 border-t border-[#8A8A8A]/30 text-[10px] text-[#FFFFFF] font-bold'>
-                  ₹{selectedDevice.orderRevenue.toFixed(2)} Attributed
+                  ₹{txn.grossRevenue.toFixed(2)} Attributed
                 </div>
               </div>
             </div>
@@ -1293,11 +1474,11 @@ export function FingerprintTrackerDemo() {
               </div>
               <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded p-2.5'>
                 <span className='text-[#8A8A8A] block text-[10px] uppercase'>Total Incurred Ad Spend</span>
-                <span className='text-[#FFFFFF] font-bold'>₹{selectedDevice.adSpend.toFixed(3)}</span>
+                <span className='text-[#FFFFFF] font-bold'>₹{txn.totalAttributedAdSpend.toFixed(3)}</span>
               </div>
               <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded p-2.5'>
                 <span className='text-[#8A8A8A] block text-[10px] uppercase'>Gross Attributed Value</span>
-                <span className='text-[#FFFFFF] font-bold'>₹{selectedDevice.orderRevenue.toFixed(2)}</span>
+                <span className='text-[#FFFFFF] font-bold'>₹{txn.grossRevenue.toFixed(2)}</span>
               </div>
               <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded p-2.5'>
                 <span className='text-[#8A8A8A] block text-[10px] uppercase'>Attributed Lift Factor</span>
