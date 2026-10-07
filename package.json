@@ -5,12 +5,13 @@
   "description": "Next-Generation Autonomous D2C Advertising Intelligence & Decision Engine",
   "scripts": {
     "dev": "pnpm --dir web dev",
-    "build": "pnpm --dir web build",
+    "build": "pnpm --dir web build && cp -r web/.next .next",
     "start": "pnpm --dir web start",
     "simulate": "python3 scripts/export_engine_state.py",
     "demo": "python3 scripts/run_demo.py"
   },
   "devDependencies": {
+    "next": "16.2.12",
     "raw-loader": "^4.0.2"
   }
 }
