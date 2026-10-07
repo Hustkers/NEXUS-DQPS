@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { IconAdjustmentsHorizontal } from '@tabler/icons-react';
+import { MetaLogo, GoogleLogo, AmazonLogo } from '@/components/icons/platform-logos';
 
 export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?: (alloc: any) => void }) {
   const [metaSpend, setMetaSpend] = useState(0); // Shifted away from stockout
@@ -53,7 +54,7 @@ export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?:
         <div className="p-3.5 rounded bg-[#000000] border border-[#8A8A8A]/40 space-y-2">
           <div className="flex items-center justify-between text-xs font-mono font-medium">
             <span className="flex items-center gap-1.5 text-[#FFFFFF]">
-              <span className="size-2 rounded-full border border-[#8A8A8A]" /> Meta Ads
+              <MetaLogo size={14} className="shrink-0" /> Meta Ads
             </span>
             <span className="font-mono text-[#FFFFFF] font-bold">${metaSpend} / day</span>
           </div>
@@ -76,7 +77,7 @@ export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?:
         <div className="p-3.5 rounded bg-[#000000] border border-[#8A8A8A]/40 space-y-2">
           <div className="flex items-center justify-between text-xs font-mono font-medium">
             <span className="flex items-center gap-1.5 text-[#FFFFFF]">
-              <span className="size-2 rounded-full bg-[#FFFFFF]" /> Google Search
+              <GoogleLogo size={14} className="shrink-0" /> Google Search
             </span>
             <span className="font-mono text-[#FFFFFF] font-bold">${googleSpend} / day</span>
           </div>
@@ -99,7 +100,7 @@ export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?:
         <div className="p-3.5 rounded bg-[#000000] border border-[#8A8A8A]/40 space-y-2">
           <div className="flex items-center justify-between text-xs font-mono font-medium">
             <span className="flex items-center gap-1.5 text-[#FFFFFF]">
-              <span className="size-2 rounded-full bg-[#8A8A8A]" /> Amazon SP
+              <AmazonLogo size={14} className="shrink-0" /> Amazon SP
             </span>
             <span className="font-mono text-[#FFFFFF] font-bold">${amazonSpend} / day</span>
           </div>

@@ -64,8 +64,9 @@ const PLATFORM_SPECS: PlatformSpec[] = [
     keyMismatches: [
       { from: 'actions[action_type="omni_purchase"].value', to: 'conversions', note: 'Nested actions array unwrapped' },
       { from: 'action_values[omni_purchase].value', to: 'attributed_revenue', note: 'Monetary conversion value extracted' },
-      { from: 'date_start', to: 'timestamp', note: 'Normalized to ISO8601 UTC' },
-      { from: 'campaign_name', to: 'sku_id & product_name', note: 'Regex SKU catalog cross-reference' }
+      { from: 'frequency & reach', to: 'wearout_decay_curve', note: 'Creative fatigue & ad saturation monitoring' },
+      { from: 'video_3_sec_watched / impressions', to: 'video_hook_rate_pct', note: 'Video creative hook & hold retention' },
+      { from: 'learning_phase_status', to: 'guardrail_status', note: 'Algorithmic 20% budget change guardrail' }
     ]
   },
   {
@@ -79,9 +80,10 @@ const PLATFORM_SPECS: PlatformSpec[] = [
     rawSample: rawGooglePartials,
     keyMismatches: [
       { from: 'metrics.costMicros', to: 'spend', note: '1,000,000 micros divided to USD float' },
-      { from: 'metrics.conversionsValue', to: 'attributed_revenue', note: 'Extracted from metrics sub-resource' },
-      { from: 'campaign.advertisingChannelType', to: 'channel_type', note: 'SEARCH / SHOPPING / PMAX mapped' },
-      { from: 'segments.date', to: 'timestamp', note: 'Normalized to ISO8601 UTC' }
+      { from: 'metrics.searchBudgetLostImpressionShare', to: 'budget_lost_is_pct', note: 'Lost IS (Budget) unlocks spend scaling' },
+      { from: 'metrics.searchRankLostImpressionShare', to: 'rank_lost_is_pct', note: 'Lost IS (Rank) diagnoses bid floor vs ad quality' },
+      { from: 'ad_group_criterion.qualityInfo.qualityScore', to: 'quality_score (1-10)', note: 'SERP relevance & expected CTR score' },
+      { from: 'campaign.biddingStrategyType', to: 'target_roas_drift', note: 'Algorithm target vs empirical ROAS drift' }
     ]
   },
   {
@@ -94,10 +96,11 @@ const PLATFORM_SPECS: PlatformSpec[] = [
     icon: IconBrandAmazon,
     rawSample: rawAmazonPartials,
     keyMismatches: [
-      { from: 'cost', to: 'spend', note: 'Direct cost mapped to unified spend' },
-      { from: 'attributedSales14d', to: 'attributed_revenue', note: '14-day attribution window reconciled' },
-      { from: 'attributedUnitsOrdered14d', to: 'conversions', note: 'Physical units ordered extracted' },
-      { from: 'asin & sku', to: 'sku_id & asin', note: 'Reconciled to Nike Footwear Catalog' }
+      { from: 'buyBoxWinPercentage', to: 'buy_box_kill_switch', note: 'SP-API Buy Box Loss prevents funding competitor clicks' },
+      { from: 'attributedSalesOtherSku14d', to: 'halo_attributed_revenue', note: 'Catalog Halo effect & brand spillover to other SKUs' },
+      { from: 'fbaFeesEstimate & referralFeeRate', to: 'fba_unit_deductions', note: 'True Amazon net margin calculation' },
+      { from: 'placement & placementBidMultiplier', to: 'top_of_search_boost', note: 'Placement multiplier bid arbitration' },
+      { from: 'cost & attributedSales14d', to: 'spend & attributed_revenue', note: '14-day attribution window reconciled' }
     ]
   },
   {
@@ -110,10 +113,11 @@ const PLATFORM_SPECS: PlatformSpec[] = [
     icon: IconBuildingStore,
     rawSample: rawShopifyOrders,
     keyMismatches: [
-      { from: 'line_items[0].sku', to: 'sku_id', note: 'Line item SKU linked to ERP unit COGS' },
-      { from: 'total_price', to: 'attributed_revenue', note: 'Actual cash collected from customer' },
-      { from: 'total_price * 0.18', to: 'spend', note: 'Shop App / Collabs promotion attribution' },
-      { from: 'inventory_item.cost', to: 'unit_cogs', note: 'ERP gross margin calculation' }
+      { from: 'customer.orders_count == 1', to: 'customer_acquisition_type', note: 'nCAC (New Customer CAC) vs Returning Customer LTV' },
+      { from: 'processing_fee (2.9% + $0.30)', to: 'payment_gateway_fee', note: 'Payment gateway friction margin deduction' },
+      { from: 'total_price - COGS - fees - taxes', to: 'net_contribution_margin', note: 'True Contribution Margin 3 (CM3) & POAS' },
+      { from: 'line_items[0].sku', to: 'sku_id', note: 'ERP catalog link & real-time COGS matching' },
+      { from: 'inventory_item.available', to: 'inventory_runway', note: 'Stockout circuit breaker triggers' }
     ]
   }
 ];
@@ -508,6 +512,90 @@ export function NormalizationShowcase() {
                 </div>
               </div>
 
+              {/* Enterprise Telemetry & ML-Ready Attributes */}
+              <div className='p-3 rounded-lg bg-cyan-950/20 border border-cyan-500/30 flex flex-col gap-2 font-mono text-[11px]'>
+                <div className='flex items-center justify-between text-cyan-400 font-bold uppercase text-[10px]'>
+                  <span className='flex items-center gap-1.5'>
+                    <IconSparkles className='size-3.5 text-cyan-400' />
+                    Enterprise Telemetry (ML Feature Store Ready)
+                  </span>
+                  <Badge variant='outline' className='bg-cyan-500/10 text-cyan-300 border-cyan-500/30 text-[9px]'>
+                    ADVANCED D2C
+                  </Badge>
+                </div>
+                <div className='grid grid-cols-2 sm:grid-cols-3 gap-2 text-[10px]'>
+                  {unifiedRecord.channel === 'meta' && (
+                    <>
+                      <div className='p-1.5 rounded bg-background/50 border border-border/40'>
+                        <span className='text-muted-foreground block text-[9px]'>AD FREQUENCY / WEAROUT</span>
+                        <span className='font-bold text-foreground'>{unifiedRecord.frequency ?? 1.0}x</span>
+                      </div>
+                      <div className='p-1.5 rounded bg-background/50 border border-border/40'>
+                        <span className='text-muted-foreground block text-[9px]'>VIDEO 3S HOOK RATE</span>
+                        <span className='font-bold text-indigo-400'>{unifiedRecord.video_hook_rate_pct ? `${unifiedRecord.video_hook_rate_pct}%` : 'N/A (Still)'}</span>
+                      </div>
+                      <div className='p-1.5 rounded bg-background/50 border border-border/40'>
+                        <span className='text-muted-foreground block text-[9px]'>LEARNING PHASE STATUS</span>
+                        <span className='font-bold text-emerald-400'>{unifiedRecord.learning_phase_status ?? 'SUCCESS'}</span>
+                      </div>
+                    </>
+                  )}
+
+                  {unifiedRecord.channel === 'google' && (
+                    <>
+                      <div className='p-1.5 rounded bg-background/50 border border-border/40'>
+                        <span className='text-muted-foreground block text-[9px]'>LOST IS (BUDGET SCALING)</span>
+                        <span className='font-bold text-amber-400'>{unifiedRecord.search_budget_lost_is_pct}%</span>
+                      </div>
+                      <div className='p-1.5 rounded bg-background/50 border border-border/40'>
+                        <span className='text-muted-foreground block text-[9px]'>LOST IS (RANK / AD FLOOR)</span>
+                        <span className='font-bold text-rose-400'>{unifiedRecord.search_rank_lost_is_pct}%</span>
+                      </div>
+                      <div className='p-1.5 rounded bg-background/50 border border-border/40'>
+                        <span className='text-muted-foreground block text-[9px]'>SERP QUALITY SCORE</span>
+                        <span className='font-bold text-emerald-400'>{unifiedRecord.quality_score ?? 9} / 10</span>
+                      </div>
+                    </>
+                  )}
+
+                  {unifiedRecord.channel === 'amazon' && (
+                    <>
+                      <div className='p-1.5 rounded bg-background/50 border border-border/40'>
+                        <span className='text-muted-foreground block text-[9px]'>SP-API BUY BOX WIN %</span>
+                        <span className={cn('font-bold', (unifiedRecord.buy_box_win_pct ?? 100) < 80 ? 'text-rose-400' : 'text-emerald-400')}>
+                          {unifiedRecord.buy_box_win_pct}%
+                        </span>
+                      </div>
+                      <div className='p-1.5 rounded bg-background/50 border border-border/40'>
+                        <span className='text-muted-foreground block text-[9px]'>CATALOG HALO REVENUE</span>
+                        <span className='font-bold text-cyan-400'>${unifiedRecord.halo_attributed_revenue?.toFixed(2) ?? '0.00'}</span>
+                      </div>
+                      <div className='p-1.5 rounded bg-background/50 border border-border/40'>
+                        <span className='text-muted-foreground block text-[9px]'>FBA FULFILLMENT DEDUCTION</span>
+                        <span className='font-bold text-amber-400'>${unifiedRecord.fba_fees?.toFixed(2) ?? '0.00'}</span>
+                      </div>
+                    </>
+                  )}
+
+                  {unifiedRecord.channel === 'shopify' && (
+                    <>
+                      <div className='p-1.5 rounded bg-background/50 border border-border/40'>
+                        <span className='text-muted-foreground block text-[9px]'>CUSTOMER ACQUISITION</span>
+                        <span className='font-bold text-purple-400'>{unifiedRecord.customer_acquisition_type}</span>
+                      </div>
+                      <div className='p-1.5 rounded bg-background/50 border border-border/40'>
+                        <span className='text-muted-foreground block text-[9px]'>PAYMENT GATEWAY FEE</span>
+                        <span className='font-bold text-amber-400'>${unifiedRecord.payment_gateway_fee?.toFixed(2)}</span>
+                      </div>
+                      <div className='p-1.5 rounded bg-background/50 border border-border/40'>
+                        <span className='text-muted-foreground block text-[9px]'>CONTRIBUTION MARGIN 3 (CM3)</span>
+                        <span className='font-bold text-emerald-400'>${unifiedRecord.net_contribution_margin?.toFixed(2)}</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
               {/* Live JSON Preview of Unified Record */}
               <div className='rounded bg-slate-950 p-3 font-mono text-[11px] text-cyan-300 overflow-auto max-h-[170px] border border-cyan-500/20'>
                 <pre className='whitespace-pre-wrap leading-tight'>
@@ -521,7 +609,14 @@ export function NormalizationShowcase() {
                       attributed_revenue: unifiedRecord.attributed_revenue,
                       roas: unifiedRecord.roas,
                       gross_margin: unifiedRecord.gross_margin,
-                      inventory_on_hand: unifiedRecord.inventory_on_hand
+                      inventory_on_hand: unifiedRecord.inventory_on_hand,
+                      ...(unifiedRecord.frequency ? { frequency: unifiedRecord.frequency } : {}),
+                      ...(unifiedRecord.video_hook_rate_pct ? { video_hook_rate_pct: unifiedRecord.video_hook_rate_pct } : {}),
+                      ...(unifiedRecord.search_budget_lost_is_pct != null ? { search_budget_lost_is_pct: unifiedRecord.search_budget_lost_is_pct } : {}),
+                      ...(unifiedRecord.buy_box_win_pct != null ? { buy_box_win_pct: unifiedRecord.buy_box_win_pct } : {}),
+                      ...(unifiedRecord.halo_attributed_revenue != null ? { halo_attributed_revenue: unifiedRecord.halo_attributed_revenue } : {}),
+                      ...(unifiedRecord.customer_acquisition_type ? { customer_acquisition_type: unifiedRecord.customer_acquisition_type } : {}),
+                      ...(unifiedRecord.net_contribution_margin != null ? { net_contribution_margin: unifiedRecord.net_contribution_margin } : {})
                     },
                     null,
                     2

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Icons } from '@/components/icons';
+import { PlatformLogo } from '@/components/icons/platform-logos';
 import { cn } from '@/lib/utils';
 
 export interface LedgerItem {
@@ -58,7 +59,10 @@ export function DecisionLedgerTable({ entries, className }: DecisionLedgerTableP
                     {item.timestamp.split(' ')[1] || item.timestamp}
                   </td>
                   <td className='py-2.5 px-3 text-[#FFFFFF] font-sans text-xs max-w-md truncate font-medium'>
-                    {item.decision}
+                    <span className='inline-flex items-center gap-1.5'>
+                      <PlatformLogo platform={item.decision} size={12} className='shrink-0 opacity-80' />
+                      <span className='truncate'>{item.decision}</span>
+                    </span>
                   </td>
                   <td className='py-2.5 px-3 text-right text-[#8A8A8A] whitespace-nowrap font-mono'>
                     ₹{item.expectedMargin.toLocaleString()}

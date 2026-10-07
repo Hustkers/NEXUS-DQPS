@@ -3,6 +3,7 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { PlatformLogo, MetaLogo, GoogleLogo } from '@/components/icons/platform-logos';
 import {
   AreaChart,
   Area,
@@ -185,6 +186,7 @@ export function PlatformBreakdownChart({
                 <div key={p.platform} className='space-y-1.5'>
                   <div className='flex items-center justify-between text-xs font-mono'>
                     <div className='flex items-center gap-2'>
+                      <PlatformLogo platform={p.platform} size={15} className='shrink-0' />
                       <span className='font-semibold text-white'>{p.displayName}</span>
                     </div>
                     <div className='flex items-center gap-2'>
@@ -216,8 +218,12 @@ export function PlatformBreakdownChart({
         <div className='mt-4 rounded bg-[#000000] p-3.5 border border-[#8A8A8A] text-[11px] font-mono text-[#8A8A8A] space-y-1.5'>
           <div className='flex justify-between items-center'>
             <span className='font-medium text-white'>Optimal Channel Shift:</span>
-            <span className='text-black bg-white border border-white px-1.5 py-0.5 rounded text-[10px] font-bold'>
-              Meta → Google Shopping
+            <span className='text-black bg-white border border-white px-1.5 py-0.5 rounded text-[10px] font-bold inline-flex items-center gap-1.5'>
+              <MetaLogo size={12} className='shrink-0' />
+              <span>Meta</span>
+              <span>→</span>
+              <GoogleLogo size={12} className='shrink-0' />
+              <span>Google Shopping</span>
             </span>
           </div>
           <div className='flex justify-between text-[10px] text-[#8A8A8A]'>

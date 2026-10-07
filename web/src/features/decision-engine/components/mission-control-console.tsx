@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
+import { PlatformLogo } from '@/components/icons/platform-logos';
 import { AnomalyCard } from './anomaly-card';
 import { ReallocationFeed } from './reallocation-feed';
 import { ScenarioController, ScenarioDefinition } from './scenario-controller';
@@ -14,7 +15,6 @@ import { CausalDagVisualizer } from './causal-dag-visualizer';
 import { RcaWaterfallChart } from './rca-waterfall-chart';
 import { ScenarioSandbox } from './scenario-sandbox';
 import { ExecutiveGraphBanner } from './executive-graph-banner';
-import { VoiceBriefingAgent } from '@/features/voice/voice-briefing-agent';
 import { USE_MOCKS, FASTAPI_BASE_URL, approveDirective } from '@/lib/api-adapter';
 import { ProductAnalysisModal, type ProductAnalysisTarget } from './product-analysis-modal';
 import { GithubGlobe } from './github-globe';
@@ -124,40 +124,6 @@ export function MissionControlConsole() {
     });
   };
 
-  const handleVoiceAuthorize = async (planId: string) => {
-    try {
-      const receipt = await approveDirective(planId, 'VOICE_BRIEFING_AUTHORIZED');
-      setState((prev) => {
-        const newLedgerItem = {
-          id: `ledg-voice-${Date.now()}`,
-          timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
-          decision: `Voice-Authorized: Throttled stocked-out Meta Hero SKU -> $0/day; Scaled Google Search -> +$800/day`,
-          expectedMargin: 2450.0,
-          realizedMargin: 2390.0,
-          variancePct: -2.4,
-          accuracyPct: 97.6,
-          confidence: 0.98,
-          status: 'executed',
-          feedback: 'Voice token authenticated (ElevenLabs HITL)'
-        };
-        return {
-          ...prev,
-          ledger: [newLedgerItem, ...prev.ledger],
-          telemetry: {
-            ...prev.telemetry,
-            activeAnomaliesCount: Math.max(0, prev.telemetry.activeAnomaliesCount - 1),
-            projectedMarginUplift: prev.telemetry.projectedMarginUplift + 1148
-          }
-        };
-      });
-      toast.success('Directive Executed via Voice Authorization', {
-        description: `Plan ${planId} signed. Atomic API budget mutate dispatched.`
-      });
-    } catch (e: any) {
-      toast.error('Voice Authorization Failed', { description: e.message });
-    }
-  };
-
   const filteredCampaigns = state.campaigns.filter((c: any) =>
     activeTab === 'all' ? true : c.platform === activeTab
   );
@@ -181,43 +147,9 @@ export function MissionControlConsole() {
             DuckDB &amp; PostgreSQL 16 • Columnar Store • Analytical SLSQP Optimizer • Dual-Knapsack Bandits • Floor ROAS 1.80x
           </p>
         </div>
-
-        <div className='flex flex-wrap items-center gap-3 text-xs font-mono'>
-          {/* Live vs Mock Data Mode Badge Toggle */}
-          <button
-            onClick={() => {
-              setLiveMode(!liveMode);
-              toast.info(`Switched to ${!liveMode ? 'Live Backend (FastAPI)' : 'Deterministic Mock Mode'}`);
-            }}
-            className={cn(
-              'flex items-center gap-2 px-2.5 py-1.5 rounded border text-[11px] transition-colors',
-              liveMode
-                ? 'bg-white border-white text-black font-bold'
-                : 'bg-[#1A1A1A] border-[#8A8A8A] text-[#8A8A8A]'
-            )}
-            title="Click to toggle between live backend API and deterministic mock replay"
-          >
-            <span className={cn('size-1.5 rounded-full', liveMode ? 'bg-black' : 'bg-white')} />
-            <span>{liveMode ? 'API: LIVE FASTAPI (8000)' : 'API: DETERMINISTIC MOCKS'}</span>
-          </button>
-
-          <div className='flex items-center gap-2 text-white bg-[#1A1A1A] px-3 py-1.5 rounded border border-[#8A8A8A] shadow-none'>
-            <span className='size-1.5 rounded-full bg-white' />
-            <span className='font-semibold'>Cycle {state.metadata.cycleId}</span>
-          </div>
-          <span className='text-[#8A8A8A] hidden sm:block text-[11px] font-mono'>
-            SLSQP Convex Optimization
-          </span>
-        </div>
       </div>
 
-      {/* 2. Voice HITL Briefing Agent Bar */}
-      <VoiceBriefingAgent
-        onAuthorizePlan={handleVoiceAuthorize}
-        activeDirectiveId="dir_meta_hero_shoe"
-      />
-
-      {/* 3. Executive Overview KPI Banner & Trajectory Graphs */}
+      {/* 2. Executive Overview KPI Banner & Trajectory Graphs */}
       <ExecutiveGraphBanner
         state={state}
         hasCriticalAnomaly={hasCriticalAnomaly}
@@ -323,7 +255,7 @@ export function MissionControlConsole() {
                 }}
                 className='px-2.5 py-1 rounded bg-[#000000] border border-[#8A8A8A] hover:border-white text-xs font-mono text-white transition-colors flex items-center gap-1.5'
               >
-                <span className='size-1.5 rounded-full bg-white' />
+                <PlatformLogo platform={c.platform} size={12} className='shrink-0' />
                 <span>{c.productName || c.sku}</span>
               </button>
             ))}
@@ -462,13 +394,14 @@ export function MissionControlConsole() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={cn(
-                  'px-3 py-1 rounded transition-all uppercase text-[11px] font-mono tracking-wider active:scale-[0.98]',
+                  'px-3 py-1 rounded transition-all uppercase text-[11px] font-mono tracking-wider active:scale-[0.98] inline-flex items-center gap-1.5',
                   activeTab === tab
                     ? 'bg-white text-black font-bold'
                     : 'text-[#8A8A8A] hover:text-white'
                 )}
               >
-                {tab}
+                {tab !== 'all' && <PlatformLogo platform={tab} size={12} className='shrink-0' />}
+                <span>{tab}</span>
               </button>
             ))}
           </div>

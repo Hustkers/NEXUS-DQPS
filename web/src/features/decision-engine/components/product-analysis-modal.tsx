@@ -19,6 +19,7 @@ import {
 } from '@tabler/icons-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { PlatformLogo } from '@/components/icons/platform-logos';
 import { GithubGlobe } from './github-globe';
 import { GlobePulse } from '@/components/ui/cobe-globe-pulse';
 import { RLVisualAnalytics } from './rl-visual-analytics';
@@ -309,20 +310,32 @@ export function ProductAnalysisModal({
                   </div>
                 ) : (
                   <div className='w-full grid grid-cols-4 gap-2 pt-3 border-t border-zinc-900 text-center font-mono text-[10px]'>
-                    <div className='p-1.5 rounded bg-zinc-900/50 border border-zinc-800/60'>
-                      <div className='text-zinc-500'>META ADS</div>
+                    <div className='p-1.5 rounded bg-zinc-900/50 border border-zinc-800/60 flex flex-col items-center justify-center gap-0.5'>
+                      <div className='flex items-center gap-1 text-zinc-400 font-semibold'>
+                        <PlatformLogo platform='meta' size={11} className='shrink-0' />
+                        <span>META ADS</span>
+                      </div>
                       <div className='text-cyan-400 font-bold'>US-East / SF</div>
                     </div>
-                    <div className='p-1.5 rounded bg-zinc-900/50 border border-zinc-800/60'>
-                      <div className='text-zinc-500'>GOOGLE SHOPPING</div>
+                    <div className='p-1.5 rounded bg-zinc-900/50 border border-zinc-800/60 flex flex-col items-center justify-center gap-0.5'>
+                      <div className='flex items-center gap-1 text-zinc-400 font-semibold'>
+                        <PlatformLogo platform='google' size={11} className='shrink-0' />
+                        <span>GOOGLE ADS</span>
+                      </div>
                       <div className='text-blue-400 font-bold'>EU / London</div>
                     </div>
-                    <div className='p-1.5 rounded bg-zinc-900/50 border border-zinc-800/60'>
-                      <div className='text-zinc-500'>AMAZON DSP</div>
+                    <div className='p-1.5 rounded bg-zinc-900/50 border border-zinc-800/60 flex flex-col items-center justify-center gap-0.5'>
+                      <div className='flex items-center gap-1 text-zinc-400 font-semibold'>
+                        <PlatformLogo platform='amazon' size={11} className='shrink-0' />
+                        <span>AMAZON DSP</span>
+                      </div>
                       <div className='text-amber-400 font-bold'>APAC / Tokyo</div>
                     </div>
-                    <div className='p-1.5 rounded bg-zinc-900/50 border border-zinc-800/60'>
-                      <div className='text-zinc-500'>TIKTOK FEED</div>
+                    <div className='p-1.5 rounded bg-zinc-900/50 border border-zinc-800/60 flex flex-col items-center justify-center gap-0.5'>
+                      <div className='flex items-center gap-1 text-zinc-400 font-semibold'>
+                        <PlatformLogo platform='shopify' size={11} className='shrink-0' />
+                        <span>SHOPIFY D2C</span>
+                      </div>
                       <div className='text-emerald-400 font-bold'>SEA / Singapore</div>
                     </div>
                   </div>
@@ -351,8 +364,9 @@ export function ProductAnalysisModal({
 
                     <div className='flex-1 min-w-0'>
                       <div className='flex items-center gap-2'>
-                        <Badge variant='outline' className='text-[10px] font-mono border-zinc-700 text-zinc-400'>
-                          {product.platform || 'Cross-Platform'}
+                        <Badge variant='outline' className='text-[10px] font-mono border-zinc-700 text-zinc-300 inline-flex items-center gap-1.5'>
+                          {product.platform && <PlatformLogo platform={product.platform} size={11} className='shrink-0' />}
+                          <span>{product.platform || 'Cross-Platform'}</span>
                         </Badge>
                         {product.sku && (
                           <span className='text-[10px] font-mono text-zinc-500'>

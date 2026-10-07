@@ -1,127 +1,203 @@
 [
   {
-    "account_id": null,
+    "account_id": "act_108429402941",
     "campaign_id": "916",
     "campaign_name": "meta-CD4371-001",
-    "adset_id": null,
-    "adset_name": null,
+    "adset_id": "23851029481",
+    "adset_name": "Broad_D2C_Footwear_Scale",
     "ad_id": "708746",
-    "ad_name": null,
-    "spend": 1.429999948,
+    "ad_name": "React_Infinity_UGC_Reel_V2",
+    "objective": "OUTCOME_SALES",
+    "optimization_goal": "OFFSITE_CONVERSIONS",
+    "attribution_setting": "7d_click_1d_view",
+    "auction_bid_strategy": "LOWEST_COST_WITHOUT_CAP",
+    "learning_phase_status": "SUCCESS",
+    "quality_ranking": "ABOVE_AVERAGE",
+    "engagement_rate_ranking": "AVERAGE",
+    "conversion_rate_ranking": "ABOVE_AVERAGE",
+    "reach": 5880,
+    "frequency": 1.25,
+    "spend": 1.43,
     "impressions": 7350,
     "clicks": 1,
+    "unique_clicks": 1,
     "cpc": 1.43,
     "cpm": 0.19,
-    "frequency": 1.25,
+    "cost_per_unique_click": 1.43,
+    "cost_per_thruplay": 0.04,
     "date_start": "2026-10-01",
     "date_stop": "2026-10-07",
+    "video_play_actions": {
+      "video_play": 4200,
+      "video_continuous_2_sec_watched_actions": 3100,
+      "video_3_sec_watched_actions": 2850,
+      "video_p25_watched_actions": 2100,
+      "video_p50_watched_actions": 1450,
+      "video_p75_watched_actions": 980,
+      "video_p100_watched_actions": 620
+    },
     "actions": [
       {
         "action_type": "link_click",
         "value": 1.0,
-        "view_1d": null,
-        "click_7d": null,
-        "click_28d": null
+        "view_1d": 0.0,
+        "click_7d": 1.0,
+        "click_28d": 1.0
+      },
+      {
+        "action_type": "post_engagement",
+        "value": 42.0,
+        "view_1d": 5.0,
+        "click_7d": 37.0,
+        "click_28d": 37.0
+      },
+      {
+        "action_type": "landing_page_view",
+        "value": 1.0,
+        "view_1d": 0.0,
+        "click_7d": 1.0,
+        "click_28d": 1.0
+      },
+      {
+        "action_type": "add_to_cart",
+        "value": 2.0,
+        "view_1d": 0.0,
+        "click_7d": 2.0,
+        "click_28d": 2.0
       },
       {
         "action_type": "omni_purchase",
         "value": 1.0,
-        "view_1d": null,
-        "click_7d": null,
-        "click_28d": null
+        "view_1d": 0.0,
+        "click_7d": 1.0,
+        "click_28d": 1.0
       }
     ],
     "action_values": [
       {
         "action_type": "omni_purchase",
         "value": 168.61,
-        "view_1d": null,
-        "click_7d": null,
-        "click_28d": null
+        "view_1d": 0.0,
+        "click_7d": 168.61,
+        "click_28d": 168.61
       }
     ]
   },
   {
-    "account_id": null,
+    "account_id": "act_108429402941",
     "campaign_id": "916",
     "campaign_name": "meta-AO2924-401",
-    "adset_id": null,
-    "adset_name": null,
+    "adset_id": "23851029482",
+    "adset_name": "Running_Lookalike_2pct",
     "ad_id": "708749",
-    "ad_name": null,
-    "spend": 1.820000023,
+    "ad_name": "AirZoomPegasus_DynamicCarousel",
+    "objective": "OUTCOME_SALES",
+    "optimization_goal": "OFFSITE_CONVERSIONS",
+    "attribution_setting": "7d_click_1d_view",
+    "auction_bid_strategy": "LOWEST_COST_WITHOUT_CAP",
+    "learning_phase_status": "LEARNING_LIMITED",
+    "quality_ranking": "BELOW_AVERAGE_35",
+    "engagement_rate_ranking": "BELOW_AVERAGE_20",
+    "conversion_rate_ranking": "AVERAGE",
+    "reach": 12750,
+    "frequency": 1.40,
+    "spend": 1.82,
     "impressions": 17861,
     "clicks": 2,
+    "unique_clicks": 2,
     "cpc": 0.91,
-    "cpm": 0.1,
-    "frequency": 1.4,
+    "cpm": 0.10,
+    "cost_per_unique_click": 0.91,
+    "cost_per_thruplay": 0.03,
     "date_start": "2026-10-01",
     "date_stop": "2026-10-07",
+    "video_play_actions": {
+      "video_play": 8900,
+      "video_continuous_2_sec_watched_actions": 6400,
+      "video_3_sec_watched_actions": 5200,
+      "video_p25_watched_actions": 3600,
+      "video_p50_watched_actions": 2100,
+      "video_p75_watched_actions": 1100,
+      "video_p100_watched_actions": 740
+    },
     "actions": [
       {
         "action_type": "link_click",
         "value": 2.0,
-        "view_1d": null,
-        "click_7d": null,
-        "click_28d": null
+        "view_1d": 0.0,
+        "click_7d": 2.0,
+        "click_28d": 2.0
       },
       {
         "action_type": "omni_purchase",
         "value": 0.0,
-        "view_1d": null,
-        "click_7d": null,
-        "click_28d": null
+        "view_1d": 0.0,
+        "click_7d": 0.0,
+        "click_28d": 0.0
       }
     ],
     "action_values": [
       {
         "action_type": "omni_purchase",
         "value": 0.0,
-        "view_1d": null,
-        "click_7d": null,
-        "click_28d": null
+        "view_1d": 0.0,
+        "click_7d": 0.0,
+        "click_28d": 0.0
       }
     ]
   },
   {
-    "account_id": null,
+    "account_id": "act_108429402941",
     "campaign_id": "916",
     "campaign_name": "meta-880848-005",
-    "adset_id": null,
-    "adset_name": null,
+    "adset_id": "23851029483",
+    "adset_name": "Marathon_Runners_Interest",
     "ad_id": "708771",
-    "ad_name": null,
+    "ad_name": "ZoomFly_Editorial_Still",
+    "objective": "OUTCOME_SALES",
+    "optimization_goal": "OFFSITE_CONVERSIONS",
+    "attribution_setting": "7d_click_1d_view",
+    "auction_bid_strategy": "TARGET_COST",
+    "learning_phase_status": "LEARNING",
+    "quality_ranking": "AVERAGE",
+    "engagement_rate_ranking": "AVERAGE",
+    "conversion_rate_ranking": "AVERAGE",
+    "reach": 630,
+    "frequency": 1.10,
     "spend": 0.0,
     "impressions": 693,
     "clicks": 0,
-    "cpc": null,
+    "unique_clicks": 0,
+    "cpc": 0.0,
     "cpm": 0.0,
-    "frequency": 1.1,
+    "cost_per_unique_click": 0.0,
+    "cost_per_thruplay": 0.0,
     "date_start": "2026-10-01",
     "date_stop": "2026-10-07",
+    "video_play_actions": null,
     "actions": [
       {
         "action_type": "link_click",
         "value": 0.0,
-        "view_1d": null,
-        "click_7d": null,
-        "click_28d": null
+        "view_1d": 0.0,
+        "click_7d": 0.0,
+        "click_28d": 0.0
       },
       {
         "action_type": "omni_purchase",
         "value": 0.0,
-        "view_1d": null,
-        "click_7d": null,
-        "click_28d": null
+        "view_1d": 0.0,
+        "click_7d": 0.0,
+        "click_28d": 0.0
       }
     ],
     "action_values": [
       {
         "action_type": "omni_purchase",
         "value": 0.0,
-        "view_1d": null,
-        "click_7d": null,
-        "click_28d": null
+        "view_1d": 0.0,
+        "click_7d": 0.0,
+        "click_28d": 0.0
       }
     ]
   }

@@ -2,33 +2,57 @@
   {
     "inventory_item_id": "inv_1001",
     "location_id": "loc_nyc_01",
-    "available": 0,
+    "location_name": "NYC Primary Distribution Center",
     "sku": "310805-137",
+    "available": 0,
     "unit_cogs": 58.0,
-    "updated_at": null
+    "reorder_point": 100,
+    "lead_time_days": 14,
+    "safety_stock": 50,
+    "daily_burn_velocity": 24.5,
+    "stockout_risk_score": 1.0,
+    "updated_at": "2026-10-07T12:00:00Z"
   },
   {
     "inventory_item_id": "inv_1002",
     "location_id": "loc_nyc_01",
-    "available": 410,
+    "location_name": "NYC Primary Distribution Center",
     "sku": "880848-005",
+    "available": 410,
     "unit_cogs": 52.5,
-    "updated_at": null
+    "reorder_point": 80,
+    "lead_time_days": 12,
+    "safety_stock": 40,
+    "daily_burn_velocity": 14.2,
+    "stockout_risk_score": 0.05,
+    "updated_at": "2026-10-07T12:00:00Z"
   },
   {
     "inventory_item_id": "inv_1003",
     "location_id": "loc_nyc_01",
-    "available": 360,
+    "location_name": "NYC Primary Distribution Center",
     "sku": "AH8050-100",
+    "available": 360,
     "unit_cogs": 48.0,
-    "updated_at": null
+    "reorder_point": 90,
+    "lead_time_days": 14,
+    "safety_stock": 45,
+    "daily_burn_velocity": 18.0,
+    "stockout_risk_score": 0.12,
+    "updated_at": "2026-10-07T12:00:00Z"
   },
   {
     "inventory_item_id": "inv_1004",
     "location_id": "loc_nyc_01",
-    "available": 520,
+    "location_name": "NYC Primary Distribution Center",
     "sku": "315122-001",
+    "available": 520,
     "unit_cogs": 38.5,
-    "updated_at": null
+    "reorder_point": 120,
+    "lead_time_days": 10,
+    "safety_stock": 60,
+    "daily_burn_velocity": 26.8,
+    "stockout_risk_score": 0.02,
+    "updated_at": "2026-10-07T12:00:00Z"
   }
 ]

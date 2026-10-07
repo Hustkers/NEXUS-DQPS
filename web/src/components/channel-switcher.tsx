@@ -34,13 +34,13 @@ export function ChannelSwitcher() {
   const getChannelIcon = (id: AdChannel, className = 'size-4') => {
     switch (id) {
       case 'amazon':
-        return <IconBrandAmazon className={className} />;
+        return <Icons.amazon className={className} />;
       case 'google':
-        return <IconBrandGoogle className={className} />;
+        return <Icons.google className={className} />;
       case 'meta':
-        return <IconBrandMeta className={className} />;
+        return <Icons.meta className={className} />;
       case 'shopify':
-        return <IconShoppingBag className={className} />;
+        return <Icons.shopify className={className} />;
       default:
         return <IconWorld className={className} />;
     }

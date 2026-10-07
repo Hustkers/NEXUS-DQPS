@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Icons } from '@/components/icons';
+import { PlatformLogo } from '@/components/icons/platform-logos';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -149,10 +150,14 @@ export function ReallocationFeed({
                   >
                     {isKill ? '[CRITICAL] ' : ''}{item.actionType.replace('_', ' ')}
                   </span>
-                  <span className='text-[#8A8A8A] line-through text-[11px]'>{item.sourceCampaign}</span>
+                  <span className='text-[#8A8A8A] line-through text-[11px] flex items-center gap-1'>
+                    <PlatformLogo platform={item.sourceCampaign} size={11} className='shrink-0 opacity-70' />
+                    <span>{item.sourceCampaign}</span>
+                  </span>
                   <Icons.arrowRight className='size-3 text-[#8A8A8A] shrink-0' />
-                  <span className='font-bold text-[#FFFFFF] truncate'>
-                    {item.targetProductName || item.targetCampaign}
+                  <span className='font-bold text-[#FFFFFF] truncate flex items-center gap-1'>
+                    <PlatformLogo platform={item.targetCampaign} size={12} className='shrink-0' />
+                    <span>{item.targetProductName || item.targetCampaign}</span>
                   </span>
                   <span className='text-[#8A8A8A] text-[11px] ml-auto md:ml-0'>
                     {(item.confidence * 100).toFixed(0)}% conf

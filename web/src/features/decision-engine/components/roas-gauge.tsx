@@ -3,6 +3,7 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { PlatformLogo } from '@/components/icons/platform-logos';
 
 interface RoasGaugeProps {
   currentRoas: number;
@@ -97,8 +98,9 @@ export function RoasGauge({
               <span className='text-xs font-semibold text-[#FFFFFF] font-mono truncate max-w-[140px]'>
                 {productName || campaignName}
               </span>
-              <span className='text-[10px] text-[#8A8A8A] uppercase tracking-wider font-mono truncate max-w-[140px]'>
-                {platform || 'Omnichannel'} • Inv: {inventory ?? 'N/A'}
+              <span className='text-[10px] text-[#8A8A8A] uppercase tracking-wider font-mono truncate max-w-[140px] flex items-center gap-1.5'>
+                {platform && <PlatformLogo platform={platform} size={12} className='shrink-0' />}
+                <span>{platform || 'Omnichannel'} • Inv: {inventory ?? 'N/A'}</span>
               </span>
             </div>
           </div>

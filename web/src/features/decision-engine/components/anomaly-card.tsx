@@ -4,6 +4,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { IconWorld } from '@tabler/icons-react';
+import { PlatformLogo } from '@/components/icons/platform-logos';
 import { cn } from '@/lib/utils';
 
 export interface FactorDecomp {
@@ -56,6 +57,7 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, className }: Anoma
             <span className='text-xs font-mono font-bold text-[#FFFFFF]'>
               {isCritical ? '■' : '○'}
             </span>
+            <PlatformLogo platform={anomaly.platform} size={14} className='shrink-0' />
             <span className='capitalize font-semibold text-[#FFFFFF]'>{anomaly.platform}</span>
             <span className='text-[#8A8A8A]'>/</span>
             <span className='text-[#8A8A8A] text-[11px]'>{anomaly.date}</span>
