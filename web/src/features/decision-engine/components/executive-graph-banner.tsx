@@ -243,7 +243,6 @@ export function ExecutiveGraphBanner({
             {channel === 'all' ? 'Blended Omnichannel' : channel.toUpperCase()})
           </span>
         </div>
-
         <div className='flex items-center gap-2'>
           {/* Timeframe pill selector */}
           <div className='flex items-center rounded-lg border border-border bg-card p-0.5 text-[11px] font-mono shadow-2xs'>
