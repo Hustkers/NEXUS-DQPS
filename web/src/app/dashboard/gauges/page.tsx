@@ -31,7 +31,7 @@ export default function GaugesPage() {
         </div>
 
         <div className='flex items-center gap-1.5 bg-zinc-900 p-1 rounded-lg border border-zinc-800 text-xs font-mono uppercase'>
-          {(['all', 'meta', 'google', 'amazon', 'tiktok'] as const).map((plat) => (
+          {(['all', 'amazon', 'google', 'meta', 'shopify'] as const).map((plat) => (
             <button
               key={plat}
               onClick={() => setActivePlatform(plat)}

@@ -5,6 +5,7 @@ import {
   IconBrandAmazon,
   IconBrandGoogle,
   IconBrandMeta,
+  IconShoppingBag,
   IconWorld
 } from '@tabler/icons-react';
 import { Icons } from '@/components/icons';
@@ -21,11 +22,13 @@ import {
 import {
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
+  useSidebar
 } from '@/components/ui/sidebar';
 import { useChannel, AdChannel, CHANNELS } from '@/context/channel-context';
 
 export function ChannelSwitcher() {
+  const { state } = useSidebar();
   const { channel, setChannel, channelInfo } = useChannel();
 
   const getChannelIcon = (id: AdChannel, className = 'size-4') => {
@@ -36,6 +39,8 @@ export function ChannelSwitcher() {
         return <IconBrandGoogle className={className} />;
       case 'meta':
         return <IconBrandMeta className={className} />;
+      case 'shopify':
+        return <IconShoppingBag className={className} />;
       default:
         return <IconWorld className={className} />;
     }
@@ -69,6 +74,13 @@ export function ChannelSwitcher() {
       type: 'Social & Discovery',
       details: 'Advantage+ Shopping Campaigns (Instagram & Facebook)',
       status: 'Live'
+    },
+    {
+      id: 'shopify',
+      name: 'Shopify Storefront',
+      type: 'Direct-to-Consumer',
+      details: 'Direct checkout, headless store & product catalog',
+      status: 'Live'
     }
   ];
 
@@ -79,19 +91,19 @@ export function ChannelSwitcher() {
           <DropdownMenuTrigger
             render={
               <SidebarMenuButton
-                size='default'
+                size='lg'
                 tooltip={`Channel: ${channelInfo.name}`}
                 className='border border-zinc-800/80 bg-zinc-950/60 hover:bg-zinc-900/80 text-zinc-200 transition-all data-popup-open:bg-sidebar-accent'
               />
             }
           >
             {/* Left Icon */}
-            <div className={`flex aspect-square size-6 items-center justify-center rounded-md border ${channelInfo.accentColor}`}>
-              {getChannelIcon(channel, 'size-3.5')}
+            <div className={`flex aspect-square size-8 items-center justify-center rounded-lg border shadow-xs shrink-0 ${channelInfo.accentColor}`}>
+              {getChannelIcon(channel, 'size-4')}
             </div>
 
             {/* Label and Subtext in Expanded Mode */}
-            <div className='grid flex-1 text-left text-xs leading-tight'>
+            <div className='grid flex-1 text-left text-xs leading-tight min-w-0 group-data-[collapsible=icon]:hidden'>
               <div className='flex items-center justify-between'>
                 <span className='truncate font-medium text-zinc-100'>{channelInfo.name}</span>
                 <span className='text-[10px] font-mono text-zinc-500 uppercase'>{channelInfo.badge}</span>
@@ -99,14 +111,14 @@ export function ChannelSwitcher() {
               <span className='truncate text-[10px] text-zinc-400 font-mono'>Ad Channel Filter</span>
             </div>
 
-            <Icons.chevronsDown className='ml-auto size-3.5 text-muted-foreground' />
+            <Icons.chevronsDown className='ml-auto size-3.5 text-muted-foreground shrink-0 group-data-[collapsible=icon]:hidden' />
           </DropdownMenuTrigger>
 
           <DropdownMenuContent
-            className='w-(--anchor-width) min-w-64 rounded-lg bg-zinc-950 border-zinc-800'
-            align='start'
-            side='bottom'
-            sideOffset={4}
+            className='w-64 rounded-lg bg-zinc-950 border-zinc-800'
+            align={state === 'collapsed' ? 'start' : 'start'}
+            side={state === 'collapsed' ? 'right' : 'bottom'}
+            sideOffset={state === 'collapsed' ? 12 : 4}
           >
             <DropdownMenuGroup>
               <DropdownMenuLabel className='text-zinc-400 text-[11px] font-mono uppercase tracking-wider px-2 py-1.5'>

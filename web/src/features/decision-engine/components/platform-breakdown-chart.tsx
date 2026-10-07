@@ -35,7 +35,8 @@ export interface DailyDataPoint {
   metaSpend: number;
   googleSpend: number;
   amazonSpend: number;
-  tiktokSpend: number;
+  shopifySpend?: number;
+  tiktokSpend?: number;
 }
 
 interface PlatformBreakdownChartProps {

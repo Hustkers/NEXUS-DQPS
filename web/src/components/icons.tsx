@@ -95,6 +95,12 @@ import {
   IconShoppingCart,
   IconShieldCheck,
   IconTerminal,
+  IconGitBranch,
+  IconChartBar,
+  IconVolume2,
+  IconMicrophone,
+  IconRobot,
+  IconMessage2,
   IconX
 } from '@tabler/icons-react';
 
@@ -238,5 +244,12 @@ export const Icons = {
   play: IconPlayerPlay,
   cart: IconShoppingCart,
   shieldCheck: IconShieldCheck,
-  terminal: IconTerminal
+  terminal: IconTerminal,
+  gitBranch: IconGitBranch,
+  barChart: IconChartBar,
+  sliders: IconAdjustmentsHorizontal,
+  volume2: IconVolume2,
+  mic: IconMicrophone,
+  bot: IconRobot,
+  messageSquare: IconMessage2
 };

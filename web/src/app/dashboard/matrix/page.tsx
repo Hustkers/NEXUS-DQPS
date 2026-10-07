@@ -30,7 +30,7 @@ export default function MatrixPage() {
             POSTGRESQL 16 CONNECTED
           </Badge>
           <Badge variant='outline' className='font-mono text-xs border-zinc-700 text-zinc-300 py-1 px-2.5'>
-            35 ACTIVE CAMPAIGNS
+            {campaigns.length} ACTIVE CAMPAIGNS
           </Badge>
         </div>
       </div>

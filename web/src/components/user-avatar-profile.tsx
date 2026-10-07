@@ -21,7 +21,7 @@ export function UserAvatarProfile({ className, showInfo = false, user }: UserAva
       </Avatar>
 
       {showInfo && (
-        <div className='grid flex-1 text-left text-sm leading-tight'>
+        <div className='grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden min-w-0'>
           <span className='truncate font-semibold'>{user?.fullName || ''}</span>
           <span className='truncate text-xs'>{user?.emailAddresses[0].emailAddress || ''}</span>
         </div>

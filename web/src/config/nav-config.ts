@@ -2,7 +2,7 @@ import { NavGroup } from '@/types';
 
 export const navGroups: NavGroup[] = [
   {
-    label: '',
+    label: 'Autonomous Decision Engine',
     items: [
       {
         title: 'Mission Control',
@@ -43,7 +43,12 @@ export const navGroups: NavGroup[] = [
         isActive: false,
         shortcut: ['d', 'l'],
         items: []
-      },
+      }
+    ]
+  },
+  {
+    label: 'Simulation & Catalog',
+    items: [
       {
         title: 'Fingerprint Identity Tracker',
         url: '/dashboard/fingerprint',

@@ -116,10 +116,10 @@ def generate_state():
     # Platform breakdown
     platform_data = []
     colors = {
-        "meta": {"hex": "#3b82f6", "name": "Meta Ads"},
-        "google": {"hex": "#10b981", "name": "Google Shopping"},
         "amazon": {"hex": "#f59e0b", "name": "Amazon Ads"},
-        "tiktok": {"hex": "#ec4899", "name": "TikTok Shop"}
+        "google": {"hex": "#10b981", "name": "Google Shopping"},
+        "meta": {"hex": "#3b82f6", "name": "Meta Ads"},
+        "shopify": {"hex": "#96bf48", "name": "Shopify Storefront"}
     }
     for p, g in last30.groupby("platform"):
         p_spend = float(g["spend"].sum())
@@ -147,7 +147,7 @@ def generate_state():
         d_roas = d_rev / max(d_spend, 1.0)
 
         # per-platform spend
-        p_spends = {p: float(g[g["platform"] == p]["spend"].sum()) for p in ["meta", "google", "amazon", "tiktok"]}
+        p_spends = {p: float(g[g["platform"] == p]["spend"].sum()) for p in ["amazon", "google", "meta", "shopify"]}
 
         daily_trend.append({
             "date": d.strftime("%b %d"),
@@ -156,10 +156,10 @@ def generate_state():
             "revenue": round(d_rev, 2),
             "margin": round(d_margin, 2),
             "roas": round(d_roas, 2),
-            "metaSpend": round(p_spends.get("meta", 0), 2),
-            "googleSpend": round(p_spends.get("google", 0), 2),
             "amazonSpend": round(p_spends.get("amazon", 0), 2),
-            "tiktokSpend": round(p_spends.get("tiktok", 0), 2)
+            "googleSpend": round(p_spends.get("google", 0), 2),
+            "metaSpend": round(p_spends.get("meta", 0), 2),
+            "shopifySpend": round(p_spends.get("shopify", 0), 2)
         })
 
     # Campaign health & ROAS gauges (modery68 + Tremor pattern)
@@ -234,7 +234,7 @@ def generate_state():
     campaigns.sort(key=lambda x: x["currentDailySpend"], reverse=True)
 
     # Anomaly Detection & Factor Decomposition (modery68 diagnostic RCA)
-    scored = detect_anomalies(df, window=14, z_thresh=2.2)
+    scored = detect_anomalies(df, window_z=14, z_thresh=2.2)
     bad = scored[scored["anomaly"]].copy()
     bad["abs_z"] = bad[["z_roas", "z_cvr"]].abs().max(axis=1)
     bad = bad.sort_values(["date", "abs_z"], ascending=[False, False])
@@ -390,14 +390,14 @@ def generate_state():
         {
             "id": "ledg-2",
             "timestamp": "2026-10-05 09:15:00",
-            "decision": "Scale tiktok-AH8050-100 (Nike Air Max 270) budget +$920/day on viral footwear trend",
+            "decision": "Scale shopify-AH8050-100 (Nike Air Max 270) budget +$920/day on direct checkout surge",
             "expectedMargin": 6800.0,
             "realizedMargin": 6590.0,
             "variancePct": -3.1,
             "accuracyPct": 96.9,
             "confidence": 0.88,
             "status": "executed",
-            "feedback": "Reinforced: Adstock decay parameter tuned for viral footwear curve"
+            "feedback": "Reinforced: Adstock decay parameter tuned for direct storefront curve"
         },
         {
             "id": "ledg-3",
@@ -435,10 +435,10 @@ def generate_state():
         },
         {
             "id": "scenario-creative-fatigue",
-            "name": "TikTok Air Max 270 Creative Fatigue (-60% CTR)",
-            "description": "Hero sneaker UGC video frequency exceeds 5.2. Hook rate collapses, CTR drops 60%, and customer acquisition cost (CAC) doubles.",
-            "injectedEvent": "Creative fatigue wear-out on TikTok UGC batch #4",
-            "autonomousResponse": "Auto-pauses exhausted ad set, triggers creative refresh alert to Nike design studio, and reroutes spend to high-vitality Meta Reels.",
+            "name": "Shopify Air Max 270 Checkout Friction (-35% CVR)",
+            "description": "Storefront payment gateway friction causes temporary drop in Nike Air Max 270 checkout completion rate.",
+            "injectedEvent": "Shopify checkout conversion rate degradation on SKU AH8050-100",
+            "autonomousResponse": "Auto-throttles affected storefront campaign, triggers checkout diagnostic alert, and reroutes spend to Amazon Buy Box.",
             "expectedSavedWaste": "$5,200 / week",
             "severity": "MEDIUM"
         },

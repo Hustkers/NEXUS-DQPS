@@ -729,9 +729,10 @@ export function FingerprintTrackerDemo() {
 
                       <div className='sm:col-span-8 flex flex-col justify-between h-full'>
                         <div>
-                          <div className='text-xs font-sans text-amber-500 flex items-center gap-1'>
-                            <span>★★★★★</span>
-                            <span className='text-zinc-400 text-[11px]'>(4.8 from 1,280 ratings)</span>
+                          <div className='text-xs font-mono text-zinc-400 flex items-center gap-2'>
+                            <span className='text-emerald-400 font-semibold'>ASIN: B0CWV8N21K</span>
+                            <span className='text-zinc-600'>•</span>
+                            <span>SKU: AH8050-100</span>
                           </div>
                           <h4 className='text-sm md:text-base font-bold text-white mt-1'>
                             Nike Men's Air Max Dn Running &amp; Street Shoes (Triple Black)

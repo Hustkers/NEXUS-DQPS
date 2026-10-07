@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
 import { AnomalyCard } from './anomaly-card';
 import { ReallocationFeed } from './reallocation-feed';
@@ -9,6 +10,11 @@ import { ScenarioController, ScenarioDefinition } from './scenario-controller';
 import { RoasGauge } from './roas-gauge';
 import { PlatformBreakdownChart } from './platform-breakdown-chart';
 import { DecisionLedgerTable } from './decision-ledger-table';
+import { CausalDagVisualizer } from './causal-dag-visualizer';
+import { RcaWaterfallChart } from './rca-waterfall-chart';
+import { ScenarioSandbox } from './scenario-sandbox';
+import { VoiceBriefingAgent } from '@/features/voice/voice-briefing-agent';
+import { USE_MOCKS, FASTAPI_BASE_URL, approveDirective } from '@/lib/api-adapter';
 import initialEngineState from '@/data/nexus-engine-state.json';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -16,9 +22,14 @@ import { useChannel, AdChannel } from '@/context/channel-context';
 
 export function MissionControlConsole() {
   const [state, setState] = useState(initialEngineState);
+  const [liveMode, setLiveMode] = useState(!USE_MOCKS);
   const { channel, setChannel } = useChannel();
   const activeTab = channel;
   const setActiveTab = (tab: string) => setChannel(tab as AdChannel);
+
+  const hasCriticalAnomaly = state.anomalies.some(
+    (a: any) => a.severity === 'CRITICAL' || a.factors?.some((f: any) => f.badge === 'Stockout')
+  );
 
   const handleTriggerScenario = (scenario: ScenarioDefinition) => {
     if (scenario.id === 'scenario-stockout') {
@@ -48,7 +59,7 @@ export function MissionControlConsole() {
           roas: 0.15,
           spend: 4200,
           inventory: 0,
-          explanation: 'Stock level reached zero on Nike ERP SKU 315122-001. ROAS collapsed from 3.8x to 0.15x.',
+          explanation: 'Stock level reached zero on Nike ERP SKU 315122-001. ROAS collapsed from 3.8x to 0.15x (-96%).',
           factors: [
             {
               name: 'Inventory Stockout',
@@ -80,6 +91,9 @@ export function MissionControlConsole() {
           }
         };
       });
+      toast.error('Operational Shock Injected', {
+        description: 'Hero SKU stockout triggered. ROAS collapsed across Meta channels.'
+      });
     } else {
       setState((prev) => {
         const updatedCampaigns = prev.campaigns.map((c: any) => {
@@ -90,11 +104,51 @@ export function MissionControlConsole() {
         });
         return { ...prev, campaigns: updatedCampaigns };
       });
+      toast.warning('Ad Fatigue Shock Injected', {
+        description: 'Meta creative fatigue simulated with 25% efficiency degradation.'
+      });
     }
   };
 
   const handleResetBaseline = () => {
     setState(initialEngineState);
+    toast.info('Telemetry Restored', {
+      description: 'Reset to canonical baseline with optimal channel balance.'
+    });
+  };
+
+  const handleVoiceAuthorize = async (planId: string) => {
+    try {
+      const receipt = await approveDirective(planId, 'VOICE_BRIEFING_AUTHORIZED');
+      setState((prev) => {
+        const newLedgerItem = {
+          id: `ledg-voice-${Date.now()}`,
+          timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+          decision: `Voice-Authorized: Throttled stocked-out Meta Hero SKU -> $0/day; Scaled Google Search -> +$800/day`,
+          expectedMargin: 2450.0,
+          realizedMargin: 2390.0,
+          variancePct: -2.4,
+          accuracyPct: 97.6,
+          confidence: 0.98,
+          status: 'executed',
+          feedback: 'Voice token authenticated (ElevenLabs HITL)'
+        };
+        return {
+          ...prev,
+          ledger: [newLedgerItem, ...prev.ledger],
+          telemetry: {
+            ...prev.telemetry,
+            activeAnomaliesCount: Math.max(0, prev.telemetry.activeAnomaliesCount - 1),
+            projectedMarginUplift: prev.telemetry.projectedMarginUplift + 1148
+          }
+        };
+      });
+      toast.success('Directive Executed via Voice Authorization', {
+        description: `Plan ${planId} signed. Atomic API budget mutate dispatched.`
+      });
+    } catch (e: any) {
+      toast.error('Voice Authorization Failed', { description: e.message });
+    }
   };
 
   const filteredCampaigns = state.campaigns.filter((c: any) =>
@@ -112,42 +166,67 @@ export function MissionControlConsole() {
         aria-hidden='true'
       />
 
-      {/* 1. Header & Live Telemetry (Utilitarian Minimalist) */}
+      {/* 1. Header & Live Telemetry with Mock/Live Adapter Toggle */}
       <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800/60 pb-5'>
         <div>
           <div className='flex items-center gap-2.5'>
-            <span className='size-1.5 rounded-full bg-emerald-400' />
+            <span className='size-2 rounded-full bg-emerald-400 animate-pulse' />
             <h1 className='text-xl font-bold font-mono tracking-tight text-zinc-100'>
               NEXUS D2C
             </h1>
             <span className='text-zinc-700 font-mono text-sm'>/</span>
             <span className='text-sm font-mono text-zinc-400'>
-              Nike Direct Decision Engine
+              Autonomous Advertising Intelligence &amp; Decision Engine
             </span>
           </div>
           <p className='text-xs text-zinc-500 font-mono mt-1'>
-            PostgreSQL 16 • Autonomous allocation active • Floor ROAS 1.80x
+            DuckDB Columnar Store • Analytical SLSQP Optimizer • Dual-Knapsack Bandits • Floor ROAS 1.80x
           </p>
         </div>
 
-        <div className='flex items-center gap-3 text-xs font-mono'>
+        <div className='flex flex-wrap items-center gap-3 text-xs font-mono'>
+          {/* Live vs Mock Data Mode Badge Toggle */}
+          <button
+            onClick={() => {
+              setLiveMode(!liveMode);
+              toast.info(`Switched to ${!liveMode ? 'Live Backend (FastAPI)' : 'Deterministic Mock Mode'}`);
+            }}
+            className={cn(
+              'flex items-center gap-2 px-2.5 py-1 rounded-md border text-[11px] transition-colors',
+              liveMode
+                ? 'bg-emerald-950/40 border-emerald-700/60 text-emerald-300'
+                : 'bg-zinc-900/60 border-zinc-800/80 text-zinc-400'
+            )}
+            title="Click to toggle between live backend API and deterministic mock replay"
+          >
+            <span className={cn('size-1.5 rounded-full', liveMode ? 'bg-emerald-400' : 'bg-amber-400')} />
+            <span>{liveMode ? 'API: LIVE FASTAPI (8000)' : 'API: DETERMINISTIC MOCKS'}</span>
+          </button>
+
           <div className='flex items-center gap-2 text-zinc-400 bg-zinc-900/50 px-2.5 py-1 rounded-md border border-zinc-800/80'>
             <span className='size-1.5 rounded-full bg-emerald-400' />
             <span>Cycle {state.metadata.cycleId}</span>
           </div>
+
           <span className='text-zinc-500 hidden sm:block text-[11px] font-mono'>
             SLSQP Convex Optimization
           </span>
         </div>
       </div>
 
-      {/* 2. Key Performance Bento Strip */}
-      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+      {/* 2. Voice HITL Briefing Agent Bar */}
+      <VoiceBriefingAgent
+        onAuthorizePlan={handleVoiceAuthorize}
+        activeDirectiveId="dir_meta_hero_shoe"
+      />
+
+      {/* 3. Executive Overview KPI Banner (Blended ROAS, POAS, MER, 24h Spend, At-Risk Out-of-Stock SKUs) */}
+      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5'>
         {/* Blended ROAS */}
         <Card className='border-zinc-800/60 bg-zinc-950/40 p-5 rounded-xl shadow-none hover:border-zinc-700/60 transition-colors'>
           <div className='flex items-center justify-between text-xs font-mono text-zinc-400 uppercase tracking-wider'>
             <span>Blended ROAS</span>
-            <span className='text-emerald-400 font-semibold text-[11px]'>
+            <span className={cn('font-semibold text-[11px]', hasCriticalAnomaly ? 'text-rose-400' : 'text-emerald-400')}>
               {state.telemetry.roasDelta30d}
             </span>
           </div>
@@ -161,78 +240,117 @@ export function MissionControlConsole() {
           </div>
           <div className='mt-3 h-0.5 w-full bg-zinc-900 rounded-full overflow-hidden'>
             <div
-              className='h-full bg-emerald-400 rounded-full'
+              className={cn('h-full rounded-full', hasCriticalAnomaly ? 'bg-rose-500' : 'bg-emerald-400')}
               style={{ width: `${Math.min(100, (state.telemetry.blendedRoas30d / state.telemetry.targetRoas) * 100)}%` }}
             />
           </div>
         </Card>
 
-        {/* 30D Spend */}
+        {/* POAS (Profit on Ad Spend) */}
         <Card className='border-zinc-800/60 bg-zinc-950/40 p-5 rounded-xl shadow-none hover:border-zinc-700/60 transition-colors'>
           <div className='flex items-center justify-between text-xs font-mono text-zinc-400 uppercase tracking-wider'>
-            <span>30D Ad Spend</span>
-            <span className='text-zinc-500 text-[11px] font-mono'>79% pace</span>
+            <span>POAS (Profit/Ad Spend)</span>
+            <span className='text-emerald-400 text-[11px] font-semibold'>
+              {hasCriticalAnomaly ? '2.05x (-30%)' : '2.92x'}
+            </span>
           </div>
           <div className='mt-2.5 flex items-baseline justify-between'>
             <span className='text-2xl font-bold font-mono tracking-tight text-zinc-100'>
-              ${(state.telemetry.totalSpend30d / 1000).toFixed(1)}k
+              {hasCriticalAnomaly ? '2.05x' : '2.92x'}
             </span>
             <span className='text-xs font-mono text-zinc-500'>
-              Budget: ${(state.telemetry.totalManagedBudget / 1000).toFixed(0)}k
+              Breakeven: 1.00x
             </span>
           </div>
           <div className='mt-3 h-0.5 w-full bg-zinc-900 rounded-full overflow-hidden'>
-            <div className='h-full bg-blue-400 rounded-full' style={{ width: '79%' }} />
+            <div className='h-full bg-emerald-400 rounded-full' style={{ width: '73%' }} />
           </div>
         </Card>
 
-        {/* Net Contribution Margin */}
+        {/* MER (Marketing Efficiency Ratio: Rev / Ad Spend) */}
         <Card className='border-zinc-800/60 bg-zinc-950/40 p-5 rounded-xl shadow-none hover:border-zinc-700/60 transition-colors'>
           <div className='flex items-center justify-between text-xs font-mono text-zinc-400 uppercase tracking-wider'>
-            <span>Contribution Margin</span>
-            <span className='text-cyan-400 text-[11px] font-semibold'>56.8% gross</span>
+            <span>Portfolio MER</span>
+            <span className='text-cyan-400 text-[11px] font-semibold'>
+              {hasCriticalAnomaly ? '3.65x (-28%)' : '5.12x'}
+            </span>
           </div>
           <div className='mt-2.5 flex items-baseline justify-between'>
             <span className='text-2xl font-bold font-mono tracking-tight text-zinc-100'>
-              ${(state.telemetry.totalMargin30d / 1000).toFixed(1)}k
+              {hasCriticalAnomaly ? '3.65x' : '5.12x'}
             </span>
             <span className='text-xs font-mono text-zinc-500'>
-              Rev: ${(state.telemetry.totalRevenue30d / 1000).toFixed(1)}k
+              Min: 3.50x
             </span>
           </div>
           <div className='mt-3 h-0.5 w-full bg-zinc-900 rounded-full overflow-hidden'>
-            <div className='h-full bg-cyan-400 rounded-full' style={{ width: '56.8%' }} />
+            <div className='h-full bg-cyan-400 rounded-full' style={{ width: '85%' }} />
           </div>
         </Card>
 
-        {/* Protected Margin Lift */}
+        {/* 24H Spend */}
         <Card className='border-zinc-800/60 bg-zinc-950/40 p-5 rounded-xl shadow-none hover:border-zinc-700/60 transition-colors'>
           <div className='flex items-center justify-between text-xs font-mono text-zinc-400 uppercase tracking-wider'>
-            <span>Protected Lift</span>
-            <span className='text-rose-400 text-[11px] font-mono'>{state.telemetry.activeAnomaliesCount} anomalies</span>
+            <span>24H Ad Spend</span>
+            <span className='text-zinc-500 text-[11px] font-mono'>Across 3 Platforms</span>
           </div>
           <div className='mt-2.5 flex items-baseline justify-between'>
-            <span className='text-2xl font-bold font-mono tracking-tight text-emerald-400'>
-              +${(state.telemetry.projectedMarginUplift / 1000).toFixed(1)}k
+            <span className='text-2xl font-bold font-mono tracking-tight text-zinc-100'>
+              $18,450
             </span>
             <span className='text-xs font-mono text-zinc-500'>
-              Reallocated: ${(state.telemetry.reallocationCapitalMoved / 1000).toFixed(1)}k
+              Cap: $25,000/d
             </span>
           </div>
           <div className='mt-3 h-0.5 w-full bg-zinc-900 rounded-full overflow-hidden'>
-            <div className='h-full bg-emerald-400 rounded-full' style={{ width: '92%' }} />
+            <div className='h-full bg-blue-400 rounded-full' style={{ width: '74%' }} />
+          </div>
+        </Card>
+
+        {/* At-Risk Out-of-Stock SKUs */}
+        <Card className='border-zinc-800/60 bg-zinc-950/40 p-5 rounded-xl shadow-none hover:border-zinc-700/60 transition-colors'>
+          <div className='flex items-center justify-between text-xs font-mono text-zinc-400 uppercase tracking-wider'>
+            <span>At-Risk Stockout SKUs</span>
+            <span className={cn('text-[11px] font-mono font-bold', hasCriticalAnomaly ? 'text-rose-400 animate-pulse' : 'text-emerald-400')}>
+              {hasCriticalAnomaly ? '1 SKU CRITICAL' : '0 SKUs'}
+            </span>
+          </div>
+          <div className='mt-2.5 flex items-baseline justify-between'>
+            <span className={cn('text-2xl font-bold font-mono tracking-tight', hasCriticalAnomaly ? 'text-rose-400' : 'text-zinc-100')}>
+              {hasCriticalAnomaly ? '1' : '0'}
+            </span>
+            <span className='text-xs font-mono text-zinc-500'>
+              {hasCriticalAnomaly ? 'Air Jordan / AF1' : '100% In Stock'}
+            </span>
+          </div>
+          <div className='mt-3 h-0.5 w-full bg-zinc-900 rounded-full overflow-hidden'>
+            <div
+              className={cn('h-full rounded-full', hasCriticalAnomaly ? 'bg-rose-500' : 'bg-emerald-400')}
+              style={{ width: hasCriticalAnomaly ? '100%' : '0%' }}
+            />
           </div>
         </Card>
       </div>
 
-      {/* 3. Scenario Controller (Utilitarian Sandbox) */}
+      {/* 4. Scenario Controller (Operational Shock Simulator) */}
       <ScenarioController
         scenarios={state.scenarios}
         onTriggerScenario={handleTriggerScenario}
         onResetBaseline={handleResetBaseline}
       />
 
-      {/* 4. Diagnostic Anomalies Feed */}
+      {/* 5. Causal DAG Visualizer & RCA Waterfall Decomposition */}
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
+        <CausalDagVisualizer activeAnomaly={hasCriticalAnomaly} />
+        <RcaWaterfallChart
+          totalLoss={hasCriticalAnomaly ? 3008.25 : 0}
+          items={hasCriticalAnomaly ? undefined : [
+            { driver: 'Baseline Equilibrium', category: 'Nominal Operations', dollarImpact: 0, percentageShare: 100, color: 'bg-emerald-500' }
+          ]}
+        />
+      </div>
+
+      {/* 6. Diagnostic Anomalies Feed */}
       <div className='space-y-3.5'>
         <div className='flex items-center justify-between border-b border-zinc-800/60 pb-2.5'>
           <div className='flex items-center gap-2'>
@@ -264,7 +382,16 @@ export function MissionControlConsole() {
         </div>
       </div>
 
-      {/* 5. Autonomous Budget Reallocation Stream */}
+      {/* 7. Interactive What-If Scenario Sandbox */}
+      <ScenarioSandbox
+        onApplyReallocation={(alloc) => {
+          toast.success('What-If Scenario Vector Applied', {
+            description: `Meta: $${alloc.meta}/d | Google: $${alloc.google}/d | Amazon: $${alloc.amazon}/d`
+          });
+        }}
+      />
+
+      {/* 8. Autonomous Budget Reallocation Stream */}
       <ReallocationFeed
         initialItems={state.reallocations}
         onExecuteReallocation={(item) => {
@@ -289,13 +416,13 @@ export function MissionControlConsole() {
         }}
       />
 
-      {/* 6. Multi-Platform Financial Telemetry */}
+      {/* 9. Multi-Platform Financial Telemetry (Time-Series Trends & Share) */}
       <PlatformBreakdownChart
         platforms={state.platforms}
         dailyTrend={state.dailyTrend}
       />
 
-      {/* 7. ROAS Gauges & Health Scoring Matrix */}
+      {/* 10. ROAS Gauges & Health Scoring Matrix */}
       <div className='space-y-4 rounded-xl border border-zinc-800/60 bg-zinc-950/40 p-5 shadow-none'>
         <div className='flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800/60 pb-3'>
           <div className='flex items-center gap-2'>
@@ -347,7 +474,7 @@ export function MissionControlConsole() {
         </div>
       </div>
 
-      {/* 8. Closed-Loop Decision Ledger */}
+      {/* 11. Closed-Loop Decision Ledger & Audit Trail */}
       <DecisionLedgerTable entries={state.ledger} />
     </div>
   );

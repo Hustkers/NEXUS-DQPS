@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 
-export type AdChannel = 'all' | 'amazon' | 'google' | 'meta';
+export type AdChannel = 'all' | 'amazon' | 'google' | 'meta' | 'shopify';
 
 export interface ChannelInfo {
   id: AdChannel;
@@ -19,7 +19,7 @@ export const CHANNELS: Record<AdChannel, ChannelInfo> = {
     id: 'all',
     name: 'All Channels',
     fullName: 'Blended Omnichannel (D2C)',
-    subtitle: 'Amazon • Google • Meta',
+    subtitle: 'Amazon • Google • Meta • Shopify',
     badge: 'Blended',
     accentColor: 'text-emerald-400 border-emerald-500/30 bg-emerald-950/20'
   },
@@ -46,6 +46,14 @@ export const CHANNELS: Record<AdChannel, ChannelInfo> = {
     subtitle: 'Instagram, Reels & Feed',
     badge: 'Advantage+',
     accentColor: 'text-sky-400 border-sky-500/30 bg-sky-950/20'
+  },
+  shopify: {
+    id: 'shopify',
+    name: 'Shopify Store',
+    fullName: 'Shopify D2C Storefront',
+    subtitle: 'Direct Checkout & Retention',
+    badge: 'Storefront',
+    accentColor: 'text-lime-400 border-lime-500/30 bg-lime-950/20'
   }
 };
 
@@ -70,11 +78,11 @@ export function ChannelProvider({ children }: { children: React.ReactNode }) {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const urlChannel = params.get('channel') as AdChannel;
-      if (urlChannel && (urlChannel === 'all' || urlChannel === 'amazon' || urlChannel === 'google' || urlChannel === 'meta')) {
+      if (urlChannel && (urlChannel === 'all' || urlChannel === 'amazon' || urlChannel === 'google' || urlChannel === 'meta' || urlChannel === 'shopify')) {
         setChannelState(urlChannel);
       } else {
         const saved = localStorage.getItem('nexus_ad_channel') as AdChannel;
-        if (saved && (saved === 'all' || saved === 'amazon' || saved === 'google' || saved === 'meta')) {
+        if (saved && (saved === 'all' || saved === 'amazon' || saved === 'google' || saved === 'meta' || saved === 'shopify')) {
           setChannelState(saved);
         }
       }

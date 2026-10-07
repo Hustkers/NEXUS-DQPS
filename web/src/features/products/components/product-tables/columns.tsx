@@ -7,6 +7,7 @@ import { Icons } from '@/components/icons';
 import Image from 'next/image';
 import { CellAction } from './cell-action';
 import { CATEGORY_OPTIONS } from './options';
+import { cn } from '@/lib/utils';
 
 export const columns: ColumnDef<Product>[] = [
   {
@@ -99,17 +100,21 @@ export const columns: ColumnDef<Product>[] = [
     }
   },
   {
-    id: 'rating',
-    accessorKey: 'rating',
-    header: 'Rating / Reviews',
+    id: 'inventory',
+    accessorKey: 'inventory',
+    header: 'Inventory / Stock',
     cell: ({ row }) => {
       const p = row.original;
-      const rating = p.rating ?? 4.5;
-      const reviews = p.reviews ?? 0;
+      const stock = (p as any).inventory ?? 150;
+      const isCritical = stock <= 0;
       return (
         <div className='flex items-center gap-1.5 text-xs font-mono'>
-          <span className='text-amber-400 font-bold'>★ {Number(rating).toFixed(1)}</span>
-          <span className='text-zinc-500 text-[11px]'>({reviews})</span>
+          <span className={cn('font-bold', isCritical ? 'text-rose-400' : 'text-emerald-400')}>
+            {stock} units
+          </span>
+          <span className='text-zinc-500 text-[11px]'>
+            {isCritical ? '(Stockout)' : '(In Stock)'}
+          </span>
         </div>
       );
     }

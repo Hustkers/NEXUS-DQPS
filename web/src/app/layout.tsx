@@ -50,7 +50,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: META_THEME_COLORS.light
+  themeColor: META_THEME_COLORS.dark
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -66,10 +66,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                // Set meta theme color
-                if (localStorage.theme === 'dark' || ((!('theme' in localStorage) || localStorage.theme === 'system') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '${META_THEME_COLORS.dark}')
+                if (localStorage.theme === 'light') {
+                  localStorage.theme = 'dark';
                 }
+                document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '${META_THEME_COLORS.dark}');
               } catch (_) {}
             `
           }}
@@ -86,7 +86,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <ThemeProvider
             attribute='class'
             defaultTheme='dark'
-            enableSystem
+            enableSystem={false}
             disableTransitionOnChange
             enableColorScheme
           >
