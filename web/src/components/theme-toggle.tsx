@@ -46,7 +46,7 @@ export const ThemeToggle = () => {
       }
       document.documentElement.setAttribute('data-theme', nextTheme);
       setTheme(nextTheme);
-    }, { clientX, clientY });
+    }, { clientX, clientY, currentTarget: event.currentTarget });
   };
 
   if (!mounted) {
