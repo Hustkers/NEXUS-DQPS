@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { Icons } from '@/components/icons';
 import { VGPUCanvas } from './vgpu-canvas';
 import { GlowButton } from './glow-button';
@@ -78,19 +77,10 @@ export function LandingPageView() {
             </GlowButton>
 
             <GlowButton
-              href='#shocks'
+              href='/dashboard/fingerprint'
               size='lg'
               variant='outline'
               className='font-mono text-sm'
-            >
-              Test 4 Shock Scenarios
-            </GlowButton>
-
-            <GlowButton
-              href='/dashboard/fingerprint'
-              size='lg'
-              variant='pill'
-              className='font-mono text-xs px-4'
             >
               Hardware Fingerprint Demo
             </GlowButton>
@@ -295,7 +285,7 @@ export function LandingPageView() {
       </section>
 
       {/* 5. 4-PHASE ARCHITECTURAL FLOW (STACK & PIPELINE) */}
-      <section id='stack' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-16 relative'>
+      <section id='stack' className='pt-20 pb-28 md:pt-28 md:pb-36 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-16 relative'>
         <span id='pipeline' className='absolute -top-20' />
         <div className='text-center max-w-3xl mx-auto mb-16'>
           <div className='font-mono text-xs font-bold text-primary uppercase tracking-widest mb-2'>
@@ -361,82 +351,6 @@ export function LandingPageView() {
           ))}
         </div>
       </section>
-
-      {/* 5.5 ISOMETRIC ALGORITHMIC TELEMETRY (HAIRLINE FIGURES) */}
-      <section id='instruments' className='py-16 md:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-16'>
-        <IsometricTelemetryPanel />
-      </section>
-
-      {/* 6. CALL TO ACTION SPOTLIGHT BANNER */}
-      <section className='py-16 md:py-24 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto'>
-        <CardSpotlight className='p-8 md:p-12 text-center bg-card border-primary/30 shadow-xl space-y-6'>
-          <div className='inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-mono font-medium'>
-            <span>Ready for Live Hackathon Demonstration</span>
-          </div>
-
-          <h2 className='text-3xl md:text-5xl font-extrabold tracking-tight text-foreground max-w-2xl mx-auto leading-tight'>
-            Experience Autonomous Ad Capital Interventions Live
-          </h2>
-
-          <p className='text-sm md:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed'>
-            Dive into the interactive mission control console, inspect simulated anomalies, view the KKT optimization vectors, and approve budget reallocations.
-          </p>
-
-          <div className='flex flex-wrap items-center justify-center gap-4 pt-2'>
-            <GlowButton
-              href='/dashboard/overview'
-              size='lg'
-              variant='default'
-              className='font-mono text-sm shadow-md'
-            >
-              Launch Mission Control →
-            </GlowButton>
-
-            <GlowButton
-              href='/dashboard/simulator'
-              size='lg'
-              variant='outline'
-              className='font-mono text-sm'
-            >
-              Open Crisis Simulator
-            </GlowButton>
-          </div>
-        </CardSpotlight>
-      </section>
-
-      {/* 7. CLEAN SYSTEM FOOTER */}
-      <footer className='border-t border-border/80 bg-muted/20 py-12 px-4 sm:px-6 lg:px-8 text-xs font-mono text-muted-foreground'>
-        <div className='max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6'>
-          <div className='flex items-center gap-3'>
-            <span className='font-bold text-foreground'>NEXUS-DQPS</span>
-            <span>•</span>
-            <span>DataQuest 3.0 Hackathon Master Submission</span>
-          </div>
-
-          <div className='flex flex-wrap items-center gap-6'>
-            <Link href='/dashboard/overview' className='hover:text-foreground transition-colors'>
-              Mission Control
-            </Link>
-            <Link href='/dashboard/matrix' className='hover:text-foreground transition-colors'>
-              SKU Matrix
-            </Link>
-            <Link href='/dashboard/fingerprint' className='hover:text-foreground transition-colors'>
-              Identity Graph
-            </Link>
-            <Link href='/dashboard/ledger' className='hover:text-foreground transition-colors'>
-              Decision Ledger
-            </Link>
-            <a
-              href='https://github.com/Hustkers/NEXUS-DQPS'
-              target='_blank'
-              rel='noopener noreferrer'
-              className='hover:text-foreground transition-colors flex items-center gap-1'
-            >
-              <Icons.brandGithub className='size-3.5' /> GitHub
-            </a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
