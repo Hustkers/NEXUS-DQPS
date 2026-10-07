@@ -21,7 +21,7 @@ export default function GaugesPage() {
 
   return (
     <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#000000] text-white min-h-screen'>
-      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-[#8A8A8A] pb-4'>
+      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-[#1A1A1A] pb-4'>
         <div>
           <div className='flex items-center gap-2'>
             <Icons.trendingUp className='size-5 text-white' />
@@ -34,7 +34,7 @@ export default function GaugesPage() {
           </p>
         </div>
 
-        <div className='flex items-center gap-1.5 bg-[#1A1A1A] p-1 rounded border border-[#8A8A8A] text-xs font-mono uppercase'>
+        <div className='flex items-center gap-1.5 bg-[#1A1A1A] p-1 rounded border border-[#1A1A1A] text-xs font-mono uppercase'>
           {(['all', 'meta', 'google', 'amazon', 'shopify'] as const).map((plat) => (
             <button
               key={plat}
@@ -89,8 +89,8 @@ export default function GaugesPage() {
       {/* Stockout Fix Modal */}
       {fixingCampaign && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4'>
-          <div className='bg-[#1A1A1A] border border-[#8A8A8A] rounded-lg max-w-md w-full p-6 space-y-4 font-mono'>
-            <div className='flex items-center justify-between border-b border-[#8A8A8A]/40 pb-3'>
+          <div className='bg-[#1A1A1A] border border-[#1A1A1A] rounded-lg max-w-md w-full p-6 space-y-4 font-mono'>
+            <div className='flex items-center justify-between border-b border-[#000000] pb-3'>
               <h3 className='text-base font-bold text-white uppercase tracking-tight flex items-center gap-2'>
                 <span>Fix Stockout Protocol</span>
               </h3>
@@ -109,10 +109,10 @@ export default function GaugesPage() {
                 Automatic circuit breaker will throttle campaign spend to zero and route dynamic reserve inventory to Shopify/Amazon fulfillment.
               </p>
             </div>
-            <div className='flex justify-end gap-2 pt-2 border-t border-[#8A8A8A]/40'>
+            <div className='flex justify-end gap-2 pt-2 border-t border-[#000000]'>
               <button
                 onClick={() => setFixingCampaign(null)}
-                className='px-3 py-1.5 rounded border border-[#8A8A8A] text-xs text-white hover:bg-[#333333]'
+                className='px-3 py-1.5 rounded border border-[#1A1A1A] text-xs text-white hover:bg-[#333333]'
               >
                 Cancel
               </button>
