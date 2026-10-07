@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -33,6 +34,7 @@ export function OrgSwitcher() {
             render={
               <SidebarMenuButton
                 size='lg'
+                tooltip='Nike Direct D2C Catalogs'
                 className='data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground border border-emerald-500/20 bg-emerald-950/20 hover:bg-emerald-900/30 transition-all'
               />
             }
@@ -55,9 +57,11 @@ export function OrgSwitcher() {
             side='bottom'
             sideOffset={4}
           >
-            <DropdownMenuLabel className='text-muted-foreground text-xs font-mono uppercase tracking-wider'>
-              Connected D2C Catalogs (PostgreSQL)
-            </DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className='text-muted-foreground text-xs font-mono uppercase tracking-wider'>
+                Connected D2C Catalogs (PostgreSQL)
+              </DropdownMenuLabel>
+            </DropdownMenuGroup>
             {brands.map((b) => (
               <DropdownMenuItem
                 key={b.name}

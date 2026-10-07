@@ -33,6 +33,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 import { Icons } from '../icons';
 import { OrgSwitcher } from '../org-switcher';
+import { ChannelSwitcher } from '../channel-switcher';
 
 export default function AppSidebar() {
   const pathname = usePathname();
@@ -53,8 +54,9 @@ export default function AppSidebar() {
 
   return (
     <Sidebar collapsible='icon'>
-      <SidebarHeader className='group-data-[collapsible=icon]:pt-4'>
+      <SidebarHeader className='group-data-[collapsible=icon]:pt-4 flex flex-col gap-1.5'>
         <OrgSwitcher />
+        <ChannelSwitcher />
       </SidebarHeader>
       <SidebarContent className='overflow-x-hidden'>
         {filteredGroups.map((group) => (
@@ -164,7 +166,7 @@ export default function AppSidebar() {
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem onClick={() => signOut({ redirectUrl: '/auth/sign-in' })}>
+                  <DropdownMenuItem onClick={() => signOut()}>
                     <Icons.logout aria-hidden className='mr-2 h-4 w-4' />
                     Sign out
                   </DropdownMenuItem>
@@ -174,7 +176,7 @@ export default function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-      <SidebarRail />
+      {/* <SidebarRail /> */}
     </Sidebar>
   );
 }
