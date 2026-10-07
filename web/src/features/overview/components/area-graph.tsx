@@ -43,14 +43,14 @@ export function AreaGraph() {
   return (
     <Card className='bg-[#1A1A1A] border-[#1A1A1A] shadow-none'>
       <CardHeader>
-        <CardTitle className='text-white font-mono flex items-center justify-between'>
+        <CardTitle className='text-white font-orbitron flex items-center justify-between'>
           <span>Traffic Telemetry Area</span>
-          <Badge variant='outline' className='border-none text-white bg-[#000000] font-mono'>
+          <Badge variant='outline' className='border-none text-white bg-[#000000] font-orbitron'>
             <Icons.trendingUp className='text-white' />
             +5.2%
           </Badge>
         </CardTitle>
-        <CardDescription className='text-[#8A8A8A] font-mono'>Showing total visitors for the last 6 months</CardDescription>
+        <CardDescription className='text-[#8A8A8A] font-orbitron'>Showing total visitors for the last 6 months</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>

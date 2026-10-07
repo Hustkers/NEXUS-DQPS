@@ -152,13 +152,13 @@ export function DecisionLedgerTable({ entries, className, showHeader = false }: 
   }, [entries]);
 
   return (
-    <div className={cn('space-y-4 font-mono', className)}>
+    <div className={cn('space-y-4 font-orbitron', className)}>
       {/* Optional In-Component Header (used when rendered inside Mission Control) */}
       {showHeader && (
         <div className='flex flex-wrap items-center justify-between gap-2 border-b border-border/80 pb-3'>
           <div className='flex items-center gap-2'>
             <Icons.check className='size-3.5 text-emerald-500' />
-            <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
+            <h3 className='font-orbitron text-xs font-bold text-foreground uppercase tracking-wider'>
               DECISION LEDGER
             </h3>
             <span className='inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'>
@@ -166,7 +166,7 @@ export function DecisionLedgerTable({ entries, className, showHeader = false }: 
               ✓ AUDITED
             </span>
           </div>
-          <span className='text-xs font-mono text-muted-foreground'>
+          <span className='text-xs font-orbitron text-muted-foreground'>
             {entries.length} AUDITED DECISIONS
           </span>
         </div>
