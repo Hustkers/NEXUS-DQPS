@@ -168,27 +168,43 @@ class GoogleCloudClient:
         if self.auth_method == "APPLICATION_DEFAULT_CREDENTIALS":
             token = self._get_bearer_token()
             if token and self.project_id:
-                url = (
-                    f"https://{self.location}-aiplatform.googleapis.com/v1/"
-                    f"projects/{self.project_id}/locations/{self.location}/publishers/google/models/"
-                    f"{self.model_name}:generateContent"
-                )
-                headers = {
-                    "Authorization": f"Bearer {token}",
-                    "Content-Type": "application/json",
-                }
-                res = self._execute_http_request(url, headers, prompt, system_instruction, response_schema)
-                if res is not None:
-                    return res
-                logger.warning("Vertex AI call failed; checking secondary fallback.")
+                candidate_models = [self.model_name]
+                for fallback in ("gemini-2.5-flash", "gemini-2.5-pro"):
+                    if fallback not in candidate_models:
+                        candidate_models.append(fallback)
+
+                for candidate in candidate_models:
+                    url = (
+                        f"https://{self.location}-aiplatform.googleapis.com/v1/"
+                        f"projects/{self.project_id}/locations/{self.location}/publishers/google/models/"
+                        f"{candidate}:generateContent"
+                    )
+                    headers = {
+                        "Authorization": f"Bearer {token}",
+                        "Content-Type": "application/json",
+                    }
+                    res, status_code = self._execute_http_request(url, headers, prompt, system_instruction, response_schema)
+                    if res is not None:
+                        return res
+                    if status_code == 404:
+                        logger.info("Vertex AI model '%s' returned 404; trying compatible fallback...", candidate)
+                        continue
+                logger.warning("Vertex AI call failed across all candidates; checking secondary fallback.")
 
         # 2. Try Gemini Developer API Key fallback if provided
         if self.api_key:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model_name}:generateContent?key={self.api_key}"
-            headers = {"Content-Type": "application/json"}
-            res = self._execute_http_request(url, headers, prompt, system_instruction, response_schema)
-            if res is not None:
-                return res
+            candidate_models = [self.model_name]
+            for fallback in ("gemini-2.5-flash", "gemini-1.5-flash"):
+                if fallback not in candidate_models:
+                    candidate_models.append(fallback)
+            for candidate in candidate_models:
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/{candidate}:generateContent?key={self.api_key}"
+                headers = {"Content-Type": "application/json"}
+                res, status_code = self._execute_http_request(url, headers, prompt, system_instruction, response_schema)
+                if res is not None:
+                    return res
+                if status_code == 404:
+                    continue
 
         # 3. Deterministic offline fallback
         logger.info("Executing offline synthetic reasoning fallback.")
@@ -201,8 +217,12 @@ class GoogleCloudClient:
         prompt: str,
         system_instruction: Optional[str] = None,
         response_schema: Optional[Dict[str, Any]] = None,
-    ) -> Optional[str]:
-        """Perform HTTP request with rate limiting and exponential backoff."""
+    ) -> tuple[Optional[str], int]:
+        """Perform HTTP request with rate limiting and exponential backoff.
+        
+        Returns:
+            Tuple of (response_text_or_None, status_code)
+        """
         self.limiter.acquire()
 
         payload: Dict[str, Any] = {
@@ -235,9 +255,12 @@ class GoogleCloudClient:
                     if candidates:
                         parts = candidates[0].get("content", {}).get("parts", [])
                         if parts:
-                            return parts[0].get("text", "")
-                    return ""
+                            return parts[0].get("text", ""), 200
+                    return "", 200
             except urllib.error.HTTPError as e:
+                if e.code == 404:
+                    # Model not published/found on this endpoint
+                    return None, 404
                 # Retry on rate limit (429) or temporary server errors (500, 503)
                 if e.code in (429, 500, 503) and attempt < self.max_retries - 1:
                     sleep_time = (2 ** attempt) + random.uniform(0.1, 0.5)
@@ -245,12 +268,12 @@ class GoogleCloudClient:
                     time.sleep(sleep_time)
                 else:
                     logger.error("Google Cloud API HTTP error %d: %s", e.code, e)
-                    return None
+                    return None, e.code
             except Exception as e:
                 logger.error("Google Cloud connection failure: %s", e)
-                return None
+                return None, 0
 
-        return None
+        return None, 0
 
     def _mock_reasoning_fallback(
         self, prompt: str, response_schema: Optional[Dict[str, Any]] = None
