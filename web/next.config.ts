@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true
   },
   turbopack: {
-    root: path.resolve(__dirname),
+    root: path.resolve(__dirname, '..'),
     rules: {
       '*.html': {
         loaders: ['raw-loader'],
