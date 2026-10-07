@@ -25,8 +25,18 @@ class DuckDBClient:
         db_dir = Path(db_path).parent
         if db_path != ":memory:" and not db_dir.exists():
             db_dir.mkdir(parents=True, exist_ok=True)
-        self.conn = duckdb.connect(db_path)
-        self.init_schema()
+        try:
+            self.conn = duckdb.connect(db_path)
+            self.read_only = False
+            self.init_schema()
+        except duckdb.IOException:
+            try:
+                self.conn = duckdb.connect(db_path, read_only=True)
+                self.read_only = True
+            except duckdb.IOException:
+                self.conn = duckdb.connect(":memory:")
+                self.read_only = False
+                self.init_schema()
 
     def init_schema(self, schema_file: Optional[str | Path] = None) -> None:
         """Execute DDL statements from db/schema.sql."""

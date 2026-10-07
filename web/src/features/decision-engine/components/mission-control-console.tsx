@@ -13,6 +13,7 @@ import { DecisionLedgerTable } from './decision-ledger-table';
 import { CausalDagVisualizer } from './causal-dag-visualizer';
 import { RcaWaterfallChart } from './rca-waterfall-chart';
 import { ScenarioSandbox } from './scenario-sandbox';
+import { ExecutiveGraphBanner } from './executive-graph-banner';
 import { VoiceBriefingAgent } from '@/features/voice/voice-briefing-agent';
 import { USE_MOCKS, FASTAPI_BASE_URL, approveDirective } from '@/lib/api-adapter';
 import { ProductAnalysisModal, type ProductAnalysisTarget } from './product-analysis-modal';
@@ -216,118 +217,12 @@ export function MissionControlConsole() {
         activeDirectiveId="dir_meta_hero_shoe"
       />
 
-      {/* 3. Executive Overview KPI Banner */}
-      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5'>
-        {/* Blended ROAS */}
-        <Card className='border-border/80 bg-card p-5 rounded-xl shadow-xs hover:border-border hover:shadow-sm transition-all'>
-          <div className='flex items-center justify-between text-xs font-mono text-muted-foreground uppercase tracking-wider'>
-            <span>Blended ROAS</span>
-            <span className={cn(
-              'px-1.5 py-0.5 rounded text-[10px] font-bold border',
-              hasCriticalAnomaly
-                ? 'text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-500/30'
-                : 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-500/30'
-            )}>
-              {state.telemetry.roasDelta30d}
-            </span>
-          </div>
-          <div className='mt-2.5 flex items-baseline justify-between'>
-            <span className='text-2xl font-bold font-mono tracking-tight text-foreground'>
-              {state.telemetry.blendedRoas30d.toFixed(2)}x
-            </span>
-            <span className='text-xs font-mono text-muted-foreground'>
-              Target: {state.telemetry.targetRoas.toFixed(2)}x
-            </span>
-          </div>
-          <div className='mt-3 h-1 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden'>
-            <div
-              className={cn('h-full rounded-full', hasCriticalAnomaly ? 'bg-rose-500' : 'bg-emerald-500')}
-              style={{ width: `${Math.min(100, (state.telemetry.blendedRoas30d / state.telemetry.targetRoas) * 100)}%` }}
-            />
-          </div>
-        </Card>
-
-        {/* 30D Spend */}
-        <Card className='border-border/80 bg-card p-5 rounded-xl shadow-xs hover:border-border hover:shadow-sm transition-all'>
-          <div className='flex items-center justify-between text-xs font-mono text-muted-foreground uppercase tracking-wider'>
-            <span>30D Ad Spend</span>
-            <span className='text-muted-foreground text-[11px] font-mono'>79% pace</span>
-          </div>
-          <div className='mt-2.5 flex items-baseline justify-between'>
-            <span className='text-2xl font-bold font-mono tracking-tight text-foreground'>
-              ₹{(state.telemetry.totalSpend30d / 1000).toFixed(1)}k
-            </span>
-            <span className='text-xs font-mono text-muted-foreground'>
-              Budget: ₹{(state.telemetry.totalManagedBudget / 1000).toFixed(0)}k
-            </span>
-          </div>
-          <div className='mt-3 h-1 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden'>
-            <div className='h-full bg-blue-500 rounded-full' style={{ width: '79%' }} />
-          </div>
-        </Card>
-
-        {/* Net Contribution Margin */}
-        <Card className='border-border/80 bg-card p-5 rounded-xl shadow-xs hover:border-border hover:shadow-sm transition-all'>
-          <div className='flex items-center justify-between text-xs font-mono text-muted-foreground uppercase tracking-wider'>
-            <span>Contribution Margin</span>
-            <span className='text-sky-700 dark:text-cyan-400 text-[11px] font-semibold'>56.8% gross</span>
-          </div>
-          <div className='mt-2.5 flex items-baseline justify-between'>
-            <span className='text-2xl font-bold font-mono tracking-tight text-foreground'>
-              ₹{(state.telemetry.totalMargin30d / 1000).toFixed(1)}k
-            </span>
-            <span className='text-xs font-mono text-muted-foreground'>
-              Rev: ₹{(state.telemetry.totalRevenue30d / 1000).toFixed(1)}k
-            </span>
-          </div>
-          <div className='mt-3 h-1 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden'>
-            <div className='h-full bg-sky-500 dark:bg-cyan-400 rounded-full' style={{ width: '56.8%' }} />
-          </div>
-        </Card>
-
-        {/* Protected Margin Lift */}
-        <Card className='border-border/80 bg-card p-5 rounded-xl shadow-xs hover:border-border hover:shadow-sm transition-all'>
-          <div className='flex items-center justify-between text-xs font-mono text-muted-foreground uppercase tracking-wider'>
-            <span>Protected Lift</span>
-            <span className='text-rose-600 dark:text-rose-400 text-[11px] font-mono'>{state.telemetry.activeAnomaliesCount} anomalies</span>
-          </div>
-          <div className='mt-2.5 flex items-baseline justify-between'>
-            <span className='text-2xl font-bold font-mono tracking-tight text-emerald-600 dark:text-emerald-400'>
-              +₹{(state.telemetry.projectedMarginUplift / 1000).toFixed(1)}k
-            </span>
-            <span className='text-xs font-mono text-muted-foreground'>
-              Reallocated: ₹{(state.telemetry.reallocationCapitalMoved / 1000).toFixed(1)}k
-            </span>
-          </div>
-          <div className='mt-3 h-1 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden'>
-            <div className='h-full bg-emerald-500 rounded-full' style={{ width: '92%' }} />
-          </div>
-        </Card>
-
-        {/* At-Risk Out-of-Stock SKUs */}
-        <Card className='border-border/80 bg-card p-5 rounded-xl shadow-xs hover:border-border hover:shadow-sm transition-all'>
-          <div className='flex items-center justify-between text-xs font-mono text-muted-foreground uppercase tracking-wider'>
-            <span>Stockout Risk</span>
-            <span className={cn('text-[11px] font-mono font-bold', hasCriticalAnomaly ? 'text-rose-600 dark:text-rose-400 animate-pulse' : 'text-emerald-600 dark:text-emerald-400')}>
-              {hasCriticalAnomaly ? '1 SKU CRITICAL' : '0 SKUs'}
-            </span>
-          </div>
-          <div className='mt-2.5 flex items-baseline justify-between'>
-            <span className={cn('text-2xl font-bold font-mono tracking-tight', hasCriticalAnomaly ? 'text-rose-600 dark:text-rose-400' : 'text-foreground')}>
-              {hasCriticalAnomaly ? '1' : '0'}
-            </span>
-            <span className='text-xs font-mono text-muted-foreground'>
-              {hasCriticalAnomaly ? 'AF1 (Stockout)' : '100% In Stock'}
-            </span>
-          </div>
-          <div className='mt-3 h-1 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden'>
-            <div
-              className={cn('h-full rounded-full', hasCriticalAnomaly ? 'bg-rose-500' : 'bg-emerald-500')}
-              style={{ width: hasCriticalAnomaly ? '100%' : '0%' }}
-            />
-          </div>
-        </Card>
-      </div>
+      {/* 3. Executive Overview KPI Banner & Trajectory Graphs */}
+      <ExecutiveGraphBanner
+        state={state}
+        hasCriticalAnomaly={hasCriticalAnomaly}
+        channel={channel}
+      />
 
       {/* 4. Scenario Controller (Operational Shock Simulator) */}
       <ScenarioController

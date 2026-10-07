@@ -33,7 +33,14 @@ CREATE OR REPLACE TABLE ledger (
 
 
 def load(db_path: str, metrics: pd.DataFrame, events: list[dict]) -> duckdb.DuckDBPyConnection:
-    con = duckdb.connect(db_path)
+    try:
+        con = duckdb.connect(db_path)
+    except duckdb.IOException:
+        try:
+            con = duckdb.connect(db_path, read_only=True)
+            return con
+        except Exception:
+            con = duckdb.connect(":memory:")
     con.execute(SCHEMA_SQL)
     con.register("m", metrics)
     con.execute("INSERT INTO metrics SELECT * FROM m")

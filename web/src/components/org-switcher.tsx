@@ -1,14 +1,31 @@
 'use client';
 
 import { Icons } from '@/components/icons';
+import { Badge } from '@/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem
 } from '@/components/ui/sidebar';
-import React from 'react';
+import React, { useState } from 'react';
 
 export function OrgSwitcher() {
+  const [activeBrand, setActiveBrand] = useState('Nike Direct (Footwear & Apparel)');
+  const brands = [
+    { name: 'Nike Direct (Footwear & Apparel)', channels: 'Meta • Google • Amazon • TikTok (Postgres 16)', active: true },
+    { name: 'Jordan Brand D2C', channels: 'Meta Advantage+ • TikTok Shop', active: false },
+    { name: 'Nike Training & Running Club', channels: 'Google Shopping • Amazon Ads', active: false }
+  ];
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>

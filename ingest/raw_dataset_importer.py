@@ -32,6 +32,20 @@ class RawAdDatasetImporter:
         self.output_dir = Path(output_dir) if output_dir else root / "data" / "payloads"
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
+    # Top 10 Footwear Catalog anchored to data/nike_shoes_sales.csv & Postgres
+    TOP_10_FOOTWEAR = [
+        {"sku": "310805-137", "name": "Air Jordan 10 Retro", "price": 192.71, "cogs": 58.00, "asin": "B07Q8Z9101", "channel_google": "PERFORMANCE_MAX", "stock": 0},    # Stockout Kill-Switch!
+        {"sku": "880848-005", "name": "Nike Zoom Fly", "price": 174.64, "cogs": 52.50, "asin": "B07Q8Z9102", "channel_google": "SEARCH", "stock": 410},
+        {"sku": "AH8050-100", "name": "Nike Air Max 270", "price": 168.61, "cogs": 48.00, "asin": "B07Q8Z9103", "channel_google": "SHOPPING", "stock": 360},
+        {"sku": "315122-001", "name": "Nike Air Force 1 '07", "price": 87.89, "cogs": 38.50, "asin": "B07Q8Z9104", "channel_google": "SEARCH", "stock": 520},
+        {"sku": "BQ8928-011", "name": "Nike Epic React Flyknit 2", "price": 125.27, "cogs": 52.00, "asin": "B07Q8Z9105", "channel_google": "SHOPPING", "stock": 330},
+        {"sku": "849559-004", "name": "Nike Air Max 2017", "price": 192.71, "cogs": 65.00, "asin": "B07Q8Z9106", "channel_google": "PERFORMANCE_MAX", "stock": 210},
+        {"sku": "CD4371-001", "name": "Nike React Infinity Run Flyknit", "price": 168.61, "cogs": 69.00, "asin": "B07Q8Z9107", "channel_google": "SEARCH", "stock": 490},
+        {"sku": "AQ2730-009", "name": "Nike Joyride Run Flyknit", "price": 180.66, "cogs": 62.00, "asin": "B07Q8Z9108", "channel_google": "SHOPPING", "stock": 280},
+        {"sku": "634835-108", "name": "Nike Air Huarache", "price": 108.37, "cogs": 42.00, "asin": "B07Q8Z9109", "channel_google": "SEARCH", "stock": 390},
+        {"sku": "AO2924-401", "name": "Nike Air Max 720", "price": 154.18, "cogs": 56.00, "asin": "B07Q8Z9110", "channel_google": "PERFORMANCE_MAX", "stock": 340},
+    ]
+
     # -------------------------------------------------------------------------
     # 1. Meta (Facebook) Dataset -> MetaAdInsights
     # -------------------------------------------------------------------------
@@ -43,34 +57,28 @@ class RawAdDatasetImporter:
 
         df = pd.read_csv(csv_path)
 
-        # Map Kaggle campaign IDs to canonical footwear campaign names & SKUs
-        campaign_map = {
-            916: {"name": "Meta-315122-001-AirForce1-Prospecting", "price": 110.0},
-            936: {"name": "Meta-880848-005-ZoomFly-Retargeting", "price": 150.0},
-            1178: {"name": "Meta-310805-137-JordanRetro-Advantage", "price": 190.0},
-        }
-
         # Filter out rows with zero spend and zero impressions to keep clean ad records
         active = df[(df["Spent"] > 0) | (df["Impressions"] > 0)].copy()
 
         models: List[MetaAdInsights] = []
         for _, row in active.iterrows():
-            cid = int(row["xyz_campaign_id"])
-            cinfo = campaign_map.get(cid, {"name": f"Meta-Camp-{cid}", "price": 120.0})
+            ad_int = int(row["ad_id"])
+            prod = self.TOP_10_FOOTWEAR[ad_int % len(self.TOP_10_FOOTWEAR)]
+            cname = f"meta-{prod['sku']}"
+            price = prod["price"]
 
             spend = float(row["Spent"])
             impr = int(row["Impressions"])
             clicks = int(row["Clicks"])
             purchases = int(row["Approved_Conversion"])
-            price = cinfo["price"]
             rev = round(purchases * price, 2)
             cpc = round(spend / max(clicks, 1), 2) if clicks > 0 else None
             cpm = round((spend / max(impr, 1)) * 1000, 2) if impr > 0 else None
 
             payload = {
-                "ad_id": str(int(row["ad_id"])),
-                "campaign_id": str(cid),
-                "campaign_name": cinfo["name"],
+                "ad_id": str(ad_int),
+                "campaign_id": str(int(row["xyz_campaign_id"])),
+                "campaign_name": cname,
                 "spend": spend,
                 "impressions": impr,
                 "clicks": clicks,
@@ -101,31 +109,15 @@ class RawAdDatasetImporter:
     def transform_google_dataset(self) -> List[GoogleAdsRow]:
         """Convert Fivetran Google Ads performance stats into GoogleAdsRow objects."""
         stats_path = self.raw_dir / "google_fivetran_campaign_stats.csv"
-        camps_path = self.raw_dir / "google_fivetran_campaigns.csv"
         if not stats_path.exists():
             raise FileNotFoundError(f"Missing {stats_path}. Run scripts/download_ad_datasets.py first.")
 
         df_stats = pd.read_csv(stats_path)
-        camps_map = {}
-        if camps_path.exists():
-            df_camps = pd.read_csv(camps_path)
-            for _, r in df_camps.iterrows():
-                camps_map[str(r["id"])] = {
-                    "name": str(r.get("name", "Google-Campaign")),
-                    "channel_type": str(r.get("advertising_channel_type", "SEARCH"))
-                }
-
-        # Semantic campaign assignments matching footwear catalog
-        footwear_campaign_defs = [
-            {"id": "9935249409", "name": "Google-Shopping-AH8050-100", "channel": "SHOPPING"},
-            {"id": "8192039103", "name": "Google-PMax-CD4371-001", "channel": "PERFORMANCE_MAX"},
-            {"id": "8192039104", "name": "Google-Search-315122-001", "channel": "SEARCH"},
-        ]
 
         models: List[GoogleAdsRow] = []
         for idx, row in df_stats.iterrows():
             cid = str(row["id"])
-            camp_def = footwear_campaign_defs[idx % len(footwear_campaign_defs)]
+            prod = self.TOP_10_FOOTWEAR[idx % len(self.TOP_10_FOOTWEAR)]
 
             cost_micros = int(row.get("cost_micros", 500000000))
             if cost_micros == 0:
@@ -142,15 +134,15 @@ class RawAdDatasetImporter:
 
             conv_val = float(row.get("conversions_value", 0.0))
             if conv_val == 0.0:
-                conv_val = round(conv * 135.0, 2)
+                conv_val = round(conv * prod["price"], 2)
 
             avg_cpc = int(cost_micros / max(clicks, 1))
 
             payload = {
                 "campaign": {
                     "id": cid,
-                    "name": camp_def["name"],
-                    "advertisingChannelType": camp_def["channel"],
+                    "name": f"google-{prod['sku']}",
+                    "advertisingChannelType": prod["channel_google"],
                 },
                 "segments": {
                     "date": str(row.get("date", "2026-10-07")),
@@ -177,17 +169,10 @@ class RawAdDatasetImporter:
     def transform_amazon_dataset(self) -> List[AmazonSponsoredProductsRow]:
         """Convert Fivetran Amazon Sponsored Products reporting into AmazonSponsoredProductsRow objects."""
         report_path = self.raw_dir / "amazon_fivetran_campaign_report.csv"
-        prod_path = self.raw_dir / "amazon_fivetran_advertised_products.csv"
         if not report_path.exists():
             raise FileNotFoundError(f"Missing {report_path}. Run scripts/download_ad_datasets.py first.")
 
         df_report = pd.read_csv(report_path)
-
-        amazon_skus = [
-            {"name": "Amazon-SP-554724-066", "sku": "554724-066", "asin": "B08N5WRW11"},
-            {"name": "Amazon-SP-BQ8928-011", "sku": "BQ8928-011", "asin": "B08N5WRW22"},
-            {"name": "Amazon-SP-849559-004", "sku": "849559-004", "asin": "B08N5WRW33"},
-        ]
 
         def _safe_f(val: Any, default: float = 0.0) -> float:
             if val is None or pd.isna(val):
@@ -208,7 +193,7 @@ class RawAdDatasetImporter:
         models: List[AmazonSponsoredProductsRow] = []
         for idx, row in df_report.iterrows():
             cid = str(row["campaign_id"])
-            sku_def = amazon_skus[idx % len(amazon_skus)]
+            prod = self.TOP_10_FOOTWEAR[idx % len(self.TOP_10_FOOTWEAR)]
 
             cost = _safe_f(row.get("cost"), 0.0)
             if cost == 0.0:
@@ -230,14 +215,14 @@ class RawAdDatasetImporter:
 
             units = _safe_i(row.get("purchases_30_d"), 0)
             if units == 0:
-                units = max(1, int(sales / 120.0))
+                units = max(1, int(sales / prod["price"]))
 
             payload = {
                 "campaignId": cid,
-                "campaignName": sku_def["name"],
+                "campaignName": f"amazon-{prod['sku']}",
                 "adGroupId": f"ag-{cid}",
-                "asin": sku_def["asin"],
-                "sku": sku_def["sku"],
+                "asin": prod["asin"],
+                "sku": prod["sku"],
                 "date": str(row.get("date", "2026-10-07")),
                 "impressions": impr,
                 "clicks": clicks,
@@ -258,17 +243,16 @@ class RawAdDatasetImporter:
     # -------------------------------------------------------------------------
     def transform_shopify_dataset(self) -> tuple[List[ShopifyInventoryLevel], List[ShopifyOrder]]:
         """Convert Fivetran Shopify seeds into ShopifyInventoryLevel and ShopifyOrder objects."""
-        # 4a. Inventory Levels & COGS
-        # High-trust catalog with COGS and stockout edge cases
+        # 4a. Inventory Levels & COGS across all 10 products
         inventory_data = [
-            {"inventory_item_id": "inv_1001", "location_id": "loc_nyc_01", "available": 520, "sku": "315122-001", "unit_cogs": 38.50},
-            {"inventory_item_id": "inv_1002", "location_id": "loc_nyc_01", "available": 410, "sku": "880848-005", "unit_cogs": 72.00},
-            {"inventory_item_id": "inv_1003", "location_id": "loc_nyc_01", "available": 0,   "sku": "310805-137", "unit_cogs": 79.00}, # STOCKOUT!
-            {"inventory_item_id": "inv_1004", "location_id": "loc_nyc_01", "available": 360, "sku": "AH8050-100", "unit_cogs": 70.00},
-            {"inventory_item_id": "inv_1005", "location_id": "loc_nyc_01", "available": 490, "sku": "CD4371-001", "unit_cogs": 69.00},
-            {"inventory_item_id": "inv_1006", "location_id": "loc_nyc_01", "available": 290, "sku": "554724-066", "unit_cogs": 48.00},
-            {"inventory_item_id": "inv_1007", "location_id": "loc_nyc_01", "available": 330, "sku": "BQ8928-011", "unit_cogs": 52.00},
-            {"inventory_item_id": "inv_1008", "location_id": "loc_nyc_01", "available": 210, "sku": "849559-004", "unit_cogs": 65.00},
+            {
+                "inventory_item_id": f"inv_{idx + 1001}",
+                "location_id": "loc_nyc_01",
+                "available": prod["stock"],
+                "sku": prod["sku"],
+                "unit_cogs": prod["cogs"],
+            }
+            for idx, prod in enumerate(self.TOP_10_FOOTWEAR)
         ]
         inv_models = [ShopifyInventoryLevel.model_validate(item) for item in inventory_data]
 
@@ -283,9 +267,8 @@ class RawAdDatasetImporter:
             df_orders = pd.read_csv(orders_path)
             for idx, r in df_orders.iterrows():
                 oid = str(r["id"])
-                sku_choice = inventory_data[idx % len(inventory_data)]["sku"]
-                total_p = float(r.get("total_price", 140.0))
-                sub_p = float(r.get("subtotal_price", 140.0))
+                prod = self.TOP_10_FOOTWEAR[idx % len(self.TOP_10_FOOTWEAR)]
+                total_p = prod["price"]
                 order_models.append(ShopifyOrder.model_validate({
                     "id": oid,
                     "order_number": str(r.get("order_number", 1000 + idx)),
@@ -293,14 +276,14 @@ class RawAdDatasetImporter:
                     "line_items": [
                         {
                             "variant_id": f"var_{idx}",
-                            "sku": sku_choice,
+                            "sku": prod["sku"],
                             "price": total_p,
                             "quantity": 1,
                             "total_discount": 0.0,
                         }
                     ],
                     "total_price": total_p,
-                    "subtotal_price": sub_p,
+                    "subtotal_price": total_p,
                 }))
 
         out_orders = self.output_dir / "shopify_orders.json"

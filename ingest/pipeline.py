@@ -161,18 +161,55 @@ class CanonicalPipeline:
                 "ga_sessions": int(a.impressions * 0.018),
             })
 
+        # 4. Shopify rows (when order_models provided)
+        if order_models:
+            order_sku_counts: Dict[str, int] = {}
+            order_sku_rev: Dict[str, float] = {}
+            for o in order_models:
+                for li in o.line_items:
+                    if li.sku:
+                        order_sku_counts[li.sku] = order_sku_counts.get(li.sku, 0) + li.quantity
+                        order_sku_rev[li.sku] = order_sku_rev.get(li.sku, 0.0) + (li.price * li.quantity)
+
+            for sku, inv_qty in sku_to_inv.items():
+                unit_cost = sku_to_cogs.get(sku, 50.0)
+                sold_qty = order_sku_counts.get(sku, 4)
+                rev = order_sku_rev.get(sku, sold_qty * 140.0)
+                spend = round(rev * 0.18, 2)
+                impressions = int(spend / 8.4 * 1000)
+                margin = max(0.0, rev - (sold_qty * unit_cost))
+
+                rows.append({
+                    "date": "2026-10-07",
+                    "platform": "shopify",
+                    "campaign": f"shopify-{sku}",
+                    "sku": sku,
+                    "spend": spend,
+                    "cpm": 8.4,
+                    "impressions": impressions,
+                    "conversions": sold_qty,
+                    "revenue": rev,
+                    "margin": round(margin, 2),
+                    "inventory": inv_qty,
+                    "price": round(rev / max(sold_qty, 1), 2),
+                    "ga_sessions": int(impressions * 0.025),
+                })
+
         return pd.DataFrame(rows)
 
     def _extract_sku(self, text: str) -> str:
         """Look for common footwear SKUs or standard codes in campaign string."""
-        known = ["310805-137", "880848-005", "AH8050-100", "315122-001", "BQ8928-011", "CD4371-001", "554724-066"]
+        known = [
+            "310805-137", "880848-005", "AH8050-100", "315122-001", "BQ8928-011",
+            "849559-004", "CD4371-001", "AQ2730-009", "634835-108", "AO2924-401", "554724-066"
+        ]
         for k in known:
             if k in text:
                 return k
         for part in text.replace("_", "-").split("-"):
             if len(part) >= 6 and any(c.isdigit() for c in part):
                 return part
-        return "315122-001"
+        return "310805-137"
 
     def run_optimization(self, metrics_df: pd.DataFrame, total_budget: Optional[float] = None) -> pd.DataFrame:
         """Run the SLSQP response-curve optimizer to generate ad recommendations."""

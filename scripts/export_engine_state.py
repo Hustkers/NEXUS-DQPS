@@ -550,6 +550,9 @@ def generate_state():
             updated_at = CURRENT_TIMESTAMP;
         """
         with conn.cursor() as cur:
+            active_names = tuple(c["campaign"] for c in campaigns)
+            if active_names:
+                cur.execute("DELETE FROM campaigns WHERE campaign_name NOT IN %s;", (active_names,))
             execute_values(cur, camp_sql, camp_rows)
 
         # Sync anomalies to DB

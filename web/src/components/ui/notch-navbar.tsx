@@ -130,7 +130,7 @@ export function NotchNavbar({
   logo,
   leftItems = DEFAULT_LEFT_ITEMS,
   rightItems = DEFAULT_RIGHT_ITEMS,
-  showThemeToggle = true,
+  showThemeToggle = false,
   ctaText = 'Enter Mission Control →',
   ctaHref = '/dashboard/overview',
   githubHref = 'https://github.com/Hustkers/NEXUS-DQPS',

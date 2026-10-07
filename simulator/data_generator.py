@@ -36,12 +36,13 @@ from simulator.shopify_generator import ShopifyGenerator
 class SyntheticTelemetryGenerator:
     """Master Multi-Channel Telemetry Generator."""
 
-    def __init__(self, seed: int = 42, base_date: str = "2026-03-01"):
+    def __init__(self, seed: int = 42, base_date: str = "2026-03-01", skus: Optional[List[str]] = None):
         self.rng = np.random.default_rng(seed)
         self.base_date = datetime.fromisoformat(f"{base_date}T00:00:00+00:00")
         self.catalog = DEFAULT_PRODUCT_CATALOG
-        self.skus = list(self.catalog.keys())
+        self.skus = skus if skus is not None else list(self.catalog.keys())[:5]
         self.shopify_gen = ShopifyGenerator(seed=seed, catalog=self.catalog)
+
 
         # Operational shock schedule: day -> list of shock configs
         # e.g., Day 25: stockout on Hero SKU '310805-137'

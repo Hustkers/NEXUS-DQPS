@@ -53,8 +53,21 @@ export function PlatformBreakdownChart({
   return (
     <div className={cn('grid grid-cols-1 lg:grid-cols-3 gap-4', className)}>
       {/* 30-Day Performance Trends (Clean Utilitarian Area Chart) */}
-      <div className='lg:col-span-2 rounded-xl border border-border/80 bg-card p-5 shadow-xs flex flex-col justify-between'>
-        <div>
+      <div className='relative overflow-hidden lg:col-span-2 rounded-xl border border-border/80 bg-card p-5 shadow-xs flex flex-col justify-between'>
+        {/* Blueprint Grid Texture */}
+        <div
+          className='pointer-events-none absolute inset-0 opacity-[0.06] dark:opacity-[0.14]'
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, currentColor 1px, transparent 1px),
+              linear-gradient(to bottom, currentColor 1px, transparent 1px)
+            `,
+            backgroundSize: '16px 16px'
+          }}
+          aria-hidden='true'
+        />
+
+        <div className='relative z-10'>
           <div className='flex items-center justify-between border-b border-border/80 pb-3 mb-4'>
             <div>
               <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
@@ -85,30 +98,38 @@ export function PlatformBreakdownChart({
               <AreaChart data={dailyTrend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id='colorRev' x1='0' y1='0' x2='0' y2='1'>
-                    <stop offset='5%' stopColor='#10b981' stopOpacity={0.2} />
+                    <stop offset='5%' stopColor='#10b981' stopOpacity={0.25} />
                     <stop offset='95%' stopColor='#10b981' stopOpacity={0.0} />
                   </linearGradient>
                   <linearGradient id='colorMargin' x1='0' y1='0' x2='0' y2='1'>
-                    <stop offset='5%' stopColor='#0284c7' stopOpacity={0.2} />
+                    <stop offset='5%' stopColor='#0284c7' stopOpacity={0.25} />
                     <stop offset='95%' stopColor='#0284c7' stopOpacity={0.0} />
                   </linearGradient>
                   <linearGradient id='colorSpend' x1='0' y1='0' x2='0' y2='1'>
-                    <stop offset='5%' stopColor='#6366f1' stopOpacity={0.15} />
+                    <stop offset='5%' stopColor='#6366f1' stopOpacity={0.2} />
                     <stop offset='95%' stopColor='#6366f1' stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray='3 3' stroke='#e2e8f0' vertical={false} className='dark:stroke-zinc-800' />
+                <CartesianGrid
+                  strokeDasharray='3 3'
+                  stroke='currentColor'
+                  className='opacity-15 dark:opacity-25'
+                  vertical={true}
+                  horizontal={true}
+                />
                 <XAxis
                   dataKey='date'
                   stroke='#64748b'
                   fontSize={10}
                   tickLine={false}
                   interval={4}
+                  fontFamily='monospace'
                 />
                 <YAxis
                   stroke='#64748b'
                   fontSize={10}
                   tickLine={false}
+                  fontFamily='monospace'
                   tickFormatter={(val) => `₹${val > 999 ? (val / 1000).toFixed(0) + 'k' : val}`}
                 />
                 <Tooltip
@@ -139,25 +160,34 @@ export function PlatformBreakdownChart({
                   type='monotone'
                   dataKey='revenue'
                   stroke='#10b981'
-                  strokeWidth={2}
+                  strokeWidth={2.2}
                   fillOpacity={1}
                   fill='url(#colorRev)'
+                  isAnimationActive={true}
+                  animationDuration={1500}
+                  animationEasing='ease-out'
                 />
                 <Area
                   type='monotone'
                   dataKey='margin'
                   stroke='#0284c7'
-                  strokeWidth={2}
+                  strokeWidth={2.2}
                   fillOpacity={1}
                   fill='url(#colorMargin)'
+                  isAnimationActive={true}
+                  animationDuration={1500}
+                  animationEasing='ease-out'
                 />
                 <Area
                   type='monotone'
                   dataKey='spend'
                   stroke='#6366f1'
-                  strokeWidth={2}
+                  strokeWidth={2.2}
                   fillOpacity={1}
                   fill='url(#colorSpend)'
+                  isAnimationActive={true}
+                  animationDuration={1500}
+                  animationEasing='ease-out'
                 />
               </AreaChart>
             </ResponsiveContainer>
