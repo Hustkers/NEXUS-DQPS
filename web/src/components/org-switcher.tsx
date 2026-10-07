@@ -19,9 +19,11 @@ import {
 import React, { useState } from 'react';
 
 export function OrgSwitcher() {
-  const [activeBrand, setActiveBrand] = useState('Nike');
+  const [activeBrand, setActiveBrand] = useState('Nike Direct');
   const brands = [
-    { name: 'Nike', channels: 'Meta • Google • Amazon • TikTok (Postgres 16)', active: true }
+    { name: 'Nike Direct', category: 'Footwear & Performance', channels: 'Meta • Google • Amazon • Shopify', status: 'Live' },
+    { name: 'Nike Sportswear', category: 'Apparel & Lifestyle', channels: 'Meta • Google • Shopify', status: 'Synced' },
+    { name: 'Jordan Brand D2C', category: 'Basketball & Streetwear', channels: 'Meta • Google • SNKRS', status: 'Synced' }
   ];
 
   return (
@@ -32,55 +34,77 @@ export function OrgSwitcher() {
             render={
               <SidebarMenuButton
                 size='lg'
-                tooltip='Nike Catalogs'
-                className='data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground border border-emerald-500/30 bg-emerald-50/80 dark:bg-emerald-950/20 hover:bg-emerald-100/80 dark:hover:bg-emerald-900/30 transition-all shadow-2xs'
+                tooltip='NEXUS D2C • Nike Catalog'
+                className='h-12 rounded-xl border border-border/50 bg-background/60 hover:bg-muted/50 hover:border-border/80 text-foreground transition-all duration-200 shadow-2xs group data-popup-open:bg-muted/60 data-popup-open:border-border'
               />
             }
           >
-            <div className='bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 flex aspect-square size-8 items-center justify-center rounded-lg border shadow-2xs'>
-              <Icons.dashboard className='size-4 animate-pulse text-emerald-600 dark:text-emerald-400' />
+            {/* Sleek Aceternity-style Logo Icon */}
+            <div className='relative flex aspect-square size-8.5 shrink-0 items-center justify-center rounded-lg border border-border/80 bg-neutral-900 dark:bg-neutral-950 text-white shadow-xs group-hover:border-primary/40 transition-colors'>
+              <Icons.dashboard className='size-4 text-emerald-400 dark:text-emerald-400 group-hover:scale-105 transition-transform' />
+              <span className='absolute -top-0.5 -right-0.5 size-2 rounded-full bg-emerald-500 ring-2 ring-background animate-pulse' />
             </div>
-            <div className='grid flex-1 text-left text-sm leading-tight'>
+
+            {/* Typography & Brand Info */}
+            <div className='grid flex-1 text-left leading-tight min-w-0 group-data-[collapsible=icon]:hidden'>
               <div className='flex items-center gap-1.5'>
-                <span className='truncate font-bold tracking-tight text-emerald-700 dark:text-emerald-400'>NEXUS D2C</span>
-                <span className='size-1.5 rounded-full bg-emerald-500 animate-ping' />
+                <span className='truncate text-xs font-bold tracking-tight text-foreground font-mono'>
+                  NEXUS D2C
+                </span>
+                <span className='rounded-sm bg-emerald-500/10 dark:bg-emerald-500/20 px-1 py-0.2 text-[9px] font-mono font-semibold text-emerald-600 dark:text-emerald-400 leading-none'>
+                  ONLINE
+                </span>
               </div>
-              <span className='truncate text-[11px] text-muted-foreground'>{activeBrand}</span>
+              <div className='flex items-center gap-1 mt-0.5'>
+                <span className='truncate text-[11px] text-muted-foreground font-medium'>
+                  {activeBrand}
+                </span>
+                <span className='text-[10px] text-muted-foreground/60 font-mono'>• Postgres 16</span>
+              </div>
             </div>
-            <Icons.chevronsDown className='ml-auto size-4 text-muted-foreground' />
+
+            <Icons.chevronsDown className='ml-auto size-3.5 text-muted-foreground/70 shrink-0 group-hover:text-foreground transition-colors group-data-[collapsible=icon]:hidden' />
           </DropdownMenuTrigger>
+
           <DropdownMenuContent
-            className='w-(--anchor-width) min-w-56 rounded-xl bg-popover border-border shadow-lg'
+            className='w-(--anchor-width) min-w-60 rounded-xl bg-popover/95 backdrop-blur-md border-border/80 shadow-xl p-1.5'
             align='start'
             side='bottom'
-            sideOffset={4}
+            sideOffset={6}
           >
             <DropdownMenuGroup>
-              <DropdownMenuLabel className='text-muted-foreground text-xs font-mono uppercase tracking-wider'>
-                Connected D2C Catalogs (PostgreSQL)
+              <DropdownMenuLabel className='text-muted-foreground text-[10px] font-mono uppercase tracking-wider px-2 py-1'>
+                Connected Brand Catalogs
               </DropdownMenuLabel>
             </DropdownMenuGroup>
+
             {brands.map((b) => (
               <DropdownMenuItem
                 key={b.name}
                 onClick={() => setActiveBrand(b.name)}
-                className='cursor-pointer flex flex-col items-start gap-0.5 hover:bg-accent focus:bg-accent'
+                className='cursor-pointer rounded-lg p-2 hover:bg-muted/80 focus:bg-muted/80 transition-colors flex items-center justify-between gap-2'
               >
-                <div className='flex w-full items-center justify-between'>
-                  <span className='font-semibold text-xs text-foreground'>{b.name}</span>
-                  {b.name === activeBrand && (
-                    <Badge variant='outline' className='text-[10px] py-0 px-1 border-emerald-300 dark:border-emerald-500/40 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40'>
-                      Active
-                    </Badge>
-                  )}
+                <div className='flex flex-col gap-0.5 min-w-0'>
+                  <div className='flex items-center gap-1.5'>
+                    <span className='font-semibold text-xs text-foreground'>{b.name}</span>
+                    <span className='text-[10px] text-muted-foreground font-mono font-normal'>({b.category})</span>
+                  </div>
+                  <span className='text-[10px] text-muted-foreground truncate'>{b.channels}</span>
                 </div>
-                <span className='text-[10px] text-muted-foreground'>{b.channels}</span>
+                {b.name === activeBrand ? (
+                  <Badge variant='outline' className='text-[9px] py-0 px-1.5 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 font-mono shrink-0'>
+                    Active
+                  </Badge>
+                ) : (
+                  <span className='text-[10px] font-mono text-muted-foreground/70 shrink-0'>{b.status}</span>
+                )}
               </DropdownMenuItem>
             ))}
-            <DropdownMenuSeparator className='bg-border' />
-            <div className='p-2 text-[10px] text-muted-foreground font-mono flex items-center justify-between'>
-              <span>DB: POSTGRES (DOCKER)</span>
-              <span className='text-emerald-600 dark:text-emerald-400 font-semibold'>ONLINE</span>
+
+            <DropdownMenuSeparator className='bg-border/60 my-1' />
+            <div className='px-2 py-1 text-[10px] text-muted-foreground font-mono flex items-center justify-between'>
+              <span>ENGINE: SCIPY CONVEX</span>
+              <span className='text-emerald-600 dark:text-emerald-400 font-semibold'>ACTIVE (CYC-9482)</span>
             </div>
           </DropdownMenuContent>
         </DropdownMenu>
