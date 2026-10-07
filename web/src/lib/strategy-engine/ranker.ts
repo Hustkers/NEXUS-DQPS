@@ -16,6 +16,18 @@ export function generateBestChoiceExplanation(
 ): BestChoiceExplanation {
   const ev = best.evaluation!;
   const curSym = ev.modelMetadata.currency === 'INR' ? '₹' : '$';
+  const isProfitable = ev.isProfitable ?? (ev.expectedNetProfit !== undefined ? ev.expectedNetProfit > 0 : ev.expectedRoas >= (ev.breakevenRoas ?? 1.61));
+  const classification = isProfitable ? ev.classification : 'NO_PROFITABLE_CONFIGURATION';
+  const decisionState = isProfitable ? 'PROFITABLE_RECOMMENDATION' : 'NO_PROFITABLE_CONFIGURATION';
+  const recommendedAction = isProfitable ? 'SCALE' : 'REDUCE_SPEND';
+
+  const whatAreWeRecommending = isProfitable
+    ? `We recommend executing "${best.strategyName}" across ${best.platform.toUpperCase()} using ${best.adFormat} with ${best.creativeAngle.toLowerCase()} creative positioning and ${best.biddingStrategy}.`
+    : `NO PROFITABLE CONFIGURATION IDENTIFIED. At the current allocated budget of ${curSym}${best.budgetAllocation.toLocaleString()} and estimated CPA of ${curSym}${ev.expectedCpa.toLocaleString()}, unit customer acquisition costs exceed product gross margin. We recommend REDUCING SPEND or pausing non-essential exploration rather than scaling unprofitable campaigns.`;
+
+  const whyAreWeRecommendingIt = isProfitable
+    ? `This strategy achieves the highest composite performance score (${ev.overallScore.toFixed(1)}/100) across all evaluated models. It delivers the strongest balance of high predicted ROAS (${ev.expectedRoas.toFixed(2)}x) and efficient customer acquisition cost (${curSym}${ev.expectedCpa.toLocaleString()}) yielding +${curSym}${Math.round(ev.expectedNetProfit || 0).toLocaleString()} expected net profit.`
+    : `Across all evaluated models, expected net profit is negative (${curSym}${Math.round(ev.expectedNetProfit || 0).toLocaleString()} net deficit). "${best.strategyName}" represents the least-loss defensive option, but scaling is strictly blocked until CPA falls below the breakeven threshold (${curSym}${Math.round((config.productPrice || 4250) * 0.35).toLocaleString()}).`;
 
   return {
     strategyId: best.strategyId,
@@ -25,15 +37,25 @@ export function generateBestChoiceExplanation(
     predictedRevenue: ev.expectedRevenue,
     predictedConversions: ev.expectedConversions,
     predictedCpa: ev.expectedCpa,
+    predictedGrossProfit: ev.expectedGrossProfit,
+    predictedNetProfit: ev.expectedNetProfit,
+    predictedProfitRoas: ev.expectedProfitRoas,
+    marginalRoas: ev.marginalRoas,
+    marginalProfit: ev.marginalProfit,
+    isProfitable,
+    decisionState,
+    recommendedAction,
     riskScore: ev.riskScore,
     confidencePct: Math.round(ev.confidenceScore * 100),
-    classification: ev.classification,
+    classification,
     answers: {
-      whatAreWeRecommending: `We recommend executing "${best.strategyName}" across ${best.platform.toUpperCase()} using ${best.adFormat} with ${best.creativeAngle.toLowerCase()} creative positioning and ${best.biddingStrategy}.`,
-      whyAreWeRecommendingIt: `This strategy achieves the highest composite performance score (${ev.overallScore.toFixed(1)}/100) across all 24 evaluated models. It delivers the strongest balance of high predicted ROAS (${ev.expectedRoas.toFixed(2)}x) and efficient customer acquisition cost (${curSym}${ev.expectedCpa.toLocaleString()}) while maintaining controlled exposure.`,
+      whatAreWeRecommending,
+      whyAreWeRecommendingIt,
       whatHappenedHistorically: ev.historicalEvidenceText || `In your past account campaigns with similar objective and audience cohorts, this archetype produced reliable conversion velocity with an average ROAS of 4.62x and consistent conversion rates above 3.7%.`,
       whatDoesCurrentMarketDataIndicate: ev.marketEvidenceText || `Live market signals indicate positive search intent (+18.4% commercial queries) and high consumer demand for performance sportswear in major metro hubs.`,
-      whatDoWePredictWillHappen: `With an allocated budget of ${curSym}${best.budgetAllocation.toLocaleString()}, we forecast generating approximately ${ev.expectedConversions} qualified sales, yielding ${curSym}${ev.expectedRevenue.toLocaleString()} in gross revenue at an estimated CPA of ${curSym}${ev.expectedCpa.toLocaleString()} and ROAS of ${ev.expectedRoas.toFixed(2)}x.`,
+      whatDoWePredictWillHappen: isProfitable
+        ? `With an allocated budget of ${curSym}${best.budgetAllocation.toLocaleString()}, we forecast generating approximately ${ev.expectedConversions} qualified sales, yielding ${curSym}${ev.expectedRevenue.toLocaleString()} in gross revenue at an estimated CPA of ${curSym}${ev.expectedCpa.toLocaleString()} and ROAS of ${ev.expectedRoas.toFixed(2)}x.`
+        : `At ${curSym}${best.budgetAllocation.toLocaleString()} spend, projected gross revenue (${curSym}${ev.expectedRevenue.toLocaleString()}) results in an expected net contribution deficit of ${curSym}${Math.round(ev.expectedNetProfit || 0).toLocaleString()}. Do not scale spend.`,
       howConfidentAreWe: `We are ${Math.round(ev.confidenceScore * 100)}% confident (${ev.confidenceLevel} confidence level). This rating is anchored directly in ${ev.similarCampaignsCount > 0 ? `${ev.similarCampaignsCount} matching historical campaigns in your account` : 'industry benchmark priors and econometric curve models'}.`,
       whatCouldGoWrong: best.risks && best.risks.length > 0
         ? best.risks[0].evidence
@@ -115,12 +137,18 @@ export function rankAndEvaluateAll(
     };
   });
 
-  // Sort descending by overallScore
+  // Sort: Profitable strategies ALWAYS rank ahead of unprofitable ones.
+  // Within the same profitability class, sort descending by overallScore.
   evaluatedStrategies.sort((a, b) => {
+    const profA = a.evaluation?.isProfitable ? 1 : 0;
+    const profB = b.evaluation?.isProfitable ? 1 : 0;
+    if (profA !== profB) return profB - profA;
     const scoreA = a.evaluation?.overallScore ?? 0;
     const scoreB = b.evaluation?.overallScore ?? 0;
     return scoreB - scoreA;
   });
+
+  const allUnprofitable = evaluatedStrategies.every((s) => !s.evaluation?.isProfitable);
 
   // Calculate portfolio averages for data-driven comparative explanations
   const roasVals = evaluatedStrategies.map((s) => s.evaluation?.expectedRoas ?? 0);
@@ -142,14 +170,27 @@ export function rankAndEvaluateAll(
     const currencySym = ev.modelMetadata.currency === 'INR' ? '₹' : '$';
 
     if (rank <= top3Count) {
-      ev.status = 'SELECTED';
-      ev.selectionReasons = [
-        `Selected as Rank #${rank} with top-tier overall performance score of ${ev.overallScore.toFixed(1)}/100.`,
-        `Predicted ROAS of ${ev.expectedRoas.toFixed(2)}x significantly outperforms portfolio average (${avgRoas.toFixed(2)}x).`,
-        `Exceptional acquisition efficiency: expected CPA of ${currencySym}${ev.expectedCpa.toLocaleString()} is lower than ${betterCpaThan} of ${totalCount - 1} alternative strategies.`,
-        `High audience fit rating (${Math.round(ev.audienceFitScore * 100)}%) on ${strat.platform.toUpperCase()} with controlled risk score (${ev.riskScore}/100).`,
-        `Historical Precedent: Classified as ${ev.classification} based on account history.`
-      ];
+      if (allUnprofitable) {
+        ev.status = 'DEFENSIVE_FLOOR';
+        ev.classification = 'NO_PROFITABLE_CONFIGURATION';
+        ev.selectionReasons = [
+          `Rank #${rank} (Least-Loss Defensive Floor): Projected net contribution deficit of -${currencySym}${Math.abs(Math.round(ev.expectedNetProfit || 0)).toLocaleString()}.`,
+          `Unprofitable at current unit economics: Predicted ROAS (${ev.expectedRoas.toFixed(2)}x) is below breakeven (${ev.breakevenRoas?.toFixed(2) ?? '1.61'}x).`,
+          `Scaling is BLOCKED: Model recommends REDUCING SPEND or defending only high-intent branded search.`,
+          `Target CPA threshold: Cost per acquisition (${currencySym}${ev.expectedCpa.toLocaleString()}) must fall below ${currencySym}${Math.round((config.productPrice || 4250) * 0.35).toLocaleString()} to break even.`,
+          `Risk rating: ${ev.riskScore}/100 with conservative platform exposure.`
+        ];
+      } else {
+        ev.status = 'SELECTED';
+        ev.selectionReasons = [
+          `Selected as Rank #${rank} with top-tier overall performance score of ${ev.overallScore.toFixed(1)}/100.`,
+          `Predicted ROAS of ${ev.expectedRoas.toFixed(2)}x significantly outperforms portfolio average (${avgRoas.toFixed(2)}x).`,
+          `Expected Net Profit: +${currencySym}${Math.round(ev.expectedNetProfit || 0).toLocaleString()} (Net Contribution Margin).`,
+          `Exceptional acquisition efficiency: expected CPA of ${currencySym}${ev.expectedCpa.toLocaleString()} is lower than ${betterCpaThan} of ${totalCount - 1} alternative strategies.`,
+          `High audience fit rating (${Math.round(ev.audienceFitScore * 100)}%) on ${strat.platform.toUpperCase()} with controlled risk score (${ev.riskScore}/100).`,
+          `Historical Precedent: Classified as ${ev.classification} based on account history.`
+        ];
+      }
       top3.push(strat);
     } else {
       ev.status = 'NOT SELECTED';

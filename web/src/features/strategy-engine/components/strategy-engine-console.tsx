@@ -148,11 +148,7 @@ export function StrategyEngineConsole() {
     try {
       setIsLoading(true);
       setError(null);
-      setGenerationStage('generating');
-
-      await new Promise((r) => setTimeout(r, 600));
       setGenerationStage('evaluating');
-      await new Promise((r) => setTimeout(r, 500));
 
       const res = await fetch('/api/campaign-strategy', {
         method: 'POST',

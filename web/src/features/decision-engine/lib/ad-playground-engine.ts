@@ -412,7 +412,8 @@ export function computePlaygroundRecommendations(
     archetypes = archetypes.filter((a) => allowed.has(a.platform));
   }
 
-  const isStockout = product.inventory <= 0;
+  const isMissingInventory = product.inventory == null || isNaN(product.inventory);
+  const isStockout = isMissingInventory || product.inventory <= 0;
   const candidates: CandidateAdConfig[] = [];
 
   for (const arch of archetypes) {

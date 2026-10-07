@@ -90,51 +90,16 @@ export function ScenarioSimulationModal({
 
   const scenarioMeta = SCENARIO_METAS[scenarioId];
 
-  // Progressive deterministic simulation runner for modal
+  // Deterministic simulation runner for modal
   const handleRunSimulation = () => {
     const horizon = inputs.horizonDays;
-    setStage('initializing');
-    setProgressPct(10);
-    setSimulatedDay(0);
-
-    // Stage 1: Baseline inspection (150ms)
-    setTimeout(() => {
-      setStage('baseline');
-      setProgressPct(25);
-      setSimulatedDay(1);
-    }, 200);
-
-    // Stage 2: Shock injection (500ms)
-    setTimeout(() => {
-      setStage('shock');
-      setProgressPct(50);
-      setSimulatedDay(Math.max(1, Math.round(horizon * 0.35)));
-    }, 550);
-
-    // Stage 3: DAG Propagation (950ms)
-    setTimeout(() => {
-      setStage('propagating');
-      setProgressPct(75);
-      setSimulatedDay(Math.max(2, Math.round(horizon * 0.7)));
-    }, 950);
-
-    // Stage 4: Autonomous Mitigation & Rebalancing (1300ms)
-    setTimeout(() => {
-      setStage('mitigating');
-      setProgressPct(90);
-      setSimulatedDay(horizon);
-    }, 1300);
-
-    // Stage 5: Finalized (1700ms)
-    setTimeout(() => {
-      setStage('completed');
-      setProgressPct(100);
-      setSimulatedDay(horizon);
-      setExecutedResult(computedResult);
-      toast.success(`Simulation Completed: ${computedResult.scenarioMeta.title}`, {
-        description: `Applied ${computedResult.activeStrategyName}. Projected Loss Avoided: +₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}.`
-      });
-    }, 1700);
+    setStage('completed');
+    setProgressPct(100);
+    setSimulatedDay(horizon);
+    setExecutedResult(computedResult);
+    toast.success(`Simulation Completed: ${computedResult.scenarioMeta.title}`, {
+      description: `Applied ${computedResult.activeStrategyName}. Projected Loss Avoided: +₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}.`
+    });
   };
 
   const handleResetInputs = () => {
