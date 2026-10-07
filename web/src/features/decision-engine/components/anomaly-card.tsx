@@ -52,7 +52,7 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, onViewReceipt, isM
   return (
     <div
       className={cn(
-        'group relative flex flex-col justify-between rounded border border-border bg-card p-4 text-card-foreground transition-all hover:border-foreground/30 shadow-none',
+        'group relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-4 text-card-foreground transition-all duration-200 hover:border-foreground/30 shadow-xs overflow-hidden before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/20 dark:before:via-white/10 before:to-transparent',
         className
       )}
     >
@@ -161,13 +161,13 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, onViewReceipt, isM
         </div>
       </div>
 
-      {/* Action buttons strictly per DESIGN.md */}
+      {/* Action buttons with Apple tactile press physics */}
       <div className='flex items-center gap-2'>
         <Button
           size='sm'
           variant='outline'
           onClick={() => onAnalyze?.(anomaly)}
-          className='flex-1 text-xs font-mono h-8 border border-border bg-card text-foreground hover:bg-muted font-semibold active:scale-[0.98]'
+          className='flex-1 text-xs font-mono h-8 border border-border bg-muted/30 text-foreground hover:bg-muted font-semibold active:scale-[0.96] rounded-xl transition-all duration-75'
         >
           <IconWorld className='mr-1.5 size-3.5 text-foreground' />
           Analyse Globe
@@ -177,27 +177,27 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, onViewReceipt, isM
             size='sm'
             variant='outline'
             onClick={() => (onViewReceipt ? onViewReceipt(anomaly) : onMitigate?.(anomaly))}
-            className='flex-1 text-xs font-mono h-8 border border-[#FFFFFF] bg-[#1A1A1A] hover:bg-[#000000] text-[#FFFFFF] font-semibold active:scale-[0.98]'
+            className='flex-1 text-xs font-mono h-8 border border-border bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-semibold active:scale-[0.96] rounded-xl transition-all duration-75'
           >
-            <Icons.check className='mr-1.5 size-3 text-[#FFFFFF]' />
+            <Icons.check className='mr-1.5 size-3' />
             View Receipt
           </Button>
         ) : isMitigating ? (
           <Button
             size='sm'
             disabled
-            className='flex-1 text-xs font-mono h-8 bg-[#8A8A8A] text-[#000000] font-semibold border-none cursor-not-allowed opacity-80'
+            className='flex-1 text-xs font-mono h-8 bg-muted text-muted-foreground font-semibold border-none cursor-not-allowed opacity-80 rounded-xl'
           >
-            <Icons.spinner className='mr-1.5 size-3 animate-spin text-[#000000]' />
+            <Icons.spinner className='mr-1.5 size-3 animate-spin' />
             Analyzing...
           </Button>
         ) : (
           <Button
             size='sm'
             onClick={() => onMitigate?.(anomaly)}
-            className='flex-1 text-xs font-mono h-8 bg-[#FFFFFF] hover:bg-[#8A8A8A] text-[#000000] font-semibold active:scale-[0.98] border-none'
+            className='flex-1 text-xs font-mono h-8 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold active:scale-[0.96] border-none rounded-xl transition-all duration-75 shadow-xs'
           >
-            <Icons.arrowRight className='mr-1.5 size-3 text-[#000000]' />
+            <Icons.arrowRight className='mr-1.5 size-3' />
             Auto-Reallocate
           </Button>
         )}
