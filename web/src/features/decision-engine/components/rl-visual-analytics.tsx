@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   IconCpu,
   IconTrendingUp,
@@ -8,12 +8,7 @@ import {
   IconChartBar,
   IconGitFork,
   IconArrowRight,
-  IconCheck,
-  IconAlertTriangle,
-  IconFilter,
   IconSparkles,
-  IconBolt,
-  IconWorld,
   IconPlayerPlay
 } from '@tabler/icons-react';
 import { Badge } from '@/components/ui/badge';
@@ -21,20 +16,19 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
   ResponsiveContainer,
-  AreaChart,
+  ComposedChart,
   Area,
   BarChart,
   Bar,
   PieChart,
   Pie,
   Cell,
-  LineChart,
   Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend
+  ReferenceLine
 } from 'recharts';
 import type { RLOptimizationResult } from '@/lib/rl-ad-optimizer';
 
@@ -44,15 +38,128 @@ interface RLVisualAnalyticsProps {
   className?: string;
 }
 
+function computeNiceYAxis(learningCurve: { rlPolicyProfit: number; baselineProfit: number }[]) {
+  if (!learningCurve || !learningCurve.length) {
+    return { ticks: [0, 1000, 2000], domain: [0, 2000] as [number, number] };
+  }
+  let minVal = Infinity;
+  let maxVal = -Infinity;
+  for (const pt of learningCurve) {
+    const lo = Math.min(pt.rlPolicyProfit, pt.baselineProfit);
+    const hi = Math.max(pt.rlPolicyProfit, pt.baselineProfit);
+    if (lo < minVal) minVal = lo;
+    if (hi > maxVal) maxVal = hi;
+  }
+  const span = Math.max(10, maxVal - minVal);
+  const rawMin = Math.max(0, minVal - span * 0.15);
+  const rawMax = maxVal + span * 0.30;
+  const targetTicks = 5;
+  const roughStep = (rawMax - rawMin) / targetTicks;
+  const power = Math.pow(10, Math.floor(Math.log10(roughStep)));
+  const fraction = roughStep / power;
+  let niceFraction = 1;
+  if (fraction < 1.5) niceFraction = 1;
+  else if (fraction < 2.25) niceFraction = 2;
+  else if (fraction < 3.5) niceFraction = 2.5;
+  else if (fraction < 7.5) niceFraction = 5;
+  else niceFraction = 10;
+  const step = niceFraction * power;
+  const start = Math.max(0, Math.floor(rawMin / step) * step);
+  const end = Math.ceil(rawMax / step) * step;
+  const ticks: number[] = [];
+  for (let v = start; v <= end + step * 0.1; v += step) {
+    ticks.push(Math.round(v));
+  }
+  return {
+    ticks,
+    domain: [ticks[0] ?? 0, ticks[ticks.length - 1] ?? rawMax] as [number, number]
+  };
+}
+
+interface CustomConvergenceTooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    payload?: {
+      episode: number;
+      rlPolicyProfit: number;
+      baselineProfit: number;
+    };
+  }>;
+}
+
+interface CustomLabelProps {
+  x?: string | number;
+  y?: string | number;
+  index?: number;
+  value?: unknown;
+  stroke?: string;
+}
+
+function CustomConvergenceTooltip({ active, payload }: CustomConvergenceTooltipProps) {
+  if (!active || !payload || !payload.length) return null;
+  const dataPoint = payload[0]?.payload;
+  if (!dataPoint) return null;
+  const { episode, rlPolicyProfit, baselineProfit } = dataPoint;
+  const diff = rlPolicyProfit - baselineProfit;
+  const diffSign = diff > 0 ? '+' : diff < 0 ? '-' : '';
+
+  return (
+    <div className='rounded-lg border border-zinc-800 bg-zinc-950/95 p-3 shadow-xl text-xs'>
+      <div className='font-semibold text-zinc-200 pb-1.5 mb-1.5 border-b border-zinc-800/80'>
+        Episode {episode}
+      </div>
+      <div className='space-y-1.5'>
+        <div className='flex items-center justify-between gap-5'>
+          <span className='flex items-center gap-1.5 text-zinc-400'>
+            <span className='size-2 rounded-full bg-emerald-500' />
+            RL profit:
+          </span>
+          <span className='font-semibold text-zinc-100 tabular-nums'>
+            ${rlPolicyProfit.toLocaleString()}
+          </span>
+        </div>
+        <div className='flex items-center justify-between gap-5'>
+          <span className='flex items-center gap-1.5 text-zinc-400'>
+            <span className='size-2 rounded-full bg-zinc-500' />
+            Baseline:
+          </span>
+          <span className='font-semibold text-zinc-400 tabular-nums'>
+            ${baselineProfit.toLocaleString()}
+          </span>
+        </div>
+        <div className='flex items-center justify-between gap-5 pt-1.5 border-t border-zinc-800/60'>
+          <span className='text-zinc-400'>Difference:</span>
+          <span className={cn('font-semibold tabular-nums', diff >= 0 ? 'text-emerald-400' : 'text-rose-400')}>
+            {diffSign}${Math.abs(diff).toLocaleString()}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function RLVisualAnalytics({
   data,
-  onApplyAction,
+  onApplyAction: _onApplyAction,
   className
 }: RLVisualAnalyticsProps) {
   const [activeTab, setActiveTab] = useState<'flowchart' | 'graphs' | 'pie' | 'bars' | 'all'>('all');
   const [pieMode, setPieMode] = useState<'post' | 'pre'>('post');
   const [isRetraining, setIsRetraining] = useState(false);
   const [retrainStep, setRetrainStep] = useState(24);
+
+  const prefersReducedMotion = React.useSyncExternalStore(
+    (onStoreChange) => {
+      if (typeof window === 'undefined') return () => {};
+      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      mq.addEventListener?.('change', onStoreChange);
+      return () => mq.removeEventListener?.('change', onStoreChange);
+    },
+    () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    () => false
+  );
+
+  const isAnimationActive = !prefersReducedMotion;
 
   const handleRetrain = () => {
     setIsRetraining(true);
@@ -70,7 +177,115 @@ export function RLVisualAnalytics({
     }, 80);
   };
 
-  const filteredLearningCurve = data.learningCurve.slice(0, retrainStep);
+  const filteredLearningCurve = useMemo(
+    () => data.learningCurve.slice(0, retrainStep),
+    [data.learningCurve, retrainStep]
+  );
+
+  const chartData = useMemo(() => {
+    return filteredLearningCurve.map(d => ({
+      ...d,
+      gapRange: [Math.min(d.baselineProfit, d.rlPolicyProfit), Math.max(d.baselineProfit, d.rlPolicyProfit)] as [number, number]
+    }));
+  }, [filteredLearningCurve]);
+
+  // Compute Y-axis domain from the FULL learning curve so it never jumps during retraining
+  const yAxisConfig = useMemo(
+    () => computeNiceYAxis(data.learningCurve),
+    [data.learningCurve]
+  );
+
+  const settleEpisode = useMemo(
+    () => data.learningCurve.find(d => d.explorationRate <= 0.10)?.episode,
+    [data.learningCurve]
+  );
+  const showSettleLine = settleEpisode !== undefined && settleEpisode <= retrainStep;
+
+  // Deriving regional states data without hardcoding
+  const usState = data.regionalStates.find(r => r.countryCode === 'US');
+  const euState = data.regionalStates.find(r => r.countryCode === 'EU');
+  const latamState = data.regionalStates.find(r => r.countryCode === 'LATAM');
+  const seaState = data.regionalStates.find(r => r.countryCode === 'SEA');
+
+  const formatProb = (st?: typeof usState) => st ? `${Math.round(st.conversionProbability * 100)}%` : '0%';
+  const formatDelta = (st?: typeof usState) => {
+    if (!st) return '0%';
+    return st.spendDeltaPct > 0 ? `+${st.spendDeltaPct}%` : `${st.spendDeltaPct}%`;
+  };
+  const isAllStockoutSuppressed = data.regionalStates.length > 0 && data.regionalStates.every(r => r.rlAction === 'SUPPRESS_ADS');
+
+  const renderRlLabel = (props: CustomLabelProps) => {
+    const { x, y, index } = props;
+    const numX = typeof x === 'number' ? x : Number(x);
+    const numY = typeof y === 'number' ? y : Number(y);
+    if (isNaN(numX) || isNaN(numY) || typeof index !== 'number') return null;
+    if (index !== chartData.length - 1) return null;
+    const currentItem = chartData[index];
+    if (!currentItem) return null;
+    const diff = currentItem.rlPolicyProfit - currentItem.baselineProfit;
+    const diffText = `${diff >= 0 ? '+' : '-'}$${Math.abs(diff).toLocaleString()} vs baseline`;
+
+    return (
+      <g key={`rl-label-${index}`}>
+        {/* End callout pill above the last RL point */}
+        <g transform={`translate(${numX}, ${numY - 24})`}>
+          <rect
+            x={-56}
+            y={-10}
+            width={112}
+            height={20}
+            rx={10}
+            fill='#022c22'
+            stroke='#059669'
+            strokeWidth={1}
+            strokeOpacity={0.7}
+          />
+          <text
+            x={0}
+            y={3.5}
+            fill='#34d399'
+            fontSize={10}
+            fontWeight={600}
+            textAnchor='middle'
+          >
+            {diffText}
+          </text>
+        </g>
+        {/* Direct line label */}
+        <text
+          x={numX + 10}
+          y={numY + 4}
+          fill='#10b981'
+          fontSize={12}
+          fontWeight={600}
+          textAnchor='start'
+        >
+          RL policy
+        </text>
+      </g>
+    );
+  };
+
+  const renderBaselineLabel = (props: CustomLabelProps) => {
+    const { x, y, index } = props;
+    const numX = typeof x === 'number' ? x : Number(x);
+    const numY = typeof y === 'number' ? y : Number(y);
+    if (isNaN(numX) || isNaN(numY) || typeof index !== 'number') return null;
+    if (index !== chartData.length - 1) return null;
+    return (
+      <text
+        key={`baseline-label-${index}`}
+        x={numX + 10}
+        y={numY + 4}
+        fill='#71717a'
+        fontSize={12}
+        fontWeight={500}
+        textAnchor='start'
+      >
+        Baseline
+      </text>
+    );
+  };
 
   return (
     <div className={cn('flex flex-col space-y-5 text-zinc-100', className)}>
@@ -78,25 +293,20 @@ export function RLVisualAnalytics({
       <div className='flex flex-wrap items-center justify-between gap-3 p-4 rounded-xl border border-zinc-800 bg-zinc-950/80 shadow-md'>
         <div className='flex items-center gap-3'>
           <div className='size-10 rounded-lg bg-cyan-950/60 border border-cyan-800/60 flex items-center justify-center text-cyan-400'>
-            <IconCpu className='size-5 animate-pulse' />
+            <IconCpu className='size-5' />
           </div>
           <div>
-            <div className='flex items-center gap-2'>
-              <h4 className='font-mono text-sm font-bold text-zinc-100'>
-                REINFORCEMENT LEARNING AD ALLOCATION AGENT
-              </h4>
-              <Badge variant='outline' className='text-[10px] font-mono border-emerald-500/40 bg-emerald-950/30 text-emerald-400'>
-                Thompson Bandit Q-Policy
-              </Badge>
-            </div>
-            <p className='text-xs font-mono text-zinc-400 mt-0.5'>
-              Maximizing profit by diverting ad spend away from low-probability regions into high-headroom zones
+            <h4 className='text-sm font-semibold text-zinc-100'>
+              Reinforcement learning ad allocation agent
+            </h4>
+            <p className='text-xs text-zinc-400 mt-0.5'>
+              Moves ad money out of regions that rarely convert and into ones with room to grow.
             </p>
           </div>
         </div>
 
         {/* Navigation Mode Buttons */}
-        <div className='flex flex-wrap items-center gap-1.5 p-1 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-mono'>
+        <div className='flex flex-wrap items-center gap-1.5 p-1 rounded-lg bg-zinc-900 border border-zinc-800 text-xs'>
           <button
             onClick={() => setActiveTab('all')}
             className={cn(
@@ -107,7 +317,7 @@ export function RLVisualAnalytics({
             )}
           >
             <IconSparkles className='size-3.5 text-cyan-400' />
-            All Analytics
+            All analytics
           </button>
           <button
             onClick={() => setActiveTab('flowchart')}
@@ -119,7 +329,7 @@ export function RLVisualAnalytics({
             )}
           >
             <IconGitFork className='size-3.5 text-purple-400' />
-            Flow Chart
+            Flow chart
           </button>
           <button
             onClick={() => setActiveTab('graphs')}
@@ -131,7 +341,7 @@ export function RLVisualAnalytics({
             )}
           >
             <IconTrendingUp className='size-3.5 text-emerald-400' />
-            Profit Graph
+            Profit graph
           </button>
           <button
             onClick={() => setActiveTab('pie')}
@@ -143,7 +353,7 @@ export function RLVisualAnalytics({
             )}
           >
             <IconChartPie className='size-3.5 text-amber-400' />
-            Spend Pie Chart
+            Spend pie chart
           </button>
           <button
             onClick={() => setActiveTab('bars')}
@@ -155,7 +365,7 @@ export function RLVisualAnalytics({
             )}
           >
             <IconChartBar className='size-3.5 text-rose-400' />
-            Probability Bar Plot
+            Probability bar plot
           </button>
         </div>
       </div>
@@ -163,43 +373,42 @@ export function RLVisualAnalytics({
       {/* KPI Bar: RL Policy Metrics */}
       <div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
         <div className='p-3.5 rounded-xl border border-zinc-800 bg-zinc-950/70'>
-          <span className='text-[11px] font-mono text-zinc-400 uppercase'>Expected Profit Lift</span>
+          <span className='text-[11px] text-zinc-400 font-medium'>Expected profit lift</span>
           <div className='flex items-baseline gap-2 mt-1'>
-            <span className='text-xl font-mono font-bold text-emerald-400'>
+            <span className='text-xl font-semibold tabular-nums text-emerald-400'>
               +${data.totalProjectedProfitLift.toLocaleString()}
             </span>
-            <span className='text-xs font-mono text-emerald-500 font-bold'>
+            <span className='text-xs font-semibold tabular-nums text-emerald-500'>
               (+{data.profitLiftPct}%)
             </span>
           </div>
-          <p className='text-[10px] text-zinc-500 mt-1 font-mono'>via optimal ad reallocation</p>
+          <p className='text-[10px] text-zinc-500 mt-1'>from moving ad money</p>
         </div>
 
         <div className='p-3.5 rounded-xl border border-zinc-800 bg-zinc-950/70'>
-          <span className='text-[11px] font-mono text-zinc-400 uppercase'>Low-Probability Ad Waste Saved</span>
+          <span className='text-[11px] text-zinc-400 font-medium'>Wasted ad spend saved</span>
           <div className='flex items-baseline gap-2 mt-1'>
-            <span className='text-xl font-mono font-bold text-rose-400'>
+            <span className='text-xl font-semibold tabular-nums text-rose-400'>
               ${data.lowProbabilitySpendAvoided.toLocaleString()}/day
             </span>
           </div>
-          <p className='text-[10px] text-zinc-500 mt-1 font-mono'>Slashed in LatAm &amp; SEA zones</p>
+          <p className='text-[10px] text-zinc-500 mt-1'>cut from low-converting regions</p>
         </div>
 
         <div className='p-3.5 rounded-xl border border-zinc-800 bg-zinc-950/70'>
-          <span className='text-[11px] font-mono text-zinc-400 uppercase'>RL Policy Confidence</span>
+          <span className='text-[11px] text-zinc-400 font-medium'>Policy confidence</span>
           <div className='flex items-baseline gap-2 mt-1'>
-            <span className='text-xl font-mono font-bold text-cyan-400'>
+            <span className='text-xl font-semibold tabular-nums text-cyan-400'>
               {(data.policyConfidence * 100).toFixed(1)}%
             </span>
-            <span className='text-xs font-mono text-zinc-400'>Beta(α, β)</span>
           </div>
-          <p className='text-[10px] text-zinc-500 mt-1 font-mono'>Thompson Sampling converged</p>
+          <p className='text-[10px] text-zinc-500 mt-1'>how sure the agent is</p>
         </div>
 
         <div className='p-3.5 rounded-xl border border-zinc-800 bg-zinc-950/70'>
-          <span className='text-[11px] font-mono text-zinc-400 uppercase'>Exploration Rate (ε)</span>
+          <span className='text-[11px] text-zinc-400 font-medium'>Exploration rate</span>
           <div className='flex items-baseline justify-between mt-1'>
-            <span className='text-xl font-mono font-bold text-amber-400'>
+            <span className='text-xl font-semibold tabular-nums text-amber-400'>
               {(data.explorationRate * 100).toFixed(0)}%
             </span>
             <Button
@@ -207,13 +416,13 @@ export function RLVisualAnalytics({
               variant='outline'
               onClick={handleRetrain}
               disabled={isRetraining}
-              className='h-6 text-[10px] font-mono border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-zinc-200'
+              className='h-6 text-[10px] border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 font-medium'
             >
               <IconPlayerPlay className='size-3 mr-1 text-emerald-400' />
-              {isRetraining ? 'Learning...' : 'Re-Train'}
+              {isRetraining ? 'Learning...' : 'Re-train'}
             </Button>
           </div>
-          <p className='text-[10px] text-zinc-500 mt-1 font-mono'>ε-greedy exploitation phase</p>
+          <p className='text-[10px] text-zinc-500 mt-1'>share of spend used to test new options</p>
         </div>
       </div>
 
@@ -222,156 +431,160 @@ export function RLVisualAnalytics({
         <div className='rounded-xl border border-zinc-800 bg-zinc-950/70 p-5 space-y-4'>
           <div className='flex items-center justify-between border-b border-zinc-800/80 pb-3'>
             <div className='flex items-center gap-2'>
-              <IconGitFork className='size-4 text-purple-400' />
-              <h5 className='font-mono text-sm font-bold text-zinc-100 uppercase'>
-                Reinforcement Learning Decision Flow Chart
+              <IconGitFork className='size-4 text-emerald-400' />
+              <h5 className='text-sm font-semibold text-zinc-100'>
+                Reinforcement learning decision flow
               </h5>
             </div>
-            <span className='text-xs font-mono text-zinc-400'>
-              Closed-Loop Dynamic Allocation Pipeline
+            <span className='text-xs text-zinc-400'>
+              How it decides, step by step
             </span>
           </div>
 
-          {/* Interactive Flow Chart Diagram */}
+          {/* Interactive Flow Chart Cards */}
           <div className='grid grid-cols-1 md:grid-cols-4 gap-3 relative'>
             {/* Stage 1 */}
-            <div className='flex flex-col justify-between p-4 rounded-xl border border-cyan-800/40 bg-cyan-950/20 relative group'>
+            <div className='flex flex-col justify-between p-4 rounded-xl border border-zinc-800 bg-zinc-900/40 relative'>
               <div>
-                <div className='flex items-center justify-between text-xs font-mono text-cyan-400 mb-2'>
-                  <span className='font-bold flex items-center gap-1.5'>
-                    <span className='size-2 rounded-full bg-cyan-400 animate-pulse' />
-                    1. STATE (S_t)
-                  </span>
-                  <Badge variant='outline' className='text-[9px] border-cyan-700 text-cyan-300'>Ingestion</Badge>
+                <div className='flex items-center gap-2.5 mb-2'>
+                  <div className='size-6 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 text-xs font-semibold flex items-center justify-center shrink-0'>
+                    1
+                  </div>
+                  <h6 className='text-sm font-bold text-zinc-200'>
+                    Read the market
+                  </h6>
                 </div>
-                <h6 className='font-mono text-xs font-bold text-zinc-200 mb-1.5'>
-                  Regional Market Signals
-                </h6>
-                <ul className='space-y-1.5 text-[11px] font-mono text-zinc-400'>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-cyan-400'>•</span>
-                    <span>P(Sale) Posterior: North America 78%, EMEA 56%</span>
-                  </li>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-rose-400'>•</span>
-                    <span>Low Probability: LatAm 14%, SEA 9%</span>
-                  </li>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-cyan-400'>•</span>
-                    <span>Stock levels &amp; CPM auction volatility</span>
-                  </li>
-                </ul>
+                <p className='text-xs text-zinc-400 leading-relaxed'>
+                  See how likely each region is to buy: North America {formatProb(usState)}, Europe {formatProb(euState)}, LatAm {formatProb(latamState)}, SEA {formatProb(seaState)}. Stock levels and ad prices are checked too.
+                </p>
               </div>
-              <div className='mt-3 pt-2 border-t border-cyan-900/40 text-[10px] font-mono text-cyan-300/80'>
-                DuckDB + Multi-Source Reconciler
+              <details className='mt-3 pt-2.5 border-t border-zinc-800/60 text-xs text-zinc-500 group/tech'>
+                <summary className='cursor-pointer text-[11px] font-medium text-zinc-400 hover:text-zinc-300 select-none'>
+                  Technical details
+                </summary>
+                <p className='mt-1 text-[11px] text-zinc-400 font-mono leading-relaxed bg-zinc-950/60 p-2 rounded border border-zinc-800/40'>
+                  State S_t, P(sale) posteriors, DuckDB + multi-source reconciler
+                </p>
+              </details>
+              {/* Connector arrow to Card 2 */}
+              <div className='hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 size-6 items-center justify-center rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 pointer-events-none'>
+                <IconArrowRight className='size-3.5' />
               </div>
             </div>
 
             {/* Stage 2 */}
-            <div className='flex flex-col justify-between p-4 rounded-xl border border-purple-800/40 bg-purple-950/20 relative group'>
+            <div className='flex flex-col justify-between p-4 rounded-xl border border-zinc-800 bg-zinc-900/40 relative'>
               <div>
-                <div className='flex items-center justify-between text-xs font-mono text-purple-400 mb-2'>
-                  <span className='font-bold flex items-center gap-1.5'>
-                    <span className='size-2 rounded-full bg-purple-400 animate-pulse' />
-                    2. POLICY EVALUATION
-                  </span>
-                  <Badge variant='outline' className='text-[9px] border-purple-700 text-purple-300'>Bandit Q(s,a)</Badge>
+                <div className='flex items-center gap-2.5 mb-2'>
+                  <div className='size-6 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 text-xs font-semibold flex items-center justify-center shrink-0'>
+                    2
+                  </div>
+                  <h6 className='text-sm font-bold text-zinc-200'>
+                    Find the best bets
+                  </h6>
                 </div>
-                <h6 className='font-mono text-xs font-bold text-zinc-200 mb-1.5'>
-                  Marginal Headroom Optimization
-                </h6>
-                <ul className='space-y-1.5 text-[11px] font-mono text-zinc-400'>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-purple-400'>•</span>
-                    <span>Computes dProfit / dSpend gradient</span>
-                  </li>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-purple-400'>•</span>
-                    <span>Detects audience saturation saturation index</span>
-                  </li>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-purple-400'>•</span>
-                    <span>Thompson Sampling Balances Exploit vs Explore</span>
-                  </li>
-                </ul>
+                <p className='text-xs text-zinc-400 leading-relaxed'>
+                  Work out where one more dollar earns the most, and where ads have stopped helping. Keep trying new options now and then.
+                </p>
               </div>
-              <div className='mt-3 pt-2 border-t border-purple-900/40 text-[10px] font-mono text-purple-300/80'>
-                Multi-Armed Contextual Policy
+              <details className='mt-3 pt-2.5 border-t border-zinc-800/60 text-xs text-zinc-500 group/tech'>
+                <summary className='cursor-pointer text-[11px] font-medium text-zinc-400 hover:text-zinc-300 select-none'>
+                  Technical details
+                </summary>
+                <p className='mt-1 text-[11px] text-zinc-400 font-mono leading-relaxed bg-zinc-950/60 p-2 rounded border border-zinc-800/40'>
+                  Bandit Q(s,a), dProfit/dSpend gradient, saturation index, Thompson sampling exploit vs explore
+                </p>
+              </details>
+              {/* Connector arrow to Card 3 */}
+              <div className='hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 size-6 items-center justify-center rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 pointer-events-none'>
+                <IconArrowRight className='size-3.5' />
               </div>
             </div>
 
             {/* Stage 3 */}
-            <div className='flex flex-col justify-between p-4 rounded-xl border border-amber-800/40 bg-amber-950/20 relative group'>
+            <div className='flex flex-col justify-between p-4 rounded-xl border border-zinc-800 bg-zinc-900/40 relative'>
               <div>
-                <div className='flex items-center justify-between text-xs font-mono text-amber-400 mb-2'>
-                  <span className='font-bold flex items-center gap-1.5'>
-                    <span className='size-2 rounded-full bg-amber-400 animate-pulse' />
-                    3. ACTION (A_t)
-                  </span>
-                  <Badge variant='outline' className='text-[9px] border-amber-700 text-amber-300'>Reallocation</Badge>
+                <div className='flex items-center gap-2.5 mb-2'>
+                  <div className='size-6 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 text-xs font-semibold flex items-center justify-center shrink-0'>
+                    3
+                  </div>
+                  <h6 className='text-sm font-bold text-zinc-200'>
+                    Move the money
+                  </h6>
                 </div>
-                <h6 className='font-mono text-xs font-bold text-zinc-200 mb-1.5'>
-                  Ad Display Redistribution
-                </h6>
-                <ul className='space-y-1.5 text-[11px] font-mono text-zinc-400'>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-emerald-400 font-bold'>+</span>
-                    <span>Scale High Headroom: US (+68%), EU (+22%)</span>
-                  </li>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-rose-400 font-bold'>-</span>
-                    <span>Suppress Low Probability: LatAm (-72%), SEA (-88%)</span>
-                  </li>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-amber-400'>•</span>
-                    <span>Zero Ad Budget Burn on Stockouts</span>
-                  </li>
-                </ul>
+                <p className='text-xs text-zinc-400 leading-relaxed'>
+                  {isAllStockoutSuppressed
+                    ? 'This product is out of stock, so ads are paused in every region until stock returns.'
+                    : `Spend more where there's room: US ${formatDelta(usState)}, EU ${formatDelta(euState)}. Cut where it isn't working: LatAm ${formatDelta(latamState)}, SEA ${formatDelta(seaState)}. Never advertise sold-out items.`}
+                </p>
               </div>
-              <div className='mt-3 pt-2 border-t border-amber-900/40 text-[10px] font-mono text-amber-300/80'>
-                Meta &amp; Google Ads Script API
+              <details className='mt-3 pt-2.5 border-t border-zinc-800/60 text-xs text-zinc-500 group/tech'>
+                <summary className='cursor-pointer text-[11px] font-medium text-zinc-400 hover:text-zinc-300 select-none'>
+                  Technical details
+                </summary>
+                <p className='mt-1 text-[11px] text-zinc-400 font-mono leading-relaxed bg-zinc-950/60 p-2 rounded border border-zinc-800/40'>
+                  Meta and Google Ads script API, spend redistribution
+                </p>
+              </details>
+              {/* Connector arrow to Card 4 */}
+              <div className='hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 z-10 size-6 items-center justify-center rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 pointer-events-none'>
+                <IconArrowRight className='size-3.5' />
               </div>
             </div>
 
             {/* Stage 4 */}
-            <div className='flex flex-col justify-between p-4 rounded-xl border border-emerald-800/40 bg-emerald-950/20 relative group'>
+            <div className='flex flex-col justify-between p-4 rounded-xl border border-zinc-800 bg-zinc-900/40 relative'>
               <div>
-                <div className='flex items-center justify-between text-xs font-mono text-emerald-400 mb-2'>
-                  <span className='font-bold flex items-center gap-1.5'>
-                    <span className='size-2 rounded-full bg-emerald-400 animate-pulse' />
-                    4. REWARD (R_t)
-                  </span>
-                  <Badge variant='outline' className='text-[9px] border-emerald-700 text-emerald-300'>Feedback</Badge>
+                <div className='flex items-center gap-2.5 mb-2'>
+                  <div className='size-6 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 text-xs font-semibold flex items-center justify-center shrink-0'>
+                    4
+                  </div>
+                  <h6 className='text-sm font-bold text-zinc-200'>
+                    Learn from results
+                  </h6>
                 </div>
-                <h6 className='font-mono text-xs font-bold text-zinc-200 mb-1.5'>
-                  Profit Lift &amp; Policy Refit
-                </h6>
-                <ul className='space-y-1.5 text-[11px] font-mono text-zinc-400'>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-emerald-400'>✓</span>
-                    <span>Reward = ΔMargin$ − ΔSpend − Penalty</span>
-                  </li>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-emerald-400'>✓</span>
-                    <span>Thompson Beta priors updated with sales</span>
-                  </li>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-emerald-400'>✓</span>
-                    <span>Append-only Decision Ledger Audit</span>
-                  </li>
-                </ul>
+                <p className='text-xs text-zinc-400 leading-relaxed'>
+                  Did profit go up after the move? Feed the result back in, and log every decision so it can be audited.
+                </p>
               </div>
-              <div className='mt-3 pt-2 border-t border-emerald-900/40 text-[10px] font-mono text-emerald-300/80'>
-                Continuous Learning Feedback Loop
-              </div>
+              <details className='mt-3 pt-2.5 border-t border-zinc-800/60 text-xs text-zinc-500 group/tech'>
+                <summary className='cursor-pointer text-[11px] font-medium text-zinc-400 hover:text-zinc-300 select-none'>
+                  Technical details
+                </summary>
+                <p className='mt-1 text-[11px] text-zinc-400 font-mono leading-relaxed bg-zinc-950/60 p-2 rounded border border-zinc-800/40'>
+                  Reward = ΔMargin$ − ΔSpend − Penalty, Beta priors updated with sales, append-only decision ledger
+                </p>
+              </details>
             </div>
+          </div>
+
+          {/* U-shaped connector back from card 4 to card 1 with "repeat" label */}
+          <div className='hidden md:flex flex-col items-center justify-center pt-2 pb-1 relative'>
+            <svg className='w-full h-7 overflow-visible text-zinc-700' viewBox='0 0 1000 28' fill='none'>
+              <path
+                d='M 875 0 V 16 Q 875 22 865 22 H 135 Q 125 22 125 16 V 0'
+                stroke='currentColor'
+                strokeWidth='1.5'
+                strokeDasharray='4 4'
+              />
+              <path
+                d='M 121 6 L 125 0 L 129 6'
+                stroke='currentColor'
+                strokeWidth='1.5'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
+            </svg>
+            <span className='absolute top-2 px-2.5 py-0.5 rounded-full bg-zinc-900 border border-zinc-800 text-[10px] text-zinc-400 font-medium'>
+              repeat
+            </span>
           </div>
         </div>
       )}
 
       {/* SECTION 2 & 3: GRAPHS & PIE CHARTS (SIDE-BY-SIDE OR INDIVIDUAL) */}
       <div className='grid grid-cols-1 lg:grid-cols-12 gap-5'>
-        {/* GRAPH: REINFORCEMENT LEARNING REWARD CONVERGENCE (AREA / LINE GRAPH) */}
+        {/* GRAPH: REINFORCEMENT LEARNING REWARD CONVERGENCE (COMPOSED CHART) */}
         {(activeTab === 'graphs' || activeTab === 'all') && (
           <div className={cn(
             'rounded-xl border border-zinc-800 bg-zinc-950/70 p-5 flex flex-col justify-between',
@@ -380,92 +593,111 @@ export function RLVisualAnalytics({
             <div>
               <div className='flex items-center justify-between border-b border-zinc-800/80 pb-3 mb-3'>
                 <div>
-                  <h5 className='font-mono text-sm font-bold text-zinc-100 flex items-center gap-2'>
+                  <h5 className='text-sm font-semibold text-zinc-100 flex items-center gap-2'>
                     <IconTrendingUp className='size-4 text-emerald-400' />
-                    RL Policy Profit Convergence Graph
+                    Profit convergence: RL policy vs static baseline
                   </h5>
-                  <p className='text-xs font-mono text-zinc-400 mt-0.5'>
-                    Learning Episode Progress: RL Dynamic Policy vs Static Rule-Based Baseline
+                  <p className='text-xs text-zinc-400 mt-0.5'>
+                    Daily profit as the agent learns
                   </p>
                 </div>
-                <Badge variant='outline' className='font-mono text-[10px] border-emerald-500/40 text-emerald-400 bg-emerald-950/30'>
+                <Badge variant='outline' className='text-[10px] border-emerald-500/40 text-emerald-400 bg-emerald-950/30 tabular-nums'>
                   Episode {retrainStep}/24
                 </Badge>
               </div>
 
               {/* Chart Component */}
-              <div className='h-[260px] w-full pt-2'>
-                <ResponsiveContainer width='100%' height='100%'>
-                  <AreaChart data={filteredLearningCurve} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id='rlProfitGrad' x1='0' y1='0' x2='0' y2='1'>
-                        <stop offset='5%' stopColor='#10b981' stopOpacity={0.4} />
-                        <stop offset='95%' stopColor='#10b981' stopOpacity={0.0} />
-                      </linearGradient>
-                      <linearGradient id='baselineProfitGrad' x1='0' y1='0' x2='0' y2='1'>
-                        <stop offset='5%' stopColor='#71717a' stopOpacity={0.2} />
-                        <stop offset='95%' stopColor='#71717a' stopOpacity={0.0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray='3 3' stroke='#27272a' />
-                    <XAxis
-                      dataKey='episode'
-                      stroke='#71717a'
-                      fontSize={11}
-                      tickFormatter={(val) => `Ep ${val}`}
-                    />
-                    <YAxis
-                      stroke='#71717a'
-                      fontSize={11}
-                      tickFormatter={(val) => `$${(val / 1000).toFixed(1)}k`}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: '#09090b',
-                        borderColor: '#27272a',
-                        borderRadius: '8px',
-                        fontFamily: 'monospace',
-                        fontSize: '12px'
-                      }}
-                      formatter={(value: any, name: any) => {
-                        const label = name === 'rlPolicyProfit' ? 'RL Adaptive Profit' : 'Static Baseline';
-                        return [`$${Number(value).toLocaleString()}`, label];
-                      }}
-                      labelFormatter={(ep) => `Training Episode ${ep}`}
-                    />
-                    <Legend
-                      verticalAlign='top'
-                      align='right'
-                      iconType='circle'
-                      wrapperStyle={{ fontSize: '11px', fontFamily: 'monospace', paddingBottom: '8px' }}
-                    />
-                    <Area
-                      type='monotone'
-                      dataKey='rlPolicyProfit'
-                      name='RL Adaptive Policy'
-                      stroke='#10b981'
-                      strokeWidth={2.5}
-                      fillOpacity={1}
-                      fill='url(#rlProfitGrad)'
-                    />
-                    <Area
-                      type='monotone'
-                      dataKey='baselineProfit'
-                      name='Static Baseline'
-                      stroke='#71717a'
-                      strokeWidth={1.5}
-                      strokeDasharray='4 4'
-                      fillOpacity={1}
-                      fill='url(#baselineProfitGrad)'
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
+              <div className='relative flex-1 min-h-[320px] w-full pt-1'>
+                <div className='absolute inset-0'>
+                  <ResponsiveContainer width='100%' height='100%'>
+                    <ComposedChart
+                      data={chartData}
+                      margin={{ top: 28, right: 84, left: 14, bottom: 24 }}
+                    >
+                      <CartesianGrid strokeDasharray='3 3' stroke='#27272a' vertical={false} />
+                      <XAxis
+                        dataKey='episode'
+                        stroke='#71717a'
+                        fontSize={11}
+                        ticks={[2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24]}
+                        domain={[1, 24]}
+                        tickLine={false}
+                        label={{
+                          value: 'Training episode',
+                          position: 'insideBottom',
+                          offset: -6,
+                          fill: '#71717a',
+                          fontSize: 11
+                        }}
+                      />
+                      <YAxis
+                        stroke='#71717a'
+                        fontSize={11}
+                        tickLine={false}
+                        ticks={yAxisConfig.ticks}
+                        domain={yAxisConfig.domain}
+                        tickFormatter={(val) => `$${Number(val).toLocaleString()}`}
+                      />
+                      <Tooltip content={<CustomConvergenceTooltip />} />
+                      {showSettleLine && (
+                        <ReferenceLine
+                          x={settleEpisode}
+                          stroke='#52525b'
+                          strokeDasharray='3 3'
+                          strokeWidth={1.5}
+                          label={{
+                            value: 'Agent settles',
+                            position: 'top',
+                            fill: '#a1a1aa',
+                            fontSize: 10,
+                            offset: 6
+                          }}
+                        />
+                      )}
+                      <Area
+                        type='monotone'
+                        dataKey='gapRange'
+                        stroke='none'
+                        fill='#10b981'
+                        fillOpacity={0.12}
+                        isAnimationActive={isAnimationActive}
+                        animationDuration={800}
+                      />
+                      <Line
+                        type='monotone'
+                        dataKey='baselineProfit'
+                        stroke='#71717a'
+                        strokeWidth={1.75}
+                        strokeDasharray='4 4'
+                        dot={{ r: 3.5, fill: '#09090b', stroke: '#71717a', strokeWidth: 1.5 }}
+                        activeDot={{ r: 5, fill: '#09090b', stroke: '#71717a', strokeWidth: 2 }}
+                        isAnimationActive={isAnimationActive}
+                        animationDuration={800}
+                        label={renderBaselineLabel}
+                      />
+                      <Line
+                        type='monotone'
+                        dataKey='rlPolicyProfit'
+                        stroke='#10b981'
+                        strokeWidth={2.5}
+                        strokeLinejoin='round'
+                        dot={{ r: 4, fill: '#10b981', stroke: '#09090b', strokeWidth: 2 }}
+                        activeDot={{ r: 6.5, fill: '#10b981', stroke: '#10b981', strokeWidth: 3 }}
+                        isAnimationActive={isAnimationActive}
+                        animationDuration={800}
+                        label={renderRlLabel}
+                      />
+                    </ComposedChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
             </div>
 
-            <div className='flex items-center justify-between pt-3 border-t border-zinc-900 font-mono text-[11px] text-zinc-400'>
-              <span>Agent explores early episodes (ε=45%) then converges to optimal budget concentration (ε=5%).</span>
-              <span className='text-emerald-400 font-bold'>+${data.totalProjectedProfitLift.toLocaleString()} Net Lift</span>
+            <div className='flex items-center justify-between pt-3 mt-3 border-t border-zinc-900 text-xs text-zinc-400'>
+              <span>Early on the agent tries many options (ε=45%), then settles on the best split (ε=5%).</span>
+              <span className='text-emerald-400 font-semibold tabular-nums whitespace-nowrap ml-2'>
+                +${data.totalProjectedProfitLift.toLocaleString()} net lift
+              </span>
             </div>
           </div>
         )}
@@ -542,7 +774,7 @@ export function RLVisualAnalytics({
                         fontFamily: 'monospace',
                         fontSize: '11px'
                       }}
-                      formatter={(value: any, name: any) => [
+                      formatter={(value: unknown, name: unknown) => [
                         `$${Number(value).toLocaleString()}/day`,
                         `${name}`
                       ]}
@@ -625,7 +857,7 @@ export function RLVisualAnalytics({
                     fontFamily: 'monospace',
                     fontSize: '12px'
                   }}
-                  formatter={(value: any, name: any) => {
+                  formatter={(value: unknown, name: unknown) => {
                     if (name === 'conversionProbabilityPct') return [`${value}%`, 'Conversion Probability'];
                     return [`${value} pts`, 'Expected Margin Score'];
                   }}
