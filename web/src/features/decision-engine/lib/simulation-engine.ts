@@ -311,10 +311,93 @@ export function runDeterministicSimulation(
     : Math.max(0, (shocked.spend - (shocked.revenue * 0.25)));
   const wastedSpend = Math.round(wastedSpendPerDay * horizon);
 
-  const lossWithoutMitigation = Math.round(Math.max(0, (baseline.margin - shocked.margin) * horizon));
-  const lossWithMitigation = Math.round(Math.max(0, (baseline.margin - mitigated.margin) * horizon));
+  // 5. Daily Cumulative Time Series (Calculated dynamically day-by-day)
+  const timeSeries: DailyLossPoint[] = [];
+  let cumNoAction = 0;
+  let cumMitigated = 0;
+
+  for (let d = 1; d <= horizon; d++) {
+    let dayShockLoss = Math.max(0, baseline.margin - shocked.margin);
+
+    if (scenarioId === 'creative-fatigue') {
+      // Ad frequency compounds daily wear-out: early days suffer lower fatigue, accelerating toward end
+      const fatigueFraction = inputs.fatiguePct / 100;
+      const dayDecayProgress = horizon === 1 ? 1 : Math.pow(d / horizon, 0.7);
+      const dayEffectiveFatigue = fatigueFraction * (0.35 + 0.65 * dayDecayProgress);
+      const dayCtr = Math.max(0.1, inputs.ctrPct * (1 - dayEffectiveFatigue)) / 100;
+      const dayImpressions = baseline.impressions;
+      const dayClicks = Math.round(dayImpressions * dayCtr);
+      const dayConversions = Math.max(0, Math.round(dayClicks * (inputs.baselineCvrPct / 100)));
+      const dayRev = Math.round(dayConversions * inputs.aov);
+      const dayMargin = Math.round(dayRev * (inputs.marginPct / 100) - inputs.baselineDailySpend);
+      dayShockLoss = Math.max(0, baseline.margin - dayMargin);
+    } else if (scenarioId === 'cpm-spike') {
+      const cpmRamp = 1 + (inputs.cpmMultiplier - 1) * Math.min(1, 0.45 + 0.55 * (d / horizon));
+      const dayCpm = inputs.baselineCpm * cpmRamp;
+      const dayImpressions = Math.round((inputs.baselineDailySpend / dayCpm) * 1000);
+      const dayClicks = Math.round(dayImpressions * (inputs.ctrPct / 100));
+      const dayConversions = Math.max(0, Math.round(dayClicks * (inputs.baselineCvrPct / 100)));
+      const dayRev = Math.round(dayConversions * inputs.aov);
+      const dayMargin = Math.round(dayRev * (inputs.marginPct / 100) - inputs.baselineDailySpend);
+      dayShockLoss = Math.max(0, baseline.margin - dayMargin);
+    } else if (scenarioId === 'stockout') {
+      dayShockLoss = Math.max(0, baseline.margin - shocked.margin);
+    } else if (scenarioId === 'price-undercut') {
+      dayShockLoss = Math.max(0, baseline.margin - shocked.margin);
+    }
+
+    let dayMitLoss = Math.max(0, baseline.margin - mitigated.margin);
+
+    if (activeStrategy.id === 'do-nothing') {
+      dayMitLoss = dayShockLoss;
+    } else if (
+      activeStrategy.id === 'shift-fresh-creative' ||
+      activeStrategy.id === 'redirect-spend' ||
+      activeStrategy.id === 'reallocate-channels' ||
+      activeStrategy.id === 'shift-to-direct'
+    ) {
+      // Autonomous policy activates on Day 1:
+      // Day 1: detection latency (incurs 25% of Day 1's shock loss before policy activates)
+      // Day 2+: Full redirection is in effect, flattening ongoing loss
+      if (d === 1) {
+        dayMitLoss = Math.round(dayShockLoss * 0.25);
+      } else {
+        dayMitLoss = Math.max(0, baseline.margin - mitigated.margin);
+      }
+    } else if (activeStrategy.id === 'pause-spend') {
+      // Circuit breaker cuts spend on Day 1
+      if (d === 1) {
+        dayMitLoss = Math.round(dayShockLoss * 0.15);
+      } else {
+        dayMitLoss = 0;
+      }
+    } else if (activeStrategy.id.includes('reduce')) {
+      dayMitLoss = Math.max(0, baseline.margin - mitigated.margin);
+    }
+
+    cumNoAction += dayShockLoss;
+    cumMitigated += dayMitLoss;
+
+    timeSeries.push({
+      day: d,
+      label: `Day ${d}`,
+      noActionLoss: Math.round(cumNoAction),
+      mitigatedLoss: Math.round(cumMitigated),
+      baselineMargin: Math.round(baseline.margin * d),
+      shockedMargin: Math.round(baseline.margin * d - cumNoAction),
+      mitigatedMargin: Math.round(baseline.margin * d - cumMitigated)
+    });
+  }
+
+  const lastPoint = timeSeries[timeSeries.length - 1];
+  const lossWithoutMitigation = lastPoint
+    ? lastPoint.noActionLoss
+    : Math.round(Math.max(0, (baseline.margin - shocked.margin) * horizon));
+  const lossWithMitigation = lastPoint
+    ? lastPoint.mitigatedLoss
+    : Math.round(Math.max(0, (baseline.margin - mitigated.margin) * horizon));
   const lossAvoided = Math.round(Math.max(0, lossWithoutMitigation - lossWithMitigation));
-  const protectedWasteWeekly = Math.round((Math.max(0, lossWithoutMitigation - lossWithMitigation) / horizon) * 7);
+  const protectedWasteWeekly = Math.round((lossAvoided / horizon) * 7);
   const dailyLossRate = Math.round(lossWithoutMitigation / horizon);
 
   const financialImpact: FinancialImpactSummary = {
@@ -327,22 +410,6 @@ export function runDeterministicSimulation(
     protectedWasteWeekly,
     dailyLossRate
   };
-
-  // 5. Daily Cumulative Time Series
-  const timeSeries: DailyLossPoint[] = [];
-  for (let d = 1; d <= horizon; d++) {
-    const noActionLoss = Math.round((lossWithoutMitigation / horizon) * d);
-    const mitigatedLoss = Math.round((lossWithMitigation / horizon) * d);
-    timeSeries.push({
-      day: d,
-      label: `Day ${d}`,
-      noActionLoss,
-      mitigatedLoss,
-      baselineMargin: Math.round(baseline.margin * d),
-      shockedMargin: Math.round(shocked.margin * d),
-      mitigatedMargin: Math.round(mitigated.margin * d)
-    });
-  }
 
   // 6. Strategy Evaluation Table (Evaluates ALL strategies under identical inputs)
   const strategyComparisons: StrategyEvaluation[] = strategies.map((s) => {

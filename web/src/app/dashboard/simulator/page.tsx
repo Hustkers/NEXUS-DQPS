@@ -80,8 +80,8 @@ function SimulationLabContent() {
     return runDeterministicSimulation(selectedScenarioId, inputs, selectedStrategyId);
   }, [selectedScenarioId, inputs, selectedStrategyId]);
 
-  // Active result displayed (computedResult if executed, else null)
-  const activeResult = executedResult || (simStage === 'completed' ? computedResult : null);
+  // Active result displayed (computedResult is the single deterministic source of truth)
+  const activeResult = computedResult;
 
   // Handle switching scenario
   const handleSelectScenario = (id: ShockScenarioId) => {
@@ -177,8 +177,7 @@ function SimulationLabContent() {
   // Sliced time-series up to current simulated day for live animation
   const simulatedTimeSeries: DailyLossPoint[] = useMemo(() => {
     const allSeries = computedResult.timeSeries;
-    if (simStage === 'ready') return [];
-    if (simStage === 'completed') return allSeries;
+    if (simStage === 'ready' || simStage === 'completed') return allSeries;
     const targetCount = Math.max(1, Math.min(allSeries.length, simulatedDay));
     return allSeries.slice(0, targetCount);
   }, [computedResult.timeSeries, simStage, simulatedDay]);
@@ -379,10 +378,23 @@ function SimulationLabContent() {
 
         <div className='flex items-center gap-3'>
           <div className='flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-card text-xs'>
-            <span className='size-2 rounded-full bg-emerald-500 animate-pulse' />
+            <span
+              className={cn(
+                'size-2 rounded-full',
+                isExecuting
+                  ? 'bg-amber-500 animate-ping'
+                  : simStage === 'completed'
+                  ? 'bg-emerald-500'
+                  : 'bg-sky-500 animate-pulse'
+              )}
+            />
             <span className='text-muted-foreground'>Status:</span>
             <span className='font-bold text-foreground'>
-              {isExecuting ? 'SIMULATING...' : 'READY TO SIMULATE'}
+              {isExecuting
+                ? `SIMULATING (${simProgress}%)`
+                : simStage === 'completed'
+                ? 'SIMULATION COMPLETE'
+                : 'LIVE PREVIEW'}
             </span>
           </div>
 
