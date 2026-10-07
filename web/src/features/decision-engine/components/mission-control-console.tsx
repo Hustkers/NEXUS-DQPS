@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
@@ -158,6 +158,54 @@ export function MissionControlConsole() {
     }
   };
 
+  useEffect(() => {
+    const handleRemoteDirective = (e: any) => {
+      const planId = e.detail?.directiveId || 'dir_meta_hero_shoe';
+      setState((prev) => {
+        const newLedgerItem = {
+          id: `ledg-copilot-${Date.now()}`,
+          timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+          decision: `Copilot-Executed: Throttled stocked-out Meta Hero SKU -> $0/day; Scaled Google Search -> +$800/day`,
+          expectedMargin: 2450.0,
+          realizedMargin: 2390.0,
+          variancePct: -2.4,
+          accuracyPct: 97.6,
+          confidence: 0.98,
+          status: 'executed',
+          feedback: 'Function Calling authenticated (NEXUS AI Copilot)'
+        };
+        return {
+          ...prev,
+          ledger: [newLedgerItem, ...prev.ledger],
+          telemetry: {
+            ...prev.telemetry,
+            activeAnomaliesCount: Math.max(0, prev.telemetry.activeAnomaliesCount - 1),
+            projectedMarginUplift: prev.telemetry.projectedMarginUplift + 1148
+          }
+        };
+      });
+    };
+
+    const handleRemoteScenario = (e: any) => {
+      const type = e.detail?.scenarioType;
+      handleTriggerScenario({
+        id: type === 'ad_fatigue' ? 'scenario-fatigue' : 'scenario-stockout',
+        title: 'Operational Shock (AppWide Copilot)',
+        description: 'Injected via AI Assistant function calling',
+        impact: '-37% ROAS',
+        severity: 'CRITICAL',
+        affectedChannel: 'Meta'
+      });
+    };
+
+    window.addEventListener('nexus:directive_executed', handleRemoteDirective);
+    window.addEventListener('nexus:scenario_injected', handleRemoteScenario);
+    return () => {
+      window.removeEventListener('nexus:directive_executed', handleRemoteDirective);
+      window.removeEventListener('nexus:scenario_injected', handleRemoteScenario);
+    };
+  }, []);
+
   const filteredCampaigns = state.campaigns.filter((c: any) =>
     activeTab === 'all' ? true : c.platform === activeTab
   );
@@ -168,7 +216,6 @@ export function MissionControlConsole() {
       <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/80 pb-5'>
         <div>
           <div className='flex items-center gap-2.5'>
-            <span className='size-2 rounded-full bg-emerald-500 shadow-xs' />
             <h1 className='text-xl font-bold font-mono tracking-tight text-foreground'>
               NEXUS D2C
             </h1>
@@ -197,12 +244,10 @@ export function MissionControlConsole() {
             )}
             title="Click to toggle between live backend API and deterministic mock replay"
           >
-            <span className={cn('size-1.5 rounded-full', liveMode ? 'bg-emerald-500' : 'bg-amber-500')} />
             <span>{liveMode ? 'API: LIVE FASTAPI (8000)' : 'API: DETERMINISTIC MOCKS'}</span>
           </button>
 
           <div className='flex items-center gap-2 text-foreground bg-card px-3 py-1.5 rounded-lg border border-border shadow-2xs'>
-            <span className='size-1.5 rounded-full bg-emerald-500' />
             <span className='font-semibold'>Cycle {state.metadata.cycleId}</span>
           </div>
           <span className='text-muted-foreground hidden sm:block text-[11px] font-mono'>
@@ -323,7 +368,6 @@ export function MissionControlConsole() {
                 }}
                 className='px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:border-cyan-500/60 text-xs font-mono text-zinc-300 hover:text-cyan-300 transition-colors flex items-center gap-1.5'
               >
-                <span className='size-1.5 rounded-full bg-cyan-400' />
                 <span>{c.productName || c.sku}</span>
               </button>
             ))}

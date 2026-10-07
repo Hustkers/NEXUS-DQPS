@@ -54,19 +54,6 @@ export function PlatformBreakdownChart({
     <div className={cn('grid grid-cols-1 lg:grid-cols-3 gap-4', className)}>
       {/* 30-Day Performance Trends (Clean Utilitarian Area Chart) */}
       <div className='relative overflow-hidden lg:col-span-2 rounded-xl border border-border/80 bg-card p-5 shadow-xs flex flex-col justify-between'>
-        {/* Blueprint Grid Texture */}
-        <div
-          className='pointer-events-none absolute inset-0 opacity-[0.06] dark:opacity-[0.14]'
-          style={{
-            backgroundImage: `
-              linear-gradient(to right, currentColor 1px, transparent 1px),
-              linear-gradient(to bottom, currentColor 1px, transparent 1px)
-            `,
-            backgroundSize: '16px 16px'
-          }}
-          aria-hidden='true'
-        />
-
         <div className='relative z-10'>
           <div className='flex items-center justify-between border-b border-border/80 pb-3 mb-4'>
             <div>
@@ -114,7 +101,7 @@ export function PlatformBreakdownChart({
                   strokeDasharray='3 3'
                   stroke='currentColor'
                   className='opacity-15 dark:opacity-25'
-                  vertical={true}
+                  vertical={false}
                   horizontal={true}
                 />
                 <XAxis

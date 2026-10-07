@@ -39,7 +39,6 @@ function SparklineTooltip({ active, payload, label, unit = '', precision = 2 }: 
     return (
       <div className='rounded-lg border border-border bg-popover/95 px-2.5 py-1.5 text-[11px] font-mono shadow-xl backdrop-blur-md text-popover-foreground pointer-events-none z-50'>
         <div className='flex items-center gap-1.5'>
-          <span className='size-1.5 rounded-full bg-emerald-500 animate-pulse' />
           <span className='text-muted-foreground'>{label}:</span>
           <span className='font-bold text-foreground'>
             {unit}{formatted}
@@ -236,7 +235,6 @@ export function ExecutiveGraphBanner({
       {/* 1. Header Bar with Time Range Selector & Comparative Detail Toggle */}
       <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-3'>
         <div className='flex items-center gap-2.5'>
-          <span className='size-2 rounded-full bg-emerald-500 animate-pulse' />
           <h2 className='font-mono text-xs font-bold uppercase tracking-wider text-foreground'>
             Executive Financial &amp; Efficiency Trajectories
           </h2>
@@ -301,27 +299,6 @@ export function ExecutiveGraphBanner({
             )}
           >
             <div className='relative overflow-hidden rounded-xl bg-card p-4 flex flex-col justify-between h-full border border-border/40'>
-              {/* Mission Control Blueprint Grid Texture */}
-              <div
-                className='pointer-events-none absolute inset-0 opacity-[0.06] dark:opacity-[0.14]'
-                style={{
-                  backgroundImage: `
-                    linear-gradient(to right, currentColor 1px, transparent 1px),
-                    linear-gradient(to bottom, currentColor 1px, transparent 1px)
-                  `,
-                  backgroundSize: '14px 14px'
-                }}
-                aria-hidden='true'
-              />
-
-              {/* Crosshair coordinate markers in corners */}
-              <span className='pointer-events-none absolute top-1.5 right-2 font-mono text-[9px] text-muted-foreground/30 font-semibold'>
-                +
-              </span>
-              <span className='pointer-events-none absolute bottom-1.5 left-2 font-mono text-[9px] text-muted-foreground/30 font-semibold'>
-                +
-              </span>
-
               {/* Card Header Content */}
               <div className='relative z-10'>
                 <div className='flex items-center justify-between'>
@@ -375,14 +352,6 @@ export function ExecutiveGraphBanner({
                         <stop offset='100%' stopColor={card.color} stopOpacity={0.0} />
                       </linearGradient>
                     </defs>
-                    {/* Micro Grid Lines inside chart */}
-                    <CartesianGrid
-                      strokeDasharray='2 3'
-                      stroke='currentColor'
-                      className='opacity-[0.08] dark:opacity-[0.16]'
-                      vertical={true}
-                      horizontal={true}
-                    />
                     {card.referenceLineY !== undefined && (
                       <ReferenceLine
                         y={card.referenceLineY}
@@ -443,23 +412,9 @@ export function ExecutiveGraphBanner({
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             className='relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm'
           >
-            {/* Blueprint Grid Texture inside Studio */}
-            <div
-              className='pointer-events-none absolute inset-0 opacity-[0.05] dark:opacity-[0.12]'
-              style={{
-                backgroundImage: `
-                  linear-gradient(to right, currentColor 1px, transparent 1px),
-                  linear-gradient(to bottom, currentColor 1px, transparent 1px)
-                `,
-                backgroundSize: '16px 16px'
-              }}
-              aria-hidden='true'
-            />
-
             <div className='relative z-10 flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-3 mb-4'>
               <div>
                 <div className='flex items-center gap-2'>
-                  <span className='size-2 rounded-full bg-emerald-500 animate-ping' />
                   <h3 className='font-mono text-xs font-bold uppercase tracking-wider text-foreground'>
                     Comparative Trajectory Studio:{' '}
                     {expandedMetric === 'roas'
@@ -543,8 +498,7 @@ export function ExecutiveGraphBanner({
                       strokeDasharray='3 3'
                       stroke='currentColor'
                       className='opacity-15 dark:opacity-25'
-                      vertical={true}
-                      horizontal={true}
+                      vertical={false}
                     />
                     <XAxis
                       dataKey='date'
@@ -617,8 +571,7 @@ export function ExecutiveGraphBanner({
                       strokeDasharray='3 3'
                       stroke='currentColor'
                       className='opacity-15 dark:opacity-25'
-                      vertical={true}
-                      horizontal={true}
+                      vertical={false}
                     />
                     <XAxis
                       dataKey='date'
