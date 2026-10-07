@@ -324,54 +324,58 @@ export function NotchNavbar({
               </svg>
             </div>
 
-            {/* Content Layer (Screenshot 1 alignment) */}
+            {/* Content Layer (nexusdqps dead-centered) */}
             <div className="relative w-full h-full flex items-end justify-between pb-2.5 px-3 sm:px-6 md:px-8 gap-4 md:gap-7">
               {/* Desktop Left Nav: Overview (Active pill), Workflow, Features */}
-              <nav className="hidden md:flex gap-3 lg:gap-4 mb-0.5 shrink-0 items-center">
-                {leftItems.map((item) => renderNavLink(item))}
-              </nav>
+              <div className="flex-1 hidden md:flex items-center justify-start mb-0.5">
+                <nav className="flex gap-3 lg:gap-4 items-center shrink-0">
+                  {leftItems.map((item) => renderNavLink(item))}
+                </nav>
+              </div>
 
               {/* Mobile Menu Button (Left) */}
               <button
                 type="button"
-                className="md:hidden mb-1 p-1.5 text-foreground/80 hover:text-foreground hover:bg-muted/60 rounded-md transition-colors"
+                className="md:hidden mb-1 p-1.5 text-foreground/80 hover:text-foreground hover:bg-muted/60 rounded-md transition-colors z-20"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 aria-label="Toggle navigation menu"
               >
                 {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
 
-              {/* Logo (Center - Single Line Horizontal Lockup: [NX] nexusdqps) */}
-              <div className="flex justify-center shrink-0 mx-2 md:mx-4 mb-1">
+              {/* Logo (Exact Center - Single Line Horizontal Lockup: [NX] nexusdqps) */}
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-2.5 flex items-center justify-center shrink-0 z-20 pointer-events-auto">
                 {logo || defaultLogo}
               </div>
 
-              {/* Desktop Right Nav: Stack, >_ Console (Blue), | , Moon Toggle, GitHub */}
-              <nav className="hidden md:flex gap-4 lg:gap-5 items-center shrink-0 mb-0.5">
-                {rightItems.map((item) => renderNavLink(item))}
+              {/* Desktop Right Nav: Stack, | , Moon Toggle, GitHub */}
+              <div className="flex-1 hidden md:flex items-center justify-end mb-0.5">
+                <nav className="flex gap-4 lg:gap-5 items-center shrink-0">
+                  {rightItems.map((item) => renderNavLink(item))}
 
-                {/* Vertical Divider Line */}
-                <div className="h-4 w-px bg-border/70 mx-0.5 shrink-0" />
+                  {/* Vertical Divider Line */}
+                  <div className="h-4 w-px bg-border/70 mx-0.5 shrink-0" />
 
-                {/* Circular Theme Toggle */}
-                {showThemeToggle && <NotchThemeToggle />}
+                  {/* Circular Theme Toggle */}
+                  {showThemeToggle && <NotchThemeToggle />}
 
-                {/* Circular GitHub Repo Button */}
-                {githubHref && (
-                  <a
-                    href={githubHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="size-8 rounded-full border border-border/80 bg-background/80 hover:bg-muted flex items-center justify-center text-foreground/80 hover:text-foreground transition-colors cursor-pointer"
-                    title="GitHub Repository"
-                  >
-                    <GithubIcon className="size-4" />
-                  </a>
-                )}
-              </nav>
+                  {/* Circular GitHub Repo Button */}
+                  {githubHref && (
+                    <a
+                      href={githubHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="size-8 rounded-full border border-border/80 bg-background/80 hover:bg-muted flex items-center justify-center text-foreground/80 hover:text-foreground transition-colors cursor-pointer"
+                      title="GitHub Repository"
+                    >
+                      <GithubIcon className="size-4" />
+                    </a>
+                  )}
+                </nav>
+              </div>
 
               {/* Mobile Right Actions */}
-              <div className="md:hidden flex items-center gap-2 mb-1">
+              <div className="md:hidden flex items-center gap-2 mb-1 ml-auto z-20">
                 {showThemeToggle && <NotchThemeToggle />}
               </div>
             </div>
