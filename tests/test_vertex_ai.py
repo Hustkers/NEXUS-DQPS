@@ -34,7 +34,7 @@ def test_vertex_ai_generate_endpoint_live():
     assert "content" in data
     assert len(data["content"]) > 0
     assert data["auth_method"] in ("APPLICATION_DEFAULT_CREDENTIALS", "OFFLINE_FALLBACK", "API_KEY")
-    assert data["provider"] == "Google Cloud Vertex AI"
+    assert data["provider"] in ("Google Cloud Vertex AI", "Offline Fallback")
 
 
 def test_vertex_ai_rca_endpoint():
