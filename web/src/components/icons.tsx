@@ -166,6 +166,7 @@ export const Icons = {
   employee: IconUserX,
   userPen: IconUserEdit,
   teams: IconUsers,
+  users: IconUsers,
 
   // Brand
   github: IconBrandGithub,
@@ -197,6 +198,7 @@ export const Icons = {
 
   // Actions
   add: IconPlus,
+  plus: IconPlus,
   edit: IconEdit,
   upload: IconUpload,
   share: IconShare,

@@ -1,63 +1,129 @@
-import { buttonVariants } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { SignUp as ClerkSignUpForm } from '@clerk/nextjs';
-import { Metadata } from 'next';
-import Link from 'next/link';
-import { InteractiveGridPattern } from './interactive-grid';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Authentication',
-  description: 'Authentication forms built using the components.'
-};
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Icons } from '@/components/icons';
+import { toast } from 'sonner';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function SignUpViewPage() {
+  const router = useRouter();
+  const [orgName, setOrgName] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      toast.success(`Welcome to NEXUS, ${fullName || 'Leader'}!`, {
+        description: `Workspace "${orgName || 'Omnichannel Cluster'}" provisioned with default causal attribution engine.`
+      });
+      router.push('/dashboard/strategy-engine');
+    }, 600);
+  };
+
   return (
-    <div className='relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0'>
-      <Link
-        href='/examples/authentication'
-        className={cn(
-          buttonVariants({ variant: 'ghost' }),
-          'absolute top-4 right-4 hidden md:top-8 md:right-8'
-        )}
-      >
-        Sign Up
-      </Link>
-      <div className='relative hidden h-full flex-col p-10 lg:flex dark:border-r'>
-        <div className='absolute inset-0 bg-sidebar' />
-        <div className='text-sidebar-foreground relative z-20 flex items-center text-lg font-medium'>
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            viewBox='0 0 24 24'
-            fill='none'
-            stroke='currentColor'
-            strokeWidth='2'
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            className='mr-2 h-6 w-6'
-          >
-            <path d='M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3' />
-          </svg>
-          Logo
+    <div className='relative flex min-h-screen flex-col items-center justify-center p-4 bg-slate-50 dark:bg-[#07090e] font-mono text-xs'>
+      <div className='w-full max-w-md space-y-6'>
+        {/* Brand Header */}
+        <div className='text-center space-y-2'>
+          <div className='inline-flex items-center justify-center size-10 rounded-xl bg-foreground text-background font-bold text-lg mb-2 shadow-sm'>
+            N
+          </div>
+          <h1 className='text-xl font-bold font-sans text-foreground'>
+            Provision NEXUS Workspace
+          </h1>
+          <p className='text-xs text-muted-foreground'>
+            Deploy Autonomous Decision Pipelines for Your E-Commerce Brand
+          </p>
         </div>
-        <InteractiveGridPattern
-          className={cn(
-            'mask-[radial-gradient(400px_circle_at_center,white,transparent)]',
-            'inset-x-0 inset-y-[0%] h-full skew-y-12'
-          )}
-        />
-        <div className='text-sidebar-foreground relative z-20 mt-auto'>
-          <blockquote className='space-y-2'>
-            <p className='text-lg'>
-              &ldquo;This starter template has saved me countless hours of work and helped me
-              deliver projects to my clients faster than ever before.&rdquo;
-            </p>
-            <footer className='text-sidebar-foreground/70 text-sm'>Random Dude</footer>
-          </blockquote>
-        </div>
-      </div>
-      <div className='flex h-full items-center justify-center p-4 lg:p-8'>
-        <div className='flex w-full max-w-md flex-col items-center justify-center space-y-6'>
-          <ClerkSignUpForm />
+
+        {/* Signup Form Card */}
+        <div className='p-6 rounded-2xl border border-border/80 bg-card shadow-sm space-y-5'>
+          <form onSubmit={handleSubmit} className='space-y-4'>
+            <div className='space-y-1.5'>
+              <label className='text-muted-foreground text-[11px] block font-semibold'>
+                Brand / Organization Name
+              </label>
+              <input
+                type='text'
+                required
+                placeholder='Nike APAC / Acme D2C'
+                value={orgName}
+                onChange={(e) => setOrgName(e.target.value)}
+                className='w-full h-9 rounded-md border border-border bg-background px-3 text-xs font-mono text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:ring-1 focus:ring-primary'
+              />
+            </div>
+
+            <div className='space-y-1.5'>
+              <label className='text-muted-foreground text-[11px] block font-semibold'>
+                Full Name
+              </label>
+              <input
+                type='text'
+                required
+                placeholder='Pragyan P.'
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className='w-full h-9 rounded-md border border-border bg-background px-3 text-xs font-mono text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:ring-1 focus:ring-primary'
+              />
+            </div>
+
+            <div className='space-y-1.5'>
+              <label className='text-muted-foreground text-[11px] block font-semibold'>
+                Work Email Address
+              </label>
+              <input
+                type='email'
+                required
+                placeholder='pragyan@brand.com'
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className='w-full h-9 rounded-md border border-border bg-background px-3 text-xs font-mono text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:ring-1 focus:ring-primary'
+              />
+            </div>
+
+            <div className='space-y-1.5'>
+              <label className='text-muted-foreground text-[11px] block font-semibold'>
+                Create Password
+              </label>
+              <input
+                type='password'
+                required
+                placeholder='••••••••••••'
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className='w-full h-9 rounded-md border border-border bg-background px-3 text-xs font-mono text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:ring-1 focus:ring-primary'
+              />
+            </div>
+
+            <Button
+              type='submit'
+              disabled={loading}
+              className='w-full h-9 text-xs font-bold uppercase bg-foreground text-background hover:bg-foreground/90'
+            >
+              {loading ? (
+                <>
+                  <Icons.spinner className='mr-1.5 size-3.5 animate-spin' />
+                  Provisioning Cluster...
+                </>
+              ) : (
+                'Create Workspace &amp; Launch'
+              )}
+            </Button>
+          </form>
+
+          <div className='text-center pt-2 border-t border-border/60 text-muted-foreground text-[11px]'>
+            Already have an active cluster?{' '}
+            <Link href='/auth/sign-in' className='text-foreground font-semibold underline'>
+              Sign In
+            </Link>
+          </div>
         </div>
       </div>
     </div>
