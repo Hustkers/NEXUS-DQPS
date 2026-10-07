@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { Icons } from '@/components/icons';
 import { VGPUCanvas } from './vgpu-canvas';
 import { GlowButton } from './glow-button';
