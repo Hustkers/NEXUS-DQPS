@@ -145,9 +145,6 @@ def build_world(seed: int = 7, days: int = 90) -> dict:
     rows = []
     for platform in PLATFORMS:
         for sku in SKUS:
-            if rng.random() < 0.25:
-                continue  # realistic channel catalog distribution
-            
             p_info = NIKE_PRODUCTS.get(sku, {"name": sku, "price": 120.0})
             price = p_info["price"]
             
