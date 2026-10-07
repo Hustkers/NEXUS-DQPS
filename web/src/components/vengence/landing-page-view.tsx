@@ -9,6 +9,7 @@ import { CardSpotlight } from './card-spotlight';
 import { BentoGrid, BentoGridItem } from './bento-grid';
 import { StatsMatrix } from './stats-matrix';
 import { ShockSimulatorShowcase } from './shock-simulator-showcase';
+import { NotchNavbar } from './notch-navbar';
 
 const HERO_STATS = [
   {
@@ -44,8 +45,11 @@ const HERO_STATS = [
 export function LandingPageView() {
   return (
     <div className='relative min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-foreground'>
+      {/* LANDING PAGE TOP BAR (NotchNavbar without Console link) */}
+      <NotchNavbar />
+
       {/* HERO SECTION WITH VGPU CANVAS BACKGROUND */}
-      <section id='overview' className='relative pt-16 pb-20 md:pt-24 md:pb-28 overflow-hidden border-b border-border/60 scroll-mt-16'>
+      <section id='overview' className='relative pt-24 pb-20 md:pt-28 md:pb-28 overflow-hidden border-b border-border/60 scroll-mt-16'>
         {/* VGPU Canvas Dynamic Waveform */}
         <VGPUCanvas className='opacity-80' intensity={1.1} />
 

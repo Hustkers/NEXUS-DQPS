@@ -110,8 +110,7 @@ const DEFAULT_LEFT_ITEMS: NavItem[] = [
 ];
 
 const DEFAULT_RIGHT_ITEMS: NavItem[] = [
-  { label: 'Stack', href: '#stack', icon: Layers },
-  { label: 'Console', href: '/dashboard/overview', icon: TerminalPromptIcon, isSpecial: true }
+  { label: 'Stack', href: '#stack', icon: Layers }
 ];
 
 export function NotchNavbar({
@@ -506,15 +505,6 @@ export function NotchNavbar({
                     <ArrowRight className="w-3.5 h-3.5 opacity-50" />
                   </a>
                 )}
-
-                <Link
-                  href="/dashboard/overview"
-                  className="flex items-center justify-center gap-2 p-2.5 rounded-lg bg-blue-600 text-white font-sans text-sm font-semibold mt-1 shadow-xs hover:bg-blue-500 transition-colors"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <TerminalPromptIcon className="w-4 h-4" />
-                  <span>Launch Mission Control Console</span>
-                </Link>
               </div>
             </nav>
           </motion.div>
