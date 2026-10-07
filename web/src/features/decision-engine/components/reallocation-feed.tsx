@@ -5,24 +5,26 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Icons } from '@/components/icons';
 import { PlatformLogo } from '@/components/icons/platform-logos';
+import { approveDirective, USE_MOCKS } from '@/lib/api-adapter';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 export interface ReallocationItem {
   id: string;
-  actionType: string;
   sourceCampaign: string;
   targetCampaign: string;
+  sourceProductName?: string;
   targetProductName?: string;
   currentSpend: number;
   recommendedSpend: number;
   deltaSpend: number;
-  expectedDailyMargin: number;
+  actionType: string;
   predictedRoas: number;
+  expectedDailyMargin: number;
   confidence: number;
+  status: 'PENDING_APPROVAL' | 'EXECUTED_TO_AD_API' | 'HEURISTIC_OVERRIDE' | string;
   reason: string;
-  status: string;
-  stockoutKill: boolean;
+  stockoutKill?: boolean;
 }
 
 interface ReallocationFeedProps {
@@ -37,65 +39,60 @@ export function ReallocationFeed({
   className
 }: ReallocationFeedProps) {
   const [items, setItems] = useState<ReallocationItem[]>(initialItems);
-  const [autoPilot, setAutoPilot] = useState<boolean>(true);
+  const [autoPilot, setAutoPilot] = useState(false);
   const [executingId, setExecutingId] = useState<string | null>(null);
 
-  const handleExecute = (item: ReallocationItem) => {
+  const handleExecute = async (item: ReallocationItem) => {
     setExecutingId(item.id);
-    setTimeout(() => {
+    try {
+      if (!USE_MOCKS) {
+        await approveDirective(item.id, 'APPROVED_MANUAL');
+      }
       setItems((prev) =>
-        prev.map((it) =>
-          it.id === item.id ? { ...it, status: 'EXECUTED_TO_AD_API' } : it
-        )
+        prev.map((it) => (it.id === item.id ? { ...it, status: 'EXECUTED_TO_AD_API' } : it))
       );
-      setExecutingId(null);
-      toast.success(`Executed Reallocation on ${item.targetProductName || item.targetCampaign}`, {
-        description: `Shifted ₹${Math.abs(item.deltaSpend).toLocaleString()}/day. Expected Margin Lift: +₹${item.expectedDailyMargin.toLocaleString()}/day.`
-      });
       onExecuteReallocation?.(item);
-    }, 500);
+      toast.success(`Dispatched reallocation for ${item.targetCampaign}`, {
+        description: `Budget updated to ₹${item.recommendedSpend.toFixed(0)}/day.`
+      });
+    } catch {
+      toast.error('Reallocation dispatch failed');
+    } finally {
+      setExecutingId(null);
+    }
   };
 
   const handleExecuteAll = () => {
-    const pending = items.filter((it) => it.status !== 'EXECUTED_TO_AD_API');
-    if (pending.length === 0) {
-      toast.info('All Reallocations already executed');
-      return;
-    }
     setExecutingId('all');
     setTimeout(() => {
-      setItems((prev) =>
-        prev.map((it) => ({ ...it, status: 'EXECUTED_TO_AD_API' }))
-      );
+      setItems((prev) => prev.map((it) => ({ ...it, status: 'EXECUTED_TO_AD_API' })));
+      items.forEach((item) => onExecuteReallocation?.(item));
       setExecutingId(null);
-      toast.success(`Executed ${pending.length} Reallocations across channels`, {
-        description: 'Orders successfully dispatched to Meta, Google, and Amazon APIs.'
-      });
-      pending.forEach((it) => onExecuteReallocation?.(it));
+      toast.success('All pending budget reallocations executed synchronously');
     }, 900);
   };
 
   return (
-    <div className={cn('rounded border border-[#1A1A1A] bg-[#1A1A1A] p-5 shadow-none text-[#FFFFFF]', className)}>
+    <div className={cn('rounded border border-border bg-card p-5 shadow-none text-card-foreground', className)}>
       {/* Header */}
-      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-[#000000] pb-3 mb-4'>
+      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-border pb-3 mb-4'>
         <div className='flex items-center gap-2'>
-          <Icons.adjustments className='size-3.5 text-[#8A8A8A]' />
-          <h3 className='font-mono text-xs font-bold text-[#FFFFFF] uppercase tracking-wider'>
+          <Icons.adjustments className='size-3.5 text-muted-foreground' />
+          <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
             Autonomous Capital Reallocation Stream
           </h3>
-          <span className='text-xs font-mono text-[#8A8A8A]'>
+          <span className='text-xs font-mono text-muted-foreground'>
             ({items.filter((it) => it.status !== 'EXECUTED_TO_AD_API').length} pending)
           </span>
         </div>
 
         <div className='flex items-center gap-4'>
-          <div className='flex items-center gap-2 text-xs font-mono text-[#8A8A8A]'>
+          <div className='flex items-center gap-2 text-xs font-mono text-muted-foreground'>
             <span>Auto-Pilot</span>
             <Switch
               checked={autoPilot}
               onCheckedChange={setAutoPilot}
-              className='data-[state=checked]:bg-[#FFFFFF] data-[state=unchecked]:bg-[#000000] border border-[#1A1A1A]'
+              className='data-[state=checked]:bg-foreground data-[state=unchecked]:bg-muted border border-border'
             />
           </div>
 
@@ -103,11 +100,11 @@ export function ReallocationFeed({
             size='sm'
             onClick={handleExecuteAll}
             disabled={executingId !== null}
-            className='h-8 text-xs font-mono bg-[#FFFFFF] hover:bg-[#8A8A8A] text-[#000000] font-semibold border-none active:scale-[0.98]'
+            className='h-8 text-xs font-mono bg-foreground hover:bg-foreground/90 text-background font-semibold border-none active:scale-[0.98]'
           >
             {executingId === 'all' ? (
               <>
-                <Icons.spinner className='mr-1.5 size-3 animate-spin text-[#000000]' />
+                <Icons.spinner className='mr-1.5 size-3 animate-spin text-background' />
                 Executing...
               </>
             ) : (
@@ -129,10 +126,10 @@ export function ReallocationFeed({
               className={cn(
                 'flex flex-col md:flex-row md:items-center justify-between gap-3 rounded border p-3.5 transition-all',
                 isExecuted
-                  ? 'border-[#1A1A1A] bg-[#000000] opacity-50'
+                  ? 'border-border bg-muted/40 opacity-60'
                   : isKill
-                  ? 'border-2 border-[#FFFFFF] bg-[#000000]'
-                  : 'border border-[#1A1A1A] bg-[#000000] hover:border-[#8A8A8A]'
+                  ? 'border-2 border-rose-500/80 bg-rose-500/5 dark:bg-rose-950/20'
+                  : 'border border-border bg-background hover:border-foreground/40'
               )}
             >
               {/* Route & Flow */}
@@ -142,43 +139,43 @@ export function ReallocationFeed({
                     className={cn(
                       'text-[10px] font-mono font-bold px-1.5 py-0.5 rounded uppercase tracking-wider',
                       isKill
-                        ? 'bg-[#FFFFFF] text-[#000000]'
+                        ? 'bg-rose-500 text-white'
                         : item.deltaSpend > 0
-                        ? 'bg-[#1A1A1A] text-[#FFFFFF]'
-                        : 'bg-[#1A1A1A] text-[#8A8A8A]'
+                        ? 'bg-muted text-foreground'
+                        : 'bg-muted text-muted-foreground'
                     )}
                   >
                     {isKill ? '[CRITICAL] ' : ''}{item.actionType.replace('_', ' ')}
                   </span>
-                  <span className='text-[#8A8A8A] line-through text-[11px] flex items-center gap-1'>
+                  <span className='text-muted-foreground line-through text-[11px] flex items-center gap-1'>
                     <PlatformLogo platform={item.sourceCampaign} size={11} className='shrink-0 opacity-70' />
                     <span>{item.sourceCampaign}</span>
                   </span>
-                  <Icons.arrowRight className='size-3 text-[#8A8A8A] shrink-0' />
-                  <span className='font-bold text-[#FFFFFF] truncate flex items-center gap-1'>
+                  <Icons.arrowRight className='size-3 text-muted-foreground shrink-0' />
+                  <span className='font-bold text-foreground truncate flex items-center gap-1'>
                     <PlatformLogo platform={item.targetCampaign} size={12} className='shrink-0' />
                     <span>{item.targetProductName || item.targetCampaign}</span>
                   </span>
-                  <span className='text-[#8A8A8A] text-[11px] ml-auto md:ml-0'>
+                  <span className='text-muted-foreground text-[11px] ml-auto md:ml-0'>
                     {(item.confidence * 100).toFixed(0)}% conf
                   </span>
                 </div>
 
                 {/* Plain Numbers inline */}
-                <div className='flex items-center gap-3 text-xs font-mono text-[#8A8A8A] flex-wrap'>
+                <div className='flex items-center gap-3 text-xs font-mono text-muted-foreground flex-wrap'>
                   <span>
-                    Spend: <span className='text-[#FFFFFF] font-medium'>₹{item.currentSpend.toFixed(0)}</span> →{' '}
-                    <span className='font-bold text-[#FFFFFF]'>
+                    Spend: <span className='text-foreground font-medium'>₹{item.currentSpend.toFixed(0)}</span> →{' '}
+                    <span className='font-bold text-foreground'>
                       ₹{item.recommendedSpend.toFixed(0)}/d ({item.deltaSpend > 0 ? '+' : ''}₹{item.deltaSpend.toFixed(0)})
                     </span>
                   </span>
                   <span>•</span>
                   <span>
-                    Lift: <span className='text-[#FFFFFF] font-bold'>+₹{item.expectedDailyMargin.toFixed(0)}/d</span>
+                    Lift: <span className='text-foreground font-bold'>+₹{item.expectedDailyMargin.toFixed(0)}/d</span>
                   </span>
                   <span>•</span>
                   <span>
-                    ROAS: <span className='text-[#FFFFFF] font-bold'>{item.predictedRoas.toFixed(2)}x</span>
+                    ROAS: <span className='text-foreground font-bold'>{item.predictedRoas.toFixed(2)}x</span>
                   </span>
                 </div>
               </div>
@@ -186,8 +183,8 @@ export function ReallocationFeed({
               {/* Execution Action */}
               <div className='shrink-0 flex items-center gap-2'>
                 {isExecuted ? (
-                  <span className='text-[11px] font-mono text-[#8A8A8A] flex items-center gap-1 font-semibold'>
-                    <Icons.check className='size-3 text-[#FFFFFF]' />
+                  <span className='text-[11px] font-mono text-muted-foreground flex items-center gap-1 font-semibold'>
+                    <Icons.check className='size-3 text-foreground' />
                     Dispatched
                   </span>
                 ) : (
@@ -196,10 +193,10 @@ export function ReallocationFeed({
                     variant='outline'
                     disabled={executingId === item.id}
                     onClick={() => handleExecute(item)}
-                    className='h-7.5 text-xs font-mono border border-[#1A1A1A] bg-[#000000] hover:bg-[#1A1A1A] hover:border-[#FFFFFF] text-[#FFFFFF] font-semibold active:scale-[0.98]'
+                    className='h-7.5 text-xs font-mono border border-border bg-card hover:bg-muted text-foreground font-semibold active:scale-[0.98]'
                   >
                     {executingId === item.id ? (
-                      <Icons.spinner className='size-3 animate-spin text-[#FFFFFF]' />
+                      <Icons.spinner className='size-3 animate-spin text-foreground' />
                     ) : (
                       'Execute'
                     )}

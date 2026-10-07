@@ -6,81 +6,91 @@ import { Badge } from '@/components/ui/badge';
 import { IconGitBranch, IconAlertCircle } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 
-export interface DAGNode {
+interface DagNode {
   id: string;
   label: string;
-  category: 'media' | 'traffic' | 'commerce' | 'financial';
   metric: string;
-  status: 'healthy' | 'at_risk' | 'critical';
+  status: 'nominal' | 'critical' | 'warning';
   x: number;
   y: number;
 }
 
-export function CausalDagVisualizer({ activeAnomaly = true }: { activeAnomaly?: boolean }) {
+interface DagEdge {
+  from: string;
+  to: string;
+  critical?: boolean;
+}
+
+interface CausalDagVisualizerProps {
+  activeAnomaly?: boolean;
+}
+
+export function CausalDagVisualizer({ activeAnomaly = false }: CausalDagVisualizerProps) {
   const [selectedNode, setSelectedNode] = useState<string | null>('orders');
 
-  const nodes: DAGNode[] = [
-    { id: 'spend', label: 'Media Spend', category: 'media', metric: '$1,900 / day', status: 'healthy', x: 40, y: 80 },
-    { id: 'cpm', label: 'Platform CPM', category: 'media', metric: '$14.20', status: 'healthy', x: 40, y: 220 },
-    { id: 'impressions', label: 'Impressions', category: 'traffic', metric: '133.8k', status: 'healthy', x: 200, y: 150 },
-    { id: 'clicks', label: 'Ad Clicks', category: 'traffic', metric: '3,210', status: 'healthy', x: 360, y: 150 },
-    { id: 'inventory', label: 'Shopify Stock', category: 'commerce', metric: activeAnomaly ? '0 Units (Stockout)' : '500 Units', status: activeAnomaly ? 'critical' : 'healthy', x: 480, y: 50 },
-    { id: 'orders', label: 'Storefront Orders', category: 'commerce', metric: activeAnomaly ? '0 Orders' : '98 Orders', status: activeAnomaly ? 'critical' : 'healthy', x: 520, y: 180 },
-    { id: 'margin', label: 'Net Margin (NCM)', category: 'financial', metric: activeAnomaly ? '-$500 Loss' : '+$2,508 / day', status: activeAnomaly ? 'critical' : 'healthy', x: 680, y: 180 },
+  const nodes: DagNode[] = [
+    { id: 'spend', label: 'Meta Ad Spend', metric: '$4,200/d', status: 'nominal', x: 20, y: 110 },
+    { id: 'impressions', label: 'Impressions', metric: '312k', status: 'nominal', x: 190, y: 35 },
+    { id: 'clicks', label: 'Clicks (CTR 1.8%)', metric: '5,616', status: 'nominal', x: 190, y: 185 },
+    { id: 'inventory', label: 'Shopify Stock Gate', metric: activeAnomaly ? '0 units' : '420 units', status: activeAnomaly ? 'critical' : 'nominal', x: 380, y: 35 },
+    { id: 'cvr', label: 'Conversion Rate', metric: activeAnomaly ? '0.12% (down 94%)' : '2.8%', status: activeAnomaly ? 'critical' : 'nominal', x: 380, y: 185 },
+    { id: 'orders', label: 'Net Orders', metric: activeAnomaly ? '7 units' : '157 units', status: activeAnomaly ? 'critical' : 'nominal', x: 570, y: 110 },
+    { id: 'profit', label: 'Net Margin (POAS)', metric: activeAnomaly ? '-$3,008' : '+$5,140', status: activeAnomaly ? 'critical' : 'nominal', x: 750, y: 110 },
   ];
 
-  const edges = [
-    { from: 'spend', to: 'impressions', critical: false },
-    { from: 'cpm', to: 'impressions', critical: false },
-    { from: 'impressions', to: 'clicks', critical: false },
-    { from: 'clicks', to: 'orders', critical: false },
-    { from: 'inventory', to: 'orders', critical: activeAnomaly },
-    { from: 'orders', to: 'margin', critical: activeAnomaly },
-    { from: 'spend', to: 'margin', critical: activeAnomaly },
+  const edges: DagEdge[] = [
+    { from: 'spend', to: 'impressions' },
+    { from: 'spend', to: 'clicks' },
+    { from: 'impressions', to: 'clicks' },
+    { from: 'clicks', to: 'inventory', critical: activeAnomaly },
+    { from: 'clicks', to: 'cvr', critical: activeAnomaly },
+    { from: 'inventory', to: 'cvr', critical: activeAnomaly },
+    { from: 'cvr', to: 'orders', critical: activeAnomaly },
+    { from: 'orders', to: 'profit', critical: activeAnomaly },
   ];
 
   const nodeMap = new Map(nodes.map((n) => [n.id, n]));
 
   return (
-    <Card className="p-5 border border-[#1A1A1A] bg-[#1A1A1A] shadow-none rounded text-[#FFFFFF] relative overflow-hidden">
-      <div className="flex items-center justify-between mb-4 border-b border-[#000000] pb-3">
+    <Card className="p-5 border border-border bg-card shadow-none rounded text-card-foreground relative overflow-hidden">
+      <div className="flex items-center justify-between mb-4 border-b border-border pb-3">
         <div className="flex items-center gap-2.5">
-          <div className="h-8 w-8 rounded bg-[#000000] flex items-center justify-center border border-[#1A1A1A]">
-            <IconGitBranch className="h-4 w-4 text-[#FFFFFF]" />
+          <div className="h-8 w-8 rounded bg-muted/60 flex items-center justify-center border border-border">
+            <IconGitBranch className="h-4 w-4 text-foreground" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-[#FFFFFF] tracking-tight flex items-center gap-2 font-mono">
+            <h3 className="text-sm font-semibold text-foreground tracking-tight flex items-center gap-2 font-mono">
               Structural Causal DAG &amp; Counterfactual Attribution Path
               {activeAnomaly && (
-                <Badge variant="outline" className="bg-[#FFFFFF] text-[#000000] border-none font-bold text-[10px] font-mono">
+                <Badge variant="outline" className="bg-foreground text-background border-none font-bold text-[10px] font-mono">
                   [CRITICAL] Anomaly Path Active
                 </Badge>
               )}
             </h3>
-            <p className="text-xs text-[#8A8A8A] font-mono mt-0.5">
+            <p className="text-xs text-muted-foreground font-mono mt-0.5">
               DoWhy-GCM Counterfactual Attribution Flow: Spend → Clicks → Shopify Inventory Gate → Net Margin
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 text-xs font-mono text-[#8A8A8A]">
+        <div className="flex items-center gap-3 text-xs font-mono text-muted-foreground">
           <span className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-[#FFFFFF]" /> Healthy Flow
+            <span className="h-2 w-2 rounded-full bg-foreground" /> Healthy Flow
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full border border-[#8A8A8A] bg-[#000000]" /> Bottleneck Path
+            <span className="h-2 w-2 rounded-full border border-border bg-muted" /> Bottleneck Path
           </span>
         </div>
       </div>
 
-      <div className="w-full h-72 border border-[#1A1A1A] rounded bg-[#000000] relative overflow-hidden flex items-center justify-center">
+      <div className="w-full h-72 border border-border rounded bg-muted/30 relative overflow-hidden flex items-center justify-center">
         <svg className="w-full h-full absolute inset-0 pointer-events-none">
           <defs>
             <marker id="arrow" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#8A8A8A" />
+              <path d="M 0 0 L 10 5 L 0 10 z" className="fill-muted-foreground" />
             </marker>
             <marker id="arrow-crit" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#FFFFFF" />
+              <path d="M 0 0 L 10 5 L 0 10 z" className="fill-foreground" />
             </marker>
           </defs>
 
@@ -94,7 +104,7 @@ export function CausalDagVisualizer({ activeAnomaly = true }: { activeAnomaly?: 
                 y1={src.y + 20}
                 x2={dst.x + 50}
                 y2={dst.y + 20}
-                stroke={e.critical ? '#FFFFFF' : '#8A8A8A'}
+                className={e.critical ? 'stroke-foreground' : 'stroke-muted-foreground/50'}
                 strokeWidth={e.critical ? 2 : 1.5}
                 strokeDasharray={e.critical ? '4 4' : undefined}
                 markerEnd={e.critical ? 'url(#arrow-crit)' : 'url(#arrow)'}
@@ -114,20 +124,20 @@ export function CausalDagVisualizer({ activeAnomaly = true }: { activeAnomaly?: 
               className={cn(
                 'absolute w-36 px-3 py-2 rounded border text-left cursor-pointer transition-all duration-200 select-none font-mono',
                 isCritical
-                  ? 'bg-[#FFFFFF] text-[#000000] border-none font-bold'
-                  : 'bg-[#1A1A1A] border-[#8A8A8A] text-[#FFFFFF] hover:border-[#FFFFFF]',
-                isSelected && (isCritical ? 'outline outline-2 outline-[#FFFFFF] ring-2 ring-[#000000]' : 'outline outline-1 outline-[#FFFFFF]')
+                  ? 'bg-foreground text-background border-none font-bold shadow-md'
+                  : 'bg-card border-border text-foreground hover:border-foreground/50',
+                isSelected && (isCritical ? 'ring-2 ring-foreground ring-offset-2 ring-offset-background' : 'ring-1 ring-foreground')
               )}
             >
               <div className="flex items-center justify-between text-[11px] font-semibold">
-                <span className={isCritical ? 'text-[#000000]' : 'text-[#FFFFFF]'}>
+                <span className={isCritical ? 'text-background' : 'text-foreground'}>
                   {node.label}
                 </span>
-                <span className={cn('text-[10px]', isCritical ? 'text-[#000000]' : 'text-[#FFFFFF]')}>
+                <span className={cn('text-[10px]', isCritical ? 'text-background' : 'text-foreground')}>
                   {isCritical ? '■' : '●'}
                 </span>
               </div>
-              <div className={cn('text-[11px] font-mono mt-0.5 truncate', isCritical ? 'text-[#000000] font-bold' : 'text-[#8A8A8A]')}>
+              <div className={cn('text-[11px] font-mono mt-0.5 truncate', isCritical ? 'text-background font-bold' : 'text-muted-foreground')}>
                 {node.metric}
               </div>
             </div>
@@ -136,14 +146,14 @@ export function CausalDagVisualizer({ activeAnomaly = true }: { activeAnomaly?: 
       </div>
 
       {selectedNode === 'orders' && activeAnomaly && (
-        <div className="mt-3 p-3 rounded bg-[#000000] border border-[#1A1A1A] text-xs font-mono flex items-center justify-between">
+        <div className="mt-3 p-3 rounded bg-muted/40 border border-border text-xs font-mono flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <IconAlertCircle className="h-4 w-4 text-[#FFFFFF] shrink-0" />
-            <span className="text-[#FFFFFF]">
+            <IconAlertCircle className="h-4 w-4 text-foreground shrink-0" />
+            <span className="text-foreground">
               <strong>Counterfactual Structural Intervention:</strong> Orders node conditioned on physical stockout: Q = min(0, page_views &times; cvr) = 0. Ad spend continues burning with $0 conversions.
             </span>
           </div>
-          <Badge className="bg-[#FFFFFF] text-[#000000] border-none font-bold shrink-0 ml-3">66% Shapley Share</Badge>
+          <Badge className="bg-foreground text-background border-none font-bold shrink-0 ml-3">66% Shapley Share</Badge>
         </div>
       )}
     </Card>

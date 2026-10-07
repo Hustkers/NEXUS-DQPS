@@ -92,7 +92,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <ThemeProvider
             attribute='class'
             defaultTheme='dark'
-            enableSystem={false}
+            enableSystem
             disableTransitionOnChange
             enableColorScheme
           >
