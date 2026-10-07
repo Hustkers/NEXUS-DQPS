@@ -80,7 +80,7 @@ export function WhyUsBento({
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-primary text-xs font-mono tracking-wider uppercase">
             <span>●</span> ARCHITECTED FOR CAPITAL EFFICIENCY
           </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-orbitron font-extrabold tracking-tight text-foreground">
             Why High-Growth Brands Run on NEXUS
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground max-w-2xl">
@@ -102,7 +102,7 @@ export function WhyUsBento({
             </div>
 
             <div className="relative z-30 w-full sm:w-3/5 md:w-3/5">
-              <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-2 relative overflow-hidden flex flex-wrap">
+              <h3 className="text-xl sm:text-2xl font-orbitron font-bold text-foreground mb-2 relative overflow-hidden flex flex-wrap">
                 <span className="flex">
                   {"AI & Autonomous Control".split("").map((l, i) => (
                     <motion.span
@@ -140,7 +140,7 @@ export function WhyUsBento({
             </div>
             
             {/* Watermark Number */}
-            <div className="absolute -right-3 -bottom-8 text-[7rem] sm:text-[9rem] font-black text-muted/30 pointer-events-none group-hover:scale-105 transition-transform duration-700 leading-none select-none z-10">
+            <div className="absolute -right-3 -bottom-8 text-[7rem] sm:text-[9rem] font-orbitron font-black text-muted/30 pointer-events-none group-hover:scale-105 transition-transform duration-700 leading-none select-none z-10">
               01
             </div>
           </motion.div>
@@ -191,7 +191,7 @@ export function WhyUsBento({
             </div>
 
             <div className="relative z-10">
-              <h3 className="text-lg sm:text-xl font-bold text-white mb-1.5">
+              <h3 className="text-lg sm:text-xl font-orbitron font-bold text-white mb-1.5">
                 Telemetry to Execution
               </h3>
               <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed">
@@ -199,7 +199,7 @@ export function WhyUsBento({
               </p>
             </div>
             {/* Watermark Number */}
-            <div className="absolute -right-6 -bottom-12 text-[9rem] sm:text-[11rem] font-bold text-neutral-800/20 pointer-events-none group-hover:scale-105 transition-transform duration-700 leading-none select-none">
+            <div className="absolute -right-6 -bottom-12 text-[9rem] sm:text-[11rem] font-orbitron font-black text-neutral-800/20 pointer-events-none group-hover:scale-105 transition-transform duration-700 leading-none select-none">
               02
             </div>
           </div>
@@ -250,14 +250,14 @@ export function WhyUsBento({
             </div>
 
             <div className="relative z-10">
-              <h3 className="text-lg sm:text-xl font-bold text-foreground mb-1.5">
+              <h3 className="text-lg sm:text-xl font-orbitron font-bold text-foreground mb-1.5">
                 Built by Systems Engineers
               </h3>
               <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
                 Architected by full-stack systems & quant engineers: Jay Gopal Tripathy, Shivam Kumar, Abhisekh, Pragyan Jain, Anushree Tiwari, and Garv Gupta.
               </p>
             </div>
-            <div className="absolute -right-3 -bottom-8 text-[6rem] sm:text-[8rem] font-black text-muted/30 pointer-events-none group-hover:scale-105 transition-transform duration-700 leading-none select-none">
+            <div className="absolute -right-3 -bottom-8 text-[6rem] sm:text-[8rem] font-orbitron font-black text-muted/30 pointer-events-none group-hover:scale-105 transition-transform duration-700 leading-none select-none">
               03
             </div>
           </motion.div>
@@ -296,14 +296,14 @@ export function WhyUsBento({
             </div>
 
             <div className="relative z-10">
-              <h3 className="text-lg sm:text-xl font-bold text-foreground mb-1.5">
+              <h3 className="text-lg sm:text-xl font-orbitron font-bold text-foreground mb-1.5">
                 Zero Human Bottlenecks
               </h3>
               <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
                 Autonomous closed-loop lifecycle. Ingestion, causal DAG diagnosis, convex optimization, safety guardrails, and automated API execution.
               </p>
             </div>
-            <div className="absolute -right-3 -bottom-8 text-[6rem] sm:text-[8rem] font-black text-muted/30 pointer-events-none group-hover:scale-105 transition-transform duration-700 leading-none select-none">
+            <div className="absolute -right-3 -bottom-8 text-[6rem] sm:text-[8rem] font-orbitron font-black text-muted/30 pointer-events-none group-hover:scale-105 transition-transform duration-700 leading-none select-none">
               04
             </div>
           </motion.div>
@@ -320,7 +320,7 @@ export function WhyUsBento({
             </div>
 
             <div className="relative z-30 w-full sm:w-3/5 md:w-3/5">
-              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground mb-2">
+              <h3 className="text-lg sm:text-xl md:text-2xl font-orbitron font-bold text-foreground mb-2">
                 Deep Full-Stack Infrastructure
               </h3>
               <p className="text-muted-foreground text-xs sm:text-sm md:text-base leading-relaxed md:max-w-xl">
@@ -329,7 +329,7 @@ export function WhyUsBento({
             </div>
 
             {/* Watermark Number */}
-            <div className="absolute -right-6 -bottom-12 text-[8rem] sm:text-[11rem] font-black text-muted/30 pointer-events-none group-hover:scale-105 transition-transform duration-700 leading-none select-none z-10">
+            <div className="absolute -right-6 -bottom-12 text-[8rem] sm:text-[11rem] font-orbitron font-black text-muted/30 pointer-events-none group-hover:scale-105 transition-transform duration-700 leading-none select-none z-10">
               05
             </div>
           </motion.div>

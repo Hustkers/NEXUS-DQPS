@@ -388,10 +388,10 @@ export function AnimatedFooter({
         <div className="footer-top-nav">
           <div className="footer-brand">
             <Link href="/" className="footer-logo-row group cursor-pointer inline-flex items-center gap-2" title="Return to top">
-              <span className="logo-mark group-hover:scale-105 transition-transform" aria-hidden="true">
+              <span className="logo-mark font-orbitron font-black group-hover:scale-105 transition-transform" aria-hidden="true">
                 {brandLogo}
               </span>
-              <span className="footer-brand-title group-hover:text-foreground transition-colors">{brandTitle}</span>
+              <span className="footer-brand-title font-orbitron font-bold group-hover:text-foreground transition-colors">{brandTitle}</span>
             </Link>
             <p className="footer-tagline">{tagline}</p>
           </div>

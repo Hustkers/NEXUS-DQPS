@@ -140,7 +140,7 @@ export const CylinderCarousel = React.forwardRef<HTMLDivElement, CylinderCarouse
                   )}
 
                   {img.roas && (
-                    <span className="font-mono text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/20 backdrop-blur-md text-emerald-400 border border-emerald-500/40 tracking-tight">
+                    <span className="font-orbitron text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-500/20 backdrop-blur-md text-emerald-400 border border-emerald-500/40 tracking-tight">
                       {img.roas}
                     </span>
                   )}
@@ -150,12 +150,12 @@ export const CylinderCarousel = React.forwardRef<HTMLDivElement, CylinderCarouse
                 {hasMetadata && (
                   <div className="absolute bottom-2.5 inset-x-2.5 p-2 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 flex flex-col gap-0.5 pointer-events-none z-10">
                     {img.brand && (
-                      <span className="font-mono text-[9px] font-semibold tracking-wider uppercase text-blue-400">
+                      <span className="font-orbitron text-[9px] font-bold tracking-wider uppercase text-blue-400">
                         {img.brand}
                       </span>
                     )}
                     {img.title && (
-                      <span className="font-sans text-xs font-bold text-white truncate leading-tight">
+                      <span className="font-orbitron text-xs font-bold text-white truncate leading-tight">
                         {img.title}
                       </span>
                     )}
