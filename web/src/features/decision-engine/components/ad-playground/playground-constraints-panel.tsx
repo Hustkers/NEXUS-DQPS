@@ -97,7 +97,7 @@ export function PlaygroundConstraintsPanel({
               Total Budget
             </span>
             <span className='font-bold text-foreground text-sm'>
-              ${constraints.total_budget.toLocaleString()}
+              ${(constraints.total_budget ?? 5000).toLocaleString()}
             </span>
           </div>
           <input
@@ -105,7 +105,7 @@ export function PlaygroundConstraintsPanel({
             min={1000}
             max={25000}
             step={500}
-            value={constraints.total_budget}
+            value={constraints.total_budget ?? 5000}
             onChange={(e) =>
               onChangeConstraints({ ...constraints, total_budget: Number(e.target.value) })
             }
@@ -142,7 +142,7 @@ export function PlaygroundConstraintsPanel({
             ))}
           </div>
           <p className='text-[10px] text-muted-foreground'>
-            Daily alloc: ~${Math.round(constraints.total_budget / constraints.duration_days)}/day
+            Daily alloc: ~${Math.round((constraints.total_budget ?? 5000) / constraints.duration_days)}/day
           </p>
         </div>
 

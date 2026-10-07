@@ -1,18 +1,19 @@
 'use client';
 
-import React, { useState, useTransition } from 'react';
-import { Card } from '@/components/ui/card';
+import React, { useState, useTransition, useCallback } from 'react';
 import {
-  IconCoins,
-  IconCpu,
+  IconAdjustments,
+  IconPlayerPlay,
   IconSparkles,
-  IconTrendingUp
+  IconTrendingUp,
+  IconPackage,
+  IconShieldCheck
 } from '@tabler/icons-react';
-import { PlaygroundProductSelector } from './playground-product-selector';
-import { PlaygroundConstraintsPanel } from './playground-constraints-panel';
-import { PlaygroundRecommendationsList } from './playground-recommendations-list';
-import { PlaygroundComparisonChart } from './playground-comparison-chart';
-import { PlaygroundConfigModal } from './playground-config-modal';
+import { PlaygroundCompactProductSelector } from './playground-compact-product-selector';
+import { PlaygroundMinimalControls } from './playground-minimal-controls';
+import { PlaygroundInteractiveCurve } from './playground-interactive-curve';
+import { PlaygroundRecommendationView } from './playground-recommendation-view';
+import { PlaygroundModelDetails } from './playground-model-details';
 import {
   computePlaygroundRecommendations,
   getPlaygroundProducts
@@ -26,208 +27,166 @@ import type {
 import { toast } from 'sonner';
 
 export function AdPlaygroundConsole() {
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   const [products] = useState<PlaygroundProductSummary[]>(() => getPlaygroundProducts());
 
   const [selectedSku, setSelectedSku] = useState<string>(() => {
     const prods = getPlaygroundProducts();
-    return prods.find((p) => p.sku === 'AH8050-100')?.sku || prods[0]?.sku || '310805-137';
+    return prods.find((p) => p.sku === '315122-001')?.sku || prods[0]?.sku || '310805-137';
   });
 
   const [constraints, setConstraints] = useState<AdPlaygroundConstraints>(() => ({
-    sku: 'AH8050-100',
-    total_budget: 5000,
-    duration_days: 14,
+    sku: '315122-001',
+    daily_budget: 2000,
+    total_budget: 14000,
+    duration_days: 7,
     target_roas_floor: 1.8,
-    platforms: ['meta', 'google', 'amazon', 'tiktok'],
-    strategy_focus: 'MAX_PROFIT'
+    strategy_focus: 'MAX_PROFIT',
+    audience: 'broad',
+    creative: 'ugc_video',
+    placement: 'auto',
+    platforms: ['meta', 'google', 'amazon', 'tiktok']
   }));
 
-  const [result, setResult] = useState<AdPlaygroundResult | null>(() => {
+  const [result, setResult] = useState<AdPlaygroundResult>(() => {
     return computePlaygroundRecommendations({
-      sku: 'AH8050-100',
-      total_budget: 5000,
-      duration_days: 14,
+      sku: '315122-001',
+      daily_budget: 2000,
+      total_budget: 14000,
+      duration_days: 7,
       target_roas_floor: 1.8,
-      platforms: ['meta', 'google', 'amazon', 'tiktok'],
-      strategy_focus: 'MAX_PROFIT'
+      strategy_focus: 'MAX_PROFIT',
+      audience: 'broad',
+      creative: 'ugc_video',
+      placement: 'auto',
+      platforms: ['meta', 'google', 'amazon', 'tiktok']
     });
   });
 
-  const [modalConfig, setModalConfig] = useState<CandidateAdConfig | null>(null);
-  const [activeTab, setActiveTab] = useState<'recommendations' | 'comparison'>('recommendations');
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [calculationStage, setCalculationStage] = useState<string>('');
 
-  const handleSelectSku = (sku: string) => {
-    setSelectedSku(sku);
-    const updated = { ...constraints, sku };
+  const selectedProduct = products.find((p) => p.sku === selectedSku) || products[0];
+
+  // Dynamic live recalculation when user moves budget slider or modifies dimensions
+  const handleConstraintsChange = useCallback((updated: AdPlaygroundConstraints) => {
     setConstraints(updated);
+    // Instant mathematical update (zero delay, pure deterministic calculation)
+    const newResult = computePlaygroundRecommendations(updated);
+    setResult(newResult);
+  }, []);
 
-    startTransition(() => {
-      const res = computePlaygroundRecommendations(updated);
-      setResult(res);
-      toast.info(`Simulated 10 campaign configurations for SKU ${sku}`);
-    });
-  };
+  const handleSelectSku = useCallback((newSku: string) => {
+    setSelectedSku(newSku);
+    const updated = { ...constraints, sku: newSku };
+    setConstraints(updated);
+    const newResult = computePlaygroundRecommendations(updated);
+    setResult(newResult);
+    toast.info(`Loaded catalog model for SKU ${newSku}`);
+  }, [constraints]);
 
-  const handleRunAnalysis = async () => {
-    startTransition(async () => {
-      try {
-        const res = await fetch('/api/ad-playground', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(constraints)
-        });
+  // Deterministic 5-stage calculation sequence when user explicitly presses [ RUN EXPERIMENT ]
+  const handleRunExperiment = useCallback(() => {
+    setIsCalculating(true);
+    setCalculationStage('CALCULATING...');
 
-        if (res.ok) {
-          const data = await res.json();
-          setResult(data);
-          toast.success('Simulation complete: 10 candidate configurations ranked by net profit!');
-          return;
-        }
-      } catch {
-        // Fallback
-      }
+    // Progressively reveal calculation stages
+    setTimeout(() => {
+      setCalculationStage('EVALUATING RESPONSE CURVE...');
+      setTimeout(() => {
+        setCalculationStage('CHECKING INVENTORY...');
+        setTimeout(() => {
+          setCalculationStage('OPTIMIZING...');
+          setTimeout(() => {
+            const finalResult = computePlaygroundRecommendations(constraints);
+            setResult(finalResult);
+            setIsCalculating(false);
+            setCalculationStage('');
+            toast.success('Simulation complete: Hill response curve & 10 candidates evaluated!');
+          }, 120);
+        }, 120);
+      }, 120);
+    }, 120);
+  }, [constraints]);
 
-      const fallback = computePlaygroundRecommendations(constraints);
-      setResult(fallback);
-      toast.success('Simulation complete: 10 candidate configurations evaluated!');
-    });
-  };
-
-  const topCandidate = result?.candidates[0];
+  const isInventoryConstrained = result.candidates[0]?.stockout_risk;
 
   return (
-    <div className='flex flex-col gap-6'>
-      {/* Top Hero KPI Bar */}
-      {result && topCandidate && (
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3'>
-          <Card className='p-4 border-emerald-500/30 bg-gradient-to-br from-emerald-950/20 via-card to-card'>
-            <div className='flex items-center justify-between text-muted-foreground text-xs font-mono'>
-              <span>Best Expected Profit</span>
-              <IconSparkles className='size-4 text-emerald-400' />
-            </div>
-            <div className='text-2xl font-bold font-mono text-emerald-400 mt-1'>
-              ${topCandidate.predicted_net_profit.toLocaleString()}
-            </div>
-            <p className='text-[10px] font-mono text-muted-foreground mt-0.5'>
-              Rank #1 ({topCandidate.platform.toUpperCase()}) over {result.duration_days} days
-            </p>
-          </Card>
-
-          <Card className='p-4 border-cyan-500/30 bg-gradient-to-br from-cyan-950/20 via-card to-card'>
-            <div className='flex items-center justify-between text-muted-foreground text-xs font-mono'>
-              <span>Predicted ROAS</span>
-              <IconTrendingUp className='size-4 text-cyan-400' />
-            </div>
-            <div className='text-2xl font-bold font-mono text-cyan-400 mt-1'>
-              {topCandidate.predicted_roas.toFixed(2)}x
-            </div>
-            <p className='text-[10px] font-mono text-muted-foreground mt-0.5'>
-              Target floor: {constraints.target_roas_floor.toFixed(1)}x
-            </p>
-          </Card>
-
-          <Card className='p-4 border-purple-500/30 bg-gradient-to-br from-purple-950/20 via-card to-card'>
-            <div className='flex items-center justify-between text-muted-foreground text-xs font-mono'>
-              <span>Gross Margin %</span>
-              <IconCoins className='size-4 text-purple-400' />
-            </div>
-            <div className='text-2xl font-bold font-mono text-purple-300 mt-1'>
-              {result.gross_margin_pct.toFixed(1)}%
-            </div>
-            <p className='text-[10px] font-mono text-muted-foreground mt-0.5'>
-              Unit COGS: ${(result.price * (1 - result.gross_margin_pct / 100)).toFixed(2)}
-            </p>
-          </Card>
-
-          <Card className='p-4 border-amber-500/30 bg-gradient-to-br from-amber-950/20 via-card to-card'>
-            <div className='flex items-center justify-between text-muted-foreground text-xs font-mono'>
-              <span>Warehouse Inventory</span>
-              <IconCpu className='size-4 text-amber-400' />
-            </div>
-            <div className='text-2xl font-bold font-mono text-amber-400 mt-1'>
-              {result.inventory.toLocaleString()} pairs
-            </div>
-            <p className='text-[10px] font-mono text-muted-foreground mt-0.5'>
-              {result.inventory > 0 ? 'Fulfillment buffer safe' : 'Critical stockout alert'}
-            </p>
-          </Card>
-        </div>
-      )}
-
-      {/* Product Selector */}
-      <PlaygroundProductSelector
-        products={products}
-        selectedSku={selectedSku}
-        onSelectSku={handleSelectSku}
-      />
-
-      {/* Constraints & Simulation Guardrails */}
-      <PlaygroundConstraintsPanel
-        constraints={constraints}
-        onChangeConstraints={setConstraints}
-        onRunAnalysis={handleRunAnalysis}
-        isLoading={isPending}
-      />
-
-      {/* View Switcher Tabs */}
-      <div className='flex items-center justify-between border-b border-border/80 pb-3'>
-        <div className='flex items-center gap-2'>
-          <button
-            onClick={() => setActiveTab('recommendations')}
-            className={`px-3 py-1.5 rounded-md font-mono text-xs font-semibold transition-all ${
-              activeTab === 'recommendations'
-                ? 'bg-cyan-500 text-slate-950 shadow-xs'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            10 Candidate Recommendations
-          </button>
-          <button
-            onClick={() => setActiveTab('comparison')}
-            className={`px-3 py-1.5 rounded-md font-mono text-xs font-semibold transition-all ${
-              activeTab === 'comparison'
-                ? 'bg-cyan-500 text-slate-950 shadow-xs'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            Profit vs Spend Comparison
-          </button>
+    <div className='flex flex-col gap-6 font-mono text-foreground'>
+      {/* 1. COMPACT HERO SECTION */}
+      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/80 pb-4'>
+        <div>
+          <div className='flex items-center gap-2.5'>
+            <span className='size-2 rounded-full bg-cyan-400 animate-pulse' />
+            <h1 className='text-xl sm:text-2xl font-bold uppercase tracking-tight text-foreground'>
+              AD PLAYGROUND
+            </h1>
+            <span className='text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded border border-cyan-500/30 bg-cyan-950/30 text-cyan-400'>
+              ● LIVE OPTIMIZER
+            </span>
+          </div>
+          <p className='text-xs text-muted-foreground mt-1'>
+            Design a campaign. See what happens.
+          </p>
         </div>
 
-        {result && (
-          <span className='text-[11px] font-mono text-muted-foreground'>
-            Target SKU: <strong className='text-cyan-400'>{result.sku}</strong> ({result.product_name})
-          </span>
-        )}
+        {/* Primary CTA in header */}
+        <div className='flex items-center gap-3'>
+          <button
+            type='button'
+            onClick={handleRunExperiment}
+            disabled={isCalculating}
+            className='px-5 py-2.5 rounded-xl bg-foreground text-background font-bold text-xs uppercase tracking-wider hover:bg-foreground/90 transition-all flex items-center gap-2 shadow-sm shrink-0 disabled:opacity-50'
+          >
+            <IconPlayerPlay className='size-3.5' />
+            <span>{isCalculating ? 'RUNNING EXPERIMENT...' : 'RUN EXPERIMENT'}</span>
+          </button>
+        </div>
       </div>
 
-      {/* Main Results View */}
-      {result && (
-        <>
-          {activeTab === 'recommendations' ? (
-            <PlaygroundRecommendationsList
-              candidates={result.candidates}
-              onInspectConfig={(cfg) => setModalConfig(cfg)}
-            />
-          ) : (
-            <PlaygroundComparisonChart candidates={result.candidates} />
-          )}
-        </>
-      )}
+      {/* 2. MAIN 2-COLUMN EXPERIMENT WORKBENCH */}
+      <div className='grid grid-cols-1 lg:grid-cols-12 gap-6 items-start'>
+        {/* LEFT COLUMN: Product & Campaign Configuration (lg:col-span-5) */}
+        <div className='lg:col-span-5 space-y-5'>
+          {/* Product Selection */}
+          <PlaygroundCompactProductSelector
+            products={products}
+            selectedProduct={selectedProduct}
+            onSelectSku={handleSelectSku}
+            isInventoryConstrained={isInventoryConstrained}
+          />
 
-      {/* Mathematical Drilldown Modal */}
-      {result && (
-        <PlaygroundConfigModal
-          config={modalConfig}
-          isOpen={modalConfig !== null}
-          onClose={() => setModalConfig(null)}
-          productPrice={result.price}
-          grossMarginPct={result.gross_margin_pct}
-          inventoryUnits={result.inventory}
-        />
-      )}
+          {/* Campaign Controls */}
+          <PlaygroundMinimalControls
+            constraints={constraints}
+            onChangeConstraints={handleConstraintsChange}
+            onRunExperiment={handleRunExperiment}
+            isCalculating={isCalculating}
+          />
+        </div>
+
+        {/* RIGHT COLUMN: Response Curve Centerpiece & Candidates (lg:col-span-7) */}
+        <div className='lg:col-span-7 space-y-5'>
+          {/* Response Curve & 3 Key Metrics */}
+          <PlaygroundInteractiveCurve
+            result={result}
+            onRunExperiment={handleRunExperiment}
+            isCalculating={isCalculating}
+            calculationStage={calculationStage}
+          />
+
+          {/* Recommended Campaign & Top Alternatives */}
+          <PlaygroundRecommendationView
+            result={result}
+          />
+
+          {/* Technical Model Details & Lineage (Accordion) */}
+          <PlaygroundModelDetails
+            result={result}
+          />
+        </div>
+      </div>
     </div>
   );
 }
