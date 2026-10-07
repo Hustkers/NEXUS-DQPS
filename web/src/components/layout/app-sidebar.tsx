@@ -44,7 +44,7 @@ export default function AppSidebar() {
   };
   const organization = { name: 'Nike Direct D2C' };
   const router = useRouter();
-  const signOut = () => router.push('/auth/sign-in');
+  const signOut = (_opts?: any) => router.push('/auth/sign-in');
   const filteredGroups = useFilteredNavGroups(navGroups);
 
   return (

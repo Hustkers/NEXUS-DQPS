@@ -59,6 +59,14 @@ export const navGroups: NavGroup[] = [
         isActive: false,
         shortcut: ['d', 'l'],
         items: []
+      },
+      {
+        title: 'Visitor Tracking & Attribution',
+        url: '/dashboard/tracking',
+        icon: 'search',
+        isActive: false,
+        shortcut: ['v', 't'],
+        items: []
       }
     ]
   },
