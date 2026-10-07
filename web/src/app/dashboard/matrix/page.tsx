@@ -447,7 +447,7 @@ export default function SkuChannelMatrixPage() {
   };
 
   return (
-    <div className='relative flex flex-1 flex-col w-full min-w-0 max-w-full overflow-hidden min-h-screen bg-[#FBFBFA] dark:bg-[#0C0D0E] text-[#111111] dark:text-[#EEEEEE] font-sans p-4 sm:p-6 md:p-8 space-y-6'>
+    <div className='relative flex flex-1 flex-col w-full min-w-0 max-w-full overflow-x-hidden min-h-screen bg-[#FBFBFA] dark:bg-[#0C0D0E] text-[#111111] dark:text-[#EEEEEE] font-sans p-4 sm:p-6 md:p-8 space-y-6'>
 
       {/* 1. FAUX-OS WINDOW CHROME & METADATA BAR (Technical Document Header) */}
       <div className='w-full border border-[#EAEAEA] dark:border-[#262626] bg-[#FFFFFF] dark:bg-[#141517] rounded-[8px] p-4 flex flex-col md:flex-row md:items-center justify-between gap-4'>
