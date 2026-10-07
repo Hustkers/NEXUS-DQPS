@@ -150,6 +150,10 @@ export const Icons = {
 
   // Brand
   github: IconBrandGithub,
+  brandGithub: IconBrandGithub,
+  checkCircle: IconCircleCheck,
+  clipboardText: IconClipboardText,
+  shield: IconShieldCheck,
   twitter: IconBrandTwitter,
   logo: IconCommand,
 
