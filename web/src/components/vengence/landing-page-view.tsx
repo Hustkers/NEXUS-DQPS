@@ -286,7 +286,7 @@ export function LandingPageView() {
       </section>
 
       {/* 5. 4-PHASE ARCHITECTURAL FLOW (STACK & PIPELINE) */}
-      <section id='stack' className='pt-20 pb-28 md:pt-28 md:pb-36 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-16 relative'>
+      <section id='stack' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-16 relative'>
         <span id='pipeline' className='absolute -top-20' />
         <div className='text-center max-w-3xl mx-auto mb-16'>
           <div className='font-mono text-xs font-bold text-primary uppercase tracking-widest mb-2'>
@@ -352,6 +352,14 @@ export function LandingPageView() {
           ))}
         </div>
       </section>
+
+      {/* CINEMATIC ASCII ANIMATED FOOTER (NEXUS ONLY) */}
+      <AnimatedFooter
+        headingLines={['NEXUS']}
+        leftImage='/animated-footer/hand-left.jpg'
+        rightImage='/animated-footer/hand-right.jpg'
+        className='h-[420px] sm:h-[520px] md:h-[620px] border-t border-border/80'
+      />
     </div>
   );
 }
