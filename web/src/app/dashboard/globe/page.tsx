@@ -33,7 +33,7 @@ export default function GlobeIntelligencePage() {
   }, [selectedProduct]);
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#07090e] text-zinc-100 min-h-screen min-w-0 max-w-full overflow-hidden'>
+    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#07090e] text-zinc-100 min-h-screen min-w-0 max-w-full'>
       {/* Page Header */}
       <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-4'>
         <div>

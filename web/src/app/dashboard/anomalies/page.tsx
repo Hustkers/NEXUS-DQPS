@@ -154,7 +154,7 @@ export default function AnomaliesPage() {
   };
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#000000] text-white min-h-screen min-w-0 max-w-full overflow-hidden'>
+    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#000000] text-white min-h-screen min-w-0 max-w-full'>
       <div className='flex flex-wrap items-center justify-between gap-4 border-b border-[#1A1A1A] pb-4'>
         <div>
           <div className='flex items-center gap-2'>

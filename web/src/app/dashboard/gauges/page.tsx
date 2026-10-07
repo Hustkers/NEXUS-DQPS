@@ -3,16 +3,11 @@
 import React, { useState, useMemo } from 'react';
 import { Icons } from '@/components/icons';
 import { RoasGauge } from '@/features/decision-engine/components/roas-gauge';
-import { FixProtocolModal } from '@/features/decision-engine/components/fix-protocol-modal';
+import { ActionDrawer } from '@/features/decision-engine/components/action-drawer';
 import { GaugesDecisionLedgerTable } from '@/features/decision-engine/components/gauges-decision-ledger-table';
 import { ProductAnalysisModal, type ProductAnalysisTarget } from '@/features/decision-engine/components/product-analysis-modal';
 import { useDecisionEngine } from '@/context/decision-engine-store';
-import {
-  computeFixPlan,
-  formatINR,
-  type DerivedProduct,
-  type FixPlanSummary,
-} from '@/lib/gauges-engine';
+import { formatINR, type DerivedProduct } from '@/lib/gauges-engine';
 import { cn } from '@/lib/utils';
 
 type FilterChip = 'all' | 'needs_fix' | 'fixed';
@@ -22,7 +17,6 @@ export default function GaugesPage() {
     products,
     ledger,
     topKpis,
-    executeFix,
     resetToDefaults,
   } = useDecisionEngine();
 
@@ -30,11 +24,10 @@ export default function GaugesPage() {
   const [filterChip, setFilterChip] = useState<FilterChip>('all');
   const [activeChannel, setActiveChannel] = useState<string>('all');
 
-  // Modal interactions
-  const [activeModalProduct, setActiveModalProduct] = useState<DerivedProduct | null>(null);
-  const [activeModalPlan, setActiveModalPlan] = useState<FixPlanSummary | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isSummaryOnly, setIsSummaryOnly] = useState(false);
+  // Action Drawer interactions (single unified Action Drawer)
+  const [activeActionId, setActiveActionId] = useState<string | null>(null);
+  const [drawerInitialState, setDrawerInitialState] = useState<'review' | 'done'>('review');
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   // Analysing Modal (3D Globe inspection)
   const [analyzingProduct, setAnalyzingProduct] = useState<ProductAnalysisTarget | null>(null);
@@ -57,28 +50,18 @@ export default function GaugesPage() {
     });
   }, [products, filterChip, activeChannel]);
 
-  // Handle opening FIX modal
-  const handleOpenFixModal = (product: DerivedProduct) => {
-    const plan = computeFixPlan(product, products);
-    setActiveModalProduct(product);
-    setActiveModalPlan(plan);
-    setIsSummaryOnly(false);
-    setIsModalOpen(true);
+  // Handle opening FIX in Action Drawer
+  const handleOpenFix = (product: DerivedProduct) => {
+    setActiveActionId(`fix-${product.id}`);
+    setDrawerInitialState('review');
+    setIsDrawerOpen(true);
   };
 
-  // Handle opening VIEW FIX summary modal
-  const handleOpenViewFixModal = (product: DerivedProduct) => {
-    const plan = product.appliedPlan || computeFixPlan(product, products);
-    setActiveModalProduct(product);
-    setActiveModalPlan(plan);
-    setIsSummaryOnly(true);
-    setIsModalOpen(true);
-  };
-
-  // Handle execution of fix
-  const handleExecuteFix = (plan: FixPlanSummary) => {
-    if (!activeModalProduct) return;
-    executeFix(activeModalProduct.id, plan);
+  // Handle opening VIEW FIX summary in Action Drawer (State 3)
+  const handleOpenViewFix = (product: DerivedProduct) => {
+    setActiveActionId(`fix-${product.id}`);
+    setDrawerInitialState('done');
+    setIsDrawerOpen(true);
   };
 
   // Reset to default test state
@@ -89,7 +72,7 @@ export default function GaugesPage() {
   };
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#000000] text-white min-h-screen font-mono min-w-0 max-w-full overflow-hidden'>
+    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#000000] text-white min-h-screen font-mono min-w-0 max-w-full'>
       {/* Header Bar */}
       <div className='flex flex-wrap items-center justify-between gap-4 border-b border-[#1A1A1A] pb-4'>
         <div>
@@ -284,8 +267,8 @@ export default function GaugesPage() {
               paused={p.paused}
               restockUnitsOrdered={p.restockUnitsOrdered}
               photoUrl={p.photoUrl}
-              onFix={() => handleOpenFixModal(p)}
-              onViewFix={() => handleOpenViewFixModal(p)}
+              onFix={() => handleOpenFix(p)}
+              onViewFix={() => handleOpenViewFix(p)}
               onAnalyze={() => {
                 setAnalyzingProduct({
                   productName: p.name,
@@ -313,14 +296,12 @@ export default function GaugesPage() {
         <GaugesDecisionLedgerTable entries={ledger} />
       </div>
 
-      {/* 3-STEP FIX PROTOCOL MODAL */}
-      <FixProtocolModal
-        product={activeModalProduct}
-        plan={activeModalPlan}
-        isOpen={isModalOpen}
-        isSummaryOnly={isSummaryOnly}
-        onClose={() => setIsModalOpen(false)}
-        onExecute={handleExecuteFix}
+      {/* ACTION DRAWER (Used by FIX and View Fix) */}
+      <ActionDrawer
+        actionId={activeActionId}
+        isOpen={isDrawerOpen}
+        initialState={drawerInitialState}
+        onClose={() => setIsDrawerOpen(false)}
       />
 
       {/* 3D Telemetry Inspection Modal */}
