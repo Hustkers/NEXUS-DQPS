@@ -171,7 +171,7 @@ export function SimulationImpactChart({
         unit: '₹'
       },
       {
-        metric: `Revenue`,
+        metric: `${horizonLabel} revenue`,
         Baseline: Math.round(baseline.revenue * multiplier),
         Shocked: Math.round(shocked.revenue * multiplier),
         Mitigated: Math.round(mitigated.revenue * multiplier),

@@ -1013,7 +1013,7 @@ export function RLVisualAnalytics({
               </div>
               <div className='flex items-center gap-2 px-2.5 py-1 rounded-md bg-zinc-900/70 border border-zinc-800/80 text-zinc-300'>
                 <span className='size-2.5 rounded-sm bg-emerald-500 shrink-0' />
-                <span>Expected margin index ($)</span>
+                <span>Expected margin index (pts)</span>
               </div>
             </div>
           </div>
