@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   CampaignConfig,
   CampaignStrategy,
@@ -11,9 +11,16 @@ import {
   LiveCampaignMonitoring,
   CompletedCampaignResult
 } from '@/lib/strategy-engine/types';
+import { StrategyCampaignContext } from './strategy-campaign-context';
+import { StrategyHeroRecommendation } from './strategy-hero-recommendation';
+import { StrategyWhatIf } from './strategy-what-if';
+import { StrategyComparisonCards } from './strategy-comparison-cards';
+import { StrategyRiskGauge } from './strategy-risk-gauge';
+import { StrategyReadyToExecute } from './strategy-ready-to-execute';
+import { StrategyEvidenceModal } from './strategy-evidence-modal';
+
 import { CampaignConfigForm } from './campaign-config-form';
 import { StrategyGenerationProgress } from './strategy-generation-progress';
-import { TopRecommendationsView } from './top-recommendations-view';
 import { AllStrategiesTable } from './all-strategies-table';
 import { StrategyDetailModal } from './strategy-detail-modal';
 import { StrategyComparisonModal } from './strategy-comparison-modal';
@@ -23,27 +30,22 @@ import { MarketSignalsRiskView } from './market-signals-risk-view';
 import { LiveMonitoringView } from './live-monitoring-view';
 import { LearningLedgerView } from './learning-ledger-view';
 import { CampaignLaunchModal } from './campaign-launch-modal';
+
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import {
   IconCpu,
-  IconSparkles,
-  IconTrendingUp,
-  IconLayersLinked,
-  IconShieldCheck,
-  IconPlus,
   IconRefresh,
   IconAlertTriangle,
-  IconChevronDown,
-  IconChevronUp,
-  IconCrown,
+  IconLayersLinked,
   IconHistory,
-  IconScale,
   IconCalculator,
+  IconShieldCheck,
   IconActivity,
-  IconBrain
+  IconBrain,
+  IconX
 } from '@tabler/icons-react';
+import { cn } from '@/lib/utils';
 
 export function StrategyEngineConsole() {
   const [campaign, setCampaign] = useState<CampaignConfig | null>(null);
@@ -60,17 +62,28 @@ export function StrategyEngineConsole() {
   const [generationStage, setGenerationStage] = useState<'idle' | 'generating' | 'evaluating' | 'complete'>('idle');
   const [error, setError] = useState<string | null>(null);
 
+  // Active selected strategy in console
+  const [selectedStrategyId, setSelectedStrategyId] = useState<string>('');
+
+  // What-If simulated budget
+  const [simulatedBudget, setSimulatedBudget] = useState<number>(50000);
+
+  // Modals & Secondary Panels
   const [showConfigForm, setShowConfigForm] = useState<boolean>(false);
+  const [isEvidenceModalOpen, setIsEvidenceModalOpen] = useState<boolean>(false);
+  const [isCompareModalOpen, setIsCompareModalOpen] = useState<boolean>(false);
+  const [isAllStrategiesOpen, setIsAllStrategiesOpen] = useState<boolean>(false);
+  const [isRiskModalOpen, setIsRiskModalOpen] = useState<boolean>(false);
+  const [isHistoricalModalOpen, setIsHistoricalModalOpen] = useState<boolean>(false);
+  const [isWatchdogModalOpen, setIsWatchdogModalOpen] = useState<boolean>(false);
+  const [isLearningModalOpen, setIsLearningModalOpen] = useState<boolean>(false);
+
   const [inspectedStrategy, setInspectedStrategy] = useState<CampaignStrategy | null>(null);
   const [selectedCompareIds, setSelectedCompareIds] = useState<string[]>([]);
-  const [isCompareModalOpen, setIsCompareModalOpen] = useState<boolean>(false);
 
   // Campaign launch authorization modal
   const [isLaunchModalOpen, setIsLaunchModalOpen] = useState<boolean>(false);
   const [strategyToLaunch, setStrategyToLaunch] = useState<CampaignStrategy | null>(null);
-
-  // Active navigation tab
-  const [activeTab, setActiveTab] = useState<string>('recommendations');
 
   // Load default seeded campaign on mount
   useEffect(() => {
@@ -93,6 +106,10 @@ export function StrategyEngineConsole() {
         setMarketSignals(data.marketSignals || []);
         setLiveMonitoring(data.liveMonitoring);
         setCompletedHistory(data.completedHistory || []);
+
+        const initialBestId = data.top3Recommendations[0]?.strategyId || data.allStrategies[0]?.strategyId || '';
+        setSelectedStrategyId(initialBestId);
+        setSimulatedBudget(data.campaign?.totalBudget || 50000);
       } else {
         const listRes = await fetch('/api/campaign-strategy');
         if (listRes.ok) {
@@ -111,6 +128,10 @@ export function StrategyEngineConsole() {
               setMarketSignals(singleData.marketSignals || []);
               setLiveMonitoring(singleData.liveMonitoring);
               setCompletedHistory(singleData.completedHistory || []);
+
+              const initialBestId = singleData.top3Recommendations[0]?.strategyId || singleData.allStrategies[0]?.strategyId || '';
+              setSelectedStrategyId(initialBestId);
+              setSimulatedBudget(singleData.campaign?.totalBudget || 50000);
             }
           }
         }
@@ -145,7 +166,7 @@ export function StrategyEngineConsole() {
       }
 
       const data = await res.json();
-      setCampaign({
+      const updatedCampaign: CampaignConfig = {
         campaignId: data.campaignId,
         campaignName: data.campaignName,
         productService: configData.productService || '',
@@ -156,7 +177,9 @@ export function StrategyEngineConsole() {
         campaignDuration: configData.campaignDuration || 30,
         objective: configData.objective || 'CONVERSIONS',
         preferredPlatforms: configData.preferredPlatforms || ['meta', 'google', 'amazon', 'tiktok']
-      });
+      };
+
+      setCampaign(updatedCampaign);
       setStrategies(data.allStrategies);
       setTop3(data.top3Recommendations);
       setBestChoice(data.bestChoice);
@@ -166,9 +189,12 @@ export function StrategyEngineConsole() {
       setLiveMonitoring(data.liveMonitoring);
       setCompletedHistory(data.completedHistory || []);
 
+      const newBestId = data.top3Recommendations[0]?.strategyId || data.allStrategies[0]?.strategyId || '';
+      setSelectedStrategyId(newBestId);
+      setSimulatedBudget(updatedCampaign.totalBudget);
+
       setGenerationStage('complete');
       setShowConfigForm(false);
-      setActiveTab('recommendations');
 
       toast.success('Generated 24 Candidate Strategies!', {
         description: `Top recommendation selected with ${data.top3Recommendations[0]?.evaluation?.expectedRoas.toFixed(2)}x predicted ROAS.`
@@ -203,69 +229,72 @@ export function StrategyEngineConsole() {
   };
 
   const handleLaunchSuccess = () => {
-    setActiveTab('watchdog');
+    toast.success('Strategy Authorized & Launched!', {
+      description: 'Campaign execution status is now live in Watchdog telemetry.'
+    });
+    setIsWatchdogModalOpen(true);
   };
 
-  // Telemetry KPIs
-  const topRoas = top3[0]?.evaluation?.expectedRoas ?? 0;
-  const blendedRevenue = top3.reduce((sum, s) => sum + (s.evaluation?.expectedRevenue ?? 0), 0);
-  const avgCpa =
-    strategies.length > 0
-      ? Math.round(
-          strategies.reduce((sum, s) => sum + (s.evaluation?.expectedCpa ?? 0), 0) / strategies.length
-        )
-      : 0;
+  const handleApplyStrategy = useCallback((strat: CampaignStrategy) => {
+    setSelectedStrategyId(strat.strategyId);
+    toast.success(`Applied ${strat.strategyName.split('—')[0]} as Active Strategy!`, {
+      description: `Targeting updated across ${strat.platform.toUpperCase()} with ₹${strat.budgetAllocation.toLocaleString('en-IN')} allocation.`
+    });
+  }, []);
+
+  // Active strategy
+  const activeStrategy =
+    strategies.find((s) => s.strategyId === selectedStrategyId) ||
+    top3[0] ||
+    strategies[0];
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen'>
-      {/* Header Banner */}
+    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen font-mono'>
+      {/* 1. MINIMAL HEADER */}
       <div className='flex flex-wrap items-center justify-between gap-4 border-b border-border/80 pb-4'>
         <div>
-          <h1 className='text-xl font-mono font-bold text-foreground uppercase tracking-tight flex items-center gap-2'>
-            <IconCpu className='size-5 text-cyan-500 dark:text-cyan-400' />
-            AI Ad Campaign Recommendation &amp; Optimization Engine
-          </h1>
-          <p className='text-xs font-mono text-muted-foreground mt-1'>
-            Personalized Ad Intelligence • Historical Calibration • 24 Candidate Strategies • Human Authorization Protocol
+          <div className='flex items-center gap-2.5'>
+            <span className='size-2 rounded-full bg-cyan-400 animate-pulse' />
+            <h1 className='text-xl sm:text-2xl font-bold uppercase tracking-tight text-foreground'>
+              STRATEGY ENGINE
+            </h1>
+            <span className='text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded border border-cyan-500/30 bg-cyan-950/30 text-cyan-400'>
+              ● AI DECISION CONSOLE
+            </span>
+          </div>
+          <p className='text-xs text-muted-foreground mt-1'>
+            AI-powered campaign decisions
           </p>
         </div>
 
-        {/* Action Controls */}
-        <div className='flex items-center gap-2'>
+        {/* Right side controls */}
+        <div className='flex items-center gap-2.5'>
           <Button
             variant='outline'
             size='sm'
             onClick={fetchDefaultCampaign}
             disabled={isLoading}
-            className='text-xs font-mono h-8 border-border hover:bg-muted'
+            className='text-xs font-mono h-8.5 border-border/80 hover:bg-muted/40'
           >
-            <IconRefresh className={`size-3.5 mr-1.5 ${isLoading ? 'animate-spin' : ''}`} />
+            <IconRefresh className={cn('size-3.5 mr-1.5', isLoading && 'animate-spin')} />
             Refresh
           </Button>
 
           <Button
             size='sm'
             onClick={() => setShowConfigForm(!showConfigForm)}
-            className='bg-cyan-500 hover:bg-cyan-400 text-black font-mono font-bold text-xs h-8 shadow-xs'
+            className='bg-foreground text-background font-mono font-bold text-xs h-8.5 shadow-xs'
           >
-            {showConfigForm ? (
-              <span className='flex items-center gap-1.5'>
-                <IconChevronUp className='size-4' /> Hide Setup
-              </span>
-            ) : (
-              <span className='flex items-center gap-1.5'>
-                <IconPlus className='size-4' /> New Campaign Setup
-              </span>
-            )}
+            {showConfigForm ? 'Close Setup' : 'New Campaign'}
           </Button>
         </div>
       </div>
 
-      {/* Error Banner with Retry */}
+      {/* Error Alert if any */}
       {error && (
-        <div className='rounded-xl border border-rose-500/40 bg-rose-500/10 p-4 text-xs font-mono text-rose-300 flex items-center justify-between'>
+        <div className='rounded-xl border border-rose-500/40 bg-rose-500/10 p-3.5 text-xs text-rose-300 flex items-center justify-between'>
           <div className='flex items-center gap-2'>
-            <IconAlertTriangle className='size-4 text-rose-400' />
+            <IconAlertTriangle className='size-4 text-rose-400 shrink-0' />
             <span>Error: {error}</span>
           </div>
           <Button
@@ -282,173 +311,275 @@ export function StrategyEngineConsole() {
       {/* Generation Progress Indicator */}
       <StrategyGenerationProgress currentStage={generationStage} />
 
-      {/* Campaign Configuration Form (Collapsible / Toggleable) */}
+      {/* Campaign Configuration Form (Collapsible) */}
       {showConfigForm && (
         <CampaignConfigForm onSubmit={handleCreateCampaign} isLoading={isLoading} />
       )}
 
-      {/* Active Campaign Telemetry KPI Cards */}
+      {/* 2. CAMPAIGN CONTEXT */}
       {campaign && (
-        <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-          <div className='rounded-xl border border-border/80 bg-card p-4 shadow-2xs'>
-            <span className='text-[10px] font-mono uppercase text-muted-foreground tracking-wider block'>
-              Target Campaign
-            </span>
-            <span className='text-sm font-mono font-bold text-foreground truncate block mt-0.5' title={campaign.campaignName}>
-              {campaign.campaignName}
-            </span>
-            <span className='text-[11px] font-mono text-cyan-400 block mt-1'>
-              Budget: ₹{campaign.totalBudget.toLocaleString()} • {campaign.campaignDuration}d
-            </span>
-          </div>
+        <StrategyCampaignContext
+          campaign={campaign}
+          onOpenConfigForm={() => setShowConfigForm(true)}
+        />
+      )}
 
-          <div className='rounded-xl border border-border/80 bg-card p-4 shadow-2xs'>
-            <span className='text-[10px] font-mono uppercase text-muted-foreground tracking-wider block'>
-              Top Recommended ROAS
-            </span>
-            <span className='text-2xl font-mono font-bold text-emerald-400 block mt-0.5'>
-              {topRoas.toFixed(2)}x
-            </span>
-            <span className='text-[11px] font-mono text-muted-foreground block mt-1'>
-              Outperforming 3.20x target floor
-            </span>
-          </div>
+      {/* 3. HERO RECOMMENDATION & WHY */}
+      {activeStrategy && (
+        <StrategyHeroRecommendation
+          strategy={activeStrategy}
+          bestChoice={bestChoice}
+          onApplyStrategy={handleApplyStrategy}
+          onOpenLaunchModal={handleOpenLaunchModal}
+          onOpenEvidenceModal={() => setIsEvidenceModalOpen(true)}
+          targetRoasFloor={campaign?.constraints?.targetRoas || 3.2}
+        />
+      )}
 
-          <div className='rounded-xl border border-border/80 bg-card p-4 shadow-2xs'>
-            <span className='text-[10px] font-mono uppercase text-muted-foreground tracking-wider block'>
-              Top 3 Projected Revenue
-            </span>
-            <span className='text-2xl font-mono font-bold text-foreground block mt-0.5'>
-              ₹{blendedRevenue.toLocaleString()}
-            </span>
-            <span className='text-[11px] font-mono text-muted-foreground block mt-1'>
-              Portfolio gross return
-            </span>
-          </div>
+      {/* 4. INTERACTIVE WHAT-IF SANDBOX */}
+      {activeStrategy && (
+        <StrategyWhatIf
+          strategy={activeStrategy}
+          currentDailyBudget={campaign?.totalBudget || 50000}
+          simulatedBudget={simulatedBudget}
+          onBudgetChange={setSimulatedBudget}
+          aov={campaign?.productPrice || 4250}
+        />
+      )}
 
-          <div className='rounded-xl border border-border/80 bg-card p-4 shadow-2xs'>
-            <span className='text-[10px] font-mono uppercase text-muted-foreground tracking-wider block'>
-              Candidate Strategy Pool
-            </span>
-            <span className='text-2xl font-mono font-bold text-foreground block mt-0.5'>
-              {strategies.length} Distinct
-            </span>
-            <span className='text-[11px] font-mono text-muted-foreground block mt-1'>
-              Avg portfolio CPA: ₹{avgCpa.toLocaleString()}
-            </span>
+      {/* 5. STRATEGY COMPARISON (TOP 3 ALTERNATIVES) */}
+      {top3 && top3.length > 0 && (
+        <StrategyComparisonCards
+          top3={top3}
+          onSelectStrategy={(strat) => {
+            setSelectedStrategyId(strat.strategyId);
+            setSimulatedBudget(strat.budgetAllocation);
+            toast.info(`Inspecting ${strat.strategyName.split('—')[0]}`);
+          }}
+          onOpenCompareModal={() => {
+            setSelectedCompareIds(top3.map((s) => s.strategyId));
+            setIsCompareModalOpen(true);
+          }}
+          onOpenAllModal={() => setIsAllStrategiesOpen(true)}
+          selectedStrategyId={selectedStrategyId}
+        />
+      )}
+
+      {/* 6. COMPACT RISK GAUGE */}
+      {activeStrategy && (
+        <StrategyRiskGauge
+          riskScore={activeStrategy.evaluation?.riskScore ?? 10}
+          confidencePct={Math.round((activeStrategy.evaluation?.confidenceScore ?? 0.94) * 100)}
+          risks={activeStrategy.risks}
+          onOpenRiskModal={() => setIsRiskModalOpen(true)}
+        />
+      )}
+
+      {/* 7. EXECUTION PANEL */}
+      {activeStrategy && (
+        <StrategyReadyToExecute
+          strategy={activeStrategy}
+          dailyBudget={simulatedBudget}
+          onApplyStrategy={handleApplyStrategy}
+          onOpenLaunchModal={handleOpenLaunchModal}
+        />
+      )}
+
+      {/* SECONDARY NAVIGATION ACCESS: Intelligence Drawers */}
+      <div className='flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-border/60 text-xs text-muted-foreground'>
+        <span className='font-bold uppercase tracking-wider text-[10px]'>
+          SECONDARY INTELLIGENCE &amp; AUDIT DRAWERS:
+        </span>
+
+        <div className='flex flex-wrap items-center gap-2'>
+          <button
+            type='button'
+            onClick={() => setIsEvidenceModalOpen(true)}
+            className='px-3 py-1.5 rounded-lg border border-border/80 bg-muted/20 hover:bg-muted/50 text-foreground transition-colors'
+          >
+            Evidence &amp; Lineage
+          </button>
+
+          <button
+            type='button'
+            onClick={() => setIsAllStrategiesOpen(true)}
+            className='px-3 py-1.5 rounded-lg border border-border/80 bg-muted/20 hover:bg-muted/50 text-foreground transition-colors'
+          >
+            All 24 Strategies
+          </button>
+
+          <button
+            type='button'
+            onClick={() => setIsHistoricalModalOpen(true)}
+            className='px-3 py-1.5 rounded-lg border border-border/80 bg-muted/20 hover:bg-muted/50 text-foreground transition-colors'
+          >
+            Historical Intel (32 Runs)
+          </button>
+
+          <button
+            type='button'
+            onClick={() => setIsRiskModalOpen(true)}
+            className='px-3 py-1.5 rounded-lg border border-border/80 bg-muted/20 hover:bg-muted/50 text-foreground transition-colors'
+          >
+            Market Signals &amp; Risks
+          </button>
+
+          <button
+            type='button'
+            onClick={() => setIsWatchdogModalOpen(true)}
+            className='px-3 py-1.5 rounded-lg border border-border/80 bg-muted/20 hover:bg-muted/50 text-foreground transition-colors'
+          >
+            Live Watchdog
+          </button>
+
+          <button
+            type='button'
+            onClick={() => setIsLearningModalOpen(true)}
+            className='px-3 py-1.5 rounded-lg border border-border/80 bg-muted/20 hover:bg-muted/50 text-foreground transition-colors'
+          >
+            Learning Ledger
+          </button>
+        </div>
+      </div>
+
+      {/* ================= MODALS & DRAWERS (Preserving 100% Functionality) ================= */}
+
+      {/* Evidence & Lineage Modal */}
+      <StrategyEvidenceModal
+        isOpen={isEvidenceModalOpen}
+        onClose={() => setIsEvidenceModalOpen(false)}
+        strategy={activeStrategy}
+        bestChoice={bestChoice}
+      />
+
+      {/* All 24 Strategies Modal Drawer */}
+      {isAllStrategiesOpen && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-in fade-in'>
+          <div className='relative w-full max-w-6xl max-h-[90vh] flex flex-col rounded-2xl border border-border bg-card shadow-2xl overflow-hidden'>
+            <div className='flex items-center justify-between border-b border-border/80 px-6 py-4 bg-muted/20'>
+              <div>
+                <h3 className='text-base font-bold text-foreground'>
+                  Candidate Strategy Pool (All 24 Models)
+                </h3>
+                <p className='text-xs text-muted-foreground'>
+                  Full multi-channel generative candidates with individual rankings and rejection rationales
+                </p>
+              </div>
+              <button
+                type='button'
+                onClick={() => setIsAllStrategiesOpen(false)}
+                className='size-8 rounded-lg border border-border/60 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors'
+              >
+                <IconX className='size-4' />
+              </button>
+            </div>
+            <div className='p-6 overflow-y-auto'>
+              <AllStrategiesTable
+                strategies={strategies}
+                onSelectStrategy={(strat) => {
+                  setInspectedStrategy(strat);
+                  setSelectedStrategyId(strat.strategyId);
+                }}
+                selectedCompareIds={selectedCompareIds}
+                onToggleCompare={handleToggleCompare}
+                onOpenCompareModal={() => setIsCompareModalOpen(true)}
+              />
+            </div>
           </div>
         </div>
       )}
 
-      {/* Main Tabbed Command Center Navigation */}
-      <Tabs
-        defaultValue='recommendations'
-        value={activeTab}
-        onValueChange={(val) => setActiveTab(val as string)}
-        className='space-y-4'
-      >
-        <div className='overflow-x-auto pb-1'>
-          <TabsList className='bg-muted/40 p-1 border border-border/80 rounded-xl h-auto flex flex-wrap gap-1'>
-            <TabsTrigger
-              value='recommendations'
-              className='text-xs font-mono py-1.5 px-3 data-[state=active]:bg-card data-[state=active]:text-amber-400 font-bold flex items-center gap-1.5'
-            >
-              <IconCrown className='size-3.5' /> Top 3 &amp; Best Choice
-            </TabsTrigger>
-
-            <TabsTrigger
-              value='historical'
-              className='text-xs font-mono py-1.5 px-3 data-[state=active]:bg-card data-[state=active]:text-cyan-400 font-bold flex items-center gap-1.5'
-            >
-              <IconHistory className='size-3.5' /> Historical Intel (32 Runs)
-            </TabsTrigger>
-
-            <TabsTrigger
-              value='all_strategies'
-              className='text-xs font-mono py-1.5 px-3 data-[state=active]:bg-card data-[state=active]:text-foreground font-bold flex items-center gap-1.5'
-            >
-              <IconLayersLinked className='size-3.5' /> All 24 Strategies
-            </TabsTrigger>
-
-            <TabsTrigger
-              value='simulator'
-              className='text-xs font-mono py-1.5 px-3 data-[state=active]:bg-card data-[state=active]:text-purple-400 font-bold flex items-center gap-1.5'
-            >
-              <IconCalculator className='size-3.5' /> Budget &amp; What-If
-            </TabsTrigger>
-
-            <TabsTrigger
-              value='signals_risks'
-              className='text-xs font-mono py-1.5 px-3 data-[state=active]:bg-card data-[state=active]:text-cyan-400 font-bold flex items-center gap-1.5'
-            >
-              <IconShieldCheck className='size-3.5' /> Market Signals &amp; Risks
-            </TabsTrigger>
-
-            <TabsTrigger
-              value='watchdog'
-              className='text-xs font-mono py-1.5 px-3 data-[state=active]:bg-card data-[state=active]:text-emerald-400 font-bold flex items-center gap-1.5'
-            >
-              <IconActivity className='size-3.5' /> Live Watchdog
-            </TabsTrigger>
-
-            <TabsTrigger
-              value='learning'
-              className='text-xs font-mono py-1.5 px-3 data-[state=active]:bg-card data-[state=active]:text-purple-400 font-bold flex items-center gap-1.5'
-            >
-              <IconBrain className='size-3.5' /> Learning Ledger
-            </TabsTrigger>
-          </TabsList>
+      {/* Historical Intelligence Modal */}
+      {isHistoricalModalOpen && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-in fade-in'>
+          <div className='relative w-full max-w-5xl max-h-[90vh] flex flex-col rounded-2xl border border-border bg-card shadow-2xl overflow-hidden'>
+            <div className='flex items-center justify-between border-b border-border/80 px-6 py-4 bg-muted/20'>
+              <h3 className='text-base font-bold text-foreground'>
+                Historical Intelligence &amp; Bayesian Calibration (32 Runs)
+              </h3>
+              <button
+                type='button'
+                onClick={() => setIsHistoricalModalOpen(false)}
+                className='size-8 rounded-lg border border-border/60 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors'
+              >
+                <IconX className='size-4' />
+              </button>
+            </div>
+            <div className='p-6 overflow-y-auto'>
+              <HistoricalIntelligenceView summary={historicalSummary} />
+            </div>
+          </div>
         </div>
+      )}
 
-        {/* Tab 1: Top Recommendations & Best Choice */}
-        <TabsContent value='recommendations'>
-          <TopRecommendationsView
-            top3={top3}
-            bestChoice={bestChoice}
-            budgetAllocation={top3BudgetAllocation}
-            onInspectStrategy={(strat) => setInspectedStrategy(strat)}
-            onToggleCompare={handleToggleCompare}
-            selectedCompareIds={selectedCompareIds}
-            onOpenLaunchModal={handleOpenLaunchModal}
-          />
-        </TabsContent>
+      {/* Market Signals & Risks Modal */}
+      {isRiskModalOpen && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-in fade-in'>
+          <div className='relative w-full max-w-5xl max-h-[90vh] flex flex-col rounded-2xl border border-border bg-card shadow-2xl overflow-hidden'>
+            <div className='flex items-center justify-between border-b border-border/80 px-6 py-4 bg-muted/20'>
+              <h3 className='text-base font-bold text-foreground'>
+                Market Signals &amp; Risk Contingencies
+              </h3>
+              <button
+                type='button'
+                onClick={() => setIsRiskModalOpen(false)}
+                className='size-8 rounded-lg border border-border/60 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors'
+              >
+                <IconX className='size-4' />
+              </button>
+            </div>
+            <div className='p-6 overflow-y-auto'>
+              <MarketSignalsRiskView signals={marketSignals} strategies={strategies} />
+            </div>
+          </div>
+        </div>
+      )}
 
-        {/* Tab 2: Historical Campaign Intelligence Layer */}
-        <TabsContent value='historical'>
-          <HistoricalIntelligenceView summary={historicalSummary} />
-        </TabsContent>
+      {/* Live Watchdog Modal */}
+      {isWatchdogModalOpen && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-in fade-in'>
+          <div className='relative w-full max-w-5xl max-h-[90vh] flex flex-col rounded-2xl border border-border bg-card shadow-2xl overflow-hidden'>
+            <div className='flex items-center justify-between border-b border-border/80 px-6 py-4 bg-muted/20'>
+              <h3 className='text-base font-bold text-foreground'>
+                Live Campaign Watchdog Telemetry
+              </h3>
+              <button
+                type='button'
+                onClick={() => setIsWatchdogModalOpen(false)}
+                className='size-8 rounded-lg border border-border/60 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors'
+              >
+                <IconX className='size-4' />
+              </button>
+            </div>
+            <div className='p-6 overflow-y-auto'>
+              <LiveMonitoringView monitoring={liveMonitoring} />
+            </div>
+          </div>
+        </div>
+      )}
 
-        {/* Tab 3: All 24 Strategies Comprehensive Table */}
-        <TabsContent value='all_strategies'>
-          <AllStrategiesTable
-            strategies={strategies}
-            onSelectStrategy={(strat) => setInspectedStrategy(strat)}
-            selectedCompareIds={selectedCompareIds}
-            onToggleCompare={handleToggleCompare}
-            onOpenCompareModal={() => setIsCompareModalOpen(true)}
-          />
-        </TabsContent>
-
-        {/* Tab 4: Budget Simulator & What-If Sandbox */}
-        <TabsContent value='simulator'>
-          <BudgetSimulatorView strategies={strategies} />
-        </TabsContent>
-
-        {/* Tab 5: Market Signals & Future Risk Matrix */}
-        <TabsContent value='signals_risks'>
-          <MarketSignalsRiskView signals={marketSignals} strategies={strategies} />
-        </TabsContent>
-
-        {/* Tab 6: Live Campaign Watchdog */}
-        <TabsContent value='watchdog'>
-          <LiveMonitoringView monitoring={liveMonitoring} />
-        </TabsContent>
-
-        {/* Tab 7: Continuous Learning Ledger */}
-        <TabsContent value='learning'>
-          <LearningLedgerView completedHistory={completedHistory} />
-        </TabsContent>
-      </Tabs>
+      {/* Learning Ledger Modal */}
+      {isLearningModalOpen && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-in fade-in'>
+          <div className='relative w-full max-w-5xl max-h-[90vh] flex flex-col rounded-2xl border border-border bg-card shadow-2xl overflow-hidden'>
+            <div className='flex items-center justify-between border-b border-border/80 px-6 py-4 bg-muted/20'>
+              <h3 className='text-base font-bold text-foreground'>
+                Autonomous Learning Ledger
+              </h3>
+              <button
+                type='button'
+                onClick={() => setIsLearningModalOpen(false)}
+                className='size-8 rounded-lg border border-border/60 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors'
+              >
+                <IconX className='size-4' />
+              </button>
+            </div>
+            <div className='p-6 overflow-y-auto'>
+              <LearningLedgerView completedHistory={completedHistory} />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Detailed Strategy Sheet / Modal */}
       <StrategyDetailModal
@@ -463,7 +594,7 @@ export function StrategyEngineConsole() {
       <StrategyComparisonModal
         isOpen={isCompareModalOpen}
         onClose={() => setIsCompareModalOpen(false)}
-        strategies={comparedStrategies}
+        strategies={comparedStrategies.length ? comparedStrategies : top3}
         onRemoveStrategy={(id) => setSelectedCompareIds(selectedCompareIds.filter((x) => x !== id))}
       />
 
