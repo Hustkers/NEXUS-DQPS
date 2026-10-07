@@ -19,6 +19,7 @@ export default function GlobeIntelligencePage() {
   const [activeGlobeView, setActiveGlobeView] = useState<'both' | 'arcs' | 'pulse'>('both');
   const [selectedProduct, setSelectedProduct] = useState<EngineCampaign>(initialEngineState.campaigns[0]);
   const [modalTarget, setModalTarget] = useState<ProductAnalysisTarget | null>(null);
+  const [selectedHubId, setSelectedHubId] = useState<string | null>(null);
 
   const rlData = React.useMemo(() => {
     return computeRLAdAllocation({
@@ -149,35 +150,94 @@ export default function GlobeIntelligencePage() {
               </div>
 
               <p className='text-xs font-mono text-zinc-400 mb-2'>
-                Live WebGL telemetry scanning global delivery vectors across Meta, Google Shopping, Amazon DSP &amp; TikTok feeds.
+                Live WebGL telemetry scanning global delivery vectors across Meta, Google Shopping, Amazon DSP &amp; TikTok feeds. Click any edge node or hub below to inspect latency and throughput.
               </p>
 
-              <div className='w-full min-h-[440px] flex items-center justify-center relative overflow-x-auto py-2'>
+              <div className='w-full min-h-[460px] flex items-center justify-center relative overflow-x-auto py-2'>
                 <GithubGlobe
                   activeSku={selectedProduct.sku}
                   activePlatform={selectedProduct.platform}
                   accentColor={[0.2, 0.85, 0.95]}
+                  selectedHubId={selectedHubId}
+                  onSelectHub={(hub) => setSelectedHubId(hub ? hub.id : null)}
+                  interactive={true}
+                  showControls={true}
                 />
               </div>
             </div>
 
             <div className='grid grid-cols-4 gap-2 pt-3 border-t border-zinc-900 text-center font-mono text-[10px]'>
-              <div className='p-1.5 rounded bg-zinc-900/60 border border-zinc-800/60'>
-                <div className='text-zinc-500'>US-EAST</div>
-                <div className='text-cyan-400 font-bold'>24ms • 48.2k imp</div>
-              </div>
-              <div className='p-1.5 rounded bg-zinc-900/60 border border-zinc-800/60'>
-                <div className='text-zinc-500'>EMEA-LON</div>
-                <div className='text-blue-400 font-bold'>38ms • 29.4k imp</div>
-              </div>
-              <div className='p-1.5 rounded bg-zinc-900/60 border border-zinc-800/60'>
-                <div className='text-zinc-500'>APAC-TYO</div>
-                <div className='text-amber-400 font-bold'>64ms • 18.9k imp</div>
-              </div>
-              <div className='p-1.5 rounded bg-zinc-900/60 border border-zinc-800/60'>
-                <div className='text-zinc-500'>SEA-SGP</div>
-                <div className='text-emerald-400 font-bold'>82ms • 4.1k imp</div>
-              </div>
+              <button
+                type='button'
+                onClick={() => setSelectedHubId(selectedHubId === 'us-east' ? null : 'us-east')}
+                className={cn(
+                  'p-2 rounded border transition-all text-left flex flex-col justify-between cursor-pointer',
+                  selectedHubId === 'us-east'
+                    ? 'bg-cyan-950/70 border-cyan-400 text-cyan-200 ring-1 ring-cyan-500/40 shadow-md'
+                    : 'bg-zinc-900/60 border-zinc-800/60 hover:border-cyan-500/40 hover:bg-zinc-900/90'
+                )}
+                title='Focus US-East hub and view latency telemetry'
+              >
+                <div className='text-zinc-500 text-[9px] flex items-center justify-between'>
+                  <span>US-EAST</span>
+                  {selectedHubId === 'us-east' && <span className='size-1.5 rounded-full bg-cyan-400 animate-ping' />}
+                </div>
+                <div className='text-cyan-400 font-bold mt-1'>24ms • 48.2k imp</div>
+              </button>
+
+              <button
+                type='button'
+                onClick={() => setSelectedHubId(selectedHubId === 'emea-lon' ? null : 'emea-lon')}
+                className={cn(
+                  'p-2 rounded border transition-all text-left flex flex-col justify-between cursor-pointer',
+                  selectedHubId === 'emea-lon'
+                    ? 'bg-blue-950/70 border-blue-400 text-blue-200 ring-1 ring-blue-500/40 shadow-md'
+                    : 'bg-zinc-900/60 border-zinc-800/60 hover:border-blue-500/40 hover:bg-zinc-900/90'
+                )}
+                title='Focus EMEA-LON hub and view latency telemetry'
+              >
+                <div className='text-zinc-500 text-[9px] flex items-center justify-between'>
+                  <span>EMEA-LON</span>
+                  {selectedHubId === 'emea-lon' && <span className='size-1.5 rounded-full bg-blue-400 animate-ping' />}
+                </div>
+                <div className='text-blue-400 font-bold mt-1'>38ms • 29.4k imp</div>
+              </button>
+
+              <button
+                type='button'
+                onClick={() => setSelectedHubId(selectedHubId === 'apac-tyo' ? null : 'apac-tyo')}
+                className={cn(
+                  'p-2 rounded border transition-all text-left flex flex-col justify-between cursor-pointer',
+                  selectedHubId === 'apac-tyo'
+                    ? 'bg-amber-950/70 border-amber-400 text-amber-200 ring-1 ring-amber-500/40 shadow-md'
+                    : 'bg-zinc-900/60 border-zinc-800/60 hover:border-amber-500/40 hover:bg-zinc-900/90'
+                )}
+                title='Focus APAC-TYO hub and view latency telemetry'
+              >
+                <div className='text-zinc-500 text-[9px] flex items-center justify-between'>
+                  <span>APAC-TYO</span>
+                  {selectedHubId === 'apac-tyo' && <span className='size-1.5 rounded-full bg-amber-400 animate-ping' />}
+                </div>
+                <div className='text-amber-400 font-bold mt-1'>64ms • 18.9k imp</div>
+              </button>
+
+              <button
+                type='button'
+                onClick={() => setSelectedHubId(selectedHubId === 'sea-sgp' ? null : 'sea-sgp')}
+                className={cn(
+                  'p-2 rounded border transition-all text-left flex flex-col justify-between cursor-pointer',
+                  selectedHubId === 'sea-sgp'
+                    ? 'bg-emerald-950/70 border-emerald-400 text-emerald-200 ring-1 ring-emerald-500/40 shadow-md'
+                    : 'bg-zinc-900/60 border-zinc-800/60 hover:border-emerald-500/40 hover:bg-zinc-900/90'
+                )}
+                title='Focus SEA-SGP hub and view latency telemetry'
+              >
+                <div className='text-zinc-500 text-[9px] flex items-center justify-between'>
+                  <span>SEA-SGP</span>
+                  {selectedHubId === 'sea-sgp' && <span className='size-1.5 rounded-full bg-emerald-400 animate-ping' />}
+                </div>
+                <div className='text-emerald-400 font-bold mt-1'>82ms • 4.1k imp</div>
+              </button>
             </div>
           </div>
         )}
