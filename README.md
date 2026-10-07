@@ -25,6 +25,7 @@ The autonomous mission control console is deployed and live on Vercel:
 | **⚡ Budget Reallocation Engine** | **[https://nexus-dqps.vercel.app/dashboard/reallocations](https://nexus-dqps.vercel.app/dashboard/reallocations)** |
 | **📜 Closed-Loop Decision Ledger** | **[https://nexus-dqps.vercel.app/dashboard/ledger](https://nexus-dqps.vercel.app/dashboard/ledger)** |
 | **🎮 Scenario Shock Sandbox** | **[https://nexus-dqps.vercel.app/dashboard/simulator](https://nexus-dqps.vercel.app/dashboard/simulator)** |
+| **🧪 Ad Playground & Profit Engine** | **[https://nexus-dqps.vercel.app/dashboard/playground](https://nexus-dqps.vercel.app/dashboard/playground)** |
 
 ---
 
@@ -34,6 +35,7 @@ The web console is built using **Next.js 16**, **shadcn/ui** (forked from `next-
 
 ### Console Capabilities:
 - **Autonomous Mission Control**: Real-time cross-channel telemetry (Meta, Google Shopping, Amazon, TikTok, Shopify ERP) with DuckDB unified warehouse sync.
+- **Ad Playground & Profit Maximization Engine (`decide/ad_playground.py`)**: Evaluates ~10 candidate advertising configurations for any footwear product across Meta, Google, Amazon, and TikTok. Fits response saturation curves ($r(s) = k \cdot s^b$), estimates volume economics, enforces warehouse stockout boundaries, and ranks candidates strictly by Expected Net Profit.
 - **Diagnostic RCA & Anomaly Cards (`modery68` pattern)**: 14-day & 4-week rolling baselines, Z-score attribution (|Z| > 2.2), causal factor decomposition bars (Stockout impact, CPM surge, Creative fatigue, CVR drop), and AI diagnostic reasoning.
 - **ROAS Gauges & Health Scoring Matrix (`Tremor` + `modery68` pattern)**: Semicircular radial gauges with floor (break-even 1.8x), target (3.2x), and 0–100 Campaign Health Scores.
 - **Autonomous Budget Reallocation Feed (`scipy` SLSQP)**: Optimal capital shifts between underperforming and convex high-marginal-yield campaigns, with 1-click execution via mock ad API and an Autonomous Auto-Pilot toggle.

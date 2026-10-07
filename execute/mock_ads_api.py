@@ -303,3 +303,41 @@ def compare_campaign_strategies(campaign_id: str, payload: CompareRequest):
         "count": len(matching),
         "strategies": matching,
     }
+
+
+# -------------------------------------------------------------------------
+# Ad Playground Endpoints
+# -------------------------------------------------------------------------
+
+class PlaygroundRecommendRequest(BaseModel):
+    sku: str = "310805-137"
+    total_budget: float = 5000.0
+    duration_days: int = 14
+    target_roas_floor: float = 1.8
+    platforms: Optional[List[str]] = None
+    strategy_focus: str = "MAX_PROFIT"
+
+
+Action.model_rebuild()
+PlaygroundRecommendRequest.model_rebuild()
+
+
+@app.get("/playground/products")
+def get_playground_products():
+    from decide.ad_playground import default_playground_engine
+    return default_playground_engine.get_available_products()
+
+
+@app.post("/playground/recommend")
+def recommend_playground(req: PlaygroundRecommendRequest):
+    from dataclasses import asdict
+    from decide.ad_playground import default_playground_engine
+    result = default_playground_engine.generate_recommendations(
+        sku=req.sku,
+        total_budget=req.total_budget,
+        duration_days=req.duration_days,
+        target_roas_floor=req.target_roas_floor,
+        platform_filter=req.platforms,
+        strategy_focus=req.strategy_focus,
+    )
+    return asdict(result)
