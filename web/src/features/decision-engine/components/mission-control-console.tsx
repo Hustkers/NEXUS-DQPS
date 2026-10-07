@@ -11,7 +11,10 @@ import { PlatformBreakdownChart } from './platform-breakdown-chart';
 import { DecisionLedgerTable } from './decision-ledger-table';
 import { ScenarioController, ScenarioDefinition } from './scenario-controller';
 import { ProductAnalysisModal, type ProductAnalysisTarget } from './product-analysis-modal';
+import { GithubGlobe } from './github-globe';
+import { GlobePulse } from '@/components/ui/cobe-globe-pulse';
 import initialEngineState from '@/data/nexus-engine-state.json';
+import Link from 'next/link';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -19,6 +22,7 @@ export function MissionControlConsole() {
   const [state, setState] = useState(initialEngineState);
   const [activeTab, setActiveTab] = useState<string>('all');
   const [analyzingProduct, setAnalyzingProduct] = useState<ProductAnalysisTarget | null>(null);
+  const [consoleGlobeMode, setConsoleGlobeMode] = useState<'arcs' | 'pulse'>('pulse');
 
   const handleTriggerScenario = (scenario: ScenarioDefinition) => {
     if (scenario.id === 'scenario-stockout') {
@@ -213,6 +217,120 @@ export function MissionControlConsole() {
         onTriggerScenario={handleTriggerScenario}
         onResetBaseline={handleResetBaseline}
       />
+
+      {/* 3.5. Live 3D Global Telemetry & Heatmap Command Center */}
+      <div className='rounded-2xl border border-zinc-800 bg-zinc-950/70 p-5 shadow-xl flex flex-col lg:flex-row items-center justify-between gap-6 overflow-hidden'>
+        <div className='flex-1 space-y-3.5 w-full'>
+          <div className='flex flex-wrap items-center justify-between gap-2 border-b border-zinc-900 pb-2.5'>
+            <div className='flex items-center gap-2'>
+              <Icons.globe className='size-5 text-cyan-400' />
+              <h3 className='font-mono text-sm font-bold text-zinc-100 uppercase tracking-tight'>
+                Live 3D Global Ad &amp; Sales Telemetry
+              </h3>
+            </div>
+            <div className='flex items-center gap-2'>
+              {/* Globe Switcher */}
+              <div className='flex items-center bg-zinc-900 rounded-lg border border-zinc-800 p-0.5 text-xs font-mono'>
+                <button
+                  onClick={() => setConsoleGlobeMode('pulse')}
+                  className={cn(
+                    'px-2.5 py-1 rounded font-semibold transition-all',
+                    consoleGlobeMode === 'pulse'
+                      ? 'bg-rose-950 text-rose-300 border border-rose-800/60'
+                      : 'text-zinc-500 hover:text-zinc-300'
+                  )}
+                >
+                  Sales Pulse
+                </button>
+                <button
+                  onClick={() => setConsoleGlobeMode('arcs')}
+                  className={cn(
+                    'px-2.5 py-1 rounded font-semibold transition-all',
+                    consoleGlobeMode === 'arcs'
+                      ? 'bg-cyan-950 text-cyan-300 border border-cyan-800/60'
+                      : 'text-zinc-500 hover:text-zinc-300'
+                  )}
+                >
+                  Analysing Arcs
+                </button>
+              </div>
+
+              <Link
+                href='/dashboard/globe'
+                className='px-2.5 py-1 rounded-md bg-zinc-900 border border-zinc-800 text-xs font-mono text-zinc-300 hover:text-white transition-colors flex items-center gap-1.5'
+              >
+                <span>Full Globe Hub</span>
+                <Icons.arrowRight className='size-3' />
+              </Link>
+            </div>
+          </div>
+
+          <p className='text-xs font-mono text-zinc-400 leading-relaxed'>
+            {consoleGlobeMode === 'pulse'
+              ? 'Real-time customer interaction pulse: Regions with high sales and engagement rendered in Red, decreasingly Yellow, and No Grey. Powered by cobe-globe-pulse.'
+              : 'WebGL ad delivery vectors across Meta, Google, Amazon & TikTok. Visualizing network latency and delivery hops via github.com/globe.'}
+          </p>
+
+          <div className='grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 font-mono text-xs'>
+            <div className='p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/70'>
+              <div className='text-[10px] text-zinc-500'>US-EAST / WEST</div>
+              <div className='text-red-400 font-bold'>High Sales (78%)</div>
+            </div>
+            <div className='p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/70'>
+              <div className='text-[10px] text-zinc-500'>WESTERN EUROPE</div>
+              <div className='text-orange-400 font-bold'>Strong (56%)</div>
+            </div>
+            <div className='p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/70'>
+              <div className='text-[10px] text-zinc-500'>ASIA-PACIFIC</div>
+              <div className='text-yellow-400 font-bold'>Moderate (44%)</div>
+            </div>
+            <div className='p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/70'>
+              <div className='text-[10px] text-zinc-500'>LATAM &amp; SEA</div>
+              <div className='text-cyan-400 font-bold'>RL Suppressed</div>
+            </div>
+          </div>
+
+          <div className='pt-2 flex flex-wrap items-center gap-2'>
+            <span className='text-[11px] font-mono text-zinc-500'>Click any active SKU to open 3D Analysis Modal:</span>
+            {state.campaigns.slice(0, 3).map((c: any) => (
+              <button
+                key={c.campaign}
+                onClick={() => {
+                  setAnalyzingProduct({
+                    productName: c.productName || c.sku,
+                    sku: c.sku,
+                    photoUrl: c.photoUrl,
+                    platform: c.platform,
+                    campaign: c.campaign,
+                    inventory: c.inventory,
+                    roas: c.roas,
+                    spend: c.currentDailySpend,
+                    severity: c.inventory === 0 ? 'CRITICAL' : 'HEALTHY'
+                  });
+                }}
+                className='px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:border-cyan-500/60 text-xs font-mono text-zinc-300 hover:text-cyan-300 transition-colors flex items-center gap-1.5'
+              >
+                <span className='size-1.5 rounded-full bg-cyan-400' />
+                <span>{c.productName || c.sku}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* The 3D Interactive Canvas */}
+        <div className='size-[260px] sm:size-[300px] flex items-center justify-center shrink-0 relative'>
+          {consoleGlobeMode === 'arcs' ? (
+            <GithubGlobe
+              className='w-full h-full'
+              activeSku='315122-001'
+              activePlatform='meta'
+              accentColor={[0.95, 0.35, 0.45]}
+            />
+          ) : (
+            <GlobePulse className='w-full h-full' speed={0.0035} />
+          )}
+        </div>
+      </div>
 
       {/* 4. Diagnostic Anomalies Feed */}
       <div className='space-y-3'>

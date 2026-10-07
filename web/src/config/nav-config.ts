@@ -13,6 +13,14 @@ export const navGroups: NavGroup[] = [
         items: []
       },
       {
+        title: '3D Global Intelligence',
+        url: '/dashboard/globe',
+        icon: 'globe',
+        isActive: false,
+        shortcut: ['3', 'g'],
+        items: []
+      },
+      {
         title: 'Diagnostic Anomalies & RCA',
         url: '/dashboard/anomalies',
         icon: 'warning',
