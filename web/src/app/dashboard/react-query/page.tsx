@@ -11,6 +11,8 @@ export const metadata = {
   title: 'Dashboard: React Query'
 };
 
+export const dynamic = 'force-dynamic';
+
 export default function ReactQueryPage() {
   const queryClient = getQueryClient();
 
