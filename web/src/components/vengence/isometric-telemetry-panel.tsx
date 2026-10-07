@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import {
   TerrainFigure,
   PlotFigure,
@@ -20,6 +21,7 @@ interface InstrumentSpec {
   badge: string;
   stat: string;
   statLabel: string;
+  href: string;
   component: React.ComponentType<{
     intensity?: number;
     className?: string;
@@ -38,6 +40,7 @@ const INSTRUMENTS: InstrumentSpec[] = [
     badge: 'HILL EQUATIONS',
     stat: '3.42x',
     statLabel: 'Marginal ROAS Inflection',
+    href: '/dashboard/gauges',
     component: TerrainFigure
   },
   {
@@ -49,6 +52,7 @@ const INSTRUMENTS: InstrumentSpec[] = [
     badge: 'SLSQP SOLVER',
     stat: '18ms',
     statLabel: 'Optimization Convergence',
+    href: '/dashboard/reallocations',
     component: PlotFigure
   },
   {
@@ -60,6 +64,7 @@ const INSTRUMENTS: InstrumentSpec[] = [
     badge: 'CAUSAL DAG',
     stat: '99.4%',
     statLabel: 'Root-Cause Confidence',
+    href: '/dashboard/anomalies',
     component: BranchesFigure
   },
   {
@@ -71,6 +76,7 @@ const INSTRUMENTS: InstrumentSpec[] = [
     badge: 'KILL-SWITCH',
     stat: '< 15m',
     statLabel: 'Intervention SLA',
+    href: '/dashboard/autonomous-engine',
     component: VaultFigure
   },
   {
@@ -82,6 +88,7 @@ const INSTRUMENTS: InstrumentSpec[] = [
     badge: 'GPU ENTROPY',
     stat: '99.8%',
     statLabel: 'Attribution Match Rate',
+    href: '/dashboard/fingerprint',
     component: PhosphorFigure
   },
   {
@@ -93,6 +100,7 @@ const INSTRUMENTS: InstrumentSpec[] = [
     badge: 'IMMUTABLE AUDIT',
     stat: '₹15.4k/w',
     statLabel: 'Protected Weekly Profit',
+    href: '/dashboard/ledger',
     component: RiffleFigure
   }
 ];
@@ -213,6 +221,14 @@ export function IsometricTelemetryPanel() {
               <p className='text-xs text-muted-foreground max-w-md leading-relaxed'>
                 {active.description}
               </p>
+              <div className='mt-2.5'>
+                <Link
+                  href={active.href}
+                  className='inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-primary hover:text-primary/80 transition-colors group'
+                >
+                  <span>Launch {active.name.split(' ')[0]} in Cockpit →</span>
+                </Link>
+              </div>
             </div>
 
             <div className='text-right shrink-0 bg-muted/40 p-2.5 rounded-xl border border-border/70 hidden sm:block'>
@@ -237,9 +253,12 @@ export function IsometricTelemetryPanel() {
               <span className='size-1.5 rounded-full bg-primary' />
               Move cursor across figure to deform geometry in real-time
             </span>
-            <span className='hidden sm:inline text-muted-foreground/60'>
-              Shared 60FPS RAF • Zero WebGL Overhead
-            </span>
+            <Link
+              href={active.href}
+              className='hidden sm:inline-flex items-center gap-1 text-[11px] font-mono font-semibold text-primary hover:underline'
+            >
+              <span>Inspect Live Module →</span>
+            </Link>
           </div>
         </div>
       </div>
