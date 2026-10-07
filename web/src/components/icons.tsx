@@ -115,8 +115,6 @@ import {
   IconRobot,
   IconMessage2,
   IconArrowsSplit2,
-  IconChartLine,
-  IconRefresh,
   IconX
 } from '@tabler/icons-react';
 
@@ -146,12 +144,6 @@ export const Icons = {
   settings: IconSettings,
   trash: IconTrash,
   terminal: IconTerminal,
-  download: IconDownload,
-  refresh: IconRefresh,
-  copy: IconCopy,
-  lineChart: IconChartLine,
-  plus: IconPlus,
-  users: IconUsers,
 
   // Navigation / Chevrons
   chevronDown: IconChevronDown,
