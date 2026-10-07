@@ -55,12 +55,12 @@ export function LandingPageView() {
 
         <div className='relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center'>
           {/* Master Headline as the Central Problem Question */}
-          <h1 className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground max-w-4xl leading-[1.1] mb-6'>
+          <h1 className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-[-0.035em] text-foreground max-w-4xl leading-[1.08] mb-6 apple-display'>
             How Can D2C Brands Stop Ad Budget Bleed Autonomously?
           </h1>
 
           {/* Proposed Solution Subtitle */}
-          <p className='text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl font-normal leading-relaxed mb-8'>
+          <p className='text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl font-normal leading-relaxed mb-8 apple-subhead'>
             <span className='text-foreground font-semibold'>The NEXUS Solution:</span> An AI-native closed loop pairing causal diagnostics with Scipy convex optimization — halting stockout waste in &lt;15 minutes to guarantee positive net contribution profit.
           </p>
 
@@ -108,7 +108,7 @@ export function LandingPageView() {
           <div className='font-mono text-xs font-bold text-primary uppercase tracking-widest mb-2'>
             STRESS TEST BENCHMARK
           </div>
-          <h2 className='text-3xl md:text-4xl font-extrabold tracking-tight text-foreground mb-4'>
+          <h2 className='text-3xl md:text-4xl font-extrabold tracking-[-0.025em] text-foreground mb-4 apple-title'>
             Four Real-World Crisis Scenarios
           </h2>
           <p className='text-sm md:text-base text-muted-foreground leading-relaxed'>
@@ -127,7 +127,7 @@ export function LandingPageView() {
           <div className='font-mono text-xs font-bold text-primary uppercase tracking-widest mb-2'>
             CORE SYSTEM PILLARS
           </div>
-          <h2 className='text-3xl md:text-4xl font-extrabold tracking-tight text-foreground mb-4'>
+          <h2 className='text-3xl md:text-4xl font-extrabold tracking-[-0.025em] text-foreground mb-4 apple-title'>
             Engineered for Ground-Truth Profitability
           </h2>
           <p className='text-sm md:text-base text-muted-foreground leading-relaxed'>

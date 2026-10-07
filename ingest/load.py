@@ -10,6 +10,7 @@ CREATE OR REPLACE TABLE metrics (
   platform VARCHAR,
   campaign VARCHAR,
   sku VARCHAR,
+  product_name VARCHAR,
   spend DOUBLE,
   cpm DOUBLE,
   impressions BIGINT,
@@ -43,10 +44,10 @@ def load(db_path: str, metrics: pd.DataFrame, events: list[dict]) -> duckdb.Duck
             con = duckdb.connect(":memory:")
     con.execute(SCHEMA_SQL)
     con.register("m", metrics)
-    con.execute("INSERT INTO metrics SELECT * FROM m")
+    con.execute("INSERT INTO metrics BY NAME SELECT * FROM m")
     if events:
         con.register("e", pd.DataFrame(events))
-        con.execute("INSERT INTO events SELECT * FROM e")
+        con.execute("INSERT INTO events BY NAME SELECT * FROM e")
     return con
 
 

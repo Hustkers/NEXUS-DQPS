@@ -31,17 +31,23 @@ export interface AnomalyItem {
   inventory: number;
   explanation: string;
   factors: FactorDecomp[];
+  isReallocated?: boolean;
+  reallocationId?: string;
+  reallocatedAt?: string;
 }
 
 interface AnomalyCardProps {
   anomaly: AnomalyItem;
   onMitigate?: (anomaly: AnomalyItem) => void;
   onAnalyze?: (anomaly: AnomalyItem) => void;
+  onViewReceipt?: (anomaly: AnomalyItem) => void;
+  isMitigating?: boolean;
   className?: string;
 }
 
-export function AnomalyCard({ anomaly, onMitigate, onAnalyze, className }: AnomalyCardProps) {
+export function AnomalyCard({ anomaly, onMitigate, onAnalyze, onViewReceipt, isMitigating, className }: AnomalyCardProps) {
   const isCritical = anomaly.severity === 'CRITICAL' || anomaly.inventory === 0;
+  const isReallocated = anomaly.isReallocated;
 
   return (
     <div
@@ -62,22 +68,37 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, className }: Anoma
             <span className='text-muted-foreground'>/</span>
             <span className='text-muted-foreground text-[11px]'>{anomaly.date}</span>
           </div>
-          <span
-            className={cn(
-              'font-mono font-bold text-[10px] px-1.5 py-0.5 rounded',
-              isCritical
-                ? 'bg-rose-500 text-white'
-                : 'bg-muted text-foreground border border-border'
+          <div className='flex items-center gap-1.5'>
+            {isReallocated && (
+              <span className='font-mono font-bold text-[10px] px-1.5 py-0.5 rounded bg-[#FFFFFF] text-[#000000] border border-[#FFFFFF]'>
+                [REALLOCATED]
+              </span>
             )}
-          >
-            {isCritical ? '[CRITICAL] ' : '[WARN] '}Z {anomaly.zScore > 0 ? `+${anomaly.zScore}` : anomaly.zScore}
-          </span>
+            <span
+              className={cn(
+                'font-mono font-bold text-[10px] px-1.5 py-0.5 rounded',
+                isCritical
+                  ? 'bg-[#FFFFFF] text-[#000000]'
+                  : 'bg-[#000000] text-[#FFFFFF]'
+              )}
+            >
+              {isCritical ? '[CRITICAL] ' : '[WARN] '}Z {anomaly.zScore > 0 ? `+${anomaly.zScore}` : anomaly.zScore}
+            </span>
+          </div>
         </div>
 
         {/* Product / Campaign block */}
         <div
+          role='button'
+          tabIndex={0}
           className='flex items-center gap-3 mb-3 cursor-pointer group/shoe transition-opacity hover:opacity-90'
           onClick={() => onAnalyze?.(anomaly)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onAnalyze?.(anomaly);
+            }
+          }}
           title='Click to inspect product telemetry'
         >
           {anomaly.photoUrl && (
@@ -151,14 +172,35 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, className }: Anoma
           <IconWorld className='mr-1.5 size-3.5 text-foreground' />
           Analyse Globe
         </Button>
-        <Button
-          size='sm'
-          onClick={() => onMitigate?.(anomaly)}
-          className='flex-1 text-xs font-mono h-8 bg-foreground hover:bg-foreground/90 text-background font-semibold active:scale-[0.98] border-none'
-        >
-          <Icons.arrowRight className='mr-1.5 size-3 text-background' />
-          Auto-Reallocate
-        </Button>
+        {isReallocated ? (
+          <Button
+            size='sm'
+            variant='outline'
+            onClick={() => (onViewReceipt ? onViewReceipt(anomaly) : onMitigate?.(anomaly))}
+            className='flex-1 text-xs font-mono h-8 border border-[#FFFFFF] bg-[#1A1A1A] hover:bg-[#000000] text-[#FFFFFF] font-semibold active:scale-[0.98]'
+          >
+            <Icons.check className='mr-1.5 size-3 text-[#FFFFFF]' />
+            View Receipt
+          </Button>
+        ) : isMitigating ? (
+          <Button
+            size='sm'
+            disabled
+            className='flex-1 text-xs font-mono h-8 bg-[#8A8A8A] text-[#000000] font-semibold border-none cursor-not-allowed opacity-80'
+          >
+            <Icons.spinner className='mr-1.5 size-3 animate-spin text-[#000000]' />
+            Analyzing...
+          </Button>
+        ) : (
+          <Button
+            size='sm'
+            onClick={() => onMitigate?.(anomaly)}
+            className='flex-1 text-xs font-mono h-8 bg-[#FFFFFF] hover:bg-[#8A8A8A] text-[#000000] font-semibold active:scale-[0.98] border-none'
+          >
+            <Icons.arrowRight className='mr-1.5 size-3 text-[#000000]' />
+            Auto-Reallocate
+          </Button>
+        )}
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { ReallocationFeed } from '@/features/decision-engine/components/reallocation-feed';
+import React, { useState, useEffect } from 'react';
+import { ReallocationFeed, type ReallocationItem } from '@/features/decision-engine/components/reallocation-feed';
 import { RLVisualAnalytics } from '@/features/decision-engine/components/rl-visual-analytics';
 import { computeRLAdAllocation } from '@/lib/rl-ad-optimizer';
 import initialEngineState from '@/data/nexus-engine-state.json';
@@ -10,6 +10,28 @@ import { cn } from '@/lib/utils';
 
 export default function ReallocationsPage() {
   const [activeView, setActiveView] = useState<'feed' | 'rl_analytics' | 'both'>('both');
+  const [items, setItems] = useState<ReallocationItem[]>(initialEngineState.reallocations as unknown as ReallocationItem[]);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadReallocations() {
+      try {
+        const res = await fetch('/api/reallocations');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.reallocations) && isMounted) {
+            setItems(data.reallocations);
+          }
+        }
+      } catch {
+        // Fallback to initialEngineState
+      }
+    }
+    loadReallocations();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Compute portfolio-level RL ad allocation
   const rlData = React.useMemo(() => {
@@ -81,7 +103,7 @@ export default function ReallocationsPage() {
       {/* Reallocation Feed Directives */}
       {(activeView === 'both' || activeView === 'feed') && (
         <ReallocationFeed
-          initialItems={initialEngineState.reallocations}
+          initialItems={items}
           campaigns={initialEngineState.campaigns}
         />
       )}

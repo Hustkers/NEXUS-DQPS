@@ -77,10 +77,10 @@ export function ShockSimulatorShowcase() {
               key={s.id}
               onClick={() => setSelectedId(s.id)}
               className={cn(
-                'text-left p-3 rounded-xl border transition-all duration-200 cursor-pointer font-mono',
+                'text-left p-3.5 rounded-2xl border transition-all duration-150 cursor-pointer font-mono active:scale-[0.97] select-none',
                 isSelected
-                  ? 'bg-card border-primary/60 shadow-sm ring-1 ring-primary/40'
-                  : 'bg-muted/40 border-border/80 hover:bg-card hover:border-border text-muted-foreground'
+                  ? 'bg-card border-foreground/50 shadow-md ring-1 ring-foreground/20 text-foreground'
+                  : 'bg-muted/30 border-border/70 hover:bg-card/70 hover:border-foreground/30 text-muted-foreground'
               )}
             >
               <div className='flex items-center justify-between mb-1'>

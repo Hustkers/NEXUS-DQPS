@@ -156,10 +156,10 @@ export function NotchNavbar({
     );
 
     const baseClasses = cn(
-      'group flex items-center gap-1.5 text-sm transition-all whitespace-nowrap select-none',
+      'group flex items-center gap-1.5 text-sm transition-[transform,background-color,color] duration-150 active:duration-75 ease-[cubic-bezier(0.16,1,0.3,1)] whitespace-nowrap select-none active:scale-[0.96]',
       isActive
-        ? 'bg-neutral-100 dark:bg-zinc-800 text-neutral-900 dark:text-white font-semibold px-3 py-1 rounded-lg shadow-2xs'
-        : 'text-neutral-600 dark:text-zinc-400 hover:text-neutral-900 dark:hover:text-white font-medium px-2 py-1'
+        ? 'bg-neutral-100/90 dark:bg-zinc-800/90 backdrop-blur-xs text-neutral-900 dark:text-white font-semibold px-3 py-1 rounded-full shadow-2xs border border-neutral-200/50 dark:border-white/10'
+        : 'text-neutral-600 dark:text-zinc-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100/50 dark:hover:bg-zinc-800/50 font-medium px-2.5 py-1 rounded-full'
     );
 
     if (isHash) {
