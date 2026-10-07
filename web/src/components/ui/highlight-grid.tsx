@@ -52,12 +52,12 @@ export const NEXUS_PROJECT_TECH_STACK_ROWS: HighlightItem[][] = [
     { label: "python engine", color: "#3B82F6" },
   ],
   [
-    { label: "meta conversions api", color: "#2563EB" },
-    { label: "google ads pmax", color: "#10B981" },
-    { label: "tiktok events api", color: "#F43F5E" },
-    { label: "shopify storefront", color: "#059669" },
-    { label: "cobe 3d webgl", color: "#8B5CF6" },
-    { label: "recharts frontier", color: "#06B6D4" },
+    { label: "zustand state", color: "#F59E0B" },
+    { label: "tanstack query", color: "#EF4444" },
+    { label: "tanstack table", color: "#10B981" },
+    { label: "recharts engine", color: "#06B6D4" },
+    { label: "radix ui primitives", color: "#8B5CF6" },
+    { label: "pandas & numpy", color: "#3B82F6" },
   ],
 ];
 
@@ -86,20 +86,23 @@ export function HighlightGrid({
   }, [rows, colors]);
 
   const moveTo = useCallback((gi: number, color: string) => {
-    // The highlight lives inside the grid, so offsets are relative to the grid.
     const grid = gridRef.current;
     const highlight = highlightRef.current;
     const el = cellRefs.current.get(gi);
     if (!grid || !highlight || !el) return;
 
-    const rect = el.getBoundingClientRect();
-    const crect = grid.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return;
+    // Use direct offset positioning relative to gridRef offsetParent for subpixel accuracy
+    const left = el.offsetLeft;
+    const top = el.offsetTop;
+    const width = el.offsetWidth;
+    const height = el.offsetHeight;
+
+    if (width === 0 || height === 0) return;
 
     highlight.style.opacity = "1";
-    highlight.style.transform = `translate(${rect.left - crect.left}px, ${rect.top - crect.top}px)`;
-    highlight.style.width = `${rect.width}px`;
-    highlight.style.height = `${rect.height}px`;
+    highlight.style.transform = `translate3d(${left}px, ${top}px, 0)`;
+    highlight.style.width = `${width}px`;
+    highlight.style.height = `${height}px`;
     highlight.style.backgroundColor = color;
     activeRef.current = { gi, color };
   }, []);
@@ -148,19 +151,19 @@ export function HighlightGrid({
   return (
     <div
       className={cn(
-        "relative flex min-h-[290px] w-full items-center justify-start overflow-x-auto overflow-y-hidden lg:justify-center py-4",
+        "relative flex min-h-[300px] w-full items-center justify-start overflow-x-auto overflow-y-hidden lg:justify-center py-4",
         className,
       )}
     >
       <div
         ref={gridRef}
-        className="relative mx-auto flex h-[240px] sm:h-[270px] w-[96%] min-w-[780px] max-w-[1100px] shrink-0 flex-col border border-border/80 dark:border-white/15 rounded-2xl overflow-hidden backdrop-blur-md bg-card/60 shadow-sm"
+        className="relative mx-auto flex h-[255px] sm:h-[285px] w-[96%] min-w-[780px] max-w-[1100px] shrink-0 flex-col border border-border/80 dark:border-white/15 rounded-2xl overflow-hidden backdrop-blur-md bg-card/60 shadow-sm"
       >
         {/* Sliding highlight — solid accent with a radiant gradient sheen layered over it */}
         <div
           ref={highlightRef}
           aria-hidden
-          className="pointer-events-none absolute left-0 top-0 z-0 opacity-0 rounded-xs"
+          className="pointer-events-none absolute left-0 top-0 z-0 opacity-0"
           style={{
             backgroundImage:
               "radial-gradient(120% 120% at 50% 0%, rgba(255,255,255,0.32), rgba(255,255,255,0) 52%), linear-gradient(180deg, rgba(255,255,255,0) 55%, rgba(0,0,0,0.22))",
@@ -174,7 +177,7 @@ export function HighlightGrid({
           <div
             key={r}
             className={cn(
-              "flex flex-1",
+              "flex flex-1 w-full",
               r < gridRows.length - 1 && "border-b border-border/70 dark:border-white/15",
             )}
           >
@@ -192,13 +195,13 @@ export function HighlightGrid({
                     moveTo(cell.gi, cell.color);
                   }}
                   className={cn(
-                    "flex h-full flex-1 items-center justify-center p-2.5 sm:p-3 text-center cursor-pointer transition-colors",
+                    "flex h-full flex-1 items-center justify-center p-2.5 sm:p-3 text-center cursor-pointer transition-colors relative",
                     c < row.length - 1 && "border-r border-border/70 dark:border-white/15",
                   )}
                 >
                   <p
                     className={cn(
-                      "relative z-[2] whitespace-nowrap font-mono text-[10.5px] sm:text-[12px] font-semibold uppercase transition-colors duration-200 select-none tracking-wider",
+                      "relative z-[2] pointer-events-none whitespace-nowrap font-mono text-[11px] sm:text-[12px] font-semibold uppercase transition-colors duration-200 select-none tracking-wider",
                       isActive ? "text-white drop-shadow-sm font-bold" : "text-muted-foreground hover:text-foreground",
                     )}
                   >
