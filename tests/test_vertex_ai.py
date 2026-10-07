@@ -19,7 +19,7 @@ def test_vertex_ai_status_endpoint():
     assert "project_id" in data
     assert "location" in data
     assert data["location"] == "us-central1"
-    assert data["model_name"] in ("gemini-2.5-flash", "gemini-2.5-pro", "gemini-1.5-flash")
+    assert data["model_name"] in ("gemini-3.8-flash", "gemini-2.5-flash", "gemini-2.5-pro", "gemini-1.5-flash")
     assert data["auth_method"] == "APPLICATION_DEFAULT_CREDENTIALS"
     assert data["has_adc"] is True
 

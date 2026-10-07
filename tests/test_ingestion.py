@@ -118,4 +118,4 @@ def test_vertex_ai_adc_status():
     status = client.get_status()
     assert status["provider"] == "Google Cloud Vertex AI"
     assert "project_id" in status
-    assert status["model_name"] in ("gemini-2.5-flash", "gemini-2.5-pro", "gemini-1.5-flash")
+    assert status["model_name"] in ("gemini-3.8-flash", "gemini-2.5-flash", "gemini-2.5-pro", "gemini-1.5-flash")
