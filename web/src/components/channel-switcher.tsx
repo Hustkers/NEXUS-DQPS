@@ -1,12 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  IconBrandAmazon,
-  IconBrandGoogle,
-  IconBrandMeta,
-  IconShoppingBag,
-  IconWorld
+  IconWorld,
+  IconChevronDown,
+  IconCheck
 } from '@tabler/icons-react';
 import { Icons } from '@/components/icons';
 import { Badge } from '@/components/ui/badge';
@@ -26,12 +24,14 @@ import {
   useSidebar
 } from '@/components/ui/sidebar';
 import { useChannel, AdChannel, CHANNELS } from '@/context/channel-context';
+import { cn } from '@/lib/utils';
 
 export function ChannelSwitcher() {
   const { state } = useSidebar();
   const { channel, setChannel, channelInfo } = useChannel();
+  const [isOpen, setIsOpen] = useState(false);
 
-  const getChannelIcon = (id: AdChannel, className = 'size-4') => {
+  const getChannelIcon = (id: AdChannel, className = 'size-3.5') => {
     switch (id) {
       case 'amazon':
         return <Icons.amazon className={className} />;
@@ -57,113 +57,160 @@ export function ChannelSwitcher() {
     {
       id: 'amazon',
       name: 'Amazon Advertising',
-      type: 'Retail Media / Marketplace',
-      details: 'Sponsored Products, Brands & Buy Box Defense',
+      type: 'Marketplace',
+      details: 'Sponsored Products & Buy Box defense',
       status: 'Live'
     },
     {
       id: 'google',
       name: 'Google Ads',
-      type: 'Search & Shopping',
-      details: 'Performance Max, Google Merchant Center Feed',
+      type: 'P-Max & Search',
+      details: 'Shopping feeds & high-intent search',
       status: 'Live'
     },
     {
       id: 'meta',
       name: 'Meta Ads',
-      type: 'Social & Discovery',
-      details: 'Advantage+ Shopping Campaigns (Instagram & Facebook)',
+      type: 'Advantage+',
+      details: 'Instagram & Facebook Reels discovery',
       status: 'Live'
     },
     {
       id: 'shopify',
       name: 'Shopify Storefront',
-      type: 'Direct-to-Consumer',
-      details: 'Direct checkout, headless store & product catalog',
+      type: 'Direct D2C',
+      details: 'Direct checkout, cart retention & catalog',
       status: 'Live'
     }
   ];
 
-  return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <SidebarMenuButton
-                size='lg'
-                tooltip={`Channel: ${channelInfo.name}`}
-                className='border border-border bg-card hover:bg-accent/60 text-foreground transition-all shadow-2xs data-popup-open:bg-sidebar-accent'
-              />
-            }
-          >
-            {/* Left Icon */}
-            <div className={`flex aspect-square size-8 items-center justify-center rounded-lg border shadow-xs shrink-0 ${channelInfo.accentColor}`}>
-              {getChannelIcon(channel, 'size-4')}
-            </div>
-
-            {/* Label and Subtext in Expanded Mode */}
-            <div className='grid flex-1 text-left text-xs leading-tight min-w-0 group-data-[collapsible=icon]:hidden'>
-              <div className='flex items-center justify-between'>
-                <span className='truncate font-semibold text-foreground'>{channelInfo.name}</span>
-                <span className='text-[10px] font-mono text-muted-foreground uppercase'>{channelInfo.badge}</span>
+  // If sidebar is collapsed into icon rail, provide seamless icon popover
+  if (state === 'collapsed') {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <SidebarMenuButton
+                  size='lg'
+                  tooltip={`Channel: ${channelInfo.name}`}
+                  className='h-10 rounded-xl border border-border/50 bg-background/60 hover:bg-muted/50 hover:border-border/80 text-foreground transition-all duration-200 shadow-2xs'
+                />
+              }
+            >
+              <div className='flex aspect-square size-7 items-center justify-center rounded-lg border border-border/70 bg-muted/40 text-foreground'>
+                {getChannelIcon(channel, 'size-3.5')}
               </div>
-              <span className='truncate text-[10px] text-muted-foreground font-mono'>Ad Channel Filter</span>
-            </div>
-
-            <Icons.chevronsDown className='ml-auto size-3.5 text-muted-foreground shrink-0 group-data-[collapsible=icon]:hidden' />
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent
-            className='w-(--anchor-width) min-w-64 rounded-xl bg-popover border-border shadow-lg'
-            align='start'
-            side='bottom'
-            sideOffset={4}
-          >
-            <DropdownMenuGroup>
-              <DropdownMenuLabel className='text-muted-foreground text-[11px] font-mono uppercase tracking-wider px-2 py-1.5'>
-                Ad Channels (Active Campaigns)
-              </DropdownMenuLabel>
-            </DropdownMenuGroup>
-
-            {channelList.map((ch) => {
-              const isSelected = channel === ch.id;
-              return (
-                <DropdownMenuItem
-                  key={ch.id}
-                  onClick={() => setChannel(ch.id)}
-                  className={`cursor-pointer flex items-start gap-2.5 p-2 rounded-lg hover:bg-[#1A1A1A] focus:bg-[#1A1A1A] ${
-                    isSelected ? 'bg-[#1A1A1A] border-l-2 border-white' : ''
-                  }`}
-                >
-                  <div className={`mt-0.5 flex aspect-square size-6 items-center justify-center rounded-md border ${CHANNELS[ch.id]?.accentColor || 'text-[#8A8A8A] border-[#8A8A8A]'}`}>
-                    {getChannelIcon(ch.id, 'size-3.5')}
-                  </div>
-                  <div className='flex flex-col flex-1 min-w-0'>
-                    <div className='flex items-center justify-between'>
-                      <span className={`text-xs font-semibold ${isSelected ? 'text-white font-bold' : 'text-white/90'}`}>
-                        {ch.name}
-                      </span>
-                      {isSelected && (
-                        <Badge variant='outline' className='text-[9px] py-0 px-1 border-white text-black bg-white font-mono font-bold'>
-                          Selected
-                        </Badge>
-                      )}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className='w-64 rounded-xl bg-popover/95 backdrop-blur-md border-border/80 shadow-xl p-1.5'
+              align='start'
+              side='right'
+              sideOffset={12}
+            >
+              <DropdownMenuGroup>
+                <DropdownMenuLabel className='text-muted-foreground text-[10px] font-mono uppercase tracking-wider px-2 py-1'>
+                  Ad Channels
+                </DropdownMenuLabel>
+              </DropdownMenuGroup>
+              {channelList.map((ch) => {
+                const isSelected = channel === ch.id;
+                return (
+                  <DropdownMenuItem
+                    key={ch.id}
+                    onClick={() => setChannel(ch.id)}
+                    className={cn(
+                      'cursor-pointer rounded-lg p-2 transition-colors flex items-center justify-between gap-2',
+                      isSelected ? 'bg-accent font-semibold text-foreground' : 'hover:bg-muted/70 text-foreground/80'
+                    )}
+                  >
+                    <div className='flex items-center gap-2 min-w-0'>
+                      <div className='flex aspect-square size-6 items-center justify-center rounded-md border border-border/60 bg-muted/30 shrink-0'>
+                        {getChannelIcon(ch.id, 'size-3')}
+                      </div>
+                      <div className='flex flex-col min-w-0'>
+                        <span className='text-xs truncate'>{ch.name}</span>
+                        <span className='text-[10px] text-muted-foreground truncate'>{ch.type}</span>
+                      </div>
                     </div>
-                    <span className='text-[10px] text-[#8A8A8A] truncate'>{ch.details}</span>
-                  </div>
-                </DropdownMenuItem>
-              );
-            })}
+                    {isSelected && <IconCheck className='size-3.5 text-primary shrink-0' />}
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
+  }
 
-            <DropdownMenuSeparator className='bg-[#8A8A8A]' />
-            <div className='p-2 text-[10px] text-[#8A8A8A] font-mono flex items-center justify-between'>
-              <span>SYNC: REAL-TIME (POSTGRES)</span>
-              <span className='text-white font-semibold'>ACTIVE</span>
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
+  // Expanded Sidebar: Aceternity UI Collapsible Accordion Navigation Item
+  return (
+    <div className='w-full min-w-0'>
+      {/* Accordion Trigger Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className='relative flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors text-muted-foreground hover:bg-muted/60 hover:text-foreground group border border-border/40 hover:border-border/70'
+      >
+        <span className='relative z-10 flex min-w-0 flex-1 items-center gap-2'>
+          <span className='flex size-6 shrink-0 items-center justify-center rounded-md border border-border/60 bg-muted/40 text-foreground group-hover:border-primary/30 transition-colors'>
+            {getChannelIcon(channel, 'size-3.5')}
+          </span>
+          <span className='truncate font-medium text-foreground text-xs'>
+            {channelInfo.name}
+          </span>
+        </span>
+
+        <div className='flex items-center gap-1.5 shrink-0 ml-2'>
+          <span className='rounded-sm bg-primary/10 border border-primary/20 px-1.5 py-0.5 text-[9px] font-mono font-semibold text-primary leading-none'>
+            {channelInfo.badge}
+          </span>
+          <IconChevronDown
+            className={cn(
+              'size-3 shrink-0 text-muted-foreground/70 transition-transform duration-200',
+              isOpen && 'rotate-180 text-foreground'
+            )}
+          />
+        </div>
+      </button>
+
+      {/* Accordion Collapsible Content with Aceternity Tree Connector */}
+      {isOpen && (
+        <div className='mt-1 ml-4.5 min-w-0 border-l border-border/60 py-1 pl-2.5 space-y-0.5 animate-in fade-in-50 duration-150'>
+          {channelList.map((ch) => {
+            const isSelected = channel === ch.id;
+            return (
+              <button
+                key={ch.id}
+                onClick={() => setChannel(ch.id)}
+                className={cn(
+                  'group/ch relative flex w-full min-w-0 items-center justify-between rounded-md px-2 py-1 text-xs transition-colors text-left',
+                  isSelected
+                    ? 'bg-accent/80 font-semibold text-foreground shadow-2xs'
+                    : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+                )}
+              >
+                <div className='flex items-center gap-2 min-w-0 flex-1'>
+                  <span className='flex size-4.5 shrink-0 items-center justify-center text-muted-foreground group-hover/ch:text-foreground'>
+                    {getChannelIcon(ch.id, 'size-3')}
+                  </span>
+                  <span className='truncate text-[11px]'>{ch.name}</span>
+                </div>
+
+                <div className='flex items-center gap-1 shrink-0 ml-1'>
+                  <span className='text-[9px] font-mono text-muted-foreground/70 hidden sm:inline'>
+                    {ch.type}
+                  </span>
+                  {isSelected && (
+                    <span className='size-1.5 rounded-full bg-emerald-500 shrink-0 ml-1' />
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }
