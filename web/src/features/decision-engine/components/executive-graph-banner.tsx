@@ -466,7 +466,7 @@ export function ExecutiveGraphBanner({
                   className='px-2.5 py-1 rounded-md bg-muted/30 border border-border hover:bg-muted text-muted-foreground hover:text-foreground font-mono text-xs transition-colors'
                   title='Close studio overlay'
                 >
-                  ✕ Close
+                  Close
                 </button>
               </div>
             </div>

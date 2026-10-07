@@ -190,11 +190,12 @@ export function MissionControlConsole() {
       const type = e.detail?.scenarioType;
       handleTriggerScenario({
         id: type === 'ad_fatigue' ? 'scenario-fatigue' : 'scenario-stockout',
-        title: 'Operational Shock (AppWide Copilot)',
+        name: 'Operational Shock (AppWide Copilot)',
         description: 'Injected via AI Assistant function calling',
-        impact: '-37% ROAS',
-        severity: 'CRITICAL',
-        affectedChannel: 'Meta'
+        injectedEvent: 'Operational crisis degradation',
+        autonomousResponse: 'Autonomous budget reallocation ready',
+        expectedSavedWaste: '+$1,148',
+        severity: 'CRITICAL'
       });
     };
 
