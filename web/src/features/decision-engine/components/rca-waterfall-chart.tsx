@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { IconChartBar } from '@tabler/icons-react';
 
-export interface WaterfallItem {
+interface WaterfallItem {
   driver: string;
   category: string;
   dollarImpact: number;
@@ -13,54 +13,60 @@ export interface WaterfallItem {
   color: string;
 }
 
-export function RcaWaterfallChart({
-  totalLoss = 3008.25,
-  items,
-}: {
-  totalLoss?: number;
+interface RcaWaterfallChartProps {
   items?: WaterfallItem[];
-}) {
+  totalLoss?: number;
+}
+
+export function RcaWaterfallChart({ items, totalLoss = 3008.25 }: RcaWaterfallChartProps) {
   const defaultItems: WaterfallItem[] = [
     {
-      driver: 'Shopify Inventory Stockout',
-      category: 'Fulfillment & Stock',
+      driver: 'Shopify Stockout Gate',
+      category: 'Inventory Shock',
       dollarImpact: 1985.45,
       percentageShare: 66.0,
-      color: 'bg-[#FFFFFF]',
+      color: 'bg-foreground'
     },
     {
-      driver: 'Ad Creative Frequency Fatigue',
-      category: 'Meta Creative Wear-Out',
-      dollarImpact: 721.98,
-      percentageShare: 24.0,
-      color: 'bg-[#8A8A8A]',
+      driver: 'Meta CPM Inflation (+34%)',
+      category: 'Auction Pressure',
+      dollarImpact: 571.57,
+      percentageShare: 19.0,
+      color: 'bg-muted-foreground'
     },
     {
-      driver: 'Auction CPM Surge',
-      category: 'Platform Bid Inflation',
-      dollarImpact: 300.82,
-      percentageShare: 10.0,
-      color: 'bg-[#8A8A8A]',
+      driver: 'Creative Ad Wear-out (CTR -40%)',
+      category: 'Creative Fatigue',
+      dollarImpact: 330.91,
+      percentageShare: 11.0,
+      color: 'bg-muted-foreground/70'
     },
+    {
+      driver: 'Landing Page LCP Drift (+1.2s)',
+      category: 'Tech Latency',
+      dollarImpact: 120.33,
+      percentageShare: 4.0,
+      color: 'bg-muted-foreground/40'
+    }
   ];
 
   const breakdown = items || defaultItems;
 
   return (
-    <Card className="p-5 border border-[#1A1A1A] bg-[#1A1A1A] shadow-none rounded text-[#FFFFFF]">
-      <div className="flex items-center justify-between mb-4 border-b border-[#000000] pb-3">
+    <Card className="p-5 border border-border bg-card shadow-none rounded text-card-foreground">
+      <div className="flex items-center justify-between mb-4 border-b border-border pb-3">
         <div>
-          <h3 className="text-sm font-semibold text-[#FFFFFF] tracking-tight flex items-center gap-2 font-mono">
-            <IconChartBar className="h-4 w-4 text-[#FFFFFF]" />
+          <h3 className="text-sm font-semibold text-foreground tracking-tight flex items-center gap-2 font-mono">
+            <IconChartBar className="h-4 w-4 text-foreground" />
             RCA Shapley Loss Waterfall Decomposition
           </h3>
-          <p className="text-xs text-[#8A8A8A] font-mono mt-0.5">
+          <p className="text-xs text-muted-foreground font-mono mt-0.5">
             Counterfactual Shapley allocation summing strictly to 100% of observed margin collapse
           </p>
         </div>
         <div className="text-right">
-          <span className="text-xs text-[#8A8A8A] block font-mono">Observed Margin Loss</span>
-          <span className="text-sm font-mono font-bold bg-[#FFFFFF] text-[#000000] px-1.5 py-0.5 rounded inline-block mt-0.5">
+          <span className="text-xs text-muted-foreground block font-mono">Observed Margin Loss</span>
+          <span className="text-sm font-mono font-bold bg-foreground text-background px-1.5 py-0.5 rounded inline-block mt-0.5">
             -${totalLoss.toLocaleString()}
           </span>
         </div>
@@ -71,21 +77,21 @@ export function RcaWaterfallChart({
           <div key={idx} className="space-y-1.5">
             <div className="flex items-center justify-between text-xs font-medium">
               <span className="flex items-center gap-2">
-                <span className={`h-2.5 w-2.5 rounded-none ${item.color.startsWith('bg-[') ? item.color : idx === 0 ? 'bg-[#FFFFFF]' : 'bg-[#8A8A8A]'}`} />
-                <span className="text-[#FFFFFF] font-mono font-semibold">{item.driver}</span>
-                <span className="text-[11px] text-[#8A8A8A] font-mono font-normal">({item.category})</span>
+                <span className={`h-2.5 w-2.5 rounded-none ${idx === 0 ? 'bg-foreground' : 'bg-muted-foreground/70'}`} />
+                <span className="text-foreground font-mono font-semibold">{item.driver}</span>
+                <span className="text-[11px] text-muted-foreground font-mono font-normal">({item.category})</span>
               </span>
               <div className="flex items-center gap-3 font-mono">
-                <span className="text-[#FFFFFF] font-bold">-${item.dollarImpact.toFixed(2)}</span>
-                <Badge variant="outline" className="text-[11px] font-mono px-1.5 py-0 border-none text-[#FFFFFF] bg-[#000000]">
+                <span className="text-foreground font-bold">-${item.dollarImpact.toFixed(2)}</span>
+                <Badge variant="outline" className="text-[11px] font-mono px-1.5 py-0 border border-border text-foreground bg-muted/60 font-semibold">
                   {item.percentageShare.toFixed(1)}%
                 </Badge>
               </div>
             </div>
 
-            <div className="w-full bg-[#000000] h-2 overflow-hidden flex">
+            <div className="w-full bg-muted h-2 overflow-hidden flex">
               <div
-                className={`h-full ${item.color.startsWith('bg-[') ? item.color : idx === 0 ? 'bg-[#FFFFFF]' : 'bg-[#8A8A8A]'} transition-all duration-500`}
+                className={`h-full ${idx === 0 ? 'bg-foreground' : 'bg-muted-foreground/70'} transition-all duration-500`}
                 style={{ width: `${item.percentageShare}%` }}
               />
             </div>
@@ -93,9 +99,9 @@ export function RcaWaterfallChart({
         ))}
       </div>
 
-      <div className="mt-4 pt-3 border-t border-[#000000] flex items-center justify-between text-[11px] text-[#8A8A8A] font-mono">
+      <div className="mt-4 pt-3 border-t border-border flex items-center justify-between text-[11px] text-muted-foreground font-mono">
         <span>Attribution Model: DoWhy-GCM Shapley</span>
-        <span className="text-[#FFFFFF] font-bold">● Sum: 100.0% Reconciled</span>
+        <span className="text-foreground font-bold">● Sum: 100.0% Reconciled</span>
       </div>
     </Card>
   );

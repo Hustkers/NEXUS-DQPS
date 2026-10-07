@@ -128,7 +128,7 @@ export function MissionControlConsole() {
   );
 
   return (
-    <div className='relative flex flex-1 flex-col gap-8 p-5 md:p-8 bg-[#000000] text-white min-h-screen selection:bg-[#1A1A1A] selection:text-white'>
+    <div className='relative flex flex-1 flex-col gap-8 p-5 md:p-8 bg-background text-foreground min-h-screen selection:bg-primary/20 selection:text-foreground'>
 
 
       {/* 2. Executive Overview KPI Banner & Trajectory Graphs */}
@@ -146,27 +146,27 @@ export function MissionControlConsole() {
       />
 
       {/* 3.5. Live 3D Global Telemetry & Heatmap Command Center */}
-      <div className='rounded border border-[#1A1A1A] bg-[#1A1A1A] p-6 shadow-none flex flex-col xl:flex-row items-start justify-between gap-6 relative min-h-[460px]'>
+      <div className='rounded border border-border bg-card p-6 shadow-none text-card-foreground flex flex-col xl:flex-row items-start justify-between gap-6 relative min-h-[460px]'>
         {/* Left Column: Telemetry info, tabs, region tiles, SKU chips */}
         <div className='flex-1 space-y-3.5 w-full min-w-0'>
-          <div className='flex flex-wrap items-center justify-between gap-2 border-b border-[#000000] pb-2.5'>
+          <div className='flex flex-wrap items-center justify-between gap-2 border-b border-border pb-2.5'>
             <div className='flex items-center gap-2'>
-              <Icons.globe className='size-5 text-white' />
-              <h3 className='font-mono text-sm font-bold text-white uppercase tracking-tight'>
+              <Icons.globe className='size-5 text-foreground' />
+              <h3 className='font-mono text-sm font-bold text-foreground uppercase tracking-tight'>
                 Live 3D Global Ad &amp; Sales Telemetry
               </h3>
             </div>
             <div className='flex items-center gap-2'>
               {/* Globe Switcher */}
-              <div className='flex items-center bg-[#000000] rounded border border-[#1A1A1A] p-0.5 text-xs font-mono'>
+              <div className='flex items-center bg-muted/60 rounded border border-border p-0.5 text-xs font-mono'>
                 <button
                   type='button'
                   onClick={() => setConsoleGlobeMode('pulse')}
                   className={cn(
                     'px-2.5 py-1 rounded font-semibold transition-all',
                     consoleGlobeMode === 'pulse'
-                      ? 'bg-white text-black font-bold'
-                      : 'text-[#8A8A8A] hover:text-white'
+                      ? 'bg-background text-foreground shadow-2xs font-bold'
+                      : 'text-muted-foreground hover:text-foreground'
                   )}
                 >
                   Sales Pulse
@@ -177,8 +177,8 @@ export function MissionControlConsole() {
                   className={cn(
                     'px-2.5 py-1 rounded font-semibold transition-all',
                     consoleGlobeMode === 'arcs'
-                      ? 'bg-white text-black font-bold'
-                      : 'text-[#8A8A8A] hover:text-white'
+                      ? 'bg-background text-foreground shadow-2xs font-bold'
+                      : 'text-muted-foreground hover:text-foreground'
                   )}
                 >
                   Analysing Arcs
@@ -187,7 +187,7 @@ export function MissionControlConsole() {
 
               <Link
                 href='/dashboard/globe'
-                className='px-2.5 py-1 rounded bg-[#000000] border border-[#1A1A1A] text-xs font-mono text-white hover:bg-white hover:text-black transition-colors flex items-center gap-1.5'
+                className='px-2.5 py-1 rounded bg-background border border-border text-xs font-mono text-foreground hover:bg-muted transition-colors flex items-center gap-1.5'
               >
                 <span>Full Globe Hub</span>
                 <Icons.arrowRight className='size-3' />
@@ -195,7 +195,7 @@ export function MissionControlConsole() {
             </div>
           </div>
 
-          <p className='text-xs font-mono text-[#8A8A8A] leading-relaxed'>
+          <p className='text-xs font-mono text-muted-foreground leading-relaxed'>
             {consoleGlobeMode === 'pulse'
               ? 'Real-time customer interaction pulse: High engagement rendered via mechanical telemetry contrast. Powered by cobe-globe-pulse.'
               : 'WebGL ad delivery vectors across Meta, Google, Amazon & Shopify. Visualizing network latency and delivery hops via github.com/globe.'}
@@ -211,17 +211,17 @@ export function MissionControlConsole() {
                 if (match) setSelectedGlobeMarker((prev) => (prev?.id === 'us-east' ? null : match));
               }}
               className={cn(
-                'p-2.5 rounded bg-[#000000] border transition-all text-left cursor-pointer group',
+                'p-2.5 rounded bg-muted/30 border transition-all text-left cursor-pointer group',
                 selectedGlobeMarker?.id === 'us-east'
-                  ? 'border-red-500 ring-1 ring-red-500/50 bg-red-950/20'
-                  : 'border-[#1A1A1A] hover:border-white'
+                  ? 'border-red-500 ring-1 ring-red-500/50 bg-red-500/10'
+                  : 'border-border hover:border-foreground/40'
               )}
             >
-              <div className='flex items-center gap-1.5 text-[10px] text-zinc-400'>
+              <div className='flex items-center gap-1.5 text-[10px] text-muted-foreground'>
                 <span className='size-2 rounded-full bg-red-500 shrink-0 shadow-[0_0_6px_#ef4444]' />
                 <span>US-EAST / WEST</span>
               </div>
-              <div className='text-white font-bold mt-0.5'>High Sales (78%)</div>
+              <div className='text-foreground font-bold mt-0.5'>High Sales (78%)</div>
             </button>
 
             {/* Tile 2: WESTERN EUROPE (Strong - Amber) */}
@@ -232,17 +232,17 @@ export function MissionControlConsole() {
                 if (match) setSelectedGlobeMarker((prev) => (prev?.id === 'eu-west' ? null : match));
               }}
               className={cn(
-                'p-2.5 rounded bg-[#000000] border transition-all text-left cursor-pointer group',
+                'p-2.5 rounded bg-muted/30 border transition-all text-left cursor-pointer group',
                 selectedGlobeMarker?.id === 'eu-west'
-                  ? 'border-amber-500 ring-1 ring-amber-500/50 bg-amber-950/20'
-                  : 'border-[#1A1A1A] hover:border-white'
+                  ? 'border-amber-500 ring-1 ring-amber-500/50 bg-amber-500/10'
+                  : 'border-border hover:border-foreground/40'
               )}
             >
-              <div className='flex items-center gap-1.5 text-[10px] text-zinc-400'>
+              <div className='flex items-center gap-1.5 text-[10px] text-muted-foreground'>
                 <span className='size-2 rounded-full bg-amber-400 shrink-0 shadow-[0_0_6px_#f59e0b]' />
                 <span>WESTERN EUROPE</span>
               </div>
-              <div className='text-white font-bold mt-0.5'>Strong (56%)</div>
+              <div className='text-foreground font-bold mt-0.5'>Strong (56%)</div>
             </button>
 
             {/* Tile 3: ASIA-PACIFIC (Moderate - Readable Amber/Yellow Text) */}
@@ -253,17 +253,17 @@ export function MissionControlConsole() {
                 if (match) setSelectedGlobeMarker((prev) => (prev?.id === 'apac' ? null : match));
               }}
               className={cn(
-                'p-2.5 rounded bg-[#000000] border transition-all text-left cursor-pointer group',
+                'p-2.5 rounded bg-muted/30 border transition-all text-left cursor-pointer group',
                 selectedGlobeMarker?.id === 'apac'
-                  ? 'border-amber-500 ring-1 ring-amber-500/50 bg-amber-950/20'
-                  : 'border-[#1A1A1A] hover:border-white'
+                  ? 'border-amber-500 ring-1 ring-amber-500/50 bg-amber-500/10'
+                  : 'border-border hover:border-foreground/40'
               )}
             >
-              <div className='flex items-center gap-1.5 text-[10px] text-zinc-400'>
+              <div className='flex items-center gap-1.5 text-[10px] text-muted-foreground'>
                 <span className='size-2 rounded-full bg-amber-400 shrink-0 shadow-[0_0_6px_#f59e0b]' />
                 <span>ASIA-PACIFIC</span>
               </div>
-              <div className='text-amber-300 font-bold mt-0.5'>Moderate (44%)</div>
+              <div className='text-foreground font-bold mt-0.5'>Moderate (44%)</div>
             </button>
 
             {/* Tile 4: LATAM & SEA (RL Suppressed - Grey) */}
@@ -274,22 +274,22 @@ export function MissionControlConsole() {
                 if (match) setSelectedGlobeMarker((prev) => (prev?.id === 'latam' ? null : match));
               }}
               className={cn(
-                'p-2.5 rounded bg-[#000000] border transition-all text-left cursor-pointer group',
+                'p-2.5 rounded bg-muted/30 border transition-all text-left cursor-pointer group',
                 selectedGlobeMarker?.id === 'latam'
-                  ? 'border-zinc-400 ring-1 ring-zinc-400/50 bg-zinc-900/60'
-                  : 'border-[#1A1A1A] hover:border-white'
+                  ? 'border-zinc-400 ring-1 ring-zinc-400/50 bg-muted/60'
+                  : 'border-border hover:border-foreground/40'
               )}
             >
-              <div className='flex items-center gap-1.5 text-[10px] text-zinc-400'>
-                <span className='size-2 rounded-full bg-zinc-500 shrink-0' />
+              <div className='flex items-center gap-1.5 text-[10px] text-muted-foreground'>
+                <span className='size-2 rounded-full bg-muted-foreground shrink-0' />
                 <span>LATAM &amp; SEA</span>
               </div>
-              <div className='text-zinc-200 font-bold mt-0.5'>RL Suppressed</div>
+              <div className='text-muted-foreground font-bold mt-0.5'>RL Suppressed</div>
             </button>
           </div>
 
           <div className='pt-1 flex flex-wrap items-center gap-2'>
-            <span className='text-[11px] font-mono text-[#8A8A8A]'>Click any active SKU to open 3D Analysis Modal:</span>
+            <span className='text-[11px] font-mono text-muted-foreground'>Click any active SKU to open 3D Analysis Modal:</span>
             {state.campaigns.slice(0, 3).map((c: any) => (
               <button
                 key={c.campaign}
@@ -307,7 +307,7 @@ export function MissionControlConsole() {
                     severity: c.inventory === 0 ? 'CRITICAL' : 'HEALTHY'
                   });
                 }}
-                className='px-2.5 py-1 rounded bg-[#000000] border border-[#1A1A1A] hover:border-white text-xs font-mono text-white transition-colors flex items-center gap-1.5'
+                className='px-2.5 py-1 rounded bg-muted/40 border border-border hover:border-foreground/40 text-xs font-mono text-foreground transition-colors flex items-center gap-1.5'
               >
                 <PlatformLogo platform={c.platform} size={12} className='shrink-0' />
                 <span>{c.productName || c.sku}</span>
@@ -361,17 +361,17 @@ export function MissionControlConsole() {
         />
       </div>
       <div className='space-y-3.5'>
-        <div className='flex items-center justify-between border-b border-[#1A1A1A] pb-2.5'>
+        <div className='flex items-center justify-between border-b border-border pb-2.5'>
           <div className='flex items-center gap-2'>
-            <Icons.warning className='size-3.5 text-white' />
-            <h3 className='font-mono text-xs font-bold text-white uppercase tracking-wider'>
+            <Icons.warning className='size-3.5 text-foreground' />
+            <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
               Active Diagnostic Anomalies
             </h3>
-            <span className='text-xs font-mono text-[#8A8A8A]'>
+            <span className='text-xs font-mono text-muted-foreground'>
               ({state.anomalies.length})
             </span>
           </div>
-          <span className='text-xs font-mono text-[#8A8A8A]'>
+          <span className='text-xs font-mono text-muted-foreground'>
             14d Baseline • |Z| &gt; 2.2
           </span>
         </div>
@@ -448,20 +448,20 @@ export function MissionControlConsole() {
       />
 
       {/* 10. ROAS Gauges & Health Scoring Matrix */}
-      <div className='space-y-4 rounded border border-[#1A1A1A] bg-[#1A1A1A]/40 p-5 shadow-none'>
-        <div className='flex flex-wrap items-center justify-between gap-3 border-b border-[#000000] pb-3'>
+      <div className='space-y-4 rounded border border-border bg-card p-5 shadow-none text-card-foreground'>
+        <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3'>
           <div className='flex items-center gap-2'>
-            <Icons.trendingUp className='size-3.5 text-white' />
-            <h3 className='font-mono text-xs font-bold text-white uppercase tracking-wider'>
+            <Icons.trendingUp className='size-3.5 text-foreground' />
+            <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
               Real-Time Campaign Gauges &amp; Health Scoring
             </h3>
-            <span className='text-xs font-mono text-[#8A8A8A]'>
+            <span className='text-xs font-mono text-muted-foreground'>
               ({filteredCampaigns.length} campaigns)
             </span>
           </div>
 
           {/* Platform Tab Filters */}
-          <div className='flex items-center gap-1 bg-[#000000] p-1 rounded border border-[#1A1A1A] text-xs font-mono'>
+          <div className='flex items-center gap-1 bg-muted/60 p-1 rounded border border-border text-xs font-mono'>
             {(['all', 'amazon', 'google', 'meta'] as const).map((tab) => (
               <button
                 key={tab}
@@ -469,8 +469,8 @@ export function MissionControlConsole() {
                 className={cn(
                   'px-3 py-1 rounded transition-all uppercase text-[11px] font-mono tracking-wider active:scale-[0.98] inline-flex items-center gap-1.5',
                   activeTab === tab
-                    ? 'bg-white text-black font-bold'
-                    : 'text-[#8A8A8A] hover:text-white'
+                    ? 'bg-background text-foreground shadow-2xs font-bold'
+                    : 'text-muted-foreground hover:text-foreground'
                 )}
               >
                 {tab !== 'all' && <PlatformLogo platform={tab} size={12} className='shrink-0' />}

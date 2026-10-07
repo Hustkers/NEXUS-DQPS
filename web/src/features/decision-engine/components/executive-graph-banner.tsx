@@ -233,10 +233,19 @@ export function ExecutiveGraphBanner({
   return (
     <div className='flex flex-col gap-4'>
       {/* 1. Header Bar with Time Range Selector & Comparative Detail Toggle */}
-      <div className='flex items-center justify-end gap-2'>
+      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3'>
+        <div className='flex items-center gap-2.5'>
+          <h2 className='font-mono text-xs font-bold uppercase tracking-wider text-foreground'>
+            Executive Financial &amp; Efficiency Trajectories
+          </h2>
+          <span className='font-mono text-[11px] text-muted-foreground'>
+            ({timeRange.toUpperCase()} Trailing •{' '}
+            {channel === 'all' ? 'Blended Omnichannel' : channel.toUpperCase()})
+          </span>
+        </div>
         <div className='flex items-center gap-2'>
           {/* Timeframe pill selector */}
-          <div className='flex items-center rounded-lg border border-[#1A1A1A] bg-card p-0.5 text-[11px] font-mono shadow-2xs'>
+          <div className='flex items-center rounded-lg border border-border bg-card p-0.5 text-[11px] font-mono shadow-2xs'>
             {(['7d', '14d', '30d'] as const).map((r) => (
               <button
                 key={r}
@@ -259,8 +268,8 @@ export function ExecutiveGraphBanner({
             className={cn(
               'flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-mono transition-all active:scale-[0.98]',
               expandedMetric
-                ? 'bg-muted text-foreground border-[#1A1A1A] font-bold'
-                : 'bg-card border-[#1A1A1A] text-muted-foreground hover:text-foreground hover:bg-muted/40'
+                ? 'bg-muted text-foreground border-border font-bold'
+                : 'bg-card border-border text-muted-foreground hover:text-foreground hover:bg-muted/40'
             )}
             title='Toggle multi-axis comparative trajectory chart'
           >
@@ -284,7 +293,7 @@ export function ExecutiveGraphBanner({
             }}
             onClick={() => setExpandedMetric(expandedMetric === card.id ? null : card.id)}
             className={cn(
-              'group relative rounded-xl border-none bg-card p-4 transition-all cursor-pointer hover:shadow-md flex flex-col justify-between overflow-hidden',
+              'group relative rounded-xl border border-border bg-card p-4 transition-all cursor-pointer hover:shadow-md flex flex-col justify-between overflow-hidden',
               expandedMetric === card.id && 'ring-2 ring-emerald-500/50 shadow-sm'
             )}
           >
@@ -398,9 +407,9 @@ export function ExecutiveGraphBanner({
             animate={{ opacity: 1, height: 'auto', y: 0 }}
             exit={{ opacity: 0, height: 0, y: -10 }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className='relative overflow-hidden rounded-2xl border border-[#1A1A1A] bg-card p-5 shadow-sm'
+            className='relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm'
           >
-            <div className='relative z-10 flex flex-wrap items-center justify-between gap-3 border-b border-[#1A1A1A] pb-3 mb-4'>
+            <div className='relative z-10 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3 mb-4'>
               <div>
                 <div className='flex items-center gap-2'>
                   <h3 className='font-mono text-xs font-bold uppercase tracking-wider text-foreground'>

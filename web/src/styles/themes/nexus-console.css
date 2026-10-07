@@ -32,6 +32,17 @@
   --sidebar-accent-foreground: #09090B;
   --sidebar-border: #E4E4E7;
   --sidebar-ring: #09090B;
+
+  /* Shared VengenceUI tokens */
+  --vng-background: #FFFFFF;
+  --vng-foreground: #09090B;
+  --vng-border: #E4E4E7;
+  --vng-primary: #09090B;
+  --vng-primary-hover: #27272A;
+  --vng-primary-foreground: #FFFFFF;
+  --vng-secondary: #F4F4F5;
+  --vng-secondary-foreground: #09090B;
+
   --font-sans: 'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace;
   --radius: 0.25rem;
@@ -43,38 +54,48 @@
 
 [data-theme='nexus-console'].dark,
 .dark {
-  --background: #000000;
+  --background: #09090B;
   --foreground: #FFFFFF;
-  --card: #1A1A1A;
+  --card: #111114;
   --card-foreground: #FFFFFF;
-  --popover: #1A1A1A;
+  --popover: #111114;
   --popover-foreground: #FFFFFF;
   --primary: #FFFFFF;
-  --primary-foreground: #000000;
-  --secondary: #1A1A1A;
+  --primary-foreground: #09090B;
+  --secondary: #27272A;
   --secondary-foreground: #FFFFFF;
-  --muted: #1A1A1A;
-  --muted-foreground: #8A8A8A;
-  --accent: #1A1A1A;
+  --muted: #18181B;
+  --muted-foreground: #A1A1AA;
+  --accent: #27272A;
   --accent-foreground: #FFFFFF;
-  --destructive: #FFFFFF;
-  --destructive-foreground: #000000;
-  --border: #8A8A8A;
-  --input: #8A8A8A;
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+  --border: #27272A;
+  --input: #27272A;
   --ring: #FFFFFF;
   --chart-1: #FFFFFF;
-  --chart-2: #8A8A8A;
-  --chart-3: #1A1A1A;
-  --chart-4: #8A8A8A;
+  --chart-2: #A1A1AA;
+  --chart-3: #27272A;
+  --chart-4: #71717A;
   --chart-5: #FFFFFF;
-  --sidebar: #000000;
-  --sidebar-foreground: #8A8A8A;
+  --sidebar: #09090B;
+  --sidebar-foreground: #A1A1AA;
   --sidebar-primary: #FFFFFF;
-  --sidebar-primary-foreground: #000000;
-  --sidebar-accent: #1A1A1A;
+  --sidebar-primary-foreground: #09090B;
+  --sidebar-accent: #27272A;
   --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: #8A8A8A;
+  --sidebar-border: #27272A;
   --sidebar-ring: #FFFFFF;
+
+  /* Shared VengenceUI tokens (dark) */
+  --vng-background: #09090B;
+  --vng-foreground: #FFFFFF;
+  --vng-border: #27272A;
+  --vng-primary: #FFFFFF;
+  --vng-primary-hover: #E4E4E7;
+  --vng-primary-foreground: #09090B;
+  --vng-secondary: #27272A;
+  --vng-secondary-foreground: #FFFFFF;
 }
 
 [data-theme='nexus-console'] {

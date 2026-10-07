@@ -9,16 +9,18 @@ import { cn } from '@/lib/utils';
 export interface ScenarioDefinition {
   id: string;
   name: string;
-  description: string;
+  severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | string;
   injectedEvent: string;
-  autonomousResponse: string;
+  autonomousAction?: string;
+  autonomousResponse?: string;
   expectedSavedWaste: string;
-  severity: string;
+  responseSpeed?: string;
+  description?: string;
 }
 
 interface ScenarioControllerProps {
   scenarios: ScenarioDefinition[];
-  onTriggerScenario?: (scenario: ScenarioDefinition) => void;
+  onTriggerScenario: (scenario: ScenarioDefinition) => void;
   onResetBaseline?: () => void;
   className?: string;
 }
@@ -31,28 +33,25 @@ export function ScenarioController({
 }: ScenarioControllerProps) {
   const [activeScenarioId, setActiveScenarioId] = useState<string | null>(null);
 
-  const handleTrigger = (scenario: ScenarioDefinition) => {
-    setActiveScenarioId(scenario.id);
-    toast.warning(`Shock Injected: ${scenario.name}`, {
-      description: scenario.autonomousResponse
-    });
-    onTriggerScenario?.(scenario);
+  const handleTrigger = (s: ScenarioDefinition) => {
+    setActiveScenarioId(s.id);
+    onTriggerScenario(s);
   };
 
   const handleReset = () => {
     setActiveScenarioId(null);
-    toast.success('Simulation Reset', {
+    toast.info('Telemetry Baseline Restored', {
       description: 'Restored baseline steady-state telemetry.'
     });
     onResetBaseline?.();
   };
 
   return (
-    <div className={cn('rounded border border-[#1A1A1A] bg-[#1A1A1A] p-5 shadow-none text-[#FFFFFF]', className)}>
-      <div className='flex items-center justify-between border-b border-[#000000] pb-3 mb-4'>
+    <div className={cn('rounded border border-border bg-card p-5 shadow-none text-card-foreground', className)}>
+      <div className='flex items-center justify-between border-b border-border pb-3 mb-4'>
         <div className='flex items-center gap-2'>
-          <Icons.sparkles className='size-3.5 text-[#8A8A8A]' />
-          <h3 className='font-mono text-xs font-bold text-[#FFFFFF] uppercase tracking-wider'>
+          <Icons.sparkles className='size-3.5 text-muted-foreground' />
+          <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
             Scenario Shock Testing Sandbox
           </h3>
         </div>
@@ -61,9 +60,9 @@ export function ScenarioController({
           size='sm'
           variant='outline'
           onClick={handleReset}
-          className='h-8 text-xs font-mono text-[#FFFFFF] hover:bg-[#000000] hover:border-[#FFFFFF] border border-[#1A1A1A] bg-[#000000] px-2.5 active:scale-[0.98]'
+          className='h-8 text-xs font-mono text-foreground hover:bg-muted border border-border bg-background px-2.5 active:scale-[0.98]'
         >
-          <Icons.clock className='mr-1.5 size-3 text-[#8A8A8A]' />
+          <Icons.clock className='mr-1.5 size-3 text-muted-foreground' />
           Reset Baseline
         </Button>
       </div>
@@ -79,24 +78,24 @@ export function ScenarioController({
               key={s.id}
               onClick={() => handleTrigger(s)}
               className={cn(
-                'group flex flex-col items-start text-left rounded p-3.5 transition-all active:scale-[0.98]',
+                'group flex flex-col items-start text-left rounded p-3.5 transition-all active:scale-[0.98] cursor-pointer',
                 isActive
-                  ? 'border border-[#FFFFFF] bg-[#000000] ring-1 ring-[#FFFFFF]'
-                  : 'border border-[#1A1A1A] bg-[#000000] hover:border-[#8A8A8A]'
+                  ? 'border border-foreground bg-muted ring-1 ring-foreground'
+                  : 'border border-border bg-background hover:border-foreground/40'
               )}
             >
               <div className='flex items-center justify-between w-full mb-1.5'>
-                <span className='font-mono text-xs font-bold text-[#FFFFFF]'>
+                <span className={cn('font-mono text-xs font-bold', isCritical ? 'text-rose-500' : 'text-foreground')}>
                   {isCritical ? '■' : '○'}
                 </span>
-                <span className='text-[10px] font-mono text-[#FFFFFF] bg-[#1A1A1A] px-1.5 py-0.5 rounded font-semibold'>
+                <span className='text-[10px] font-mono text-foreground bg-muted px-1.5 py-0.5 rounded font-semibold border border-border'>
                   {s.expectedSavedWaste.split(' ')[0]} saved
                 </span>
               </div>
-              <div className='font-mono text-xs font-bold text-[#FFFFFF] line-clamp-1'>
+              <div className='font-mono text-xs font-bold text-foreground line-clamp-1'>
                 {s.name}
               </div>
-              <div className='text-[11px] text-[#8A8A8A] font-mono mt-1 line-clamp-1'>
+              <div className='text-[11px] text-muted-foreground font-mono mt-1 line-clamp-1'>
                 {s.injectedEvent}
               </div>
             </button>
