@@ -443,8 +443,29 @@ export function MissionControlConsole() {
       {/* 7. Interactive What-If Scenario Sandbox */}
       <ScenarioSandbox
         onApplyReallocation={(alloc) => {
-          toast.success('What-If Scenario Vector Applied', {
-            description: `Meta: $${alloc.meta}/d | Google: $${alloc.google}/d | Amazon: $${alloc.amazon}/d`
+          setState((prev: any) => ({
+            ...prev,
+            platforms: prev.platforms.map((p: any) => {
+              if (p.platform === 'meta') {
+                return { ...p, spend: alloc.meta * 30, revenue: alloc.metaRev * 30 };
+              }
+              if (p.platform === 'google') {
+                return { ...p, spend: alloc.google * 30, revenue: alloc.googleRev * 30 };
+              }
+              if (p.platform === 'amazon') {
+                return { ...p, spend: alloc.amazon * 30, revenue: alloc.amazonRev * 30 };
+              }
+              return p;
+            }),
+            telemetry: {
+              ...prev.telemetry,
+              totalManagedBudget: alloc.totalSpend * 30,
+              blendedRoas30d: +alloc.blendedRoas.toFixed(2),
+              projectedMarginUplift: Math.round(alloc.netContribution * 30)
+            }
+          }));
+          toast.success('What-If Scenario Vector Applied To Mission Control', {
+            description: `Meta: ₹${alloc.meta}/d | Google: ₹${alloc.google}/d | Amazon: ₹${alloc.amazon}/d. Blended ROAS: ${alloc.blendedRoas.toFixed(2)}x.`
           });
         }}
       />
