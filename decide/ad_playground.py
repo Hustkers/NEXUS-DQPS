@@ -14,8 +14,23 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 
-from decide.optimizer import response_curve
 from simulator.generator import NIKE_PRODUCTS
+
+
+def response_curve(spend: np.ndarray, revenue: np.ndarray) -> tuple[float, float]:
+    """Fit a robust power-law response curve revenue = k * spend^b."""
+    valid = (spend > 0) & (revenue > 0)
+    if np.sum(valid) >= 3:
+        try:
+            log_s = np.log(spend[valid])
+            log_r = np.log(revenue[valid])
+            b, log_k = np.polyfit(log_s, log_r, deg=1)
+            b = float(np.clip(b, 0.4, 0.95))
+            k = float(np.exp(log_k))
+            return k, b
+        except Exception:
+            pass
+    return 100.0, 0.75
 
 
 @dataclass
