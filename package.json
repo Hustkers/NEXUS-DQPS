@@ -1,0 +1,13 @@
+{
+  "name": "nexus-d2c",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Next-Generation Autonomous D2C Advertising Intelligence & Decision Engine",
+  "scripts": {
+    "dev": "pnpm --dir web dev",
+    "build": "pnpm --dir web build",
+    "start": "pnpm --dir web start",
+    "simulate": "python3 scripts/export_engine_state.py",
+    "demo": "python3 scripts/run_demo.py"
+  }
+}
