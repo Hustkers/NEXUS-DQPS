@@ -6,11 +6,58 @@ import { VGPUCanvas } from './vgpu-canvas';
 import { GlowButton } from './glow-button';
 import { CardSpotlight } from './card-spotlight';
 import { BentoGrid, BentoGridItem } from './bento-grid';
+import { StatsMatrix, type StatItem } from './stats-matrix';
 import { ShockSimulatorShowcase } from './shock-simulator-showcase';
 import { NotchNavbar } from './notch-navbar';
 import { IsometricTelemetryPanel } from './isometric-telemetry-panel';
 import { PlotFigure, BranchesFigure, PhosphorFigure, RiffleFigure } from './hairline-figures';
 import { AnimatedFooter } from '@/components/ui/animated-footer';
+
+const HERO_STATS: StatItem[] = [
+  {
+    label: 'Protected Capital',
+    value: '₹15,400/wk',
+    numericValue: 15400,
+    prefix: '₹',
+    suffix: '/wk',
+    decimals: 0,
+    sublabel: 'Stockout kill-switch waste cut',
+    trend: 'live',
+    badge: 'CIRCUIT BREAKER'
+  },
+  {
+    label: 'Hardware Attribution',
+    value: '99.8%',
+    numericValue: 99.8,
+    suffix: '%',
+    decimals: 1,
+    sublabel: 'Deterministic entropy match',
+    trend: 'up',
+    change: '+3.2x ROAS'
+  },
+  {
+    label: 'Circuit SLA',
+    value: '< 15 mins',
+    numericValue: 15,
+    prefix: '< ',
+    suffix: ' mins',
+    decimals: 0,
+    sublabel: 'Out-of-stock throttling speed',
+    trend: 'up',
+    change: 'REAL-TIME'
+  },
+  {
+    label: 'Optimization Stability',
+    value: '±20%',
+    numericValue: 20,
+    prefix: '±',
+    suffix: '%',
+    decimals: 0,
+    sublabel: 'Bounded KKT convex budget shift',
+    trend: 'neutral',
+    change: 'SCIPY / PULP'
+  }
+];
 
 export function LandingPageView() {
   return (
@@ -20,8 +67,10 @@ export function LandingPageView() {
 
       {/* HERO SECTION WITH VGPU CANVAS BACKGROUND */}
       <section id='overview' className='relative pt-24 pb-20 md:pt-28 md:pb-28 overflow-hidden border-b border-border/60 scroll-mt-16'>
-        {/* VGPU Canvas Dynamic Waveform */}
-        <VGPUCanvas className='opacity-80' intensity={1.1} />
+        {/* VGPU Canvas Dynamic Waveform (Full Hero Background Layer) */}
+        <div className='absolute inset-0 pointer-events-none overflow-hidden z-0'>
+          <VGPUCanvas className='opacity-80' intensity={1.1} />
+        </div>
 
         <div className='relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center'>
           {/* Master Headline as the Central Problem Question */}
@@ -35,7 +84,7 @@ export function LandingPageView() {
           </p>
 
           {/* Primary Button Group with VengenceUI Button Forge Styling */}
-          <div className='flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-16'>
+          <div className='flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-10 sm:mb-12'>
             <GlowButton
               href='/dashboard/overview'
               size='lg'
@@ -53,6 +102,11 @@ export function LandingPageView() {
             >
               Hardware Fingerprint Demo
             </GlowButton>
+          </div>
+
+          {/* Live Telemetry Animated Stats Matrix (VengenceUI Spring Counter) */}
+          <div className='w-full max-w-5xl mb-12 sm:mb-16'>
+            <StatsMatrix stats={HERO_STATS} />
           </div>
 
           {/* Hairline Isometric Telemetry Mission Console */}

@@ -24,32 +24,70 @@ export function VGPUCanvas({ className = '', intensity = 1.0 }: VGPUCanvasProps)
     if (!ctx) return;
 
     let animationFrameId: number;
-    let width = (canvas.width = canvas.offsetWidth * window.devicePixelRatio);
-    let height = (canvas.height = canvas.offsetHeight * window.devicePixelRatio);
+    let width = 0;
+    let height = 0;
     let time = 0;
 
-    let mouseX = width / 2;
-    let mouseY = height / 2;
-    let targetMouseX = width / 2;
-    let targetMouseY = height / 2;
+    let mouseX = 0;
+    let mouseY = 0;
+    let targetMouseX = 0;
+    let targetMouseY = 0;
+    let hasMouseInteracted = false;
+
+    const updateSize = () => {
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const parent = canvas.parentElement;
+      const parentRect = parent?.getBoundingClientRect();
+
+      const measuredWidth =
+        rect.width || parentRect?.width || canvas.offsetWidth || window.innerWidth || 1200;
+      const measuredHeight =
+        rect.height || parentRect?.height || canvas.offsetHeight || 700;
+
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = canvas.width = Math.max(100, Math.floor(measuredWidth * dpr));
+      height = canvas.height = Math.max(100, Math.floor(measuredHeight * dpr));
+
+      if (!hasMouseInteracted) {
+        mouseX = targetMouseX = width / 2;
+        mouseY = targetMouseY = height / 2;
+      }
+    };
+
+    updateSize();
 
     const handleResize = () => {
-      if (!canvas) return;
-      width = canvas.width = canvas.offsetWidth * window.devicePixelRatio;
-      height = canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+      updateSize();
     };
 
     const handleMouseMove = (e: MouseEvent) => {
+      if (!canvas) return;
+      hasMouseInteracted = true;
       const rect = canvas.getBoundingClientRect();
-      targetMouseX = (e.clientX - rect.left) * window.devicePixelRatio;
-      targetMouseY = (e.clientY - rect.top) * window.devicePixelRatio;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      targetMouseX = (e.clientX - rect.left) * dpr;
+      targetMouseY = (e.clientY - rect.top) * dpr;
     };
 
     window.addEventListener('resize', handleResize);
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && canvas.parentElement) {
+      resizeObserver = new ResizeObserver(() => {
+        updateSize();
+      });
+      resizeObserver.observe(canvas.parentElement);
+    }
 
     const render = () => {
+      if (width <= 0 || height <= 0) {
+        updateSize();
+      }
+
       time += 0.008;
+
       // Smooth mouse interpolation
       mouseX += (targetMouseX - mouseX) * 0.05;
       mouseY += (targetMouseY - mouseY) * 0.05;
@@ -58,12 +96,12 @@ export function VGPUCanvas({ className = '', intensity = 1.0 }: VGPUCanvasProps)
 
       const rows = 18;
       const cols = 28;
-      const spacingX = width / (cols - 1);
-      const spacingY = height / (rows - 1);
+      const spacingX = width / Math.max(cols - 1, 1);
+      const spacingY = height / Math.max(rows - 1, 1);
 
-      // Draw subtle mathematical response field lines
       ctx.lineWidth = 1;
 
+      // Draw subtle mathematical response field lines
       for (let r = 0; r < rows; r++) {
         ctx.beginPath();
         let started = false;
@@ -92,17 +130,22 @@ export function VGPUCanvas({ className = '', intensity = 1.0 }: VGPUCanvasProps)
         }
 
         // Adaptive monochrome response field lines
-        const isDarkTheme = document.documentElement.classList.contains('dark') || !document.documentElement.classList.contains('light');
+        const isDarkTheme =
+          document.documentElement.classList.contains('dark') ||
+          !document.documentElement.classList.contains('light');
         const strokeRgb = isDarkTheme ? '255, 255, 255' : '15, 23, 42';
-        const lineAlpha = (0.03 + (r / rows) * 0.05) * (isDarkTheme ? 1.0 : 1.3);
+        const lineAlpha = (0.035 + (r / rows) * 0.055) * (isDarkTheme ? 1.0 : 1.3);
         ctx.strokeStyle = `rgba(${strokeRgb}, ${lineAlpha})`;
         ctx.stroke();
       }
 
       // Draw floating nodes at vertex intersections near mouse
-      const isDarkTheme = document.documentElement.classList.contains('dark') || !document.documentElement.classList.contains('light');
+      const isDarkTheme =
+        document.documentElement.classList.contains('dark') ||
+        !document.documentElement.classList.contains('light');
       const nodeRgb = isDarkTheme ? '255, 255, 255' : '15, 23, 42';
       const nodeStep = 2;
+
       for (let r = 0; r < rows; r += nodeStep) {
         for (let c = 0; c < cols; c += nodeStep) {
           const x = c * spacingX;
@@ -118,9 +161,11 @@ export function VGPUCanvas({ className = '', intensity = 1.0 }: VGPUCanvasProps)
             const y = baseY + elevation;
 
             ctx.beginPath();
-            const radius = (1.5 + mouseFactor * 2.5);
+            const radius = 1.5 + mouseFactor * 2.5;
             ctx.arc(x, y, radius, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(${nodeRgb}, ${mouseFactor * (isDarkTheme ? 0.75 : 0.5)})`;
+            ctx.fillStyle = `rgba(${nodeRgb}, ${
+              mouseFactor * (isDarkTheme ? 0.75 : 0.5)
+            })`;
             ctx.fill();
           }
         }
@@ -134,12 +179,15 @@ export function VGPUCanvas({ className = '', intensity = 1.0 }: VGPUCanvasProps)
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
+      if (resizeObserver) resizeObserver.disconnect();
       cancelAnimationFrame(animationFrameId);
     };
   }, [intensity]);
 
   return (
-    <div className={`relative w-full h-full pointer-events-none overflow-hidden ${className}`}>
+    <div
+      className={`absolute inset-0 w-full h-full pointer-events-none overflow-hidden ${className}`}
+    >
       <canvas
         ref={canvasRef}
         className='absolute inset-0 w-full h-full block'
@@ -150,3 +198,5 @@ export function VGPUCanvas({ className = '', intensity = 1.0 }: VGPUCanvasProps)
     </div>
   );
 }
+
+export default VGPUCanvas;
