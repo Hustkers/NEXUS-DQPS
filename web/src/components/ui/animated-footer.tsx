@@ -10,7 +10,7 @@ export const DEFAULT_TEAM_MEMBERS: AvatarItem[] = [
   {
     id: "jay-gopal-tripathy",
     name: "Jay Gopal Tripathy",
-    image: "https://github.com/Hustkers.png",
+    image: "/team/jay-gopal.webp",
   },
   {
     id: "shivam-kumar",
