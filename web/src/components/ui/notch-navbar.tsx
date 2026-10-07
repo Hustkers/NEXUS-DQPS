@@ -327,7 +327,7 @@ export function NotchNavbar({
             {/* Content Layer (3-column layout: Left Nav | Center Logo | Right Nav) */}
             <div className="relative w-full h-full flex items-end justify-between pb-2.5 px-3 sm:px-6 md:px-8 gap-2 sm:gap-4">
               {/* Desktop Left Nav: Overview, Workflow */}
-              <div className="flex-1 hidden md:flex items-center justify-start mb-0.5 min-w-0">
+              <div className="flex-1 hidden md:flex items-center justify-end mb-0.5 min-w-0">
                 <nav className="flex gap-2.5 lg:gap-3.5 items-center shrink-0">
                   {leftItems.map((item) => renderNavLink(item))}
                 </nav>
@@ -344,12 +344,12 @@ export function NotchNavbar({
               </button>
 
               {/* Logo (Exact Center - Single Line Horizontal Lockup: [NX] nexusdqps) */}
-              <div className="flex items-center justify-center shrink-0 mb-0.5 px-3 z-20 pointer-events-auto">
+              <div className="flex items-center justify-center shrink-0 mb-0.5 mx-3 sm:mx-5 z-20 pointer-events-auto">
                 {logo || defaultLogo}
               </div>
 
               {/* Desktop Right Nav: Features, Stack, | , Moon Toggle, GitHub */}
-              <div className="flex-1 hidden md:flex items-center justify-end mb-0.5 min-w-0">
+              <div className="flex-1 hidden md:flex items-center justify-start mb-0.5 min-w-0">
                 <nav className="flex gap-3 lg:gap-4 items-center shrink-0">
                   {rightItems.map((item) => renderNavLink(item))}
 
