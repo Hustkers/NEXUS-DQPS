@@ -39,7 +39,7 @@ export default function AppSidebar() {
   const signOut = (_opts?: unknown) => router.push('/auth/sign-in');
 
   return (
-    <Sidebar collapsible='icon' className='relative border-r border-sidebar-border'>
+    <Sidebar collapsible='icon' className='border-r border-sidebar-border'>
       {/* Vengence UI Diagonal Striped Divider along the sidebar border */}
       <VengenceDiagonalDivider />
 
