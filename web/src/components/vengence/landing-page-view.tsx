@@ -10,6 +10,8 @@ import { BentoGrid, BentoGridItem } from './bento-grid';
 import { StatsMatrix } from './stats-matrix';
 import { ShockSimulatorShowcase } from './shock-simulator-showcase';
 import { NotchNavbar } from './notch-navbar';
+import { IsometricTelemetryPanel } from './isometric-telemetry-panel';
+import { PlotFigure, BranchesFigure, PhosphorFigure, RiffleFigure } from './hairline-figures';
 
 const HERO_STATS = [
   {
@@ -95,8 +97,24 @@ export function LandingPageView() {
           </div>
 
           {/* Clean No-Counter Stats Matrix */}
-          <div className='w-full max-w-5xl'>
+          <div className='w-full max-w-5xl mb-12 sm:mb-16'>
             <StatsMatrix stats={HERO_STATS} />
+          </div>
+
+          {/* Hairline Isometric Telemetry Mission Console */}
+          <div className='w-full max-w-5xl'>
+            <div className='text-left mb-3 px-1 flex items-center justify-between'>
+              <div className='flex items-center gap-2'>
+                <span className='size-2 rounded-full bg-emerald-500 animate-pulse' />
+                <span className='font-mono text-xs font-bold tracking-wider uppercase text-muted-foreground'>
+                  LIVE ISOMETRIC TELEMETRY PROJECTION
+                </span>
+              </div>
+              <span className='font-mono text-[10px] text-muted-foreground/80 hidden sm:inline'>
+                MOVE CURSOR TO PROBE SURFACES & VECTORS
+              </span>
+            </div>
+            <IsometricTelemetryPanel />
           </div>
         </div>
       </section>
@@ -150,19 +168,24 @@ export function LandingPageView() {
               </span>
             }
             header={
-              <div className='h-40 rounded-xl bg-card border border-border/80 p-4 font-mono text-xs flex flex-col justify-between'>
-                <div className='flex items-center justify-between text-muted-foreground border-b border-border/60 pb-2'>
-                  <span>PULP / SCIPY FORMULATION</span>
-                  <span className='text-emerald-600 dark:text-emerald-400 font-semibold'>STATUS: OPTIMAL</span>
+              <div className='grid grid-cols-1 sm:grid-cols-12 gap-3 h-auto sm:h-44 p-3 bg-card border border-border/80 rounded-xl'>
+                <div className='sm:col-span-5 h-36 sm:h-full flex items-center justify-center p-1 relative hairline-container cursor-crosshair'>
+                  <PlotFigure intensity={0.75} className='size-full max-h-[140px]' label='KKT SLSQP' />
                 </div>
-                <div className='bg-muted/40 p-3 rounded-lg text-[11px] leading-relaxed text-foreground font-mono space-y-1'>
-                  <div>max ∑ POAS_k(S_k) • GrossMargin_k</div>
-                  <div className='text-muted-foreground'>s.t. ∑ S_k ≤ B_total | S_k(1-0.20) ≤ S_k^new ≤ S_k(1+0.20)</div>
-                  <div className='text-emerald-600 dark:text-emerald-400'>Circuit Breaker: if Inventory_k == 0 ⇒ S_k^new = 0 (Kill-Switch)</div>
-                </div>
-                <div className='text-[10px] text-muted-foreground flex justify-between'>
-                  <span>Execution: 1-Click Rollback Enabled</span>
-                  <span>Solves in 18ms</span>
+                <div className='sm:col-span-7 flex flex-col justify-between font-mono text-xs py-1'>
+                  <div className='flex items-center justify-between text-muted-foreground border-b border-border/60 pb-1.5'>
+                    <span>PULP / SCIPY FORMULATION</span>
+                    <span className='text-emerald-600 dark:text-emerald-400 font-semibold text-[10px]'>OPTIMAL (18ms)</span>
+                  </div>
+                  <div className='bg-muted/40 p-2 rounded-lg text-[10px] leading-relaxed text-foreground font-mono space-y-0.5 my-1'>
+                    <div>max ∑ POAS_k(S_k) • GrossMargin_k</div>
+                    <div className='text-muted-foreground text-[9px]'>s.t. ∑ S_k ≤ B_total | ±20% Liquidity Bounds</div>
+                    <div className='text-emerald-600 dark:text-emerald-400 text-[9px]'>Circuit Breaker: Zero-Inventory Kill-Switch</div>
+                  </div>
+                  <div className='text-[10px] text-muted-foreground flex justify-between'>
+                    <span>1-Click Rollback</span>
+                    <span className='font-bold text-foreground'>Pointer-Reactive</span>
+                  </div>
                 </div>
               </div>
             }
@@ -180,32 +203,17 @@ export function LandingPageView() {
               </span>
             }
             header={
-              <div className='h-40 rounded-xl bg-card border border-border/80 p-4 font-mono text-xs flex flex-col justify-between'>
-                <div className='text-muted-foreground text-[10px] uppercase font-bold'>
-                  Factor Decomposition
+              <div className='h-44 rounded-xl bg-card border border-border/80 p-3 font-mono text-xs flex flex-col justify-between'>
+                <div className='flex items-center justify-between text-muted-foreground text-[10px] uppercase font-bold border-b border-border/60 pb-1'>
+                  <span>DoWhy-GCM Structural DAG</span>
+                  <span className='text-sky-500 font-bold'>CAUSAL</span>
                 </div>
-                <div className='space-y-2'>
-                  <div>
-                    <div className='flex justify-between text-[11px] mb-0.5'>
-                      <span>Inventory Depletion</span>
-                      <span className='text-destructive font-bold'>-18 pts</span>
-                    </div>
-                    <div className='w-full h-1.5 rounded-full bg-muted overflow-hidden'>
-                      <div className='h-full bg-destructive w-[65%]' />
-                    </div>
-                  </div>
-                  <div>
-                    <div className='flex justify-between text-[11px] mb-0.5'>
-                      <span>Auction CPM Inflation</span>
-                      <span className='text-amber-500 font-bold'>+9 pts</span>
-                    </div>
-                    <div className='w-full h-1.5 rounded-full bg-muted overflow-hidden'>
-                      <div className='h-full bg-amber-500 w-[35%]' />
-                    </div>
-                  </div>
+                <div className='h-24 w-full flex items-center justify-center hairline-container cursor-crosshair'>
+                  <BranchesFigure intensity={0.8} className='size-full max-h-[96px]' label='Causal DAG' />
                 </div>
-                <div className='text-[10px] text-muted-foreground'>
-                  Result: Zero Creative Blame
+                <div className='text-[10px] text-muted-foreground flex justify-between pt-1 border-t border-border/50'>
+                  <span>ERP vs Auction CPM</span>
+                  <span className='text-emerald-500 font-semibold'>99.4% Confidence</span>
                 </div>
               </div>
             }
@@ -223,18 +231,17 @@ export function LandingPageView() {
               </span>
             }
             header={
-              <div className='h-40 rounded-xl bg-card border border-border/80 p-4 font-mono text-xs flex flex-col justify-between'>
-                <div className='text-muted-foreground text-[10px] uppercase font-bold flex justify-between'>
-                  <span>Deterministic Entropy</span>
+              <div className='h-44 rounded-xl bg-card border border-border/80 p-3 font-mono text-xs flex flex-col justify-between'>
+                <div className='flex items-center justify-between text-muted-foreground text-[10px] uppercase font-bold border-b border-border/60 pb-1'>
+                  <span>Hardware Entropy CRT</span>
                   <span className='text-emerald-500 font-bold'>99.8% MATCH</span>
                 </div>
-                <div className='p-2 rounded bg-muted/40 font-mono text-[10px] space-y-1 text-muted-foreground truncate'>
-                  <div>HASH: d8a9f24b-321a</div>
-                  <div>DEVICE: Apple M-Series GPU</div>
-                  <div>CANVAS: Canvas2D SHA256 Match</div>
+                <div className='h-24 w-full flex items-center justify-center hairline-container cursor-crosshair'>
+                  <PhosphorFigure intensity={0.7} className='size-full max-h-[96px]' label='Entropy Phosphor' />
                 </div>
-                <div className='text-[11px] font-bold text-foreground'>
-                  YouTube (10:14) → Amazon Buy (16:35)
+                <div className='text-[10px] text-muted-foreground flex justify-between pt-1 border-t border-border/50'>
+                  <span>GPU Canvas SHA256</span>
+                  <span className='text-foreground font-semibold'>Zero 3P Cookies</span>
                 </div>
               </div>
             }
@@ -253,28 +260,33 @@ export function LandingPageView() {
               </span>
             }
             header={
-              <div className='h-40 rounded-xl bg-card border border-border/80 p-4 font-mono text-xs flex flex-col justify-between'>
-                <div className='flex items-center justify-between text-muted-foreground text-[10px] uppercase font-bold border-b border-border/60 pb-1.5'>
-                  <span>Historical Variance Telemetry</span>
-                  <span className='text-emerald-600 dark:text-emerald-400'>ACCURACY: 96.8%</span>
+              <div className='grid grid-cols-1 sm:grid-cols-12 gap-3 h-auto sm:h-44 p-3 bg-card border border-border/80 rounded-xl'>
+                <div className='sm:col-span-5 h-36 sm:h-full flex items-center justify-center p-1 relative hairline-container cursor-crosshair'>
+                  <RiffleFigure intensity={0.65} className='size-full max-h-[140px]' label='Decision Ledger' />
                 </div>
-                <div className='grid grid-cols-3 gap-2 text-center'>
-                  <div className='p-2 rounded bg-muted/40'>
-                    <div className='text-[10px] text-muted-foreground'>Predicted Lift</div>
-                    <div className='text-sm font-bold text-foreground'>+₹3,450/d</div>
+                <div className='sm:col-span-7 flex flex-col justify-between font-mono text-xs py-1'>
+                  <div className='flex items-center justify-between text-muted-foreground text-[10px] uppercase font-bold border-b border-border/60 pb-1'>
+                    <span>Reinforcement Variance Ledger</span>
+                    <span className='text-emerald-600 dark:text-emerald-400'>ACCURACY: 96.8%</span>
                   </div>
-                  <div className='p-2 rounded bg-muted/40'>
-                    <div className='text-[10px] text-muted-foreground'>Realized Lift</div>
-                    <div className='text-sm font-bold text-emerald-600 dark:text-emerald-400'>+₹3,610/d</div>
+                  <div className='grid grid-cols-3 gap-1.5 text-center my-1'>
+                    <div className='p-1.5 rounded bg-muted/40'>
+                      <div className='text-[9px] text-muted-foreground'>Predicted Lift</div>
+                      <div className='text-xs font-bold text-foreground'>+₹3,450/d</div>
+                    </div>
+                    <div className='p-1.5 rounded bg-muted/40'>
+                      <div className='text-[9px] text-muted-foreground'>Realized Lift</div>
+                      <div className='text-xs font-bold text-emerald-600 dark:text-emerald-400'>+₹3,610/d</div>
+                    </div>
+                    <div className='p-1.5 rounded bg-muted/40'>
+                      <div className='text-[9px] text-muted-foreground'>Variance</div>
+                      <div className='text-xs font-bold text-foreground'>+4.7%</div>
+                    </div>
                   </div>
-                  <div className='p-2 rounded bg-muted/40'>
-                    <div className='text-[10px] text-muted-foreground'>Variance</div>
-                    <div className='text-sm font-bold text-foreground'>+4.7%</div>
+                  <div className='text-[10px] text-muted-foreground flex justify-between pt-1 border-t border-border/50'>
+                    <span>DuckDB Weights Updated</span>
+                    <span className='font-bold text-foreground'>Immutable Ledger</span>
                   </div>
-                </div>
-                <div className='text-[10px] text-muted-foreground flex justify-between'>
-                  <span>Reinforcement: Adstock weights updated</span>
-                  <span>Audit Trail: Immutable</span>
                 </div>
               </div>
             }
@@ -348,6 +360,11 @@ export function LandingPageView() {
             </CardSpotlight>
           ))}
         </div>
+      </section>
+
+      {/* 5.5 ISOMETRIC ALGORITHMIC TELEMETRY (HAIRLINE FIGURES) */}
+      <section id='instruments' className='py-16 md:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-16'>
+        <IsometricTelemetryPanel />
       </section>
 
       {/* 6. CALL TO ACTION SPOTLIGHT BANNER */}
