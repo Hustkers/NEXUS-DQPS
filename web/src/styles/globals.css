@@ -189,6 +189,29 @@
   transform: rotate(12deg) scale(1.06);
 }
 
+/* ── Hairline Isometric Figures Theme Engine ───────── */
+:root {
+  --hairline-plate: var(--card, #ffffff);
+  --hairline-hi: var(--foreground, #09090b);
+  --hairline-edge: var(--muted-foreground, #71717a);
+  --hairline-mid: var(--border, #e4e4e7);
+  --hairline-lo: var(--muted, #f4f4f5);
+  --hairline-stroke: 1;
+}
+
+.dark, [data-theme='dark'], [data-theme='nexus-console'] {
+  --hairline-plate: var(--card, #121215);
+  --hairline-hi: #ffffff;
+  --hairline-edge: #a1a1aa;
+  --hairline-mid: #52525b;
+  --hairline-lo: #27272a;
+  --hairline-stroke: 1;
+}
+
+.hairline-container {
+  --hairline-plate: var(--card);
+}
+
 /* Base UI sets --accordion-panel-height on Accordion.Panel, but tw-animate-css's
    accordion keyframes only read the radix-era variable. Redefine them (later in
    the cascade, so these win) with a Base UI fallback so expand/collapse animates
