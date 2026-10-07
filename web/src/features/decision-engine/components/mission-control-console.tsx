@@ -138,6 +138,31 @@ export function MissionControlConsole() {
   return (
     <div className='relative flex flex-1 min-w-0 max-w-full flex-col gap-6 md:gap-8 p-3.5 sm:p-5 md:p-8 bg-background text-foreground min-h-screen selection:bg-primary/20 selection:text-foreground'>
 
+      {/* Flagship Product Feature Banner: Autonomous Learning & Live What-If Simulator */}
+      <div className='rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 via-card to-card p-5 font-mono shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4'>
+        <div className='space-y-1 max-w-2xl'>
+          <div className='flex items-center gap-2'>
+            <span className='size-2 rounded-full bg-emerald-500 animate-pulse' />
+            <span className='text-[10px] uppercase font-bold tracking-widest text-emerald-600 dark:text-emerald-400'>
+              Flagship Capability • Primary Autonomous Loop
+            </span>
+          </div>
+          <h2 className='text-base sm:text-lg font-bold uppercase tracking-tight text-foreground'>
+            WHERE SHOULD THE NEXT ₹ GO?
+          </h2>
+          <p className='text-xs text-muted-foreground leading-relaxed'>
+            The engine analyzes historical campaign outcomes, models non-linear diminishing returns (Hill saturation curves), and continuously re-allocates multi-channel budgets to maximize incremental profit.
+          </p>
+        </div>
+
+        <Link
+          href='/dashboard/autonomous-engine'
+          className='px-4 py-2.5 rounded-xl bg-foreground text-background font-bold text-xs uppercase tracking-wider hover:bg-foreground/90 transition-all shrink-0 flex items-center gap-2 shadow-sm'
+        >
+          <Icons.sliders className='size-3.5 text-emerald-400' />
+          Launch Live What-If Simulator →
+        </Link>
+      </div>
 
       {/* 2. Executive Overview KPI Banner & Trajectory Graphs */}
       <ExecutiveGraphBanner

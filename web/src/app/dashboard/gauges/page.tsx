@@ -38,7 +38,6 @@ export default function GaugesPage() {
 
   // Analysing Modal (3D Globe inspection)
   const [analyzingProduct, setAnalyzingProduct] = useState<ProductAnalysisTarget | null>(null);
-
   // Filter products by Filter Chips & Channel
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {

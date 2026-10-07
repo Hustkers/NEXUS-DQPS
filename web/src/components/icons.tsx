@@ -112,6 +112,8 @@ import {
   IconRobot,
   IconMessage2,
   IconArrowsSplit2,
+  IconRefresh,
+  IconChartLine,
   IconX
 } from '@tabler/icons-react';
 
@@ -272,6 +274,8 @@ export const Icons = {
   shieldCheck: IconShieldCheck,
   gitBranch: IconGitBranch,
   barChart: IconChartBar,
+  lineChart: IconChartLine,
+  refresh: IconRefresh,
   sliders: IconAdjustmentsHorizontal,
   volume2: IconVolume2,
   mic: IconMicrophone,

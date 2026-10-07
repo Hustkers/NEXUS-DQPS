@@ -13,6 +13,14 @@ export const navGroups: NavGroup[] = [
         items: []
       },
       {
+        title: 'Autonomous Ad Learning Engine',
+        url: '/dashboard/autonomous-engine',
+        icon: 'sparkles',
+        isActive: false,
+        shortcut: ['a', 'l'],
+        items: []
+      },
+      {
         title: 'AI Strategy Engine',
         url: '/dashboard/strategy-engine',
         icon: 'bot',

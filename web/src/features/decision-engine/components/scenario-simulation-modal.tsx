@@ -14,6 +14,7 @@ import {
 } from '../lib/simulation-engine';
 import { ScenarioInputPanel } from './scenario-input-panel';
 import { StrategySelector } from './strategy-selector';
+import { SimulationVisualizer, SimulationStage } from './simulation-visualizer';
 import { SimulationFinancialImpact } from './simulation-financial-impact';
 import { SimulationImpactChart } from './simulation-impact-chart';
 import { SimulationLossCurve } from './simulation-loss-curve';
@@ -21,7 +22,7 @@ import { SimulationResultsMatrix } from './simulation-results-matrix';
 import { SimulationStrategyComparison } from './simulation-strategy-comparison';
 import { SimulationCausalChain } from './simulation-causal-chain';
 import { SimulationDataLineage } from './simulation-data-lineage';
-import type { ShockScenarioId, ScenarioInputParams, SimulationResult } from '../types/simulation-types';
+import type { ShockScenarioId, ScenarioInputParams, SimulationResult, DailyLossPoint } from '../types/simulation-types';
 
 interface ScenarioSimulationModalProps {
   scenarioId: ShockScenarioId;
@@ -30,8 +31,6 @@ interface ScenarioSimulationModalProps {
   onResetBaseline?: () => void;
   onApplyMitigation?: (result: SimulationResult) => void;
 }
-
-type SimStage = 'idle' | 'baseline' | 'shock' | 'propagating' | 'financial' | 'mitigation' | 'recovery' | 'completed';
 
 export function ScenarioSimulationModal({
   scenarioId,
@@ -51,28 +50,37 @@ export function ScenarioSimulationModal({
   );
   const [selectedStrategyId, setSelectedStrategyId] = useState<string>(defaultStrategy);
 
-  // Controlled 3-second animated execution state sequence
-  const [simStage, setSimStage] = useState<SimStage>('idle');
-  const isSimulating = simStage !== 'idle' && simStage !== 'completed';
+  // Progressive execution lifecycle
+  const [stage, setStage] = useState<SimulationStage>('ready');
+  const [progressPct, setProgressPct] = useState<number>(0);
+  const [simulatedDay, setSimulatedDay] = useState<number>(0);
+  const [executedResult, setExecutedResult] = useState<SimulationResult | null>(null);
+
+  const isSimulating = stage !== 'ready' && stage !== 'completed';
 
   // Deterministic simulation calculation
-  const simulationResult = useMemo<SimulationResult>(() => {
+  const computedResult = useMemo<SimulationResult>(() => {
     return runDeterministicSimulation(scenarioId, inputs, selectedStrategyId);
   }, [scenarioId, inputs, selectedStrategyId]);
+
+  const activeResult = executedResult || (stage === 'completed' ? computedResult : null);
 
   // Sync inputs whenever scenarioId changes
   React.useEffect(() => {
     setInputs(BASELINE_DEFAULTS[scenarioId]);
     const rec = SCENARIO_STRATEGIES[scenarioId]?.find((s) => s.isRecommended)?.id || SCENARIO_STRATEGIES[scenarioId]?.[0]?.id || 'do-nothing';
     setSelectedStrategyId(rec);
-    setSimStage('idle');
+    setStage('ready');
+    setExecutedResult(null);
+    setProgressPct(0);
+    setSimulatedDay(0);
   }, [scenarioId]);
 
   // Keyboard accessibility
   React.useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape' && !isSimulating) onClose();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
@@ -82,38 +90,60 @@ export function ScenarioSimulationModal({
 
   const scenarioMeta = SCENARIO_METAS[scenarioId];
 
-  // Controlled multi-phase animation sequence (0s to 3s)
+  // Progressive deterministic simulation runner for modal
   const handleRunSimulation = () => {
-    setSimStage('baseline');
-    
-    // Check for prefers-reduced-motion
-    const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) {
-      setSimStage('completed');
-      toast.success(`Simulation Completed: ${scenarioMeta.title}`, {
-        description: `Applied ${simulationResult.activeStrategyName}. Projected Loss Avoided: +₹${simulationResult.financialImpact.lossAvoided.toLocaleString('en-IN')}.`
-      });
-      return;
-    }
+    const horizon = inputs.horizonDays;
+    setStage('initializing');
+    setProgressPct(10);
+    setSimulatedDay(0);
 
-    // Sequence stages
-    setTimeout(() => setSimStage('shock'), 500);
-    setTimeout(() => setSimStage('propagating'), 1000);
-    setTimeout(() => setSimStage('financial'), 1500);
-    setTimeout(() => setSimStage('mitigation'), 2000);
-    setTimeout(() => setSimStage('recovery'), 2500);
+    // Stage 1: Baseline inspection (150ms)
     setTimeout(() => {
-      setSimStage('completed');
-      toast.success(`Simulation Completed: ${scenarioMeta.title}`, {
-        description: `Applied ${simulationResult.activeStrategyName}. Projected Loss Avoided: +₹${simulationResult.financialImpact.lossAvoided.toLocaleString('en-IN')}.`
+      setStage('baseline');
+      setProgressPct(25);
+      setSimulatedDay(1);
+    }, 200);
+
+    // Stage 2: Shock injection (500ms)
+    setTimeout(() => {
+      setStage('shock');
+      setProgressPct(50);
+      setSimulatedDay(Math.max(1, Math.round(horizon * 0.35)));
+    }, 550);
+
+    // Stage 3: DAG Propagation (950ms)
+    setTimeout(() => {
+      setStage('propagating');
+      setProgressPct(75);
+      setSimulatedDay(Math.max(2, Math.round(horizon * 0.7)));
+    }, 950);
+
+    // Stage 4: Autonomous Mitigation & Rebalancing (1300ms)
+    setTimeout(() => {
+      setStage('mitigating');
+      setProgressPct(90);
+      setSimulatedDay(horizon);
+    }, 1300);
+
+    // Stage 5: Finalized (1700ms)
+    setTimeout(() => {
+      setStage('completed');
+      setProgressPct(100);
+      setSimulatedDay(horizon);
+      setExecutedResult(computedResult);
+      toast.success(`Simulation Completed: ${computedResult.scenarioMeta.title}`, {
+        description: `Applied ${computedResult.activeStrategyName}. Projected Loss Avoided: +₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}.`
       });
-    }, 3000);
+    }, 1700);
   };
 
   const handleResetInputs = () => {
     setInputs(BASELINE_DEFAULTS[scenarioId]);
     setSelectedStrategyId(defaultStrategy);
-    setSimStage('idle');
+    setStage('ready');
+    setExecutedResult(null);
+    setProgressPct(0);
+    setSimulatedDay(0);
     onResetBaseline?.();
     toast.info('Restored Scenario Baseline', {
       description: 'Parameters reset to 90-day canonical baseline.'
@@ -121,26 +151,200 @@ export function ScenarioSimulationModal({
   };
 
   const handleApply = () => {
-    onApplyMitigation?.(simulationResult);
+    if (!activeResult) return;
+    onApplyMitigation?.(activeResult);
     toast.success(`Autonomous Mitigation Dispatched`, {
-      description: `Target policy "${simulationResult.activeStrategyName}" engaged for ${scenarioMeta.affectedProductName}.`
+      description: `Target policy "${activeResult.activeStrategyName}" engaged for ${scenarioMeta.affectedProductName}.`
     });
     onClose();
   };
 
-  // Stage labels and descriptions for ticker
-  const stageLabels: Record<SimStage, { label: string; tone: string; desc: string }> = {
-    idle: { label: 'READY TO SIMULATE', tone: 'text-zinc-400 border-zinc-800 bg-zinc-900', desc: 'Select inputs and mitigation strategy to simulate.' },
-    baseline: { label: '0.0s: BASELINE TELEMETRY', tone: 'text-zinc-300 border-zinc-700 bg-zinc-900', desc: 'Sampling steady-state daily spend and conversions...' },
-    shock: { label: '0.5s: SHOCK DETECTED', tone: 'text-rose-400 border-rose-800 bg-rose-950/40', desc: 'Injecting crisis event into supply-chain ad pipeline...' },
-    propagating: { label: '1.0s: PROPAGATING IMPACT', tone: 'text-amber-400 border-amber-800 bg-amber-950/40', desc: 'Traversing DAG causal nodes and adstock decay curves...' },
-    financial: { label: '1.5s: FINANCIAL IMPACT CALCULATED', tone: 'text-rose-300 border-rose-800 bg-rose-950/40', desc: 'Quantifying gross revenue bleed and wasted ad budget...' },
-    mitigation: { label: '2.0s: MITIGATION APPLIED', tone: 'text-sky-400 border-sky-800 bg-sky-950/40', desc: 'Executing SLSQP allocation reallocation & kill-switch...' },
-    recovery: { label: '2.5s: RECOVERY PROJECTED', tone: 'text-emerald-400 border-emerald-800 bg-emerald-950/40', desc: 'Solving recovered margin & break-even ROAS equilibrium...' },
-    completed: { label: '3.0s: SIMULATION COMPLETE', tone: 'text-emerald-400 border-emerald-700 bg-emerald-950/60', desc: 'Autonomous strategy evaluated with deterministic proof.' }
-  };
+  // Sliced time-series up to current simulated day for live animation
+  const simulatedTimeSeries: DailyLossPoint[] = useMemo(() => {
+    const allSeries = computedResult.timeSeries;
+    if (stage === 'ready') return [];
+    if (stage === 'completed') return allSeries;
+    const targetCount = Math.max(1, Math.min(allSeries.length, simulatedDay));
+    return allSeries.slice(0, targetCount);
+  }, [computedResult.timeSeries, stage, simulatedDay]);
 
-  const currentTicker = stageLabels[simStage];
+  // Compute live telemetry stats depending on simulation stage
+  const liveTelemetry = useMemo(() => {
+    const base = computedResult.baseline;
+    const shock = computedResult.shocked;
+    const mit = computedResult.mitigated;
+
+    if (scenarioId === 'stockout') {
+      const invDisplay =
+        stage === 'ready' || stage === 'baseline'
+          ? `${inputs.inventoryUnits} units`
+          : stage === 'shock'
+          ? `${inputs.inventoryShockUnits} units (Depleted)`
+          : stage === 'propagating'
+          ? '0 units (Out of Stock)'
+          : `${inputs.inventoryShockUnits} units (Protected)`;
+
+      const spendDisplay =
+        stage === 'ready' || stage === 'baseline'
+          ? `₹${base.spend.toLocaleString('en-IN')}/day`
+          : stage === 'shock' || stage === 'propagating'
+          ? `₹${shock.spend.toLocaleString('en-IN')}/day (Burning)`
+          : `₹${mit.spend.toLocaleString('en-IN')}/day (Controlled)`;
+
+      const roasDisplay =
+        stage === 'ready' || stage === 'baseline'
+          ? `${base.roas.toFixed(2)}x`
+          : stage === 'shock' || stage === 'propagating'
+          ? `${shock.roas.toFixed(2)}x (Collapsed)`
+          : `${mit.roas.toFixed(2)}x (Recovered)`;
+
+      const protectedDisplay =
+        stage === 'completed'
+          ? `+₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}`
+          : stage === 'mitigating'
+          ? `+₹${Math.round(computedResult.financialImpact.lossAvoided * 0.85).toLocaleString('en-IN')}`
+          : '₹0';
+
+      return {
+        labelA: 'Physical Inventory',
+        valueA: invDisplay,
+        subA: 'Warehouse SKU: 315122-001',
+        labelB: 'Daily Ad Spend',
+        valueB: spendDisplay,
+        subB: 'Meta Advantage+ Campaign',
+        labelC: 'Effective ROAS',
+        valueC: roasDisplay,
+        subC: 'Conversion return on ad spend',
+        labelD: 'Capital Protected',
+        valueD: protectedDisplay,
+        subD: 'Loss avoided vs unmitigated'
+      };
+    }
+
+    if (scenarioId === 'cpm-spike') {
+      const cpmDisplay =
+        stage === 'ready' || stage === 'baseline'
+          ? `₹${inputs.baselineCpm.toFixed(2)}`
+          : `₹${(inputs.baselineCpm * inputs.cpmMultiplier).toFixed(2)} (+${Math.round((inputs.cpmMultiplier - 1) * 100)}%)`;
+
+      const impDisplay =
+        stage === 'ready' || stage === 'baseline'
+          ? base.impressions.toLocaleString('en-IN')
+          : stage === 'shock' || stage === 'propagating'
+          ? `${shock.impressions.toLocaleString('en-IN')} (Compressed)`
+          : mit.impressions.toLocaleString('en-IN');
+
+      const roasDisplay =
+        stage === 'ready' || stage === 'baseline'
+          ? `${base.roas.toFixed(2)}x`
+          : stage === 'shock'
+          ? `${shock.roas.toFixed(2)}x (< Break-even)`
+          : `${mit.roas.toFixed(2)}x (Rebalanced)`;
+
+      const lossDisplay =
+        stage === 'completed'
+          ? `+₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}`
+          : '₹0';
+
+      return {
+        labelA: 'Auction CPM',
+        valueA: cpmDisplay,
+        subA: 'Meta footwear auction rate',
+        labelB: 'Daily Impressions',
+        valueB: impDisplay,
+        subB: 'Ad views delivered',
+        labelC: 'Operating ROAS',
+        valueC: roasDisplay,
+        subC: 'Threshold floor: 1.80x',
+        labelD: 'Loss Avoided',
+        valueD: lossDisplay,
+        subD: 'Shifted to Amazon/Google'
+      };
+    }
+
+    if (scenarioId === 'creative-fatigue') {
+      const ctrDisplay =
+        stage === 'ready' || stage === 'baseline'
+          ? `${inputs.ctrPct.toFixed(2)}%`
+          : stage === 'shock' || stage === 'propagating'
+          ? `${(inputs.ctrPct * (1 - inputs.fatiguePct / 100)).toFixed(2)}% (-${inputs.fatiguePct}%)`
+          : `${(inputs.ctrPct * 0.95).toFixed(2)}% (Refreshed)`;
+
+      const convDisplay =
+        stage === 'ready' || stage === 'baseline'
+          ? `${base.conversions} orders`
+          : stage === 'shock'
+          ? `${shock.conversions} orders (Decayed)`
+          : `${mit.conversions} orders (Restored)`;
+
+      const roasDisplay =
+        stage === 'ready' || stage === 'baseline'
+          ? `${base.roas.toFixed(2)}x`
+          : stage === 'shock'
+          ? `${shock.roas.toFixed(2)}x`
+          : `${mit.roas.toFixed(2)}x`;
+
+      const lossDisplay =
+        stage === 'completed'
+          ? `+₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}`
+          : '₹0';
+
+      return {
+        labelA: 'Ad Set CTR',
+        valueA: ctrDisplay,
+        subA: 'TikTok UGC hook & click rate',
+        labelB: 'Daily Orders',
+        valueB: convDisplay,
+        subB: 'Air Max 270 unit conversions',
+        labelC: 'Channel ROAS',
+        valueC: roasDisplay,
+        subC: 'Post-fatigue recovery rate',
+        labelD: 'Capital Protected',
+        valueD: lossDisplay,
+        subD: 'Rerouted to Meta Reels'
+      };
+    }
+
+    // price-undercut
+    const bbDisplay =
+      stage === 'ready' || stage === 'baseline'
+        ? `${inputs.buyBoxProbabilityPct}%`
+        : stage === 'shock' || stage === 'propagating'
+        ? '25% (Undercut by Rival)'
+        : '68% (Rebalanced Direct)';
+
+    const priceDisplay =
+      stage === 'ready' || stage === 'baseline'
+        ? `₹${inputs.ourPrice.toLocaleString('en-IN')}`
+        : `₹${inputs.competitorPrice.toLocaleString('en-IN')} (-${inputs.competitorUndercutPct}%)`;
+
+    const roasDisplay =
+      stage === 'ready' || stage === 'baseline'
+        ? `${base.roas.toFixed(2)}x`
+        : stage === 'shock'
+        ? `${shock.roas.toFixed(2)}x`
+        : `${mit.roas.toFixed(2)}x`;
+
+    const lossDisplay =
+      stage === 'completed'
+        ? `+₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}`
+        : '₹0';
+
+    return {
+      labelA: 'Buy Box Win Rate',
+      valueA: bbDisplay,
+      subA: 'Amazon buy box session share',
+      labelB: 'Competitor Price',
+      valueB: priceDisplay,
+      subB: 'Rival merchant price shock',
+      labelC: 'Blended ROAS',
+      valueC: roasDisplay,
+      subC: 'Scipy convex yield return',
+      labelD: 'Protected Capital',
+      valueD: lossDisplay,
+      subD: 'Shifted to Nike Direct'
+    };
+  }, [scenarioId, stage, inputs, computedResult]);
 
   return (
     <div
@@ -206,84 +410,41 @@ export function ScenarioSimulationModal({
           </div>
         </header>
 
-        {/* SIMULATION TICKER & ANIMATED PROGRESS BAR */}
-        <div className='rounded-xl border border-border/80 bg-muted/30 p-3 space-y-2'>
-          <div className='flex flex-wrap items-center justify-between gap-2 text-xs'>
-            <div className='flex items-center gap-2'>
-              <span className={cn('px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider', currentTicker.tone)}>
-                {currentTicker.label}
-              </span>
-              <span className='text-muted-foreground text-[11px] hidden sm:inline'>
-                {currentTicker.desc}
-              </span>
-            </div>
-
-            <Button
-              size='sm'
-              onClick={handleRunSimulation}
-              disabled={isSimulating}
-              className='h-8 px-3 text-xs font-bold uppercase bg-foreground text-background hover:bg-foreground/90 active:scale-[0.98]'
-            >
-              {isSimulating ? (
-                <>
-                  <Icons.spinner className='mr-1.5 size-3.5 animate-spin' />
-                  Simulating...
-                </>
-              ) : (
-                <>
-                  <Icons.play className='mr-1.5 size-3.5 text-emerald-500' />
-                  Run Simulation
-                </>
-              )}
-            </Button>
-          </div>
-
-          {/* Progress sequence visualizer */}
-          <div className='h-1.5 w-full bg-border/60 rounded-full overflow-hidden'>
-            <div
-              className={cn(
-                'h-full transition-all duration-300 rounded-full',
-                simStage === 'completed' ? 'bg-emerald-500' : 'bg-primary'
-              )}
-              style={{
-                width:
-                  simStage === 'idle'
-                    ? '0%'
-                    : simStage === 'baseline'
-                    ? '15%'
-                    : simStage === 'shock'
-                    ? '30%'
-                    : simStage === 'propagating'
-                    ? '48%'
-                    : simStage === 'financial'
-                    ? '65%'
-                    : simStage === 'mitigation'
-                    ? '82%'
-                    : simStage === 'recovery'
-                    ? '95%'
-                    : '100%'
-              }}
-            />
-          </div>
-        </div>
-
-        {/* MAIN SPLIT WORKSPACE: INPUTS (5 cols) vs RESULTS (7 cols) */}
+        {/* MAIN SPLIT WORKSPACE: INPUTS (5 cols) vs LIVE HUD & RESULTS (7 cols) */}
         <div className='grid grid-cols-1 lg:grid-cols-12 gap-5'>
           {/* LEFT COLUMN: PARAMETER INPUTS & STRATEGIES */}
           <div className='lg:col-span-5 space-y-4'>
             <ScenarioInputPanel
               scenarioId={scenarioId}
               inputs={inputs}
-              onChangeInputs={setInputs}
+              onChangeInputs={(newInputs) => {
+                setInputs(newInputs);
+                if (stage === 'completed') {
+                  setStage('ready');
+                  setExecutedResult(null);
+                }
+              }}
               onResetBaseline={handleResetInputs}
             />
 
             <StrategySelector
               strategies={strategies}
               selectedStrategyId={selectedStrategyId}
-              onSelectStrategy={setSelectedStrategyId}
+              onSelectStrategy={(newStratId) => {
+                setSelectedStrategyId(newStratId);
+                if (stage === 'completed') {
+                  setStage('ready');
+                  setExecutedResult(null);
+                }
+              }}
               inputs={inputs}
-              onChangeInputs={setInputs}
+              onChangeInputs={(newInputs) => {
+                setInputs(newInputs);
+                if (stage === 'completed') {
+                  setStage('ready');
+                  setExecutedResult(null);
+                }
+              }}
             />
 
             {/* AUTONOMOUS DECISION RATIONALE CARD */}
@@ -293,40 +454,59 @@ export function ScenarioSimulationModal({
                 Why NEXUS Chose This Strategy
               </div>
               <p className='text-muted-foreground leading-relaxed text-[11px]'>
-                {simulationResult.recommendation.reason}
+                {computedResult.recommendation.reason}
               </p>
               <div className='flex items-center justify-between pt-2 border-t border-emerald-500/20 text-[10px] text-muted-foreground'>
-                <span>Protected Waste: <strong className='text-emerald-600 dark:text-emerald-400'>+₹{simulationResult.financialImpact.lossAvoided.toLocaleString('en-IN')}</strong></span>
-                <span>Target ROAS: <strong className='text-foreground'>{simulationResult.mitigated.roas.toFixed(2)}x</strong></span>
+                <span>Protected Waste: <strong className='text-emerald-600 dark:text-emerald-400'>+₹{computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}</strong></span>
+                <span>Target ROAS: <strong className='text-foreground'>{computedResult.mitigated.roas.toFixed(2)}x</strong></span>
               </div>
             </div>
           </div>
 
-          {/* RIGHT COLUMN: FINANCIAL HERO, CHARTS, MATRICES & LINEAGE */}
+          {/* RIGHT COLUMN: RUNNABLE VISUALIZER & DYNAMICALLY REVEALED RESULTS */}
           <div className='lg:col-span-7 space-y-4'>
-            {/* 1. FINANCIAL HERO MATRIX */}
-            <SimulationFinancialImpact result={simulationResult} />
-
-            {/* 2. RECHARTS COMPARISON & CUMULATIVE LOSS CURVES */}
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <SimulationImpactChart result={simulationResult} />
-              <SimulationLossCurve result={simulationResult} />
-            </div>
-
-            {/* 3. FULL METRIC BREAKDOWN TABLE (Baseline vs Shocked vs Mitigated) */}
-            <SimulationResultsMatrix result={simulationResult} />
-
-            {/* 4. STRATEGY COMPARISON MATRIX TABLE */}
-            <SimulationStrategyComparison
-              result={simulationResult}
-              onSelectStrategy={setSelectedStrategyId}
+            {/* 1. RUNNABLE SIMULATION HUD */}
+            <SimulationVisualizer
+              scenarioId={scenarioId}
+              stage={stage}
+              progressPct={progressPct}
+              simulatedDay={simulatedDay}
+              totalDays={inputs.horizonDays}
+              timeSeriesSoFar={simulatedTimeSeries}
+              currentTelemetry={liveTelemetry}
+              onRun={handleRunSimulation}
+              onReset={handleResetInputs}
+              result={computedResult}
             />
 
-            {/* 5. STEP-BY-STEP CAUSAL PROPAGATION DIAGRAM */}
-            <SimulationCausalChain nodes={simulationResult.causalChain} />
+            {/* 2. DYNAMIC RESULTS: Populated only after simulation runs */}
+            {activeResult && (
+              <div className='space-y-4 animate-in fade-in-50 duration-500'>
+                {/* FINANCIAL HERO MATRIX */}
+                <SimulationFinancialImpact result={activeResult} />
 
-            {/* 6. DATA LINEAGE & FORMULA AUDIT TRACE */}
-            <SimulationDataLineage lineage={simulationResult.dataLineage} />
+                {/* RECHARTS COMPARISON & CUMULATIVE LOSS CURVES */}
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <SimulationImpactChart result={activeResult} />
+                  <SimulationLossCurve result={activeResult} />
+                </div>
+
+                {/* FULL METRIC BREAKDOWN TABLE */}
+                <SimulationResultsMatrix result={activeResult} />
+
+                {/* STRATEGY COMPARISON MATRIX TABLE */}
+                <SimulationStrategyComparison
+                  result={activeResult}
+                  onSelectStrategy={setSelectedStrategyId}
+                />
+
+                {/* STEP-BY-STEP CAUSAL PROPAGATION DIAGRAM */}
+                <SimulationCausalChain nodes={activeResult.causalChain} />
+
+                {/* DATA LINEAGE & FORMULA AUDIT TRACE */}
+                <SimulationDataLineage lineage={activeResult.dataLineage} />
+              </div>
+            )}
           </div>
         </div>
 
