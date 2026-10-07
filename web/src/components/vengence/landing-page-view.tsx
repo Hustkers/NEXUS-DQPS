@@ -10,6 +10,7 @@ import { NotchNavbar } from './notch-navbar';
 import { CylinderCarousel, type CarouselImage } from './cylinder-carousel';
 import { PlotFigure, BranchesFigure, PhosphorFigure, RiffleFigure } from './hairline-figures';
 import { AnimatedFooter } from '@/components/ui/animated-footer';
+import { WhyUsBento } from './why-us-bento';
 import { ArrowRight, Sparkles, TrendingUp, ShieldCheck, Zap } from 'lucide-react';
 
 const AGENCY_TICKER_ITEMS = [
@@ -498,6 +499,9 @@ export function LandingPageView() {
           ))}
         </div>
       </section>
+
+      {/* WHY US BENTO (CONFIGURED WITH ISOMETRIC VISUALS & TEAM AVATARS) */}
+      <WhyUsBento />
 
       {/* CINEMATIC ASCII ANIMATED FOOTER (CONFIGURED WITH SHARED TOOLTIP TEAM AVATARS) */}
       <AnimatedFooter
