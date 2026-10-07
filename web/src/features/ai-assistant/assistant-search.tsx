@@ -138,7 +138,7 @@ export function AssistantSearch() {
     items.push({
       id: 'tool-vertex-ai',
       title: 'Google Cloud Vertex AI Telemetry',
-      subtitle: 'Inspect Vertex AI reasoning status (gemini-2.5-flash via ADC)',
+      subtitle: 'Inspect Vertex AI reasoning status (gemini-3.8-flash via ADC)',
       category: 'Voice & AI',
       icon: <IconCpu className="size-4 text-emerald-400" />,
       action: () => {
