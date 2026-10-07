@@ -3,6 +3,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
+import { IconWorld } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 
 export interface FactorDecomp {
@@ -34,10 +35,11 @@ export interface AnomalyItem {
 interface AnomalyCardProps {
   anomaly: AnomalyItem;
   onMitigate?: (anomaly: AnomalyItem) => void;
+  onAnalyze?: (anomaly: AnomalyItem) => void;
   className?: string;
 }
 
-export function AnomalyCard({ anomaly, onMitigate, className }: AnomalyCardProps) {
+export function AnomalyCard({ anomaly, onMitigate, onAnalyze, className }: AnomalyCardProps) {
   const isCritical = anomaly.severity === 'CRITICAL';
   const isHigh = anomaly.severity === 'HIGH';
 
@@ -74,9 +76,13 @@ export function AnomalyCard({ anomaly, onMitigate, className }: AnomalyCardProps
         </div>
 
         {/* Shoe / Campaign block */}
-        <div className='flex items-center gap-3 mb-3'>
+        <div
+          className='flex items-center gap-3 mb-3 cursor-pointer group/shoe transition-opacity hover:opacity-90'
+          onClick={() => onAnalyze?.(anomaly)}
+          title='Click to inspect product telemetry'
+        >
           {anomaly.photoUrl && (
-            <div className='relative size-11 rounded border border-zinc-800 bg-zinc-900 overflow-hidden shrink-0'>
+            <div className='relative size-11 rounded border border-zinc-800 bg-zinc-900 overflow-hidden shrink-0 group-hover/shoe:border-cyan-500/50 transition-colors'>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={anomaly.photoUrl}
@@ -87,7 +93,7 @@ export function AnomalyCard({ anomaly, onMitigate, className }: AnomalyCardProps
           )}
           <div className='flex-1 min-w-0'>
             <div className='flex items-center justify-between gap-1'>
-              <h4 className='font-mono text-sm font-bold text-zinc-100 truncate'>
+              <h4 className='font-mono text-sm font-bold text-zinc-100 truncate group-hover/shoe:text-cyan-400 transition-colors'>
                 {anomaly.productName || anomaly.campaign}
               </h4>
               {anomaly.inventory === 0 && (
@@ -144,16 +150,27 @@ export function AnomalyCard({ anomaly, onMitigate, className }: AnomalyCardProps
         </div>
       </div>
 
-      {/* Action button */}
-      <Button
-        size='sm'
-        variant='outline'
-        onClick={() => onMitigate?.(anomaly)}
-        className='w-full text-xs font-mono h-8 border-zinc-800 text-zinc-300 hover:bg-zinc-900 hover:text-zinc-100'
-      >
-        <Icons.arrowRight className='mr-1.5 size-3 text-emerald-400' />
-        Auto-Reallocate
-      </Button>
+      {/* Action buttons: Analyse Globe & Reallocate */}
+      <div className='flex items-center gap-2'>
+        <Button
+          size='sm'
+          variant='outline'
+          onClick={() => onAnalyze?.(anomaly)}
+          className='flex-1 text-xs font-mono h-8 border-cyan-800/60 bg-cyan-950/40 text-cyan-300 hover:bg-cyan-900/60 hover:text-cyan-100'
+        >
+          <IconWorld className='mr-1.5 size-3.5 text-cyan-400' />
+          Analyse Globe
+        </Button>
+        <Button
+          size='sm'
+          variant='outline'
+          onClick={() => onMitigate?.(anomaly)}
+          className='flex-1 text-xs font-mono h-8 border-zinc-800 text-zinc-300 hover:bg-zinc-900 hover:text-zinc-100'
+        >
+          <Icons.arrowRight className='mr-1.5 size-3 text-emerald-400' />
+          Reallocate
+        </Button>
+      </div>
     </div>
   );
 }

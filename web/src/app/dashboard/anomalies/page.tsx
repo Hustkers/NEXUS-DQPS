@@ -4,11 +4,13 @@ import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
 import { AnomalyCard } from '@/features/decision-engine/components/anomaly-card';
+import { ProductAnalysisModal, type ProductAnalysisTarget } from '@/features/decision-engine/components/product-analysis-modal';
 import initialEngineState from '@/data/nexus-engine-state.json';
 import { toast } from 'sonner';
 
 export default function AnomaliesPage() {
   const [filterSeverity, setFilterSeverity] = useState<'ALL' | 'CRITICAL' | 'HIGH' | 'WARNING'>('ALL');
+  const [analyzingProduct, setAnalyzingProduct] = useState<ProductAnalysisTarget | null>(null);
   const anomalies = initialEngineState.anomalies;
 
   const filtered = anomalies.filter((a: any) =>
@@ -52,6 +54,22 @@ export default function AnomaliesPage() {
           <AnomalyCard
             key={anom.id}
             anomaly={anom}
+            onAnalyze={(a) => {
+              setAnalyzingProduct({
+                id: a.id,
+                productName: a.productName || a.campaign,
+                sku: a.sku,
+                photoUrl: a.photoUrl,
+                platform: a.platform,
+                campaign: a.campaign,
+                inventory: a.inventory,
+                roas: a.roas,
+                spend: a.spend,
+                explanation: a.explanation,
+                severity: a.severity,
+                factors: a.factors
+              });
+            }}
             onMitigate={(a) => {
               toast.success(`Dispatched mitigation for ${a.campaign}`, {
                 description: 'Sent reallocation order to autonomous optimizer.'
@@ -60,6 +78,16 @@ export default function AnomaliesPage() {
           />
         ))}
       </div>
+
+      {/* Analysing Phase Modal featuring 3D GitHub Globe */}
+      <ProductAnalysisModal
+        product={analyzingProduct}
+        isOpen={!!analyzingProduct}
+        onClose={() => setAnalyzingProduct(null)}
+        onMitigate={(prod) => {
+          toast.success(`Autonomous mitigation dispatched for ${prod.productName}`);
+        }}
+      />
     </div>
   );
 }

@@ -17,11 +17,14 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
+import { IconWorld } from '@tabler/icons-react';
+
 interface CellActionProps {
   data: Product;
+  onAnalyze?: (data: Product) => void;
 }
 
-export function CellAction({ data }: CellActionProps) {
+export function CellAction({ data, onAnalyze }: CellActionProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -54,6 +57,9 @@ export function CellAction({ data }: CellActionProps) {
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
           </DropdownMenuGroup>
           <DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => onAnalyze?.(data)}>
+              <IconWorld className='mr-2 h-4 w-4 text-cyan-400' /> Analyse Telemetry (Globe)
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => router.push(`/dashboard/product/${data.id}`)}>
               <Icons.edit className='mr-2 h-4 w-4' /> Update
             </DropdownMenuItem>

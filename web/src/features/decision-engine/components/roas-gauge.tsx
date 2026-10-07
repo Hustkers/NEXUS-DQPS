@@ -16,6 +16,7 @@ interface RoasGaugeProps {
   inventory?: number;
   className?: string;
   compact?: boolean;
+  onAnalyze?: () => void;
 }
 
 export function RoasGauge({
@@ -29,7 +30,8 @@ export function RoasGauge({
   platform,
   inventory,
   className,
-  compact = false
+  compact = false,
+  onAnalyze
 }: RoasGaugeProps) {
   // Map ROAS (0 to 5.0) to angle on semicircular arc (180deg to 0deg)
   const maxRoas = 5.0;
@@ -77,8 +79,11 @@ export function RoasGauge({
     <div
       className={cn(
         'relative flex flex-col items-center justify-between rounded-xl border border-zinc-800 bg-zinc-950/70 p-4 transition-all hover:border-zinc-700 shadow-sm',
+        onAnalyze && 'cursor-pointer hover:border-cyan-500/40 hover:bg-zinc-900/40',
         className
       )}
+      onClick={onAnalyze}
+      title={onAnalyze ? 'Click to inspect product telemetry' : undefined}
     >
       {/* Header if campaign provided */}
       {campaignName && (

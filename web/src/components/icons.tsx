@@ -28,6 +28,7 @@ import {
   IconCode,
   IconCommand,
   IconCreditCard,
+  IconTerminal,
   IconDeviceLaptop,
   IconDots,
   IconDotsVertical,
@@ -112,6 +113,7 @@ export const Icons = {
   search: IconSearch,
   settings: IconSettings,
   trash: IconTrash,
+  terminal: IconTerminal,
 
   // Navigation / Chevrons
   chevronDown: IconChevronDown,

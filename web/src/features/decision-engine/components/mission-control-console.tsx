@@ -10,6 +10,7 @@ import { ReallocationFeed } from './reallocation-feed';
 import { PlatformBreakdownChart } from './platform-breakdown-chart';
 import { DecisionLedgerTable } from './decision-ledger-table';
 import { ScenarioController, ScenarioDefinition } from './scenario-controller';
+import { ProductAnalysisModal, type ProductAnalysisTarget } from './product-analysis-modal';
 import initialEngineState from '@/data/nexus-engine-state.json';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -17,6 +18,7 @@ import { cn } from '@/lib/utils';
 export function MissionControlConsole() {
   const [state, setState] = useState(initialEngineState);
   const [activeTab, setActiveTab] = useState<string>('all');
+  const [analyzingProduct, setAnalyzingProduct] = useState<ProductAnalysisTarget | null>(null);
 
   const handleTriggerScenario = (scenario: ScenarioDefinition) => {
     if (scenario.id === 'scenario-stockout') {
@@ -234,6 +236,22 @@ export function MissionControlConsole() {
             <AnomalyCard
               key={anom.id}
               anomaly={anom}
+              onAnalyze={(a) => {
+                setAnalyzingProduct({
+                  id: a.id,
+                  productName: a.productName || a.campaign,
+                  sku: a.sku,
+                  photoUrl: a.photoUrl,
+                  platform: a.platform,
+                  campaign: a.campaign,
+                  inventory: a.inventory,
+                  roas: a.roas,
+                  spend: a.spend,
+                  explanation: a.explanation,
+                  severity: a.severity,
+                  factors: a.factors
+                });
+              }}
               onMitigate={(a) => {
                 toast.success(`Dispatched mitigation for ${a.campaign}`, {
                   description: 'Triggered optimizer to reallocate capital to highest marginal-yield campaign.'
@@ -318,6 +336,19 @@ export function MissionControlConsole() {
               targetRoas={camp.targetRoas}
               breakevenRoas={camp.breakevenRoas}
               healthScore={camp.healthScore}
+              onAnalyze={() => {
+                setAnalyzingProduct({
+                  productName: camp.productName || camp.campaign,
+                  sku: camp.sku,
+                  photoUrl: camp.photoUrl,
+                  platform: camp.platform,
+                  campaign: camp.campaign,
+                  inventory: camp.inventory,
+                  roas: camp.roas,
+                  targetRoas: camp.targetRoas,
+                  severity: camp.roasStatus === 'CRITICAL_STOCKOUT' ? 'CRITICAL' : 'HEALTHY'
+                });
+              }}
             />
           ))}
         </div>
@@ -325,6 +356,16 @@ export function MissionControlConsole() {
 
       {/* 8. Closed-Loop Decision Ledger */}
       <DecisionLedgerTable entries={state.ledger} />
+
+      {/* 9. Analysing Phase Modal featuring 3D GitHub Globe */}
+      <ProductAnalysisModal
+        product={analyzingProduct}
+        isOpen={!!analyzingProduct}
+        onClose={() => setAnalyzingProduct(null)}
+        onMitigate={(prod) => {
+          toast.success(`Autonomous mitigation dispatched for ${prod.productName}`);
+        }}
+      />
     </div>
   );
 }

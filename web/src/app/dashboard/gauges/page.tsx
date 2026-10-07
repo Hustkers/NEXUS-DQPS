@@ -4,11 +4,13 @@ import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
 import { RoasGauge } from '@/features/decision-engine/components/roas-gauge';
+import { ProductAnalysisModal, type ProductAnalysisTarget } from '@/features/decision-engine/components/product-analysis-modal';
 import initialEngineState from '@/data/nexus-engine-state.json';
 import { cn } from '@/lib/utils';
 
 export default function GaugesPage() {
   const [activePlatform, setActivePlatform] = useState<string>('all');
+  const [analyzingProduct, setAnalyzingProduct] = useState<ProductAnalysisTarget | null>(null);
   const campaigns = initialEngineState.campaigns;
 
   const filtered = campaigns.filter((c: any) =>
@@ -61,9 +63,29 @@ export default function GaugesPage() {
             targetRoas={c.targetRoas}
             breakevenRoas={c.breakevenRoas}
             healthScore={c.healthScore}
+            onAnalyze={() => {
+              setAnalyzingProduct({
+                productName: c.productName || c.campaign,
+                sku: c.sku,
+                photoUrl: c.photoUrl,
+                platform: c.platform,
+                campaign: c.campaign,
+                inventory: c.inventory,
+                roas: c.roas,
+                targetRoas: c.targetRoas,
+                severity: c.roasStatus === 'CRITICAL_STOCKOUT' ? 'CRITICAL' : 'HEALTHY'
+              });
+            }}
           />
         ))}
       </div>
+
+      {/* Analysing Phase Modal featuring 3D GitHub Globe */}
+      <ProductAnalysisModal
+        product={analyzingProduct}
+        isOpen={!!analyzingProduct}
+        onClose={() => setAnalyzingProduct(null)}
+      />
     </div>
   );
 }
