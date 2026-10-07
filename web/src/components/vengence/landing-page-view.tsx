@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { Icons } from '@/components/icons';
 import { VGPUCanvas } from './vgpu-canvas';
 import { GlowButton } from './glow-button';
@@ -78,19 +77,10 @@ export function LandingPageView() {
             </GlowButton>
 
             <GlowButton
-              href='#shocks'
+              href='/dashboard/fingerprint'
               size='lg'
               variant='outline'
               className='font-mono text-sm'
-            >
-              Test 4 Shock Scenarios
-            </GlowButton>
-
-            <GlowButton
-              href='/dashboard/fingerprint'
-              size='lg'
-              variant='pill'
-              className='font-mono text-xs px-4'
             >
               Hardware Fingerprint Demo
             </GlowButton>
