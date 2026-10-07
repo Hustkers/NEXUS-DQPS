@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Icons } from '@/components/icons';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { ShockScenarioId, SimulationResult, DailyLossPoint } from '../types/simulation-types';
 
@@ -35,15 +34,15 @@ export function SimulationVisualizer({
   progressPct,
   simulatedDay,
   totalDays,
-  onRun,
-  result,
+  onRun: _onRun,
+  result: _result,
   className,
   variant: _variant = 'default',
 }: SimulationVisualizerProps) {
   const isRunning = stage !== 'ready' && stage !== 'completed';
   const isReady = stage === 'ready';
 
-  if (isReady && !result) {
+  if (isReady) {
     return (
       <div className={cn('rounded-xl border border-border bg-card p-12 text-center space-y-4 shadow-xs', className)}>
         <div className='mx-auto size-12 rounded-full bg-muted/60 flex items-center justify-center text-muted-foreground'>
@@ -57,14 +56,6 @@ export function SimulationVisualizer({
             1. Pick a crisis &nbsp;•&nbsp; 2. Choose a response &nbsp;•&nbsp; 3. Press Run
           </p>
         </div>
-        {onRun && (
-          <div className='pt-2'>
-            <Button onClick={onRun} className='bg-primary text-primary-foreground font-medium'>
-              <Icons.play className='mr-2 size-4 fill-current' />
-              Run simulation
-            </Button>
-          </div>
-        )}
       </div>
     );
   }
