@@ -69,6 +69,7 @@ export default function ReallocationsPage() {
             Reallocation Directives
           </button>
         </div>
+      </div>
 
       {/* RL Analytics Suite */}
       {(activeView === 'both' || activeView === 'rl_analytics') && (

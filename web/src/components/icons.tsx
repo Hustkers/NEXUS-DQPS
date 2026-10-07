@@ -96,7 +96,6 @@ import {
   IconPlayerPlay,
   IconShoppingCart,
   IconShieldCheck,
-  IconTerminal,
   IconX
 } from '@tabler/icons-react';
 
@@ -241,6 +240,5 @@ export const Icons = {
   topology: IconTopologyComplex,
   play: IconPlayerPlay,
   cart: IconShoppingCart,
-  shieldCheck: IconShieldCheck,
-  terminal: IconTerminal
+  shieldCheck: IconShieldCheck
 };
