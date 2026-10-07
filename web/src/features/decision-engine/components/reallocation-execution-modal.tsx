@@ -109,21 +109,21 @@ export function ReallocationExecutionModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className='max-w-3xl max-h-[92vh] overflow-y-auto font-mono bg-[#000000] text-[#FFFFFF] border border-[#1A1A1A] p-5 sm:p-6 shadow-none'>
+      <DialogContent className='max-w-3xl max-h-[92vh] overflow-y-auto font-mono bg-card text-card-foreground border border-border/80 p-5 sm:p-6 rounded-2xl shadow-2xl backdrop-blur-xl relative overflow-hidden before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/20 dark:before:via-white/10 before:to-transparent'>
         {/* Header */}
-        <DialogHeader className='border-b border-[#1A1A1A] pb-3 mb-2'>
+        <DialogHeader className='border-b border-border/80 pb-3 mb-2'>
           <div className='flex flex-wrap items-center justify-between gap-3'>
             <div className='flex items-center gap-2'>
-              <span className='text-xs font-mono font-bold text-[#FFFFFF]'>
+              <span className='text-xs font-mono font-bold text-foreground'>
                 {executionState === 'completed' ? '■' : '●'}
               </span>
-              <DialogTitle className='text-sm sm:text-base font-bold font-mono uppercase tracking-wider text-[#FFFFFF]'>
+              <DialogTitle className='text-sm sm:text-base font-bold font-mono uppercase tracking-wider text-foreground'>
                 {executionState === 'analysis' && 'Auto-Reallocation Analysis'}
                 {executionState === 'executing' && 'Auto-Reallocation In Progress'}
                 {executionState === 'completed' && 'Auto-Reallocation Completed'}
                 {executionState === 'error' && 'Auto-Reallocation Aborted'}
               </DialogTitle>
-              <span className='text-[10px] bg-[#1A1A1A] border border-[#1A1A1A] text-[#8A8A8A] px-1.5 py-0.5 rounded font-mono font-bold'>
+              <span className='text-[10px] bg-muted border border-border text-muted-foreground px-1.5 py-0.5 rounded-lg font-mono font-bold'>
                 {executionState === 'analysis' && '[ANALYSIS]'}
                 {executionState === 'executing' && '[EXECUTING]'}
                 {executionState === 'completed' && '[AUDITED]'}
@@ -132,43 +132,43 @@ export function ReallocationExecutionModal({
             </div>
 
             {/* Tab navigation */}
-            <div className='flex items-center gap-1 bg-[#1A1A1A] p-0.5 rounded border border-[#1A1A1A] text-xs'>
+            <div className='flex items-center gap-1 bg-muted/60 p-1 rounded-xl border border-border/60 text-xs'>
               <button
                 onClick={() => setActiveTab('overview')}
-                className={`px-2 py-0.5 rounded text-[11px] font-bold uppercase transition-all ${
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase transition-all duration-75 active:scale-[0.96] ${
                   activeTab === 'overview'
-                    ? 'bg-[#FFFFFF] text-[#000000]'
-                    : 'text-[#8A8A8A] hover:text-[#FFFFFF]'
+                    ? 'bg-background text-foreground shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 Overview
               </button>
               <button
                 onClick={() => setActiveTab('flow')}
-                className={`px-2 py-0.5 rounded text-[11px] font-bold uppercase transition-all ${
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase transition-all duration-75 active:scale-[0.96] ${
                   activeTab === 'flow'
-                    ? 'bg-[#FFFFFF] text-[#000000]'
-                    : 'text-[#8A8A8A] hover:text-[#FFFFFF]'
+                    ? 'bg-background text-foreground shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 Capital Flow
               </button>
               <button
                 onClick={() => setActiveTab('metrics')}
-                className={`px-2 py-0.5 rounded text-[11px] font-bold uppercase transition-all ${
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase transition-all duration-75 active:scale-[0.96] ${
                   activeTab === 'metrics'
-                    ? 'bg-[#FFFFFF] text-[#000000]'
-                    : 'text-[#8A8A8A] hover:text-[#FFFFFF]'
+                    ? 'bg-background text-foreground shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 Forecast
               </button>
               <button
                 onClick={() => setActiveTab('receipt')}
-                className={`px-2 py-0.5 rounded text-[11px] font-bold uppercase transition-all ${
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase transition-all duration-75 active:scale-[0.96] ${
                   activeTab === 'receipt'
-                    ? 'bg-[#FFFFFF] text-[#000000]'
-                    : 'text-[#8A8A8A] hover:text-[#FFFFFF]'
+                    ? 'bg-background text-foreground shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 Receipt
@@ -176,7 +176,7 @@ export function ReallocationExecutionModal({
             </div>
           </div>
 
-          <DialogDescription className='text-xs font-mono text-[#8A8A8A] mt-1'>
+          <DialogDescription className='text-xs font-mono text-muted-foreground mt-1'>
             Scipy Convex Optimization Directive • Shift ₹{Math.round(details.capitalMoved).toLocaleString('en-IN')}/day from {details.source.campaign} to {details.destination.productName}
           </DialogDescription>
         </DialogHeader>
@@ -477,16 +477,16 @@ export function ReallocationExecutionModal({
                 variant='outline'
                 size='sm'
                 onClick={onClose}
-                className='text-xs font-mono h-8 border border-[#1A1A1A] bg-[#000000] text-[#FFFFFF] hover:bg-[#1A1A1A] hover:border-[#8A8A8A]'
+                className='text-xs font-mono h-8 border border-border bg-muted/30 text-foreground hover:bg-muted font-semibold active:scale-[0.96] rounded-xl transition-all duration-75'
               >
                 Cancel
               </Button>
               <Button
                 size='sm'
                 onClick={handleConfirm}
-                className='text-xs font-mono h-8 bg-[#FFFFFF] hover:bg-[#8A8A8A] text-[#000000] font-bold border-none active:scale-[0.98]'
+                className='text-xs font-mono h-8 bg-primary hover:bg-primary/90 text-primary-foreground font-bold border-none active:scale-[0.96] rounded-xl transition-all duration-75 shadow-xs'
               >
-                <Icons.arrowRight className='mr-1.5 size-3 text-[#000000]' />
+                <Icons.arrowRight className='mr-1.5 size-3' />
                 Confirm Reallocation
               </Button>
             </div>
@@ -494,12 +494,12 @@ export function ReallocationExecutionModal({
         )}
 
         {executionState === 'completed' && activeTab !== 'receipt' && (
-          <div className='flex items-center justify-between pt-4 mt-2 border-t border-[#1A1A1A]'>
+          <div className='flex items-center justify-between pt-4 mt-2 border-t border-border/80'>
             <Button
               variant='outline'
               size='sm'
               onClick={handleGoToLedger}
-              className='text-xs font-mono h-8 border border-[#8A8A8A] bg-[#000000] text-[#FFFFFF] hover:bg-[#1A1A1A]'
+              className='text-xs font-mono h-8 border border-border bg-muted/30 text-foreground hover:bg-muted font-semibold active:scale-[0.96] rounded-xl transition-all duration-75'
             >
               View In Decision Ledger →
             </Button>
@@ -508,14 +508,14 @@ export function ReallocationExecutionModal({
                 variant='outline'
                 size='sm'
                 onClick={() => setActiveTab('receipt')}
-                className='text-xs font-mono h-8 border border-[#1A1A1A] bg-[#000000] text-[#FFFFFF] hover:bg-[#1A1A1A]'
+                className='text-xs font-mono h-8 border border-border bg-muted/30 text-foreground hover:bg-muted font-semibold active:scale-[0.96] rounded-xl transition-all duration-75'
               >
                 Audit Receipt
               </Button>
               <Button
                 size='sm'
                 onClick={onClose}
-                className='text-xs font-mono h-8 bg-[#FFFFFF] hover:bg-[#8A8A8A] text-[#000000] font-bold border-none'
+                className='text-xs font-mono h-8 bg-primary hover:bg-primary/90 text-primary-foreground font-bold border-none active:scale-[0.96] rounded-xl transition-all duration-75 shadow-xs'
               >
                 Done
               </Button>
