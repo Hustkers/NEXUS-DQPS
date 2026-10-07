@@ -46,6 +46,113 @@
   }
 }
 
+/* ==========================================================================
+   Apple Design Foundations (Fluid Interfaces, Materials, Physics & Optics)
+   ========================================================================== */
+:root {
+  --apple-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --apple-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --apple-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --apple-spring-duration: 0.35s;
+}
+
+/* Optical Typography Sizing & Tracking */
+.apple-display {
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+}
+
+.apple-title {
+  letter-spacing: -0.022em;
+  line-height: 1.2;
+}
+
+.apple-subhead {
+  letter-spacing: -0.012em;
+  line-height: 1.5;
+}
+
+.apple-caption {
+  letter-spacing: 0.02em;
+}
+
+/* Materials & Glass Translucency */
+.apple-glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+}
+
+.dark .apple-glass {
+  background: rgba(14, 14, 18, 0.75);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Apple Card Surface: Continuous squircle curvature + light-catching top edge */
+.apple-card {
+  border-radius: 1rem;
+  position: relative;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 12px -2px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.apple-card::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4) 20%, rgba(255, 255, 255, 0.7) 50%, rgba(255, 255, 255, 0.4) 80%, transparent);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.dark .apple-card::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08) 20%, rgba(255, 255, 255, 0.22) 50%, rgba(255, 255, 255, 0.08) 80%, transparent);
+  opacity: 0.8;
+}
+
+.dark .apple-card {
+  box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.35);
+}
+
+/* Kill Latency: Instant Pointer-Down Press Feedback */
+.apple-press {
+  transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1), filter 120ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.apple-press:active {
+  transform: scale(0.97);
+  filter: brightness(0.97);
+  transition-duration: 60ms;
+}
+
+/* Accessibility & System Preferences */
+@media (prefers-reduced-motion: reduce) {
+  .apple-press,
+  .apple-press:active,
+  .apple-card {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .apple-glass {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: var(--card) !important;
+  }
+}
+
 /* ── View Transitions (Vengeance UI Smooth Theme Reveal) ──────── */
 ::view-transition-old(root),
 ::view-transition-new(root) {
