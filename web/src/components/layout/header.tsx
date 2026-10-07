@@ -5,6 +5,7 @@ import { Breadcrumbs } from '../breadcrumbs';
 import SearchInput from '../search-input';
 import CtaGithub from './cta-github';
 import { NotificationCenter } from '@/features/notifications/components/notification-center';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function Header() {
   return (
@@ -26,6 +27,7 @@ export default function Header() {
         <CtaGithub />
         <SearchInput />
         <NotificationCenter />
+        <ThemeToggle />
       </div>
     </header>
   );
