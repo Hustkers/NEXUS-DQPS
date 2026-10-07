@@ -12,7 +12,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-PLATFORMS = ["amazon", "google", "meta", "shopify"]
+PLATFORMS = ["amazon", "google", "meta", "tiktok", "shopify"]
 
 # Top 12 Nike footwear items mapped to real catalog SKUs and prices
 NIKE_PRODUCTS = {
@@ -126,7 +126,7 @@ NIKE_PRODUCTS = {
     }
 }
 
-SKUS = list(NIKE_PRODUCTS.keys())[:10]
+SKUS = list(NIKE_PRODUCTS.keys())
 EVENT_TYPES = ["cpm_spike", "stockout", "creative_fatigue", "competitor_price_drop", "conversion_shift"]
 
 
@@ -149,7 +149,7 @@ def build_world(seed: int = 7, days: int = 90) -> dict:
             price = p_info["price"]
             
             base_spend = rng.uniform(400, 2600)
-            base_cpm = {"meta": 9.5, "google": 14.0, "amazon": 11.2, "shopify": 8.4}[platform] * rng.uniform(0.8, 1.3)
+            base_cpm = {"meta": 9.5, "google": 14.0, "amazon": 11.2, "tiktok": 6.8, "shopify": 8.4}[platform] * rng.uniform(0.8, 1.3)
             base_cvr = rng.uniform(0.015, 0.045)
             margin_pct = rng.uniform(0.48, 0.68)  # Nike direct gross margins ~50-65%
             inventory = int(rng.uniform(600, 2800))

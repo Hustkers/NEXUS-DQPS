@@ -2,21 +2,22 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
 import { PlatformLogo } from '@/components/icons/platform-logos';
+import { cn } from '@/lib/utils';
 
 interface RoasGaugeProps {
   currentRoas: number;
   targetRoas?: number;
   breakevenRoas?: number;
+  maxRoas?: number;
   healthScore?: number;
   campaignName?: string;
   productName?: string;
   photoUrl?: string;
   platform?: string;
   inventory?: number;
-  className?: string;
   compact?: boolean;
+  className?: string;
   onAnalyze?: () => void;
   onFix?: () => void;
 }
@@ -25,61 +26,58 @@ export function RoasGauge({
   currentRoas,
   targetRoas = 3.2,
   breakevenRoas = 1.8,
-  healthScore = 75,
+  maxRoas = 6.0,
+  healthScore = 85,
   campaignName,
   productName,
   photoUrl,
   platform,
   inventory,
-  className,
   compact = false,
+  className,
   onAnalyze,
   onFix
 }: RoasGaugeProps) {
-  // Map ROAS (0 to 5.0) to angle on semicircular arc (180deg to 0deg)
-  const maxRoas = 5.0;
-  const clampedRoas = Math.min(Math.max(currentRoas, 0), maxRoas);
-  const percentage = clampedRoas / maxRoas;
-  
-  // Circumference for r=65: half circle length = PI * 65 = ~204
-  const radius = compact ? 45 : 65;
-  const strokeWidth = compact ? 6 : 10;
+  const radius = compact ? 42 : 58;
+  const strokeWidth = compact ? 7 : 9;
   const circumference = Math.PI * radius;
-  const strokeDashoffset = circumference * (1 - percentage);
 
-  // Monochrome Status computation according to DESIGN.md
+  // Clamp ROAS between 0 and maxRoas
+  const clampedRoas = Math.min(Math.max(currentRoas, 0), maxRoas);
+  const progressRatio = clampedRoas / maxRoas;
+  const strokeDashoffset = circumference * (1 - progressRatio);
+
+  // Status computation
   const isStockout = inventory !== undefined && inventory <= 0;
   const isCritical = isStockout || currentRoas < breakevenRoas;
   const isWarning = !isCritical && currentRoas < targetRoas;
 
   let statusBadge = '● TARGET MET';
-  let badgeVariant = 'border-none text-[#FFFFFF] bg-[#000000] font-bold';
+  let badgeVariant = 'border-border text-foreground bg-muted/60 font-semibold';
 
   if (isStockout) {
     statusBadge = '[CRITICAL] STOCKOUT';
-    badgeVariant = 'border-none text-[#000000] bg-[#FFFFFF] font-bold';
+    badgeVariant = 'border-none text-white bg-rose-500 font-bold';
   } else if (currentRoas < breakevenRoas) {
     statusBadge = '[CRITICAL] SUB-FLOOR';
-    badgeVariant = 'border-none text-[#000000] bg-[#FFFFFF] font-bold';
+    badgeVariant = 'border-none text-white bg-rose-500 font-bold';
   } else if (isWarning) {
     statusBadge = '○ [WARN] PROFITABLE';
-    badgeVariant = 'border-none text-[#8A8A8A] bg-[#000000] font-normal';
+    badgeVariant = 'border-border text-muted-foreground bg-muted/40 font-normal';
   }
 
-  // Health score monochrome tag
+  // Health score tag style
   const healthBadgeStyle =
     healthScore >= 75
-      ? 'text-[#FFFFFF] bg-[#000000] font-bold'
+      ? 'text-foreground bg-muted font-bold border border-border'
       : healthScore >= 50
-      ? 'text-[#8A8A8A] bg-[#000000] font-medium'
-      : 'text-[#000000] border-none bg-[#FFFFFF] font-bold';
-
-  const arcStrokeColor = isCritical ? '#FFFFFF' : isWarning ? '#8A8A8A' : '#FFFFFF';
+      ? 'text-muted-foreground bg-muted/60 font-medium border border-border'
+      : 'text-white border-none bg-rose-500 font-bold';
 
   return (
     <div
       className={cn(
-        'relative flex flex-col items-center justify-between rounded border border-[#1A1A1A] bg-[#1A1A1A] p-4 transition-all hover:border-[#8A8A8A] hover:bg-[#000000]',
+        'relative flex flex-col items-center justify-between rounded border border-border bg-card p-4 transition-all hover:border-foreground/30 hover:bg-muted/20 text-card-foreground',
         onAnalyze && 'cursor-pointer',
         className
       )}
@@ -88,19 +86,19 @@ export function RoasGauge({
     >
       {/* Header if campaign provided */}
       {campaignName && (
-        <div className='flex w-full items-center justify-between gap-2 border-b border-[#000000] pb-2 mb-2'>
+        <div className='flex w-full items-center justify-between gap-2 border-b border-border pb-2 mb-2'>
           <div className='flex items-center gap-2 min-w-0'>
             {photoUrl && (
-              <div className='relative size-7 rounded bg-[#000000] overflow-hidden shrink-0'>
+              <div className='relative size-7 rounded bg-muted/60 border border-border overflow-hidden shrink-0'>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={photoUrl} alt={productName || campaignName} className='size-full object-cover' />
               </div>
             )}
             <div className='flex flex-col text-left min-w-0'>
-              <span className='text-xs font-semibold text-[#FFFFFF] font-mono truncate max-w-[140px]'>
+              <span className='text-xs font-semibold text-foreground font-mono truncate max-w-[140px]'>
                 {productName || campaignName}
               </span>
-              <span className='text-[10px] text-[#8A8A8A] uppercase tracking-wider font-mono truncate max-w-[140px] flex items-center gap-1.5'>
+              <span className='text-[10px] text-muted-foreground uppercase tracking-wider font-mono truncate max-w-[140px] flex items-center gap-1.5'>
                 {platform && <PlatformLogo platform={platform} size={12} className='shrink-0' />}
                 <span>{platform || 'Omnichannel'} • Inv: {inventory ?? 'N/A'}</span>
               </span>
@@ -126,18 +124,19 @@ export function RoasGauge({
           height={radius + strokeWidth + 8}
           className='overflow-visible'
         >
-          {/* Background Track: #1A1A1A */}
+          {/* Background Track */}
           <path
             d={`M ${strokeWidth} ${radius + strokeWidth} A ${radius} ${radius} 0 0 1 ${
               radius * 2 + strokeWidth
             } ${radius + strokeWidth}`}
             fill='none'
-            stroke='#000000'
+            stroke='currentColor'
+            className='opacity-15 dark:opacity-20'
             strokeWidth={strokeWidth}
             strokeLinecap='round'
           />
 
-          {/* Break-even Marker Line (Floor / Threshold Target: dotted #8A8A8A) */}
+          {/* Break-even Marker Line */}
           {(() => {
             const beRatio = breakevenRoas / maxRoas;
             const beAngle = Math.PI * (1 - beRatio);
@@ -153,14 +152,15 @@ export function RoasGauge({
                 y1={y1}
                 x2={x2}
                 y2={y2}
-                stroke='#8A8A8A'
+                stroke='currentColor'
+                className='opacity-40'
                 strokeWidth='1'
                 strokeDasharray='2 2'
               />
             );
           })()}
 
-          {/* Target Marker Line (Baseline: dashed #8A8A8A) */}
+          {/* Target Marker Line */}
           {(() => {
             const tgRatio = targetRoas / maxRoas;
             const tgAngle = Math.PI * (1 - tgRatio);
@@ -176,20 +176,21 @@ export function RoasGauge({
                 y1={y1}
                 x2={x2}
                 y2={y2}
-                stroke='#8A8A8A'
+                stroke='currentColor'
+                className='opacity-60'
                 strokeWidth='1.5'
                 strokeDasharray='4 4'
               />
             );
           })()}
 
-          {/* Active Arc Value: Solid #FFFFFF or #8A8A8A */}
+          {/* Active Arc Value */}
           <path
             d={`M ${strokeWidth} ${radius + strokeWidth} A ${radius} ${radius} 0 0 1 ${
               radius * 2 + strokeWidth
             } ${radius + strokeWidth}`}
             fill='none'
-            stroke={arcStrokeColor}
+            stroke={isCritical ? '#f43f5e' : isWarning ? '#f59e0b' : 'currentColor'}
             strokeWidth={strokeWidth}
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
@@ -198,17 +199,17 @@ export function RoasGauge({
           />
         </svg>
 
-        {/* Center ROAS readout: Monochrome */}
+        {/* Center ROAS readout */}
         <div className='absolute bottom-0 flex flex-col items-center'>
-          <span className={cn('font-mono font-bold tracking-tight text-[#FFFFFF]', compact ? 'text-lg' : 'text-2xl')}>
+          <span className={cn('font-mono font-bold tracking-tight text-foreground', compact ? 'text-lg' : 'text-2xl')}>
             {currentRoas.toFixed(2)}x
           </span>
-          <span className='text-[10px] text-[#8A8A8A] font-mono -mt-0.5'>ROAS</span>
+          <span className='text-[10px] text-muted-foreground font-mono -mt-0.5'>ROAS</span>
         </div>
       </div>
 
       {/* Footer Markers & Status Badge */}
-      <div className='mt-2 flex w-full items-center justify-between text-[10px] font-mono text-[#8A8A8A]'>
+      <div className='mt-2 flex w-full items-center justify-between text-[10px] font-mono text-muted-foreground'>
         <div className='flex items-center gap-1.5'>
           <span>Floor {breakevenRoas.toFixed(1)}x</span>
           <span>•</span>
@@ -221,14 +222,14 @@ export function RoasGauge({
 
       {/* Stockout Fix Button */}
       {isStockout && (
-        <div className='mt-3 w-full pt-2 border-t border-[#000000]'>
+        <div className='mt-3 w-full pt-2 border-t border-border'>
           <button
             type='button'
             onClick={(e) => {
               e.stopPropagation();
               onFix?.();
             }}
-            className='w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded bg-[#FFFFFF] text-[#000000] font-mono text-xs font-bold uppercase tracking-wider hover:bg-[#8A8A8A] hover:text-[#FFFFFF] transition-all shadow-sm'
+            className='w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded bg-foreground text-background font-mono text-xs font-bold uppercase tracking-wider hover:bg-foreground/90 transition-all shadow-sm'
           >
             <span>Fix</span>
           </button>

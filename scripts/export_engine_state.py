@@ -123,6 +123,7 @@ def generate_state():
         "amazon": {"hex": "#f59e0b", "name": "Amazon Ads"},
         "google": {"hex": "#10b981", "name": "Google Shopping"},
         "meta": {"hex": "#3b82f6", "name": "Meta Ads"},
+        "tiktok": {"hex": "#ec4899", "name": "TikTok Shop"},
         "shopify": {"hex": "#96bf48", "name": "Shopify Storefront"}
     }
     for p, g in last30.groupby("platform"):
@@ -151,7 +152,7 @@ def generate_state():
         d_roas = d_rev / max(d_spend, 1.0)
 
         # per-platform spend
-        p_spends = {p: float(g[g["platform"] == p]["spend"].sum()) for p in ["amazon", "google", "meta", "shopify"]}
+        p_spends = {p: float(g[g["platform"] == p]["spend"].sum()) for p in ["amazon", "google", "meta", "tiktok", "shopify"]}
 
         daily_trend.append({
             "date": d.strftime("%b %d"),
@@ -163,6 +164,7 @@ def generate_state():
             "amazonSpend": round(p_spends.get("amazon", 0), 2),
             "googleSpend": round(p_spends.get("google", 0), 2),
             "metaSpend": round(p_spends.get("meta", 0), 2),
+            "tiktokSpend": round(p_spends.get("tiktok", 0), 2),
             "shopifySpend": round(p_spends.get("shopify", 0), 2)
         })
 

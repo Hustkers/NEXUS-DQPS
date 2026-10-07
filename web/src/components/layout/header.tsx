@@ -5,6 +5,7 @@ import { Breadcrumbs } from '../breadcrumbs';
 import SearchInput from '../search-input';
 import CtaGithub from './cta-github';
 import { NotificationCenter } from '@/features/notifications/components/notification-center';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function Header() {
   return (
@@ -16,16 +17,10 @@ export default function Header() {
       </div>
 
       <div className='flex items-center gap-2 px-4'>
-        <a
-          href='/'
-          className='hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 border border-border/70 transition-colors'
-          title='View Landing Page & Pitch Story'
-        >
-          <span>← Pitch & Overview</span>
-        </a>
         <CtaGithub />
         <SearchInput />
         <NotificationCenter />
+        <ThemeToggle />
       </div>
     </header>
   );
