@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { ShockAnalysisPanel } from './shock-analysis-panel';
 
 export interface ScenarioDefinition {
   id: string;
@@ -30,9 +31,11 @@ export function ScenarioController({
   className
 }: ScenarioControllerProps) {
   const [activeScenarioId, setActiveScenarioId] = useState<string | null>(null);
+  const [dismissed, setDismissed] = useState(false);
 
   const handleTrigger = (scenario: ScenarioDefinition) => {
     setActiveScenarioId(scenario.id);
+    setDismissed(false);
     toast.warning(`Shock Injected: ${scenario.name}`, {
       description: scenario.autonomousResponse
     });
@@ -41,13 +44,21 @@ export function ScenarioController({
 
   const handleReset = () => {
     setActiveScenarioId(null);
+    setDismissed(false);
     toast.success('Simulation Reset', {
       description: 'Restored baseline steady-state telemetry.'
     });
     onResetBaseline?.();
   };
 
+  const handleDismiss = () => {
+    setDismissed(true);
+  };
+
+  const showPanel = activeScenarioId !== null && !dismissed;
+
   return (
+    <>
     <div className={cn('rounded border border-[#8A8A8A] bg-[#1A1A1A] p-5 shadow-none text-[#FFFFFF]', className)}>
       <div className='flex items-center justify-between border-b border-[#8A8A8A]/40 pb-3 mb-4'>
         <div className='flex items-center gap-2'>
@@ -104,5 +115,14 @@ export function ScenarioController({
         })}
       </div>
     </div>
+
+    {showPanel && activeScenarioId && (
+      <ShockAnalysisPanel
+        scenarioId={activeScenarioId}
+        onClose={handleDismiss}
+        onReset={handleReset}
+      />
+    )}
+    </>
   );
 }
