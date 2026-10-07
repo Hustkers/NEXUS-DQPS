@@ -57,13 +57,13 @@ export function LandingPageView() {
           </div>
 
           {/* Master Headline as the Central Problem Question */}
-          <h1 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground max-w-5xl leading-[1.12] mb-6'>
-            How Can Multi-Channel D2C Brands Stop Ad Budget Hemorrhaging When Platforms Obscure Attribution, SKUs Stock Out, and AI Hallucinates Spend?
+          <h1 className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground max-w-4xl leading-[1.1] mb-6'>
+            How Can D2C Brands Stop Ad Budget Bleed Autonomously?
           </h1>
 
           {/* Proposed Solution Subtitle */}
-          <p className='text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl font-normal leading-relaxed mb-8'>
-            <span className='text-foreground font-semibold'>The NEXUS Solution:</span> An AI-native closed-loop decision engine that decouples deterministic convex budget optimization (<span className='font-mono text-xs sm:text-sm px-1.5 py-0.5 rounded bg-muted text-primary border border-primary/20'>Scipy SLSQP</span> with strict ±20% platform stability bounds and &lt;15m stockout circuit breakers) from causal root-cause diagnostics. Powered by DuckDB cross-channel reconciliation, deterministic hardware attribution, and an append-only decision ledger auditing expected vs. realized margin lift, NEXUS guarantees positive Net Contribution Profit (POAS) across every ad channel.
+          <p className='text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl font-normal leading-relaxed mb-8'>
+            <span className='text-foreground font-semibold'>The NEXUS Solution:</span> An AI-native closed loop pairing causal diagnostics with Scipy convex optimization — halting stockout waste in &lt;15 minutes to guarantee positive net contribution profit.
           </p>
 
           {/* Primary Button Group with VengenceUI Button Forge Styling */}
