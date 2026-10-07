@@ -1,8 +1,8 @@
-'use client';
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Icons } from '@/components/icons';
 import { PlatformLogo } from '@/components/icons/platform-logos';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 export interface LedgerItem {
@@ -24,18 +24,68 @@ interface DecisionLedgerTableProps {
 }
 
 export function DecisionLedgerTable({ entries, className }: DecisionLedgerTableProps) {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filtered = entries.filter((item) =>
+    item.decision.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.timestamp.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleExportCSV = () => {
+    const headers = ['ID', 'Timestamp', 'Allocation Action', 'Expected Margin (INR)', 'Realized Margin (INR)', 'Accuracy (%)', 'Confidence (%)'];
+    const rows = entries.map((e) => [
+      e.id,
+      e.timestamp,
+      `"${e.decision.replace(/"/g, '""')}"`,
+      e.expectedMargin,
+      e.realizedMargin,
+      e.accuracyPct.toFixed(1),
+      (e.confidence * 100).toFixed(0)
+    ]);
+    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `nexus-decision-ledger-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success('Decision Ledger exported to CSV', {
+      description: `Downloaded ${entries.length} audited decisions.`
+    });
+  };
+
   return (
     <div className={cn('rounded border border-border bg-card p-5 shadow-none text-card-foreground', className)}>
-      <div className='flex items-center justify-between border-b border-border pb-3 mb-4'>
+      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3 mb-4'>
         <div className='flex items-center gap-2'>
           <Icons.check className='size-3.5 text-foreground' />
           <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
             Decision Ledger &amp; Counterfactual Calibration
           </h3>
         </div>
-        <span className='text-xs font-mono text-muted-foreground'>
-          {entries.length} audited decisions
-        </span>
+        <div className='flex items-center gap-3'>
+          <input
+            type='text'
+            placeholder='Filter directives...'
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className='h-7.5 px-2.5 text-xs font-mono rounded border border-border bg-background text-foreground focus:outline-hidden focus:ring-1 focus:ring-foreground'
+          />
+          <Button
+            size='sm'
+            variant='outline'
+            onClick={handleExportCSV}
+            className='h-7.5 text-xs font-mono font-semibold text-foreground border-border bg-background hover:bg-muted active:scale-[0.98]'
+          >
+            Export CSV
+          </Button>
+          <span className='text-xs font-mono text-muted-foreground'>
+            {filtered.length} / {entries.length} decisions
+          </span>
+        </div>
       </div>
 
       {/* Table */}

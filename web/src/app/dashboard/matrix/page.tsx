@@ -4,6 +4,7 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
+import { toast } from 'sonner';
 import initialEngineState from '@/data/nexus-engine-state.json';
 import { cn } from '@/lib/utils';
 
@@ -215,6 +216,57 @@ export default function MatrixPage() {
   const totalSpend = useMemo(() => rawCampaigns.reduce((acc, c) => acc + c.currentDailySpend, 0), [rawCampaigns]);
   const stockoutCount = useMemo(() => productGroups.filter((p) => p.inventory === 0).length, [productGroups]);
 
+  const handleExportCsv = () => {
+    const headers = [
+      'SKU',
+      'Shoe Name',
+      'Category',
+      'Marketplace',
+      'Unit Price (INR)',
+      'Gross Margin (%)',
+      'ERP Stock',
+      'Daily Spend (INR)',
+      'Daily Revenue (INR)',
+      'Current ROAS',
+      'Target ROAS',
+      'ROAS Status'
+    ];
+
+    const rows: string[][] = [];
+    filteredProducts.forEach((p) => {
+      Object.entries(p.marketplaces).forEach(([platform, camp]) => {
+        rows.push([
+          `"${p.sku}"`,
+          `"${p.productName.replace(/"/g, '""')}"`,
+          `"${p.category}"`,
+          `"${platform.toUpperCase()}"`,
+          `"${p.price}"`,
+          `"${camp.marginPct}%"`,
+          `"${p.inventory}"`,
+          `"${camp.currentDailySpend}"`,
+          `"${camp.currentDailyRevenue}"`,
+          `"${camp.roas.toFixed(2)}x"`,
+          `"${camp.targetRoas.toFixed(2)}x"`,
+          `"${camp.roasStatus}"`
+        ]);
+      });
+    });
+
+    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `nexus-sku-matrix-${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success('SKU Economics Matrix exported to CSV', {
+      description: `Exported ${rows.length} marketplace SKU campaigns.`
+    });
+  };
+
   return (
     <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen'>
       {/* Top Header */}
@@ -305,6 +357,15 @@ export default function MatrixPage() {
                 ? 'Collapse All'
                 : 'Expand All Marketplaces'}
             </span>
+          </button>
+
+          <button
+            onClick={handleExportCsv}
+            className='px-3 py-1 text-xs font-mono rounded-md border border-border bg-muted/40 text-foreground hover:bg-muted flex items-center gap-1.5 shrink-0 transition-colors'
+            title='Export filtered SKU economics matrix to CSV'
+          >
+            <Icons.download className='size-3.5 text-muted-foreground' />
+            <span>Export CSV</span>
           </button>
         </div>
       </div>

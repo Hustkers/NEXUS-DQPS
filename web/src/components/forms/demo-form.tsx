@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { ToggleGroupItem } from '@/components/ui/toggle-group';
 import type { DateRange } from 'react-day-picker';
 import { Icons } from '@/components/icons';
+import { toast } from 'sonner';
 
 // Schema — validated on submit, errors display next to each field
 const demoFormSchema = z.object({
@@ -141,7 +142,9 @@ export default function DemoForm() {
       onSubmit: demoFormSchema
     },
     onSubmit: () => {
-      alert('Form submitted successfully!');
+      toast.success('Form submitted successfully!', {
+        description: 'All fields validated against Zod schema.'
+      });
     }
   });
 

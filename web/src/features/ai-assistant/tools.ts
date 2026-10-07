@@ -58,14 +58,14 @@ export const ASSISTANT_TOOLS: Record<string, ToolDefinition> = {
             directiveId,
             status: 'EXECUTED',
             receiptId: receipt.receipt_id || `rcpt-${Date.now()}`,
-            recoveredMargin: '+$1,148',
-            throttledSpend: '$800/day on Meta Advantage+',
-            scaledSpend: '+$800/day on Google Zoom Fly & Amazon Air Max',
+            recoveredMargin: '+₹1,148',
+            throttledSpend: '₹800/day on Meta Advantage+',
+            scaledSpend: '+₹800/day on Google Zoom Fly & Amazon Air Max',
             confidence: 0.98,
             ledgerStatus: 'COMMITTED',
             timestamp: new Date().toLocaleTimeString(),
           },
-          summary: 'Successfully executed reallocation directive. Recovered margin: +$1,148. Dispatched atomic mutations to Meta Graph & Google Ads APIs.',
+          summary: 'Successfully executed reallocation directive. Recovered margin: +₹1,148. Dispatched atomic mutations to Meta Graph & Google Ads APIs.',
         };
       } catch (err: any) {
         toast.error('Reallocation Tool Failed', { description: err.message });
@@ -93,10 +93,10 @@ export const ASSISTANT_TOOLS: Record<string, ToolDefinition> = {
       const targetChannel = (args.channel || 'all').toLowerCase();
 
       const channelsData: Record<string, any> = {
-        meta: { name: 'Meta Ads', roas: '3.21x', spend24h: '$8,400', cpa: '$42.10', health: 'Degraded (-37% SKU stockout)' },
-        google: { name: 'Google Ads', roas: '5.64x', spend24h: '$6,100', cpa: '$28.40', health: 'Optimal' },
-        amazon: { name: 'Amazon Ads', roas: '6.12x', spend24h: '$3,950', cpa: '$22.80', health: 'Optimal' },
-        tiktok: { name: 'TikTok Ads', roas: '2.10x', spend24h: '$1,200', cpa: '$58.00', health: 'Warning' },
+        meta: { name: 'Meta Ads', roas: '3.21x', spend24h: '₹8,400', cpa: '₹42.10', health: 'Degraded (-37% SKU stockout)' },
+        google: { name: 'Google Ads', roas: '5.64x', spend24h: '₹6,100', cpa: '₹28.40', health: 'Optimal' },
+        amazon: { name: 'Amazon Ads', roas: '6.12x', spend24h: '₹3,950', cpa: '₹22.80', health: 'Optimal' },
+        tiktok: { name: 'TikTok Ads', roas: '2.10x', spend24h: '₹1,200', cpa: '₹58.00', health: 'Warning' },
       };
 
       const result = {
@@ -142,7 +142,7 @@ export const ASSISTANT_TOOLS: Record<string, ToolDefinition> = {
         dailyBurnVelocity: '142 units/day',
         daysOfCover: 0,
         severity: 'CRITICAL_STOCKOUT',
-        causalImpact: 'Meta retargeting campaigns burning $800/day on out-of-stock SKU.',
+        causalImpact: 'Meta retargeting campaigns burning ₹800/day on out-of-stock SKU.',
         recommendedAction: 'Execute authorize_reallocation to shift spend to high-stock Nike Zoom Fly.',
       };
 
@@ -264,7 +264,7 @@ export async function executeAssistantTurn(
     const args = { directiveId: 'dir_meta_hero_shoe', reason: 'Executive authorization via AI Copilot' };
     const result = await tool.execute(args);
     return {
-      replyText: `I have executed the **${tool.name}** function. Dispatched atomic budget shifts: throttled Meta Hero SKU to $0/day and scaled Google Search & Amazon Air Max (+${result.data.recoveredMargin} margin recovered).`,
+      replyText: `I have executed the **${tool.name}** function. Dispatched atomic budget shifts: throttled Meta Hero SKU to ₹0/day and scaled Google Search & Amazon Air Max (+${result.data.recoveredMargin} margin recovered).`,
       toolCall: { name: tool.name, args, result },
     };
   }

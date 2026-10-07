@@ -103,7 +103,7 @@ export const GLOBE_REGIONS: PulseMarker[] = [
     color: '#ef4444',
     status: 'High sales',
     label: 'US East (New York)',
-    volume: '$42.5k / 4.2x ROAS',
+    volume: '₹42.5k / 4.2x ROAS',
     metrics: {
       spend: 10120,
       revenue: 42504,
@@ -124,7 +124,7 @@ export const GLOBE_REGIONS: PulseMarker[] = [
       },
       recommendedAction: {
         action: 'Scale budget +15% on high-intent Meta and Google Shopping retargeting',
-        expectedLift: '+$3,850 profit lift (+18% ROAS)',
+        expectedLift: '+₹3,850 profit lift (+18% ROAS)',
       },
     },
   },
@@ -138,7 +138,7 @@ export const GLOBE_REGIONS: PulseMarker[] = [
     color: '#f43f5e',
     status: 'High sales',
     label: 'US West (San Francisco)',
-    volume: '$38.2k / 3.9x ROAS',
+    volume: '₹38.2k / 3.9x ROAS',
     metrics: {
       spend: 9800,
       revenue: 38220,
@@ -159,7 +159,7 @@ export const GLOBE_REGIONS: PulseMarker[] = [
       },
       recommendedAction: {
         action: 'Maintain aggressive bid cap; expand into TikTok viral lookalikes',
-        expectedLift: '+$2,900 profit lift',
+        expectedLift: '+₹2,900 profit lift',
       },
     },
   },
@@ -173,7 +173,7 @@ export const GLOBE_REGIONS: PulseMarker[] = [
     color: '#f97316',
     status: 'Decreasing',
     label: 'EMEA (London)',
-    volume: '$28.1k / 3.4x ROAS',
+    volume: '₹28.1k / 3.4x ROAS',
     metrics: {
       spend: 8260,
       revenue: 28084,
@@ -193,8 +193,8 @@ export const GLOBE_REGIONS: PulseMarker[] = [
         percentage: -6.4,
       },
       recommendedAction: {
-        action: 'Shift $1,800/d to top-performing UK weekend flash ad groups',
-        expectedLift: '+$1,450 profit lift',
+        action: 'Shift ₹1,800/d to top-performing UK weekend flash ad groups',
+        expectedLift: '+₹1,450 profit lift',
       },
     },
   },
@@ -208,7 +208,7 @@ export const GLOBE_REGIONS: PulseMarker[] = [
     color: '#f59e0b',
     status: 'Decreasing',
     label: 'APAC (Tokyo)',
-    volume: '$19.0k / 2.5x ROAS',
+    volume: '₹19.0k / 2.5x ROAS',
     metrics: {
       spend: 7600,
       revenue: 19000,
@@ -228,8 +228,8 @@ export const GLOBE_REGIONS: PulseMarker[] = [
         percentage: -14.8,
       },
       recommendedAction: {
-        action: 'Trim budget -$2,400 due to stock depletion on high-margin colorways',
-        expectedLift: 'Prevents -$1,200 ad waste',
+        action: 'Trim budget -₹2,400 due to stock depletion on high-margin colorways',
+        expectedLift: 'Prevents -₹1,200 ad waste',
       },
     },
   },
@@ -243,7 +243,7 @@ export const GLOBE_REGIONS: PulseMarker[] = [
     color: '#eab308',
     status: 'Decreasing',
     label: 'India Direct (Mumbai)',
-    volume: '$18.6k / 2.9x ROAS',
+    volume: '₹18.6k / 2.9x ROAS',
     metrics: {
       spend: 6400,
       revenue: 18560,
@@ -264,7 +264,7 @@ export const GLOBE_REGIONS: PulseMarker[] = [
       },
       recommendedAction: {
         action: 'Shift from broad discovery to cart-abandonment retargeting',
-        expectedLift: '+$980 profit lift',
+        expectedLift: '+₹980 profit lift',
       },
     },
   },
@@ -278,7 +278,7 @@ export const GLOBE_REGIONS: PulseMarker[] = [
     color: '#facc15',
     status: 'Decreasing',
     label: 'SEA Hub (Singapore)',
-    volume: '$14.2k / 2.7x ROAS',
+    volume: '₹14.2k / 2.7x ROAS',
     metrics: {
       spend: 5260,
       revenue: 14202,
@@ -298,8 +298,8 @@ export const GLOBE_REGIONS: PulseMarker[] = [
         percentage: -9.1,
       },
       recommendedAction: {
-        action: 'Reallocate $1,500 to US-East & Google Shopping SKU-7',
-        expectedLift: '+$1,120 profit lift',
+        action: 'Reallocate ₹1,500 to US-East & Google Shopping SKU-7',
+        expectedLift: '+₹1,120 profit lift',
       },
     },
   },
@@ -313,7 +313,7 @@ export const GLOBE_REGIONS: PulseMarker[] = [
     color: '#fde047',
     status: 'Decreasing',
     label: 'Oceania (Sydney)',
-    volume: '$11.0k / 2.5x ROAS',
+    volume: '₹11.0k / 2.5x ROAS',
     metrics: {
       spend: 4400,
       revenue: 11000,
@@ -334,7 +334,7 @@ export const GLOBE_REGIONS: PulseMarker[] = [
       },
       recommendedAction: {
         action: 'Consolidate ad groups into high-converting weekend delivery schedules',
-        expectedLift: '+$640 profit lift',
+        expectedLift: '+₹640 profit lift',
       },
     },
   },
@@ -348,7 +348,7 @@ export const GLOBE_REGIONS: PulseMarker[] = [
     color: '#9ca3af',
     status: 'Suppressed',
     label: 'LATAM (São Paulo)',
-    volume: '$0 spend / Suppressed',
+    volume: '₹0 spend / Suppressed',
     metrics: {
       spend: 0, // Tested for division-by-zero safety
       revenue: 0,
@@ -369,7 +369,7 @@ export const GLOBE_REGIONS: PulseMarker[] = [
       },
       recommendedAction: {
         action: 'Keep budget suppressed until regional fulfillment center restocks inventory',
-        expectedLift: 'Preserves $2,500/mo cashflow',
+        expectedLift: 'Preserves ₹2,500/mo cashflow',
       },
     },
   },

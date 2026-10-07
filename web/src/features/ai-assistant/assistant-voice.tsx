@@ -92,7 +92,7 @@ export function AssistantVoice({ onToolExecuted, router }: AssistantVoiceProps) 
   const handleStartBriefing = () => {
     setIsListening(false);
     const briefText =
-      'Executive Briefing: ROAS on Meta Advantage Plus dropped due to Hero SKU stockout in Shopify. Recommending immediate reallocation of $800 to Google Search and Amazon. Projected margin recovery: +$1,148. Do you authorize this directive?';
+      'Executive Briefing: ROAS on Meta Advantage Plus dropped due to Hero SKU stockout in Shopify. Recommending immediate reallocation of ₹800 to Google Search and Amazon. Projected margin recovery: +₹1,148. Do you authorize this directive?';
 
     setTranscript(briefText);
     speakText(briefText, () => {

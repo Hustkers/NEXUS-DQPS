@@ -67,7 +67,7 @@ export function AssistantSearch() {
     items.push({
       id: 'tool-auth',
       title: 'Authorize Budget Reallocation',
-      subtitle: 'Execute atomic budget shifts (Meta -> Google & Amazon: +$1,148 margin)',
+      subtitle: 'Execute atomic budget shifts (Meta -> Google & Amazon: +₹1,148 margin)',
       category: 'Autonomous Action',
       icon: <IconBolt className="size-4 text-emerald-400" />,
       shortcut: '↵',
