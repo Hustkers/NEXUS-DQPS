@@ -271,7 +271,7 @@ export function MissionControlConsole() {
         />
       </div>
       <div className='space-y-3.5'>
-        <div className='flex items-center justify-between border-b border-[#8A8A8A] pb-2.5'>
+        <div className='flex items-center justify-between border-b border-[#1A1A1A] pb-2.5'>
           <div className='flex items-center gap-2'>
             <Icons.warning className='size-3.5 text-white' />
             <h3 className='font-mono text-xs font-bold text-white uppercase tracking-wider'>

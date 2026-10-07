@@ -156,7 +156,7 @@ export function GithubGlobe({
 
       {/* Interactive Telemetry HUD tags floating over Globe */}
       <div className='pointer-events-none absolute bottom-3 left-4 flex flex-col gap-1 text-[10px] font-mono'>
-        <div className='flex items-center gap-1.5 text-[#FFFFFF] bg-[#000000] px-2.5 py-1 rounded border border-[#8A8A8A]'>
+        <div className='flex items-center gap-1.5 text-[#FFFFFF] bg-[#000000] px-2.5 py-1 rounded border border-[#1A1A1A]'>
           <span className='size-1.5 rounded-full bg-[#FFFFFF]' />
           <span className='font-bold'>GLOBAL TELEMETRY STREAM</span>
         </div>
@@ -165,7 +165,7 @@ export function GithubGlobe({
         </div>
       </div>
 
-      <div className='pointer-events-none absolute top-3 right-4 flex items-center gap-2 text-[10px] font-mono text-[#FFFFFF] bg-[#000000] px-2.5 py-1 rounded border border-[#8A8A8A]'>
+      <div className='pointer-events-none absolute top-3 right-4 flex items-center gap-2 text-[10px] font-mono text-[#FFFFFF] bg-[#000000] px-2.5 py-1 rounded border border-[#1A1A1A]'>
         <span className='size-1.5 rounded-full bg-[#FFFFFF]' />
         <span>github.com/globe WebGL</span>
       </div>

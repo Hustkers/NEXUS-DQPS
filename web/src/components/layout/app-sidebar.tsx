@@ -42,7 +42,7 @@ export default function AppSidebar() {
     fullName: 'Nexus AI Director',
     emailAddresses: [{ emailAddress: 'director@nexus-engine.ai' }]
   };
-  const organization = { name: 'Nike Direct D2C' };
+  const organization = { name: 'Nike' };
   const router = useRouter();
   const signOut = (_opts?: any) => router.push('/auth/sign-in');
   const filteredGroups = useFilteredNavGroups(navGroups);

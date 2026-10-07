@@ -51,7 +51,6 @@ export function CardSpotlight({
       <div
         className='pointer-events-none absolute -inset-px transition-opacity duration-150'
         style={{
-          opacity: isHovered ? 1 : 0,
           background: `radial-gradient(${radius}px circle at ${position.x}px ${position.y}px, var(--color-foreground, currentColor), transparent 80%)`,
           opacity: isHovered ? 0.04 : 0
         }}
