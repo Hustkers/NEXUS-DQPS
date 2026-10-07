@@ -24,58 +24,58 @@ interface DecisionLedgerTableProps {
 
 export function DecisionLedgerTable({ entries, className }: DecisionLedgerTableProps) {
   return (
-    <div className={cn('rounded-xl border border-zinc-800/60 bg-zinc-950/40 p-5 shadow-none', className)}>
-      <div className='flex items-center justify-between border-b border-zinc-800/60 pb-3 mb-4'>
+    <div className={cn('rounded-xl border border-border/80 bg-card p-5 shadow-xs', className)}>
+      <div className='flex items-center justify-between border-b border-border/80 pb-3 mb-4'>
         <div className='flex items-center gap-2'>
-          <Icons.check className='size-3.5 text-zinc-400' />
-          <h3 className='font-mono text-xs font-bold text-zinc-200 uppercase tracking-wider'>
+          <Icons.check className='size-3.5 text-muted-foreground' />
+          <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
             Decision Ledger &amp; Counterfactual Calibration
           </h3>
         </div>
-        <span className='text-xs font-mono text-zinc-500'>
+        <span className='text-xs font-mono text-muted-foreground'>
           {entries.length} audited decisions
         </span>
       </div>
 
       {/* Table */}
-      <div className='overflow-x-auto'>
+      <div className='overflow-x-auto rounded-lg border border-border/60'>
         <table className='w-full text-left text-xs font-mono'>
           <thead>
-            <tr className='border-b border-zinc-800/60 text-[10px] text-zinc-500 uppercase tracking-wider'>
-              <th className='py-2 px-3 font-medium'>Timestamp</th>
-              <th className='py-2 px-3 font-medium'>Allocation Action</th>
-              <th className='py-2 px-3 text-right font-medium'>Exp. Margin</th>
-              <th className='py-2 px-3 text-right font-medium'>Realized</th>
-              <th className='py-2 px-3 text-right font-medium'>Accuracy</th>
-              <th className='py-2 px-3 text-right font-medium'>Confidence</th>
+            <tr className='border-b border-border/80 bg-slate-50/70 dark:bg-zinc-900/40 text-[10px] text-muted-foreground uppercase tracking-wider'>
+              <th className='py-2.5 px-3 font-semibold'>Timestamp</th>
+              <th className='py-2.5 px-3 font-semibold'>Allocation Action</th>
+              <th className='py-2.5 px-3 text-right font-semibold'>Exp. Margin</th>
+              <th className='py-2.5 px-3 text-right font-semibold'>Realized</th>
+              <th className='py-2.5 px-3 text-right font-semibold'>Accuracy</th>
+              <th className='py-2.5 px-3 text-right font-semibold'>Confidence</th>
             </tr>
           </thead>
-          <tbody className='divide-y divide-zinc-900/80'>
+          <tbody className='divide-y divide-border/60'>
             {entries.map((item) => {
               const isPositiveLift = item.realizedMargin >= item.expectedMargin;
 
               return (
-                <tr key={item.id} className='hover:bg-zinc-900/30 transition-colors'>
-                  <td className='py-2.5 px-3 text-zinc-500 text-[11px] whitespace-nowrap'>
+                <tr key={item.id} className='hover:bg-slate-50/80 dark:hover:bg-zinc-900/30 transition-colors'>
+                  <td className='py-2.5 px-3 text-muted-foreground text-[11px] whitespace-nowrap font-medium'>
                     {item.timestamp.split(' ')[1] || item.timestamp}
                   </td>
-                  <td className='py-2.5 px-3 text-zinc-300 font-sans text-xs max-w-md truncate'>
+                  <td className='py-2.5 px-3 text-foreground font-sans text-xs max-w-md truncate font-medium'>
                     {item.decision}
                   </td>
-                  <td className='py-2.5 px-3 text-right text-zinc-400 whitespace-nowrap'>
+                  <td className='py-2.5 px-3 text-right text-muted-foreground whitespace-nowrap'>
                     ${item.expectedMargin.toLocaleString()}
                   </td>
                   <td className='py-2.5 px-3 text-right whitespace-nowrap'>
-                    <span className={cn('font-semibold', isPositiveLift ? 'text-emerald-400' : 'text-amber-400')}>
+                    <span className={cn('font-bold', isPositiveLift ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400')}>
                       ${item.realizedMargin.toLocaleString()}
                     </span>
                   </td>
                   <td className='py-2.5 px-3 text-right whitespace-nowrap'>
-                    <span className={cn('font-medium', item.accuracyPct >= 90 ? 'text-emerald-400' : 'text-amber-400')}>
+                    <span className={cn('font-bold', item.accuracyPct >= 90 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400')}>
                       {item.accuracyPct.toFixed(1)}%
                     </span>
                   </td>
-                  <td className='py-2.5 px-3 text-right text-zinc-300 font-medium whitespace-nowrap'>
+                  <td className='py-2.5 px-3 text-right text-foreground font-bold whitespace-nowrap'>
                     {(item.confidence * 100).toFixed(0)}%
                   </td>
                 </tr>

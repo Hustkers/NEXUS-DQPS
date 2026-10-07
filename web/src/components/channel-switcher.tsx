@@ -81,7 +81,7 @@ export function ChannelSwitcher() {
               <SidebarMenuButton
                 size='default'
                 tooltip={`Channel: ${channelInfo.name}`}
-                className='border border-zinc-800/80 bg-zinc-950/60 hover:bg-zinc-900/80 text-zinc-200 transition-all data-popup-open:bg-sidebar-accent'
+                className='border border-border bg-card hover:bg-accent/60 text-foreground transition-all shadow-2xs data-popup-open:bg-sidebar-accent'
               />
             }
           >
@@ -93,23 +93,23 @@ export function ChannelSwitcher() {
             {/* Label and Subtext in Expanded Mode */}
             <div className='grid flex-1 text-left text-xs leading-tight'>
               <div className='flex items-center justify-between'>
-                <span className='truncate font-medium text-zinc-100'>{channelInfo.name}</span>
-                <span className='text-[10px] font-mono text-zinc-500 uppercase'>{channelInfo.badge}</span>
+                <span className='truncate font-semibold text-foreground'>{channelInfo.name}</span>
+                <span className='text-[10px] font-mono text-muted-foreground uppercase'>{channelInfo.badge}</span>
               </div>
-              <span className='truncate text-[10px] text-zinc-400 font-mono'>Ad Channel Filter</span>
+              <span className='truncate text-[10px] text-muted-foreground font-mono'>Ad Channel Filter</span>
             </div>
 
             <Icons.chevronsDown className='ml-auto size-3.5 text-muted-foreground' />
           </DropdownMenuTrigger>
 
           <DropdownMenuContent
-            className='w-(--anchor-width) min-w-64 rounded-lg bg-zinc-950 border-zinc-800'
+            className='w-(--anchor-width) min-w-64 rounded-xl bg-popover border-border shadow-lg'
             align='start'
             side='bottom'
             sideOffset={4}
           >
             <DropdownMenuGroup>
-              <DropdownMenuLabel className='text-zinc-400 text-[11px] font-mono uppercase tracking-wider px-2 py-1.5'>
+              <DropdownMenuLabel className='text-muted-foreground text-[11px] font-mono uppercase tracking-wider px-2 py-1.5'>
                 Ad Channels (Active Campaigns)
               </DropdownMenuLabel>
             </DropdownMenuGroup>
@@ -120,34 +120,34 @@ export function ChannelSwitcher() {
                 <DropdownMenuItem
                   key={ch.id}
                   onClick={() => setChannel(ch.id)}
-                  className={`cursor-pointer flex items-start gap-2.5 p-2 rounded-md hover:bg-zinc-900 focus:bg-zinc-900 ${
-                    isSelected ? 'bg-zinc-900/70 border-l-2 border-emerald-400' : ''
+                  className={`cursor-pointer flex items-start gap-2.5 p-2 rounded-lg hover:bg-accent focus:bg-accent ${
+                    isSelected ? 'bg-accent/80 border-l-2 border-emerald-500' : ''
                   }`}
                 >
-                  <div className={`mt-0.5 flex aspect-square size-6 items-center justify-center rounded-md border ${CHANNELS[ch.id]?.accentColor || 'text-zinc-400 border-zinc-800'}`}>
+                  <div className={`mt-0.5 flex aspect-square size-6 items-center justify-center rounded-md border ${CHANNELS[ch.id]?.accentColor || 'text-muted-foreground border-border'}`}>
                     {getChannelIcon(ch.id, 'size-3.5')}
                   </div>
                   <div className='flex flex-col flex-1 min-w-0'>
                     <div className='flex items-center justify-between'>
-                      <span className={`text-xs font-semibold ${isSelected ? 'text-zinc-100 font-bold' : 'text-zinc-300'}`}>
+                      <span className={`text-xs font-semibold ${isSelected ? 'text-foreground font-bold' : 'text-foreground/90'}`}>
                         {ch.name}
                       </span>
                       {isSelected && (
-                        <Badge variant='outline' className='text-[9px] py-0 px-1 border-emerald-500/40 text-emerald-400 bg-emerald-950/40 font-mono'>
+                        <Badge variant='outline' className='text-[9px] py-0 px-1 border-emerald-300 dark:border-emerald-500/40 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 font-mono'>
                           Selected
                         </Badge>
                       )}
                     </div>
-                    <span className='text-[10px] text-zinc-500 truncate'>{ch.details}</span>
+                    <span className='text-[10px] text-muted-foreground truncate'>{ch.details}</span>
                   </div>
                 </DropdownMenuItem>
               );
             })}
 
-            <DropdownMenuSeparator className='bg-zinc-800' />
-            <div className='p-2 text-[10px] text-zinc-400 font-mono flex items-center justify-between'>
+            <DropdownMenuSeparator className='bg-border' />
+            <div className='p-2 text-[10px] text-muted-foreground font-mono flex items-center justify-between'>
               <span>SYNC: REAL-TIME (POSTGRES)</span>
-              <span className='text-emerald-400 font-semibold'>ACTIVE</span>
+              <span className='text-emerald-600 dark:text-emerald-400 font-semibold'>ACTIVE</span>
             </div>
           </DropdownMenuContent>
         </DropdownMenu>

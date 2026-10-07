@@ -43,65 +43,65 @@ export function RoasGauge({
   const strokeDashoffset = circumference * (1 - percentage);
 
   // Status computation
-  let statusColor = 'text-emerald-400';
+  let statusColor = 'text-emerald-600 dark:text-emerald-400';
   let statusBadge = 'OPTIMAL';
-  let badgeVariant = 'border-emerald-500/20 text-emerald-400 bg-emerald-950/30';
+  let badgeVariant = 'border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30';
 
   if (inventory !== undefined && inventory <= 0) {
-    statusColor = 'text-rose-400';
+    statusColor = 'text-rose-600 dark:text-rose-400';
     statusBadge = 'STOCKOUT';
-    badgeVariant = 'border-rose-500/20 text-rose-400 bg-rose-950/30';
+    badgeVariant = 'border-rose-200 dark:border-rose-500/20 text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30';
   } else if (currentRoas < breakevenRoas) {
-    statusColor = 'text-rose-400';
+    statusColor = 'text-rose-600 dark:text-rose-400';
     statusBadge = 'SUB-FLOOR';
-    badgeVariant = 'border-rose-500/20 text-rose-400 bg-rose-950/30';
+    badgeVariant = 'border-rose-200 dark:border-rose-500/20 text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30';
   } else if (currentRoas < targetRoas) {
-    statusColor = 'text-amber-400';
+    statusColor = 'text-amber-600 dark:text-amber-400';
     statusBadge = 'PROFITABLE';
-    badgeVariant = 'border-amber-500/20 text-amber-400 bg-amber-950/30';
+    badgeVariant = 'border-amber-200 dark:border-amber-500/20 text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30';
   } else {
-    statusColor = 'text-emerald-400';
+    statusColor = 'text-emerald-600 dark:text-emerald-400';
     statusBadge = 'TARGET MET';
-    badgeVariant = 'border-emerald-500/20 text-emerald-400 bg-emerald-950/30';
+    badgeVariant = 'border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30';
   }
 
   // Health score color
   const healthColor =
     healthScore >= 75
-      ? 'text-emerald-400 border-emerald-500/20'
+      ? 'text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-950/20'
       : healthScore >= 50
-      ? 'text-amber-400 border-amber-500/20'
-      : 'text-rose-400 border-rose-500/20';
+      ? 'text-amber-800 dark:text-amber-400 border-amber-200 dark:border-amber-500/20 bg-amber-50 dark:bg-amber-950/20'
+      : 'text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-500/20 bg-rose-50 dark:bg-rose-950/20';
 
   return (
     <div
       className={cn(
-        'relative flex flex-col items-center justify-between rounded-xl border border-zinc-800/60 bg-zinc-950/40 p-4 transition-colors hover:border-zinc-700/60 shadow-none',
+        'relative flex flex-col items-center justify-between rounded-xl border border-border/80 bg-card p-4 transition-all hover:border-border hover:shadow-sm shadow-xs',
         className
       )}
     >
       {/* Header if campaign provided */}
       {campaignName && (
-        <div className='flex w-full items-center justify-between gap-2 border-b border-zinc-800/60 pb-2 mb-2'>
+        <div className='flex w-full items-center justify-between gap-2 border-b border-border/80 pb-2 mb-2'>
           <div className='flex items-center gap-2 min-w-0'>
             {photoUrl && (
-              <div className='relative size-7 rounded border border-zinc-800/80 bg-zinc-900/60 overflow-hidden shrink-0'>
+              <div className='relative size-7 rounded-lg border border-border bg-muted overflow-hidden shrink-0 shadow-2xs'>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={photoUrl} alt={productName || campaignName} className='size-full object-cover' />
               </div>
             )}
             <div className='flex flex-col text-left min-w-0'>
-              <span className='text-xs font-medium text-zinc-200 font-mono truncate max-w-[140px]'>
+              <span className='text-xs font-semibold text-foreground font-mono truncate max-w-[140px]'>
                 {productName || campaignName}
               </span>
-              <span className='text-[10px] text-zinc-500 uppercase tracking-wider font-mono truncate max-w-[140px]'>
+              <span className='text-[10px] text-muted-foreground uppercase tracking-wider font-mono truncate max-w-[140px]'>
                 {platform || 'Omnichannel'} • Inv: {inventory ?? 'N/A'}
               </span>
             </div>
           </div>
           <div
             className={cn(
-              'flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-mono font-semibold shrink-0',
+              'flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-mono font-bold shrink-0',
               healthColor
             )}
             title={`Campaign Health Score: ${healthScore}/100`}
@@ -127,7 +127,7 @@ export function RoasGauge({
             fill='none'
             stroke='currentColor'
             strokeWidth={strokeWidth}
-            className='text-zinc-900'
+            className='text-slate-100 dark:text-zinc-800'
             strokeLinecap='round'
           />
 
@@ -196,18 +196,18 @@ export function RoasGauge({
           <span className={cn('font-mono font-bold tracking-tight', compact ? 'text-lg' : 'text-2xl', statusColor)}>
             {currentRoas.toFixed(2)}x
           </span>
-          <span className='text-[10px] text-zinc-500 font-mono -mt-0.5'>ROAS</span>
+          <span className='text-[10px] text-muted-foreground font-mono -mt-0.5'>ROAS</span>
         </div>
       </div>
 
       {/* Footer Markers & Status Badge */}
-      <div className='mt-2 flex w-full items-center justify-between text-[10px] font-mono text-zinc-500'>
+      <div className='mt-2 flex w-full items-center justify-between text-[10px] font-mono text-muted-foreground'>
         <div className='flex items-center gap-1.5'>
           <span>Floor {breakevenRoas.toFixed(1)}x</span>
-          <span className='text-zinc-700'>•</span>
+          <span className='text-muted-foreground/40'>•</span>
           <span>Target {targetRoas.toFixed(1)}x</span>
         </div>
-        <Badge variant='outline' className={cn('text-[9px] py-0 px-1 font-mono tracking-wider', badgeVariant)}>
+        <Badge variant='outline' className={cn('text-[9px] py-0 px-1 font-mono tracking-wider font-semibold', badgeVariant)}>
           {statusBadge}
         </Badge>
       </div>

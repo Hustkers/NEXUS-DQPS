@@ -83,8 +83,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <NuqsAdapter>
           <ThemeProvider
             attribute='class'
-            defaultTheme='dark'
-            enableSystem
+            defaultTheme='light'
+            enableSystem={false}
             disableTransitionOnChange
             enableColorScheme
           >

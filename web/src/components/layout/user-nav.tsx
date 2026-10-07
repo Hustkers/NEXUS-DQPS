@@ -20,20 +20,20 @@ export function UserNav() {
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <Button variant='ghost' className='relative h-8 w-8 rounded-full border border-emerald-500/30 bg-emerald-950/20'>
+          <Button variant='ghost' className='relative h-8 w-8 rounded-full border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-950/20'>
             <Avatar className='h-8 w-8'>
-              <AvatarFallback className='bg-emerald-950 text-emerald-400 font-mono text-xs font-bold'>NX</AvatarFallback>
+              <AvatarFallback className='bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-mono text-xs font-bold'>NX</AvatarFallback>
             </Avatar>
           </Button>
         }
       />
-      <DropdownMenuContent className='w-56 bg-zinc-950 border-zinc-800' align='end' sideOffset={10}>
+      <DropdownMenuContent className='w-56 bg-popover border-border shadow-md' align='end' sideOffset={10}>
         <DropdownMenuGroup>
           <DropdownMenuLabel className='font-normal'>
             <div className='flex flex-col space-y-1'>
-              <p className='text-sm leading-none font-semibold text-zinc-100 flex items-center gap-1.5'>
+              <p className='text-sm leading-none font-semibold text-foreground flex items-center gap-1.5'>
                 Nexus AI Operator
-                <span className='size-1.5 rounded-full bg-emerald-400' />
+                <span className='size-1.5 rounded-full bg-emerald-500' />
               </p>
               <p className='text-muted-foreground text-xs leading-none font-mono'>
                 operator@nexus-d2c.internal
@@ -41,23 +41,23 @@ export function UserNav() {
             </div>
           </DropdownMenuLabel>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator className='bg-zinc-800' />
+        <DropdownMenuSeparator className='bg-border' />
         <DropdownMenuGroup>
           <DropdownMenuItem onClick={() => router.push('/dashboard/overview')} className='cursor-pointer text-xs'>
-            <Icons.dashboard className='mr-2 h-3.5 w-3.5 text-emerald-400' />
+            <Icons.dashboard className='mr-2 h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400' />
             Mission Control
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => router.push('/dashboard/simulator')} className='cursor-pointer text-xs'>
-            <Icons.terminal className='mr-2 h-3.5 w-3.5 text-cyan-400' />
+            <Icons.terminal className='mr-2 h-3.5 w-3.5 text-sky-600 dark:text-cyan-400' />
             Scenario Injector
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => router.push('/dashboard/ledger')} className='cursor-pointer text-xs'>
-            <Icons.check className='mr-2 h-3.5 w-3.5 text-emerald-400' />
+            <Icons.check className='mr-2 h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400' />
             Decision Ledger
           </DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator className='bg-zinc-800' />
-        <div className='p-2 text-[10px] text-zinc-500 font-mono'>
+        <DropdownMenuSeparator className='bg-border' />
+        <div className='p-2 text-[10px] text-muted-foreground font-mono'>
           SYS_STATUS: OPTIMIZING (OK)
         </div>
       </DropdownMenuContent>
