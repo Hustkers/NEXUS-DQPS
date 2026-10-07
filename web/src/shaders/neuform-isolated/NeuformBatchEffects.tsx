@@ -898,6 +898,7 @@ function NeuformBatchEffect({
         border: 0,
         background,
         filter,
+        pointerEvents: "none",
         ...style,
       }}
     />

@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Icons } from '@/components/icons';
 import { IconPackage, IconChevronDown, IconCheck, IconX, IconAlertTriangle } from '@tabler/icons-react';
 import type { PlaygroundProductSummary } from '../../types/ad-playground-types';
 import { cn } from '@/lib/utils';
@@ -71,14 +70,15 @@ export function PlaygroundCompactProductSelector({
 
         <div className='flex items-center gap-3.5'>
           {/* Shoe Thumbnail */}
-          <div className='relative size-16 sm:size-18 rounded-lg overflow-hidden bg-muted/40 border border-border/80 shrink-0'>
+          <div className='relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-lg overflow-hidden bg-muted/40 border border-border/80'>
             {selectedProduct.photoUrl ? (
               <Image
                 src={selectedProduct.photoUrl}
                 alt={selectedProduct.name}
                 fill
-                sizes='72px'
-                className='object-cover'
+                sizes='80px'
+                className='object-cover pointer-events-none select-none'
+                priority
               />
             ) : (
               <div className='w-full h-full flex items-center justify-center text-muted-foreground'>
@@ -201,14 +201,14 @@ export function PlaygroundCompactProductSelector({
                     )}
                   >
                     <div className='flex items-center gap-3 min-w-0'>
-                      <div className='relative size-12 rounded-lg overflow-hidden bg-muted/50 border border-border/60 shrink-0'>
+                      <div className='relative w-12 h-12 shrink-0 rounded-lg overflow-hidden bg-muted/50 border border-border/60'>
                         {p.photoUrl ? (
                           <Image
                             src={p.photoUrl}
                             alt={p.name}
                             fill
                             sizes='48px'
-                            className='object-cover'
+                            className='object-cover pointer-events-none select-none'
                           />
                         ) : (
                           <div className='w-full h-full flex items-center justify-center text-muted-foreground'>
