@@ -223,6 +223,8 @@ __marimo__/
 /data/*
 !/data/imports/
 !/data/imports/**
+!/data/fixtures/
+!/data/fixtures/**
 __pycache__/
 *.pyc
 
