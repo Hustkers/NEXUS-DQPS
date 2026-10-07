@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import path from 'path';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
@@ -19,6 +20,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true
   },
   turbopack: {
+    root: path.resolve(__dirname),
     rules: {
       '*.html': {
         loaders: [rawLoader],
