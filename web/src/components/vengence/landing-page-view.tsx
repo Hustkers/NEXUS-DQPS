@@ -9,6 +9,7 @@ import { CardSpotlight } from './card-spotlight';
 import { BentoGrid, BentoGridItem } from './bento-grid';
 import { StatsMatrix } from './stats-matrix';
 import { ShockSimulatorShowcase } from './shock-simulator-showcase';
+import { NotchNavbar } from './notch-navbar';
 
 const HERO_STATS = [
   {
@@ -44,70 +45,11 @@ const HERO_STATS = [
 export function LandingPageView() {
   return (
     <div className='relative min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-foreground'>
-      {/* 1. TOP STICKY NAVIGATION BAR */}
-      <header className='sticky top-0 z-50 w-full border-b border-border/80 bg-background/85 backdrop-blur-md transition-all'>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4'>
-          {/* Logo & Status Badge */}
-          <Link href='/' className='flex items-center gap-3 group'>
-            <div className='size-8 rounded-lg bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 flex items-center justify-center font-mono font-bold text-sm shadow-xs group-hover:scale-105 transition-transform'>
-              N
-            </div>
-            <div className='flex flex-col'>
-              <div className='font-mono font-extrabold text-sm tracking-tight flex items-center gap-2'>
-                <span>NEXUS-DQPS</span>
-                <span className='size-1.5 rounded-full bg-emerald-500 animate-pulse' />
-              </div>
-              <span className='text-[10px] text-muted-foreground font-mono leading-none'>
-                AUTONOMOUS AD ENGINE
-              </span>
-            </div>
-          </Link>
-
-          {/* Center Navigation Links */}
-          <nav className='hidden md:flex items-center gap-6 font-mono text-xs font-medium text-muted-foreground'>
-            <a href='#shocks' className='hover:text-foreground transition-colors'>
-              Crisis Scenarios
-            </a>
-            <a href='#bento' className='hover:text-foreground transition-colors'>
-              Engine Architecture
-            </a>
-            <a href='#pipeline' className='hover:text-foreground transition-colors'>
-              4-Phase Flow
-            </a>
-            <Link href='/dashboard/fingerprint' className='hover:text-foreground transition-colors'>
-              Identity Graph
-            </Link>
-            <Link href='/dashboard/ledger' className='hover:text-foreground transition-colors'>
-              Decision Ledger
-            </Link>
-          </nav>
-
-          {/* Action CTAs */}
-          <div className='flex items-center gap-3'>
-            <a
-              href='https://github.com/Hustkers/NEXUS-DQPS'
-              target='_blank'
-              rel='noopener noreferrer'
-              className='size-9 rounded-lg border border-border/80 hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors'
-              title='View GitHub Repository'
-            >
-              <Icons.brandGithub className='size-4' />
-            </a>
-
-            <GlowButton
-              href='/dashboard/overview'
-              size='sm'
-              variant='default'
-              className='font-mono text-xs shadow-xs'
-            >
-              Enter Mission Control →
-            </GlowButton>
-          </div>
-        </div>
-      </header>
+      {/* 1. VENGEANCE UI NOTCH NAVIGATION BAR */}
+      <NotchNavbar />
 
       {/* 2. HERO SECTION WITH VGPU CANVAS BACKGROUND */}
-      <section className='relative pt-12 pb-20 md:pt-20 md:pb-28 overflow-hidden border-b border-border/60'>
+      <section className='relative pt-24 pb-20 md:pt-28 md:pb-28 overflow-hidden border-b border-border/60'>
         {/* VGPU Canvas Dynamic Waveform */}
         <VGPUCanvas className='opacity-80' intensity={1.1} />
 

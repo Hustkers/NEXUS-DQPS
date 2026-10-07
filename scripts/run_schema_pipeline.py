@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """Execute the complete Section 1 Schema Pipeline to generate Ad Recommendations."""
 import json
+import os
 import sys
 from pathlib import Path
 
-# Add project root to sys.path
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+# Add project root to sys.path and set working directory
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT))
+os.chdir(PROJECT_ROOT)
 
 from ingest.pipeline import CanonicalPipeline
 from ingest.load import load
@@ -172,7 +175,16 @@ def main():
     print("=================================================================\n")
 
     payloads_dir = Path("data/payloads")
-    create_endpoint_exact_fixtures(payloads_dir)
+    raw_dir = Path("data/raw_datasets")
+
+    if (raw_dir / "meta_kaggle_conversion.csv").exists() and "--mock" not in sys.argv:
+        print("📦 Ingesting real public benchmark datasets from data/raw_datasets/...")
+        from ingest.raw_dataset_importer import RawAdDatasetImporter
+        importer = RawAdDatasetImporter(raw_dir=raw_dir, output_dir=payloads_dir)
+        importer.transform_all()
+    else:
+        print("🔧 Generating endpoint-exact fixtures...")
+        create_endpoint_exact_fixtures(payloads_dir)
 
     pipeline = CanonicalPipeline(data_dir=str(payloads_dir))
 
