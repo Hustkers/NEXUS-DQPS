@@ -71,7 +71,8 @@ const DEFAULT_LEFT_ITEMS: NavItem[] = [
 
 const DEFAULT_RIGHT_ITEMS: NavItem[] = [
   { label: 'Pipeline', href: '#stack', icon: Layers },
-  { label: 'Simulator', href: '/dashboard/simulator', icon: Zap }
+  { label: 'Simulator', href: '/dashboard/simulator', icon: Zap },
+  { label: 'Enter App', href: '/dashboard/overview', icon: TerminalPromptIcon, isSpecial: true }
 ];
 
 export function NotchNavbar({
@@ -115,13 +116,13 @@ export function NotchNavbar({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Target style logo from Screenshot 1: [NX] nexusdqps (matching [CG] contextgc)
+  // Target style logo: [NX] nexusdqps with Vengence Orbitron display styling
   const defaultLogo = (
     <Link href="/" className="flex items-center gap-2 group shrink-0 mb-0.5">
-      <div className="bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 rounded-lg px-2 py-0.5 font-bold font-sans text-xs tracking-tight flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+      <div className="bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 rounded-lg px-2 py-0.5 font-black font-orbitron text-xs tracking-tight flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
         NX
       </div>
-      <span className="font-bold text-sm sm:text-base tracking-tight text-foreground font-sans">
+      <span className="font-bold text-sm sm:text-base tracking-tight text-foreground font-orbitron">
         nexusdqps
       </span>
     </Link>
@@ -133,15 +134,15 @@ export function NotchNavbar({
     const isActive = activeItem === item.label;
 
     if (item.isSpecial) {
-      // Special Console link (vibrant blue with prompt icon from Screenshot 1)
+      // Primary Enter App button
       return (
         <Link
           key={item.label}
           href={item.href}
-          className="group flex items-center gap-1.5 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-500 transition-colors whitespace-nowrap"
+          className="group flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 transition-colors whitespace-nowrap bg-emerald-500/10 dark:bg-emerald-500/15 hover:bg-emerald-500/25 px-3 py-1 rounded-full border border-emerald-500/30 shadow-2xs"
         >
-          <Icon className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-          <span>{item.label}</span>
+          <Icon className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform" />
+          <span>{item.label} →</span>
         </Link>
       );
     }
@@ -435,7 +436,7 @@ export function NotchNavbar({
                     className={cn(
                       'flex items-center gap-3 p-2.5 rounded-lg transition-colors font-sans text-sm font-medium',
                       isConsole
-                        ? 'text-blue-600 dark:text-blue-400 font-semibold bg-blue-50/50 dark:bg-blue-950/20'
+                        ? 'text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30'
                         : 'text-foreground/85 hover:text-foreground hover:bg-muted/60'
                     )}
                     onClick={() => setIsMobileMenuOpen(false)}

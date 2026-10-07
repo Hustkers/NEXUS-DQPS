@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { SharedTooltipAvatars, type AvatarItem } from "@/components/ui/shared-tooltip-avatars";
@@ -10,7 +11,7 @@ export const DEFAULT_TEAM_MEMBERS: AvatarItem[] = [
   {
     id: "jay-gopal-tripathy",
     name: "Jay Gopal Tripathy",
-    image: "https://github.com/Hustkers.png",
+    image: "/team/jay-gopal.webp",
   },
   {
     id: "shivam-kumar",
@@ -386,13 +387,26 @@ export function AnimatedFooter({
       <div className="footer-wrap">
         <div className="footer-top-nav">
           <div className="footer-brand">
-            <div className="footer-logo-row">
-              <span className="logo-mark" aria-hidden="true">
+            <Link href="/" className="footer-logo-row group cursor-pointer inline-flex items-center gap-2" title="Return to top">
+              <span className="logo-mark font-orbitron font-black group-hover:scale-105 transition-transform" aria-hidden="true">
                 {brandLogo}
               </span>
-              <span className="footer-brand-title">{brandTitle}</span>
-            </div>
+              <span className="footer-brand-title font-orbitron font-bold group-hover:text-foreground transition-colors">{brandTitle}</span>
+            </Link>
             <p className="footer-tagline">{tagline}</p>
+          </div>
+
+          {/* Quick Platform Links */}
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3.5 text-xs font-mono text-muted-foreground my-2 lg:my-0">
+            <Link href="/dashboard/overview" className="hover:text-foreground transition-colors">Cockpit</Link>
+            <span className="opacity-25">•</span>
+            <Link href="/dashboard/playground" className="hover:text-foreground transition-colors">Playground</Link>
+            <span className="opacity-25">•</span>
+            <Link href="/dashboard/reallocations" className="hover:text-foreground transition-colors">Reallocations</Link>
+            <span className="opacity-25">•</span>
+            <Link href="/dashboard/anomalies" className="hover:text-foreground transition-colors">Diagnostics</Link>
+            <span className="opacity-25">•</span>
+            <Link href="/dashboard/ledger" className="hover:text-foreground transition-colors">Ledger</Link>
           </div>
 
           {/* VengeanceUI Shared Tooltip Team Avatars */}

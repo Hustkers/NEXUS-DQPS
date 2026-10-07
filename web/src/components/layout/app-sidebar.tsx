@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/sidebar';
 import { UserAvatarProfile } from '@/components/user-avatar-profile';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import * as React from 'react';
 import { Icons } from '../icons';
 import { OrgSwitcher } from '../org-switcher';
@@ -44,7 +45,28 @@ export default function AppSidebar() {
       <VengenceDiagonalDivider />
 
       {/* Top Brand & Ad Channels Header */}
-      <SidebarHeader className='group-data-[collapsible=icon]:pt-3 flex flex-col gap-2 p-2'>
+      <SidebarHeader className='group-data-[collapsible=icon]:pt-2 flex flex-col gap-1.5 p-2'>
+        {/* NEXUS Brand Home Link */}
+        <div className='flex items-center justify-between px-1.5 py-1 group-data-[collapsible=icon]:justify-center'>
+          <Link
+            href='/'
+            className='flex items-center gap-2 group text-foreground hover:opacity-90 transition-opacity rounded-md p-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+            title='NEXUS D2C — Return to Landing Page'
+          >
+            <div className='bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 rounded-lg px-2 py-0.5 font-bold font-sans text-xs tracking-tight flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform'>
+              NX
+            </div>
+            <div className='flex items-center gap-1.5 group-data-[collapsible=icon]:hidden'>
+              <span className='font-bold text-sm tracking-tight text-foreground font-sans'>
+                nexusdqps
+              </span>
+              <span className='text-[9px] font-mono px-1 py-0.2 rounded bg-muted text-muted-foreground group-hover:text-foreground transition-colors'>
+                ← Home
+              </span>
+            </div>
+          </Link>
+        </div>
+
         <OrgSwitcher />
         <ChannelSwitcher />
       </SidebarHeader>
@@ -125,6 +147,13 @@ export default function AppSidebar() {
                   >
                     <Icons.notification className='mr-2 h-4 w-4 text-muted-foreground' />
                     Notifications
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => router.push('/')}
+                    className='cursor-pointer text-foreground hover:bg-accent'
+                  >
+                    <Icons.externalLink className='mr-2 h-4 w-4 text-muted-foreground' />
+                    Landing Page
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator className='bg-border' />

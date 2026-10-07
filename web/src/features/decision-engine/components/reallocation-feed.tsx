@@ -39,6 +39,7 @@ export interface LegacyReallocationItem {
   targetRoas?: number;
   targetMarginalRoas?: number;
   netRevenueLift?: number;
+  timestamp?: string;
 }
 
 export type ReallocationItem = EngineReallocationItem | LegacyReallocationItem;
@@ -134,7 +135,6 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const total = reallocations.length;
-    // Step through visual progress
     for (let i = 1; i <= total; i++) {
       setExecuteAllProgress({ current: i, total });
       if (!prefersReducedMotion) {
@@ -148,28 +148,27 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
     toast.success('All pending budget reallocations executed synchronously');
   };
 
-  // Aggregated preview stats for Execute All
   const totalMovedAll = reallocations.reduce((acc, it) => acc + it.movedAmount, 0);
   const totalLiftAll = reallocations.reduce((acc, it) => acc + it.netRevenueLift, 0);
 
   return (
     <div className={cn('rounded-xl border border-border bg-card p-4 sm:p-5 shadow-xs text-card-foreground font-mono min-w-0 max-w-full space-y-4', className)}>
       {/* Header */}
-      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-border/70 pb-3.5'>
+      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border/70 pb-3'>
         <div className='flex items-center gap-2'>
           <Icons.adjustments className='size-4 text-primary' />
           <h3 className='text-xs font-bold text-foreground uppercase tracking-wider'>
-            Autonomous Capital Reallocation Stream
+            Decision Feed
           </h3>
           <span className='px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold'>
             {reallocations.length} pending
           </span>
         </div>
 
-        <div className='flex items-center gap-4'>
+        <div className='flex items-center gap-3'>
           {/* Auto-Pilot Toggle */}
           <div className='flex items-center gap-2 text-xs text-muted-foreground'>
-            <span className={cn(autoPilot && 'text-emerald-600 dark:text-emerald-400 font-bold')}>Auto-Pilot (≥80% conf)</span>
+            <span className={cn(autoPilot && 'text-emerald-500 font-bold')}>Auto-Pilot</span>
             <Switch
               checked={autoPilot}
               onCheckedChange={toggleAutoPilot}
@@ -181,94 +180,101 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
             size='sm'
             onClick={handleStartExecuteAll}
             disabled={reallocations.length === 0}
-            className='h-8 text-xs font-mono bg-foreground hover:bg-foreground/90 text-background font-bold uppercase tracking-wider rounded-lg shadow-sm active:scale-[0.98]'
+            className='h-7 px-3 text-xs font-mono bg-foreground hover:bg-foreground/90 text-background font-bold uppercase tracking-wider rounded-lg shadow-sm active:scale-[0.98]'
           >
-            Execute All Directives
+            Execute All
           </Button>
         </div>
       </div>
 
-      {/* Streamlined Reallocation Directive Cards */}
+      {/* Streamlined Decision Feed: TIME | PRODUCT | ISSUE | ACTION | OUTCOME */}
       {reallocations.length === 0 ? (
-        <div className='rounded-xl border border-dashed border-border bg-muted/20 p-8 text-center space-y-1.5'>
-          <Icons.check className='size-6 text-emerald-500 mx-auto' />
+        <div className='rounded-xl border border-dashed border-border bg-muted/20 p-6 text-center space-y-1'>
+          <Icons.check className='size-5 text-emerald-500 mx-auto' />
           <p className='text-xs font-bold text-foreground uppercase tracking-wider'>
-            All Capital Reallocations Executed &amp; Calibrated
+            All Decisions Executed
           </p>
-          <p className='text-[11px] text-muted-foreground max-w-md mx-auto'>
-            Zero pending budget imbalance. Portfolio channels operating at optimal SLSQP convex yield bounds.
+          <p className='text-[10px] text-muted-foreground'>
+            Zero pending budget imbalance across channels.
           </p>
         </div>
       ) : (
-        <div className='space-y-2.5'>
-          {reallocations.map((item) => {
+        <div className='space-y-2'>
+          {/* Column Header */}
+          <div className='hidden md:grid grid-cols-12 gap-3 px-3 py-1 text-[10px] uppercase font-bold text-muted-foreground tracking-wider border-b border-border/50'>
+            <span className='col-span-1'>Time</span>
+            <span className='col-span-3'>Product</span>
+            <span className='col-span-3'>Issue</span>
+            <span className='col-span-3'>Action</span>
+            <span className='col-span-2 text-right'>Outcome</span>
+          </div>
+
+          {reallocations.map((item, idx) => {
             const isKill = item.actionTag === 'PAUSE';
-            const isLowStock = item.actionTag === 'REDIRECT';
-            const actionLabel = isKill ? 'PAUSE SPEND' : isLowStock ? 'REDIRECT SPEND' : 'TRIM BUDGET';
-            const badgeColor = isKill
-              ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30'
-              : isLowStock
-              ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30'
-              : 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/30';
+            const isRedirect = item.actionTag === 'REDIRECT';
+
+            const timeStr = (item as any).timestamp || `03:${(17 + idx * 4).toString().padStart(2, '0')}`;
+            const issueStr = isKill
+              ? '⚠ OUT OF STOCK'
+              : isRedirect
+              ? '⚡ BID SURGE'
+              : '📉 ROAS DECAY';
+            const issueBadgeColor = isKill
+              ? 'text-rose-500 bg-rose-500/10 border-rose-500/30'
+              : isRedirect
+              ? 'text-amber-500 bg-amber-500/10 border-amber-500/30'
+              : 'text-indigo-400 bg-indigo-500/10 border-indigo-500/30';
+
+            const actionStr = isKill
+              ? 'Pause campaign → Reallocate 80%'
+              : isRedirect
+              ? `Redirect spend → ${item.targetChannel}`
+              : 'Trim spend → Maximize yield';
 
             return (
               <div
                 key={item.id}
-                className='p-4 rounded-xl border border-border/80 bg-card/60 hover:bg-card hover:border-border transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xs'
+                className='p-3 rounded-lg border border-border/80 bg-card/60 hover:bg-card hover:border-border transition-colors flex flex-col md:grid md:grid-cols-12 gap-2 md:gap-3 items-start md:items-center text-xs'
               >
-                {/* Left: Action tag, Route, Campaign IDs, Rationale */}
-                <div className='flex-1 min-w-0 space-y-1.5'>
-                  <div className='flex items-center gap-2 flex-wrap text-xs'>
-                    <span className={cn('text-[9px] font-bold px-2 py-0.5 rounded border uppercase font-mono tracking-wider', badgeColor)}>
-                      [{actionLabel}]
-                    </span>
-                    <span className='text-[10px] text-muted-foreground font-mono'>
-                      #{item.sourceCampaign} → #{item.targetCampaign}
-                    </span>
-                    <span className='px-1.5 py-0.2 rounded bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 text-[10px] font-bold'>
-                      {item.confidence}% Bayesian Conf.
-                    </span>
-                  </div>
-
-                  {/* Visual Route Flow */}
-                  <div className='flex items-center gap-2 text-xs font-bold text-foreground flex-wrap'>
-                    <span className='flex items-center gap-1.5'>
-                      <span className='size-1.5 rounded-full bg-rose-500' />
-                      <span>{item.sourceProductName}</span>
-                      <span className='text-muted-foreground font-normal text-[11px]'>({item.sourceChannel})</span>
-                    </span>
-                    <span className='text-muted-foreground text-xs'>→</span>
-                    <span className='flex items-center gap-1.5'>
-                      <span className='size-1.5 rounded-full bg-emerald-500' />
-                      <span>{item.targetProductName}</span>
-                      <span className='text-muted-foreground font-normal text-[11px]'>({item.targetChannel})</span>
-                    </span>
-                  </div>
-
-                  {/* Rationale Snippet */}
-                  <p className='text-[11px] text-muted-foreground leading-relaxed line-clamp-1'>
-                    {item.reason}
-                  </p>
+                {/* 1. TIME */}
+                <div className='col-span-1 text-[11px] font-mono text-muted-foreground font-semibold'>
+                  {timeStr}
                 </div>
 
-                {/* Center: Financial Impact Stats */}
-                <div className='flex items-center gap-4 shrink-0 text-xs border-y md:border-y-0 md:border-l border-border/60 py-2.5 md:py-0 md:pl-4'>
-                  <div>
-                    <span className='text-[10px] text-muted-foreground uppercase block font-semibold'>Capital Shift</span>
-                    <span className='font-bold text-foreground text-sm font-mono'>{formatINR(item.movedAmount)}/day</span>
+                {/* 2. PRODUCT */}
+                <div className='col-span-3 min-w-0'>
+                  <div className='font-bold text-foreground truncate'>
+                    {item.sourceProductName}
                   </div>
-                  <div>
-                    <span className='text-[10px] text-muted-foreground uppercase block font-semibold'>Net Rev Lift</span>
-                    <span className='font-bold text-emerald-600 dark:text-emerald-400 text-sm font-mono'>+{formatINR(item.netRevenueLift)}/day</span>
+                  <div className='text-[10px] text-muted-foreground font-normal truncate'>
+                    {item.sourceChannel}
                   </div>
                 </div>
 
-                {/* Right: Review & Execute Button */}
-                <div className='shrink-0 flex items-center justify-end'>
+                {/* 3. ISSUE */}
+                <div className='col-span-3'>
+                  <span className={cn('px-2 py-0.5 rounded text-[10px] font-bold border inline-flex items-center gap-1 font-mono', issueBadgeColor)}>
+                    {issueStr}
+                  </span>
+                </div>
+
+                {/* 4. ACTION */}
+                <div className='col-span-3 font-mono text-[11px] text-foreground font-medium'>
+                  <div>{actionStr.split('→')[0].trim()}</div>
+                  <div className='text-emerald-400 font-semibold text-[10px]'>
+                    → {actionStr.split('→')[1]?.trim() || 'Reallocate'}
+                  </div>
+                </div>
+
+                {/* 5. OUTCOME & BUTTON */}
+                <div className='col-span-2 w-full flex md:flex-col items-center md:items-end justify-between gap-1.5'>
+                  <div className='text-emerald-400 font-bold font-mono text-xs whitespace-nowrap'>
+                    +{formatINR(item.netRevenueLift)}/day
+                  </div>
                   <Button
                     size='sm'
                     onClick={() => handleOpenReview(item)}
-                    className='h-8 px-4 text-xs font-mono bg-foreground hover:bg-foreground/90 text-background font-bold uppercase tracking-wider rounded-lg shadow-sm transition-all active:scale-[0.98]'
+                    className='h-6 px-2.5 text-[10px] font-mono bg-foreground hover:bg-foreground/90 text-background font-bold uppercase tracking-wider rounded shadow-xs'
                   >
                     Review &amp; Move
                   </Button>
@@ -282,7 +288,6 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
       {/* RIGHT-SIDE REALLOCATION CONSOLE DRAWER */}
       {selectedItem && (
         <div className='fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-xs animate-in fade-in duration-200'>
-          {/* Backdrop Click */}
           <div
             className='fixed inset-0'
             onClick={() => {
@@ -290,7 +295,6 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
             }}
           />
 
-          {/* Right-Side Drawer */}
           <div
             className='relative z-10 h-full w-full max-w-[min(560px,100vw)] bg-card border-l border-border p-6 sm:p-8 overflow-y-auto overflow-x-hidden font-mono shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-200 text-card-foreground'
             onClick={(e) => e.stopPropagation()}
@@ -324,7 +328,6 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
             {/* STEP 1: REVIEW */}
             {modalStep === 1 && (
               <div className='space-y-5 my-auto py-4'>
-                {/* Big Centered Number Block */}
                 <div className='rounded-xl border border-border bg-muted/30 py-5 px-4 text-center space-y-1'>
                   <div className='text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight font-mono'>
                     {formatINR(selectedItem.movedAmount)}
@@ -334,9 +337,7 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
                   </p>
                 </div>
 
-                {/* From / To Comparative Cards */}
                 <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
-                  {/* FROM CARD */}
                   <div className='rounded-lg border border-border bg-muted/20 p-3.5 flex flex-col justify-between space-y-2'>
                     <div>
                       <span className='text-[10px] uppercase tracking-wider font-semibold text-muted-foreground block'>
@@ -368,7 +369,6 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
                     </div>
                   </div>
 
-                  {/* TO CARD */}
                   <div className='rounded-lg border border-border bg-muted/20 p-3.5 flex flex-col justify-between space-y-2'>
                     <div>
                       <span className='text-[10px] uppercase tracking-wider font-semibold text-muted-foreground block'>
@@ -394,7 +394,6 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
                   </div>
                 </div>
 
-                {/* Why and Expected gain */}
                 <div className='space-y-2.5 rounded-lg border border-border/80 bg-muted/20 p-4 text-xs'>
                   <div className='space-y-1'>
                     <span className='text-[10px] uppercase tracking-wider font-bold text-muted-foreground block'>
@@ -414,7 +413,6 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
                   </div>
                 </div>
 
-                {/* Details Accordion */}
                 <details className='rounded-lg border border-border/60 bg-muted/10 p-3 text-xs group'>
                   <summary className='cursor-pointer text-muted-foreground hover:text-foreground font-medium flex items-center justify-between select-none'>
                     <span>Mathematical proof &amp; campaign lineage</span>
@@ -437,13 +435,9 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
                         <span className='text-foreground font-bold'>{selectedItem.targetCampaign}</span>
                       </div>
                     </div>
-                    <p className='text-[10px] text-muted-foreground leading-relaxed pt-1'>
-                      Bounds: Marginal return modeled using Scipy SLSQP convex optimization with 15% diminishing yield elasticity and inventory safety floors.
-                    </p>
                   </div>
                 </details>
 
-                {/* Action Buttons */}
                 <div className='flex items-center justify-end gap-2.5 pt-3 border-t border-border/70'>
                   <Button
                     variant='outline'
@@ -485,7 +479,7 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
               </div>
             )}
 
-            {/* STEP 3: DONE COMPACT STATE */}
+            {/* STEP 3: DONE */}
             {modalStep === 3 && (
               <div className='space-y-5 my-auto py-4'>
                 <div className='rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-4 flex items-center justify-between'>
@@ -507,7 +501,6 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
                   </span>
                 </div>
 
-                {/* Updated Allocations Summary */}
                 <div className='rounded-lg border border-border bg-muted/20 p-4 space-y-2.5 text-xs'>
                   <span className='text-[10px] uppercase font-bold tracking-wider text-muted-foreground block'>
                     Updated Active Allocations
@@ -530,11 +523,6 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
                   </div>
                 </div>
 
-                <div className='flex items-center gap-2 text-[11px] text-muted-foreground bg-muted/20 p-3 rounded-lg border border-border/60'>
-                  <Icons.info className='size-3.5 text-muted-foreground shrink-0' />
-                  <span>Outcomes are modeled algorithmic projections evaluated over a 7-day calibration window.</span>
-                </div>
-
                 <div className='flex items-center justify-end pt-3 border-t border-border/70'>
                   <Button
                     onClick={() => setSelectedItem(null)}
@@ -552,7 +540,6 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
       {/* RIGHT-SIDE DRAWER: EXECUTE ALL FLOW */}
       {executeAllState && (
         <div className='fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-xs animate-in fade-in duration-200'>
-          {/* Backdrop Click */}
           <div
             className='fixed inset-0'
             onClick={() => {
@@ -560,14 +547,12 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
             }}
           />
 
-          {/* Drawer */}
           <div
             className='relative z-10 h-full w-full max-w-[min(560px,100vw)] bg-card border-l border-border p-6 sm:p-8 overflow-y-auto overflow-x-hidden font-mono shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-200 text-card-foreground'
             onClick={(e) => e.stopPropagation()}
             role='dialog'
             aria-modal='true'
           >
-            {/* Header */}
             <div className='flex items-start justify-between border-b border-border/80 pb-4'>
               <div className='min-w-0 pr-4'>
                 <h3 className='text-sm font-bold text-foreground uppercase tracking-tight flex items-center gap-2'>
@@ -598,37 +583,32 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
                     <span className='text-[10px] text-muted-foreground uppercase font-semibold block'>
                       Total Capital Moved
                     </span>
-                    <span className='text-xl font-bold text-foreground mt-1 block font-mono'>
+                    <span className='text-xl font-extrabold text-foreground font-mono mt-1 block'>
                       {formatINR(totalMovedAll)}
                     </span>
                   </div>
-                  <div className='rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3.5'>
-                    <span className='text-[10px] text-emerald-600 dark:text-emerald-400 uppercase font-semibold block'>
-                      Total Expected Gain
+                  <div className='rounded-xl border border-border bg-muted/20 p-3.5'>
+                    <span className='text-[10px] text-muted-foreground uppercase font-semibold block'>
+                      Net Revenue Lift
                     </span>
-                    <span className='text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 block font-mono'>
+                    <span className='text-xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono mt-1 block'>
                       +{formatINR(totalLiftAll)}
                     </span>
                   </div>
                 </div>
 
-                <div className='rounded-xl border border-border bg-muted/20 p-4 space-y-2'>
+                <div className='space-y-2 rounded-xl border border-border bg-muted/20 p-4'>
                   <span className='text-[10px] uppercase font-bold tracking-wider text-muted-foreground block'>
-                    Pending Reallocations ({reallocations.length})
+                    Queue Summary ({reallocations.length} Directives)
                   </span>
-                  <div className='space-y-2 max-h-60 overflow-y-auto pr-1 text-xs'>
+                  <div className='space-y-1.5 max-h-48 overflow-y-auto pr-1 text-xs'>
                     {reallocations.map((it) => (
-                      <div key={it.id} className='rounded-lg border border-border/80 bg-card p-3 flex items-center justify-between'>
-                        <div className='min-w-0 pr-2'>
-                          <span className='text-foreground font-semibold truncate block'>
-                            {it.sourceProductName} → {it.targetProductName}
-                          </span>
-                          <span className='text-[11px] text-muted-foreground font-mono'>
-                            Move {formatINR(it.movedAmount)} · Gain +{formatINR(it.netRevenueLift)}
-                          </span>
-                        </div>
-                        <span className='text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30 shrink-0 font-mono'>
-                          {it.confidence}%
+                      <div key={it.id} className='flex items-center justify-between py-1 border-b border-border/40 last:border-b-0'>
+                        <span className='text-foreground truncate max-w-[200px]'>
+                          {it.sourceProductName} → {it.targetProductName}
+                        </span>
+                        <span className='font-mono font-bold text-foreground shrink-0'>
+                          {formatINR(it.movedAmount)}
                         </span>
                       </div>
                     ))}
@@ -645,9 +625,9 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
                   </Button>
                   <Button
                     onClick={handleConfirmExecuteAll}
-                    className='h-9 px-5 bg-foreground hover:bg-foreground/90 text-background text-xs font-bold uppercase tracking-wider shadow-sm'
+                    className='h-9 px-5 bg-foreground hover:bg-foreground/90 text-background text-xs font-bold uppercase tracking-wider'
                   >
-                    Move All Budgets ({reallocations.length} Actions)
+                    Execute All Now
                   </Button>
                 </div>
               </div>
@@ -656,71 +636,39 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
             {/* EXECUTING STEP */}
             {executeAllState === 'executing' && (
               <div className='py-12 space-y-6 text-center my-auto'>
-                <div className='size-12 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin mx-auto' />
+                <div className='size-12 rounded-full border-2 border-primary border-t-transparent animate-spin mx-auto' />
                 <div className='space-y-1.5'>
                   <h4 className='text-sm font-bold text-foreground uppercase tracking-wider'>
-                    Applying Directives In Batch
+                    Executing Reallocations ({executeAllProgress.current} / {executeAllProgress.total})
                   </h4>
                   <p className='text-xs text-muted-foreground'>
-                    Applying action {executeAllProgress.current} of {executeAllProgress.total}...
+                    Dispatching multi-channel API vectors and committing to ledger...
                   </p>
                 </div>
-
-                <div className='w-full max-w-xs mx-auto bg-muted rounded-full h-2 overflow-hidden'>
+                <div className='w-full max-w-xs mx-auto bg-muted rounded-full h-1.5 overflow-hidden'>
                   <div
-                    className='bg-emerald-500 h-full transition-all duration-300'
+                    className='bg-primary h-full transition-all duration-300'
                     style={{
-                      width: `${(executeAllProgress.current / Math.max(1, executeAllProgress.total)) * 100}%`,
+                      width: `${(executeAllProgress.current / Math.max(executeAllProgress.total, 1)) * 100}%`
                     }}
                   />
                 </div>
               </div>
             )}
 
-            {/* COMBINED RESULT STEP */}
+            {/* RESULT STEP */}
             {executeAllState === 'result' && executeAllSummary && (
               <div className='space-y-5 my-auto py-4'>
-                <div className='rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-4 flex items-center justify-between'>
-                  <div className='flex items-center gap-2.5'>
-                    <div className='size-7 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold'>
-                      ✓
-                    </div>
-                    <div>
-                      <span className='text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider'>
-                        Batch Completed at {new Date().toTimeString().slice(0, 5)}
-                      </span>
-                      <p className='text-[11px] text-emerald-600/80 dark:text-emerald-400/80'>
-                        {executeAllSummary.count} reallocations executed and committed
-                      </p>
-                    </div>
+                <div className='rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-5 text-center space-y-2'>
+                  <div className='size-10 rounded-full bg-emerald-500 text-white flex items-center justify-center text-sm font-bold mx-auto'>
+                    ✓
                   </div>
-                  <span className='text-[10px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/20 px-2.5 py-1 rounded border border-emerald-500/30 uppercase font-bold'>
-                    Batch Done
-                  </span>
-                </div>
-
-                <div className='grid grid-cols-2 gap-3'>
-                  <div className='rounded-xl border border-border bg-muted/20 p-3.5'>
-                    <span className='text-[10px] text-muted-foreground uppercase font-semibold block'>
-                      Total Capital Moved
-                    </span>
-                    <span className='text-xl font-bold text-foreground mt-1 block font-mono'>
-                      {formatINR(executeAllSummary.totalMoved)}
-                    </span>
-                  </div>
-                  <div className='rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3.5'>
-                    <span className='text-[10px] text-emerald-600 dark:text-emerald-400 uppercase font-semibold block'>
-                      Total Projected Lift
-                    </span>
-                    <span className='text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 block font-mono'>
-                      +{formatINR(executeAllSummary.totalLift)}
-                    </span>
-                  </div>
-                </div>
-
-                <div className='flex items-center gap-2 text-[11px] text-muted-foreground bg-muted/20 p-3 rounded-lg border border-border/60'>
-                  <Icons.info className='size-3.5 text-muted-foreground shrink-0' />
-                  <span>Outcomes are algorithmic projections modeled over a 7-day calibration window.</span>
+                  <h4 className='text-sm font-bold text-foreground uppercase tracking-wider'>
+                    All {executeAllSummary.count} Directives Successfully Executed
+                  </h4>
+                  <p className='text-xs text-emerald-600 dark:text-emerald-400 font-mono'>
+                    +{formatINR(executeAllSummary.totalLift)}/day Net Revenue Lift Captured
+                  </p>
                 </div>
 
                 <div className='flex items-center justify-end pt-3 border-t border-border/70'>

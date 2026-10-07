@@ -13,6 +13,7 @@ import { ReallocationWhyBetter } from './reallocation-why-better';
 import { ReallocationExecutionReceipt } from './reallocation-execution-receipt';
 import type { ReallocationExecutionDetails } from '../types/reallocation-execution';
 import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 interface ReallocationExecutionModalProps {
   details: ReallocationExecutionDetails | null;
@@ -245,11 +246,11 @@ export function ReallocationExecutionModal({
           {executionState === 'executing' && (
             <div className='py-6 px-4 space-y-6'>
               <div className='text-center space-y-2'>
-                <div className='inline-flex items-center gap-2 px-3 py-1 rounded bg-[#1A1A1A] border border-[#1A1A1A] text-xs font-mono text-[#FFFFFF]'>
-                  <Icons.spinner className='size-3.5 animate-spin text-[#FFFFFF]' />
+                <div className='inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-muted border border-border text-xs font-mono text-foreground'>
+                  <Icons.spinner className='size-3.5 animate-spin text-foreground' />
                   AUTO-REALLOCATION IN PROGRESS
                 </div>
-                <p className='text-xs font-mono text-[#8A8A8A]'>
+                <p className='text-xs font-mono text-muted-foreground'>
                   Executing deterministic capital rebalance for {details.source.campaign}
                 </p>
               </div>
@@ -257,67 +258,67 @@ export function ReallocationExecutionModal({
               {/* Structured Step Progress */}
               <div className='max-w-md mx-auto space-y-3 font-mono text-xs'>
                 {/* Step 1 */}
-                <div className='flex items-center gap-3 p-2.5 rounded bg-[#1A1A1A] border border-[#1A1A1A]'>
-                  <span className='font-bold text-xs text-[#FFFFFF]'>
+                <div className='flex items-center gap-3 p-2.5 rounded-lg bg-card border border-border'>
+                  <span className='font-bold text-xs text-foreground'>
                     {executionStep >= 1 ? '✓' : '○'}
                   </span>
-                  <span className={executionStep >= 1 ? 'text-[#FFFFFF] font-bold' : 'text-[#8A8A8A]'}>
+                  <span className={executionStep >= 1 ? 'text-foreground font-bold' : 'text-muted-foreground'}>
                     Anomaly validated
                   </span>
                   {executionStep === 1 && (
-                    <Icons.spinner className='size-3 animate-spin text-[#FFFFFF] ml-auto' />
+                    <Icons.spinner className='size-3 animate-spin text-foreground ml-auto' />
                   )}
                 </div>
 
                 {/* Step 2 */}
-                <div className='flex items-center gap-3 p-2.5 rounded bg-[#1A1A1A] border border-[#1A1A1A]'>
-                  <span className='font-bold text-xs text-[#FFFFFF]'>
+                <div className='flex items-center gap-3 p-2.5 rounded-lg bg-card border border-border'>
+                  <span className='font-bold text-xs text-foreground'>
                     {executionStep >= 2 ? '✓' : executionStep === 1 ? '●' : '○'}
                   </span>
-                  <span className={executionStep >= 2 ? 'text-[#FFFFFF] font-bold' : 'text-[#8A8A8A]'}>
+                  <span className={executionStep >= 2 ? 'text-foreground font-bold' : 'text-muted-foreground'}>
                     Campaign analyzed
                   </span>
                   {executionStep === 2 && (
-                    <Icons.spinner className='size-3 animate-spin text-[#FFFFFF] ml-auto' />
+                    <Icons.spinner className='size-3 animate-spin text-foreground ml-auto' />
                   )}
                 </div>
 
                 {/* Step 3 */}
-                <div className='flex items-center gap-3 p-2.5 rounded bg-[#1A1A1A] border border-[#1A1A1A]'>
-                  <span className='font-bold text-xs text-[#FFFFFF]'>
+                <div className='flex items-center gap-3 p-2.5 rounded-lg bg-card border border-border'>
+                  <span className='font-bold text-xs text-foreground'>
                     {executionStep >= 3 ? '✓' : executionStep === 2 ? '●' : '○'}
                   </span>
-                  <span className={executionStep >= 3 ? 'text-[#FFFFFF] font-bold' : 'text-[#8A8A8A]'}>
+                  <span className={executionStep >= 3 ? 'text-foreground font-bold' : 'text-muted-foreground'}>
                     Eligible targets evaluated
                   </span>
                   {executionStep === 3 && (
-                    <Icons.spinner className='size-3 animate-spin text-[#FFFFFF] ml-auto' />
+                    <Icons.spinner className='size-3 animate-spin text-foreground ml-auto' />
                   )}
                 </div>
 
                 {/* Step 4 */}
-                <div className='flex items-center gap-3 p-2.5 rounded bg-[#1A1A1A] border border-[#1A1A1A]'>
-                  <span className='font-bold text-xs text-[#FFFFFF]'>
+                <div className='flex items-center gap-3 p-2.5 rounded-lg bg-card border border-border'>
+                  <span className='font-bold text-xs text-foreground'>
                     {executionStep >= 4 ? '✓' : executionStep === 3 ? '●' : '○'}
                   </span>
-                  <span className={executionStep >= 4 ? 'text-[#FFFFFF] font-bold' : 'text-[#8A8A8A]'}>
+                  <span className={executionStep >= 4 ? 'text-foreground font-bold' : 'text-muted-foreground'}>
                     Applying allocation
                   </span>
                   {executionStep === 4 && (
-                    <Icons.spinner className='size-3 animate-spin text-[#FFFFFF] ml-auto' />
+                    <Icons.spinner className='size-3 animate-spin text-foreground ml-auto' />
                   )}
                 </div>
 
                 {/* Step 5 */}
-                <div className='flex items-center gap-3 p-2.5 rounded bg-[#1A1A1A] border border-[#1A1A1A]'>
-                  <span className='font-bold text-xs text-[#FFFFFF]'>
+                <div className='flex items-center gap-3 p-2.5 rounded-lg bg-card border border-border'>
+                  <span className='font-bold text-xs text-foreground'>
                     {executionStep >= 5 ? '✓' : executionStep === 4 ? '●' : '○'}
                   </span>
-                  <span className={executionStep >= 5 ? 'text-[#FFFFFF] font-bold' : 'text-[#8A8A8A]'}>
+                  <span className={executionStep >= 5 ? 'text-foreground font-bold' : 'text-muted-foreground'}>
                     Recording decision
                   </span>
                   {executionStep === 5 && (
-                    <Icons.spinner className='size-3 animate-spin text-[#FFFFFF] ml-auto' />
+                    <Icons.spinner className='size-3 animate-spin text-foreground ml-auto' />
                   )}
                 </div>
               </div>
@@ -328,29 +329,29 @@ export function ReallocationExecutionModal({
           {/* PHASE 6: EXECUTION COMPLETED BANNER */}
           {/* ============================================================ */}
           {executionState === 'completed' && activeTab !== 'receipt' && (
-            <div className='p-3.5 mb-3 rounded border border-[#FFFFFF] bg-[#1A1A1A] font-mono text-xs space-y-2'>
+            <div className='p-3.5 mb-3 rounded-lg border border-emerald-500/40 bg-emerald-500/10 font-mono text-xs space-y-2'>
               <div className='flex items-center justify-between'>
-                <span className='font-bold text-[#FFFFFF] uppercase flex items-center gap-1.5'>
-                  <Icons.check className='size-3.5 text-[#FFFFFF]' />
+                <span className='font-bold text-emerald-600 dark:text-emerald-400 uppercase flex items-center gap-1.5'>
+                  <Icons.check className='size-3.5' />
                   REALLOCATION COMPLETED
                 </span>
-                <span className='text-[10px] text-[#8A8A8A] font-semibold'>
+                <span className='text-[10px] text-muted-foreground font-semibold'>
                   Decision ID: {details.ledgerRecord.id}
                 </span>
               </div>
-              <div className='text-[11px] text-[#8A8A8A] space-y-1 pt-1 border-t border-[#000000]'>
+              <div className='text-[11px] text-muted-foreground space-y-1 pt-1 border-t border-border'>
                 <div>
-                  <span className='text-[#FFFFFF] font-bold'>₹{Math.round(details.capitalMoved).toLocaleString('en-IN')}/day</span> reallocated
+                  <span className='text-foreground font-bold'>₹{Math.round(details.capitalMoved).toLocaleString('en-IN')}/day</span> reallocated
                 </div>
                 <div className='flex items-center gap-2 text-xs'>
-                  <span className='text-[#8A8A8A]'>FROM:</span>
-                  <span className='text-[#FFFFFF] font-medium'>{details.source.productName} ({details.source.campaign})</span>
-                  <Icons.arrowRight className='size-3 text-[#8A8A8A]' />
-                  <span className='text-[#8A8A8A]'>TO:</span>
-                  <span className='text-[#FFFFFF] font-bold'>{details.destination.productName} ({details.destination.campaign})</span>
+                  <span className='text-muted-foreground'>FROM:</span>
+                  <span className='text-foreground font-medium'>{details.source.productName} ({details.source.campaign})</span>
+                  <Icons.arrowRight className='size-3 text-muted-foreground' />
+                  <span className='text-muted-foreground'>TO:</span>
+                  <span className='text-foreground font-bold'>{details.destination.productName} ({details.destination.campaign})</span>
                 </div>
-                <div className='text-[10px] text-[#8A8A8A] pt-0.5'>
-                  <span className='text-[#FFFFFF] font-semibold'>Reason:</span> {details.reason}
+                <div className='text-[10px] text-muted-foreground pt-0.5'>
+                  <span className='text-foreground font-semibold'>Reason:</span> {details.reason}
                 </div>
               </div>
             </div>
@@ -360,19 +361,19 @@ export function ReallocationExecutionModal({
           {/* ERROR STATE */}
           {/* ============================================================ */}
           {executionState === 'error' && (
-            <div className='p-4 rounded border border-[#8A8A8A] bg-[#1A1A1A] font-mono text-xs space-y-3'>
-              <div className='flex items-center gap-2 text-[#FFFFFF] font-bold'>
-                <Icons.warning className='size-4 text-[#FFFFFF]' />
+            <div className='p-4 rounded-lg border border-rose-500/30 bg-card font-mono text-xs space-y-3'>
+              <div className='flex items-center gap-2 text-rose-600 dark:text-rose-400 font-bold'>
+                <Icons.warning className='size-4' />
                 <span>REALLOCATION ABORTED</span>
               </div>
-              <p className='text-xs text-[#8A8A8A] leading-relaxed'>
+              <p className='text-xs text-muted-foreground leading-relaxed'>
                 {errorMessage || 'Unable to execute reallocation. Zero capital moved.'}
               </p>
               <div className='pt-2 flex justify-end'>
                 <Button
                   size='sm'
                   onClick={onClose}
-                  className='text-xs font-mono bg-[#FFFFFF] text-[#000000] hover:bg-[#8A8A8A]'
+                  className='text-xs font-mono bg-foreground text-background hover:bg-foreground/80'
                 >
                   Close
                 </Button>
@@ -386,93 +387,98 @@ export function ReallocationExecutionModal({
           {executionState !== 'executing' && executionState !== 'error' && activeTab === 'overview' && (
             <div className='space-y-4 pt-1'>
               {/* Real Decision Explanation Grid */}
-              <div className='rounded border border-[#1A1A1A] bg-[#1A1A1A] p-4 font-mono text-xs space-y-3'>
-                <div className='flex items-center justify-between border-b border-[#000000] pb-2'>
-                  <span className='text-[11px] font-bold uppercase tracking-wider text-[#FFFFFF]'>
+              <div className='rounded-lg border border-border bg-card p-4 font-mono text-xs space-y-3'>
+                <div className='flex items-center justify-between border-b border-border pb-2'>
+                  <span className='text-[11px] font-bold uppercase tracking-wider text-foreground'>
                     Operational RCA &amp; Directive Specifications
                   </span>
-                  <span className='text-[10px] text-[#8A8A8A]'>
+                  <span className='text-[10px] text-muted-foreground'>
                     Autonomy Tier 1 • SLSQP Model
                   </span>
                 </div>
 
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-3 text-xs'>
                   {/* Anomaly */}
-                  <div className='space-y-0.5 p-2 rounded bg-[#000000] border border-[#1A1A1A]'>
-                    <span className='text-[10px] uppercase text-[#8A8A8A] block font-bold'>Anomaly</span>
-                    <span className='text-xs font-bold text-[#FFFFFF] truncate block'>
+                  <div className='space-y-0.5 p-2 rounded-lg bg-background border border-border'>
+                    <span className='text-[10px] uppercase text-muted-foreground block font-bold'>Anomaly</span>
+                    <span className='text-xs font-bold text-foreground truncate block'>
                       {details.anomaly?.productName || details.source.productName} ({details.source.campaign})
                     </span>
                   </div>
 
                   {/* Severity */}
-                  <div className='space-y-0.5 p-2 rounded bg-[#000000] border border-[#1A1A1A]'>
-                    <span className='text-[10px] uppercase text-[#8A8A8A] block font-bold'>Severity &amp; Deviation</span>
+                  <div className='space-y-0.5 p-2 rounded-lg bg-background border border-border'>
+                    <span className='text-[10px] uppercase text-muted-foreground block font-bold'>Severity &amp; Deviation</span>
                     <div className='flex items-center gap-2'>
-                      <span className='px-1.5 py-0.2 rounded bg-[#FFFFFF] text-[#000000] text-[10px] font-bold'>
+                      <span className={cn(
+                        'px-1.5 py-0.2 rounded text-[10px] font-bold border',
+                        details.anomaly?.severity === 'CRITICAL'
+                          ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30'
+                          : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30'
+                      )}>
                         [{details.anomaly?.severity || 'CRITICAL'}]
                       </span>
-                      <span className='text-xs font-bold text-[#FFFFFF]'>
+                      <span className='text-xs font-bold text-foreground'>
                         Z {details.anomaly?.zScore !== undefined ? (details.anomaly.zScore > 0 ? `+${details.anomaly.zScore}` : details.anomaly.zScore) : '-2.51'}
                       </span>
                     </div>
                   </div>
 
                   {/* Root Cause */}
-                  <div className='space-y-0.5 p-2 rounded bg-[#000000] border border-[#1A1A1A] md:col-span-2'>
-                    <span className='text-[10px] uppercase text-[#8A8A8A] block font-bold'>Diagnostic Root Cause</span>
-                    <span className='text-xs text-[#FFFFFF] font-medium leading-relaxed block'>
+                  <div className='space-y-0.5 p-2 rounded-lg bg-background border border-border md:col-span-2'>
+                    <span className='text-[10px] uppercase text-muted-foreground block font-bold'>Diagnostic Root Cause</span>
+                    <span className='text-xs text-foreground font-medium leading-relaxed block'>
                       {details.anomaly?.rootCause || details.anomaly?.explanation || 'Inventory depleted while ad retargeting remained active.'}
                     </span>
                   </div>
 
                   {/* Current Allocation */}
-                  <div className='space-y-0.5 p-2 rounded bg-[#000000] border border-[#1A1A1A]'>
-                    <span className='text-[10px] uppercase text-[#8A8A8A] block font-bold'>Current Allocation</span>
-                    <span className='text-xs font-bold text-[#FFFFFF]'>
+                  <div className='space-y-0.5 p-2 rounded-lg bg-background border border-border'>
+                    <span className='text-[10px] uppercase text-muted-foreground block font-bold'>Current Allocation</span>
+                    <span className='text-xs font-bold text-foreground'>
                       ₹{Math.round(details.source.currentSpend).toLocaleString('en-IN')}/day
                     </span>
                   </div>
 
                   {/* Recommended Action */}
-                  <div className='space-y-0.5 p-2 rounded bg-[#000000] border border-[#1A1A1A]'>
-                    <span className='text-[10px] uppercase text-[#8A8A8A] block font-bold'>Recommended Action</span>
-                    <span className='text-xs font-bold text-[#FFFFFF]'>
+                  <div className='space-y-0.5 p-2 rounded-lg bg-background border border-border'>
+                    <span className='text-[10px] uppercase text-muted-foreground block font-bold'>Recommended Action</span>
+                    <span className='text-xs font-bold text-foreground'>
                       REDUCE ₹{Math.round(details.capitalMoved).toLocaleString('en-IN')}/day
                     </span>
                   </div>
 
                   {/* Destination */}
-                  <div className='space-y-0.5 p-2 rounded bg-[#000000] border border-[#1A1A1A]'>
-                    <span className='text-[10px] uppercase text-[#8A8A8A] block font-bold'>Destination Target</span>
+                  <div className='space-y-0.5 p-2 rounded-lg bg-background border border-border'>
+                    <span className='text-[10px] uppercase text-muted-foreground block font-bold'>Destination Target</span>
                     <div className='flex items-center gap-1.5'>
                       <PlatformLogo platform={details.destination.platform} size={13} className='shrink-0' />
-                      <span className='text-xs font-bold text-[#FFFFFF] truncate'>
+                      <span className='text-xs font-bold text-foreground truncate'>
                         {details.destination.productName} ({details.destination.campaign})
                       </span>
                     </div>
                   </div>
 
                   {/* Budget Movement */}
-                  <div className='space-y-0.5 p-2 rounded bg-[#000000] border border-[#1A1A1A]'>
-                    <span className='text-[10px] uppercase text-[#8A8A8A] block font-bold'>Budget Movement</span>
-                    <span className='text-xs font-bold text-[#FFFFFF]'>
+                  <div className='space-y-0.5 p-2 rounded-lg bg-background border border-border'>
+                    <span className='text-[10px] uppercase text-muted-foreground block font-bold'>Budget Movement</span>
+                    <span className='text-xs font-bold text-foreground'>
                       +₹{Math.round(details.capitalMoved).toLocaleString('en-IN')}/day shift
                     </span>
                   </div>
 
                   {/* Expected Impact */}
-                  <div className='space-y-0.5 p-2 rounded bg-[#000000] border border-[#1A1A1A] md:col-span-2'>
-                    <span className='text-[10px] uppercase text-[#8A8A8A] block font-bold'>Expected Impact</span>
-                    <span className='text-xs font-bold text-[#FFFFFF]'>
+                  <div className='space-y-0.5 p-2 rounded-lg bg-background border border-border md:col-span-2'>
+                    <span className='text-[10px] uppercase text-muted-foreground block font-bold'>Expected Impact</span>
+                    <span className='text-xs font-bold text-foreground'>
                       +₹{Math.round(details.expectedDailyLift).toLocaleString('en-IN')}/day margin lift • {details.predictedRoas.toFixed(2)}x Target ROAS (+{details.destination.roasDeltaPct.toFixed(1)}%)
                     </span>
                   </div>
 
                   {/* Reason */}
-                  <div className='space-y-0.5 p-2 rounded bg-[#000000] border border-[#1A1A1A] md:col-span-2'>
-                    <span className='text-[10px] uppercase text-[#8A8A8A] block font-bold'>Optimizer Decision Reason</span>
-                    <p className='text-xs text-[#8A8A8A] leading-relaxed'>
+                  <div className='space-y-0.5 p-2 rounded-lg bg-background border border-border md:col-span-2'>
+                    <span className='text-[10px] uppercase text-muted-foreground block font-bold'>Optimizer Decision Reason</span>
+                    <p className='text-xs text-muted-foreground leading-relaxed'>
                       {details.reason}
                     </p>
                   </div>

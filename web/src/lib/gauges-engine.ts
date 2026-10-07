@@ -300,10 +300,12 @@ export function getProductFooterSummary(
  * - zero inventory guard: A stockout NEVER looks healthy! Score clamped to max 32 (< 50, critical red gauge).
  */
 export function deriveProduct(product: ProductModel): DerivedProduct {
-  const coverDays = product.dailyUnitsSold > 0 ? product.inventory / product.dailyUnitsSold : 0;
+  const isMissingInventory = product.inventory == null || isNaN(product.inventory);
+  const safeInventory = isMissingInventory ? 0 : product.inventory;
+  const coverDays = product.dailyUnitsSold > 0 ? safeInventory / product.dailyUnitsSold : 0;
 
   let baseStatus: ProductStatus = 'target met';
-  if (product.inventory <= 0) {
+  if (isMissingInventory || safeInventory <= 0) {
     baseStatus = 'stockout';
   } else if (coverDays < 7) {
     baseStatus = 'low stock';
@@ -320,8 +322,8 @@ export function deriveProduct(product: ProductModel): DerivedProduct {
   const coverComponent = Math.min(100, (coverDays / 14) * 100) * 0.3;
   let rawHealth = roasComponent + coverComponent;
 
-  // Zero inventory guard: ensure health score is never considered healthy (< 50)
-  if (product.inventory <= 0) {
+  // Zero/Missing inventory guard: ensure health score is never considered healthy (< 50, critical red gauge)
+  if (isMissingInventory || safeInventory <= 0) {
     rawHealth = Math.min(rawHealth, 32);
   }
 
@@ -604,6 +606,7 @@ export function generateReallocations(products: DerivedProduct[]): ReallocationI
     // Destination candidates: ROAS >= 3.2, cover >= 21d, dest.roas > src.roas, destMarginalRoas > src.roas
     const eligibleDests = products.filter((dest) => {
       if (dest.id === src.id || dest.paused) return false;
+      if (dest.inventory == null || isNaN(dest.inventory) || dest.inventory <= 0) return false;
       if (dest.roas < TARGET_ROAS || dest.coverDays < 21) return false;
       if (dest.roas <= src.roas) return false;
       const destMarginal = Number((dest.roas * 0.85).toFixed(3));

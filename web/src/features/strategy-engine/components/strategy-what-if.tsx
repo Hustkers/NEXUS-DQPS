@@ -147,7 +147,7 @@ export function StrategyWhatIf({
       </div>
 
       {/* Dynamic Calculated KPI Output Cards */}
-      <div className='grid grid-cols-2 sm:grid-cols-4 gap-3'>
+      <div className='grid grid-cols-2 lg:grid-cols-5 gap-3'>
         <div className='p-3.5 rounded-xl border border-border/60 bg-card'>
           <span className='text-[10px] text-muted-foreground uppercase font-bold block'>
             PROJECTED REVENUE
@@ -173,36 +173,53 @@ export function StrategyWhatIf({
             {simResult.roas.toFixed(2)}x
           </span>
           <span className='text-[10px] text-muted-foreground block mt-0.5'>
-            Target floor: 3.20x
+            Floor: {simResult.breakevenRoas.toFixed(2)}x
           </span>
         </div>
 
         <div className='p-3.5 rounded-xl border border-border/60 bg-card'>
           <span className='text-[10px] text-muted-foreground uppercase font-bold block'>
-            ESTIMATED ORDERS
+            NET CONTRIBUTION PROFIT
+          </span>
+          <span
+            className={cn(
+              'text-lg sm:text-xl font-bold block mt-1',
+              simResult.netProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'
+            )}
+          >
+            {simResult.netProfit >= 0 ? '+' : ''}₹{simResult.netProfit.toLocaleString('en-IN')}
+          </span>
+          <span className='text-[10px] text-muted-foreground block mt-0.5'>
+            {simResult.netProfit >= 0 ? 'Profitable' : 'Negative Margin'}
+          </span>
+        </div>
+
+        <div className='p-3.5 rounded-xl border border-border/60 bg-card'>
+          <span className='text-[10px] text-muted-foreground uppercase font-bold block'>
+            MARGINAL RETURN (NEXT ₹)
+          </span>
+          <span
+            className={cn(
+              'text-lg sm:text-xl font-bold block mt-1',
+              simResult.marginalProfit >= 0 ? 'text-cyan-400' : 'text-amber-400'
+            )}
+          >
+            {simResult.marginalRoas.toFixed(2)}x
+          </span>
+          <span className='text-[10px] text-muted-foreground block mt-0.5'>
+            ₹{simResult.marginalProfit >= 0 ? '+' : ''}{simResult.marginalProfit.toFixed(2)} net/₹1
+          </span>
+        </div>
+
+        <div className='p-3.5 rounded-xl border border-border/60 bg-card col-span-2 lg:col-span-1'>
+          <span className='text-[10px] text-muted-foreground uppercase font-bold block'>
+            ORDERS &amp; CPA
           </span>
           <span className='text-lg sm:text-xl font-bold text-foreground block mt-1'>
             {simResult.conversions} orders
           </span>
           <span className='text-[10px] text-muted-foreground block mt-0.5'>
-            AOV ₹{aov.toLocaleString('en-IN')}
-          </span>
-        </div>
-
-        <div className='p-3.5 rounded-xl border border-border/60 bg-card'>
-          <span className='text-[10px] text-muted-foreground uppercase font-bold block'>
-            SIMULATED CPA
-          </span>
-          <span
-            className={cn(
-              'text-lg sm:text-xl font-bold block mt-1',
-              simResult.cpa <= baseCpa * 1.25 ? 'text-cyan-400' : 'text-rose-400'
-            )}
-          >
-            ₹{simResult.cpa.toLocaleString('en-IN')}
-          </span>
-          <span className='text-[10px] text-muted-foreground block mt-0.5'>
-            Base: ₹{baseCpa.toLocaleString('en-IN')}
+            CPA ₹{simResult.cpa.toLocaleString('en-IN')}
           </span>
         </div>
       </div>

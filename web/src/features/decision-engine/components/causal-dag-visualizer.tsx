@@ -11,6 +11,7 @@ interface DagNode {
   label: string;
   metric: string;
   status: 'nominal' | 'critical' | 'warning';
+  detail: string;
   x: number;
   y: number;
 }
@@ -29,69 +30,118 @@ export function CausalDagVisualizer({ activeAnomaly = false }: CausalDagVisualiz
   const [selectedNode, setSelectedNode] = useState<string | null>('orders');
 
   const nodes: DagNode[] = [
-    { id: 'spend', label: 'Meta Ad Spend', metric: '₹4,200/d', status: 'nominal', x: 20, y: 110 },
-    { id: 'impressions', label: 'Impressions', metric: '312k', status: 'nominal', x: 190, y: 35 },
-    { id: 'clicks', label: 'Clicks (CTR 1.8%)', metric: '5,616', status: 'nominal', x: 190, y: 185 },
-    { id: 'inventory', label: 'Shopify Stock Gate', metric: activeAnomaly ? '0 units' : '420 units', status: activeAnomaly ? 'critical' : 'nominal', x: 380, y: 35 },
-    { id: 'cvr', label: 'Conversion Rate', metric: activeAnomaly ? '0.12% (down 94%)' : '2.8%', status: activeAnomaly ? 'critical' : 'nominal', x: 380, y: 185 },
-    { id: 'orders', label: 'Net Orders', metric: activeAnomaly ? '7 units' : '157 units', status: activeAnomaly ? 'critical' : 'nominal', x: 570, y: 110 },
-    { id: 'profit', label: 'Net Margin (POAS)', metric: activeAnomaly ? '-₹3,008' : '+₹5,140', status: activeAnomaly ? 'critical' : 'nominal', x: 750, y: 110 },
+    {
+      id: 'spend',
+      label: 'Spend',
+      metric: '₹4,200/d',
+      status: 'nominal',
+      detail: 'Daily budget allocated to campaign. Steady-state burn across ad networks.',
+      x: 20,
+      y: 90
+    },
+    {
+      id: 'clicks',
+      label: 'Clicks',
+      metric: '5,616 (1.8% CTR)',
+      status: 'nominal',
+      detail: 'Ad creative click-through volume. Stable traffic inbound to catalog landing page.',
+      x: 160,
+      y: 90
+    },
+    {
+      id: 'conversion',
+      label: 'Conversion',
+      metric: activeAnomaly ? '0.12% (-94%)' : '2.8% CVR',
+      status: activeAnomaly ? 'critical' : 'nominal',
+      detail: activeAnomaly
+        ? 'Conversion collapsed by -94% due to physical warehouse stock depletion.'
+        : 'Nominal checkout conversion matching 30d baseline benchmark.',
+      x: 310,
+      y: 40
+    },
+    {
+      id: 'inventory',
+      label: 'Inventory',
+      metric: activeAnomaly ? '0 units' : '420 units',
+      status: activeAnomaly ? 'critical' : 'nominal',
+      detail: activeAnomaly
+        ? 'Stock depletion gate: Zero purchasable inventory available in distribution center.'
+        : 'In-stock inventory healthy with 24 days buffer.',
+      x: 310,
+      y: 140
+    },
+    {
+      id: 'orders',
+      label: 'Orders',
+      metric: activeAnomaly ? '7 units' : '157 units',
+      status: activeAnomaly ? 'critical' : 'nominal',
+      detail: activeAnomaly
+        ? 'Severe order shortfall (-96% volume). Budget burning without fulfilled orders.'
+        : 'Consistent order velocity meeting daily target volume.',
+      x: 470,
+      y: 90
+    },
+    {
+      id: 'margin',
+      label: 'Margin',
+      metric: activeAnomaly ? '-₹3,008' : '+₹5,140',
+      status: activeAnomaly ? 'critical' : 'nominal',
+      detail: activeAnomaly
+        ? 'Net daily margin deficit: -₹3,008 observed loss attributable to stockout waste.'
+        : 'Positive net contribution margin yield: +₹5,140/day.',
+      x: 620,
+      y: 90
+    },
   ];
 
   const edges: DagEdge[] = [
-    { from: 'spend', to: 'impressions' },
     { from: 'spend', to: 'clicks' },
-    { from: 'impressions', to: 'clicks' },
+    { from: 'clicks', to: 'conversion', critical: activeAnomaly },
     { from: 'clicks', to: 'inventory', critical: activeAnomaly },
-    { from: 'clicks', to: 'cvr', critical: activeAnomaly },
-    { from: 'inventory', to: 'cvr', critical: activeAnomaly },
-    { from: 'cvr', to: 'orders', critical: activeAnomaly },
-    { from: 'orders', to: 'profit', critical: activeAnomaly },
+    { from: 'inventory', to: 'conversion', critical: activeAnomaly },
+    { from: 'conversion', to: 'orders', critical: activeAnomaly },
+    { from: 'orders', to: 'margin', critical: activeAnomaly },
   ];
 
   const nodeMap = new Map(nodes.map((n) => [n.id, n]));
+  const activeNodeData = nodes.find((n) => n.id === selectedNode);
 
   return (
-    <Card className="p-5 border border-border bg-card shadow-none rounded text-card-foreground relative overflow-hidden min-w-0 max-w-full">
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-4 border-b border-border pb-3">
-        <div className="flex items-center gap-2.5">
-          <div className="h-8 w-8 rounded bg-muted/60 flex items-center justify-center border border-border">
-            <IconGitBranch className="h-4 w-4 text-foreground" />
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-foreground tracking-tight flex items-center gap-2 font-mono">
-              Structural Causal DAG &amp; Counterfactual Attribution Path
-              {activeAnomaly && (
-                <Badge variant="outline" className="bg-foreground text-background border-none font-bold text-[10px] font-mono">
-                  [CRITICAL] Anomaly Path Active
-                </Badge>
-              )}
-            </h3>
-            <p className="text-xs text-muted-foreground font-mono mt-0.5">
-              DoWhy-GCM Counterfactual Attribution Flow: Spend → Clicks → Shopify Inventory Gate → Net Margin
-            </p>
-          </div>
+    <Card className='p-4 sm:p-5 border border-border bg-card shadow-none rounded-xl text-card-foreground relative overflow-hidden min-w-0 max-w-full font-mono space-y-3.5'>
+      {/* Header Bar */}
+      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border/70 pb-3'>
+        <div className='flex items-center gap-2'>
+          <IconGitBranch className='size-4 text-primary' />
+          <h3 className='text-xs font-bold text-foreground uppercase tracking-wider'>
+            Causal DAG Attribution
+          </h3>
+          {activeAnomaly && (
+            <Badge variant='outline' className='bg-rose-500/10 text-rose-500 border-rose-500/30 font-bold text-[10px]'>
+              Anomaly Path
+            </Badge>
+          )}
         </div>
 
-        <div className="flex items-center gap-3 text-xs font-mono text-muted-foreground">
-          <span className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-foreground" /> Healthy Flow
+        <div className='flex items-center gap-3 text-[11px] text-muted-foreground'>
+          <span className='flex items-center gap-1.5'>
+            <span className='size-2 rounded-full bg-foreground' /> Nominal
           </span>
-          <span className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full border border-border bg-muted" /> Bottleneck Path
+          <span className='flex items-center gap-1.5'>
+            <span className='size-2 rounded-full bg-rose-500' /> Bottleneck
           </span>
         </div>
       </div>
 
-      <div className="w-full h-72 border border-border rounded bg-muted/30 relative overflow-x-auto overflow-y-hidden">
-        <div className="min-w-[920px] w-full h-full relative">
-          <svg className="w-full h-full absolute inset-0 pointer-events-none">
+      {/* SVG DAG Canvas */}
+      <div className='w-full h-56 border border-border/70 rounded-lg bg-muted/20 relative overflow-x-auto overflow-y-hidden'>
+        <div className='min-w-[760px] w-full h-full relative'>
+          <svg className='w-full h-full absolute inset-0 pointer-events-none'>
             <defs>
-              <marker id="arrow" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                <path d="M 0 0 L 10 5 L 0 10 z" className="fill-muted-foreground" />
+              <marker id='dag-arrow' viewBox='0 0 10 10' refX='20' refY='5' markerWidth='5' markerHeight='5' orient='auto-start-reverse'>
+                <path d='M 0 0 L 10 5 L 0 10 z' className='fill-muted-foreground/60' />
               </marker>
-              <marker id="arrow-crit" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                <path d="M 0 0 L 10 5 L 0 10 z" className="fill-foreground" />
+              <marker id='dag-arrow-crit' viewBox='0 0 10 10' refX='20' refY='5' markerWidth='5' markerHeight='5' orient='auto-start-reverse'>
+                <path d='M 0 0 L 10 5 L 0 10 z' className='fill-rose-500' />
               </marker>
             </defs>
 
@@ -101,14 +151,14 @@ export function CausalDagVisualizer({ activeAnomaly = false }: CausalDagVisualiz
               return (
                 <line
                   key={idx}
-                  x1={src.x + 50}
-                  y1={src.y + 20}
-                  x2={dst.x + 50}
-                  y2={dst.y + 20}
-                  className={e.critical ? 'stroke-foreground' : 'stroke-muted-foreground/50'}
+                  x1={src.x + 55}
+                  y1={src.y + 18}
+                  x2={dst.x + 55}
+                  y2={dst.y + 18}
+                  className={e.critical ? 'stroke-rose-500' : 'stroke-muted-foreground/40'}
                   strokeWidth={e.critical ? 2 : 1.5}
-                  strokeDasharray={e.critical ? '4 4' : undefined}
-                  markerEnd={e.critical ? 'url(#arrow-crit)' : 'url(#arrow)'}
+                  strokeDasharray={e.critical ? '3 3' : undefined}
+                  markerEnd={e.critical ? 'url(#dag-arrow-crit)' : 'url(#dag-arrow)'}
                 />
               );
             })}
@@ -118,44 +168,47 @@ export function CausalDagVisualizer({ activeAnomaly = false }: CausalDagVisualiz
             const isCritical = node.status === 'critical';
             const isSelected = selectedNode === node.id;
             return (
-              <div
+              <button
                 key={node.id}
+                type='button'
                 onClick={() => setSelectedNode(node.id)}
                 style={{ left: `${node.x}px`, top: `${node.y}px` }}
                 className={cn(
-                  'absolute w-36 px-3 py-2 rounded border text-left cursor-pointer transition-all duration-200 select-none font-mono',
+                  'absolute w-28 px-2.5 py-1.5 rounded-lg border text-left cursor-pointer transition-all duration-150 select-none font-mono',
                   isCritical
-                    ? 'bg-foreground text-background border-none font-bold shadow-md'
+                    ? 'bg-rose-950/40 border-rose-500/60 text-foreground font-bold shadow-xs'
                     : 'bg-card border-border text-foreground hover:border-foreground/50',
-                  isSelected && (isCritical ? 'ring-2 ring-foreground ring-offset-2 ring-offset-background' : 'ring-1 ring-foreground')
+                  isSelected && (isCritical ? 'ring-2 ring-rose-500' : 'ring-1 ring-foreground')
                 )}
               >
-                <div className="flex items-center justify-between text-[11px] font-semibold">
-                  <span className={isCritical ? 'text-background' : 'text-foreground'}>
+                <div className='flex items-center justify-between text-[10px] font-bold uppercase'>
+                  <span className={isCritical ? 'text-rose-400' : 'text-foreground'}>
                     {node.label}
                   </span>
-                  <span className={cn('text-[10px]', isCritical ? 'text-background' : 'text-foreground')}>
+                  <span className={isCritical ? 'text-rose-500' : 'text-muted-foreground'}>
                     {isCritical ? '■' : '●'}
                   </span>
                 </div>
-                <div className={cn('text-[11px] font-mono mt-0.5 truncate', isCritical ? 'text-background font-bold' : 'text-muted-foreground')}>
+                <div className={cn('text-[10px] font-mono mt-0.5 truncate', isCritical ? 'text-rose-300 font-bold' : 'text-muted-foreground')}>
                   {node.metric}
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>
       </div>
 
-      {selectedNode === 'orders' && activeAnomaly && (
-        <div className="mt-3 p-3 rounded bg-muted/40 border border-border text-xs font-mono flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <IconAlertCircle className="h-4 w-4 text-foreground shrink-0" />
-            <span className="text-foreground">
-              <strong>Counterfactual Structural Intervention:</strong> Orders node conditioned on physical stockout: Q = min(0, page_views &times; cvr) = 0. Ad spend continues burning with ₹0 conversions.
-            </span>
+      {/* Selected Node Compact Detail Strip */}
+      {activeNodeData && (
+        <div className='p-2.5 rounded-lg bg-muted/30 border border-border/70 text-xs flex flex-wrap items-center justify-between gap-2'>
+          <div className='flex items-center gap-2 min-w-0'>
+            <IconAlertCircle className={cn('size-3.5 shrink-0', activeNodeData.status === 'critical' ? 'text-rose-500' : 'text-foreground')} />
+            <span className='font-bold text-foreground uppercase'>{activeNodeData.label}:</span>
+            <span className='text-muted-foreground truncate'>{activeNodeData.detail}</span>
           </div>
-          <Badge className="bg-foreground text-background border-none font-bold shrink-0 ml-3">66% Shapley Share</Badge>
+          <span className={cn('font-bold shrink-0 text-[11px]', activeNodeData.status === 'critical' ? 'text-rose-400' : 'text-emerald-400')}>
+            {activeNodeData.metric}
+          </span>
         </div>
       )}
     </Card>

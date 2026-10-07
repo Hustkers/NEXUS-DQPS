@@ -8,6 +8,7 @@ import { ReallocationExecutionModal } from '@/features/decision-engine/component
 import type { ReallocationExecutionDetails } from '@/features/decision-engine/types/reallocation-execution';
 import initialEngineState from '@/data/nexus-engine-state.json';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 export default function AnomaliesPage() {
   const [filterSeverity, setFilterSeverity] = useState<'ALL' | 'CRITICAL' | 'HIGH' | 'WARNING'>('ALL');
@@ -154,30 +155,31 @@ export default function AnomaliesPage() {
   };
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#000000] text-white min-h-screen min-w-0 max-w-full'>
-      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-[#1A1A1A] pb-4'>
+    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-background text-foreground min-h-screen min-w-0 max-w-full'>
+      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4'>
         <div>
           <div className='flex items-center gap-2'>
-            <Icons.warning className='size-5 text-white' />
-            <h1 className='text-xl font-mono font-bold text-white uppercase tracking-tight'>
+            <Icons.warning className='size-5 text-foreground' />
+            <h1 className='text-xl font-mono font-bold text-foreground uppercase tracking-tight'>
               Diagnostic Root-Cause Analysis (RCA) &amp; Anomalies
             </h1>
           </div>
-          <p className='text-xs font-mono text-[#8A8A8A] mt-1'>
+          <p className='text-xs font-mono text-muted-foreground mt-1'>
             modery68 4-Week Rolling Baselines • IsolationForest &amp; Z-Score Attribution (|Z| &gt; 2.2)
           </p>
         </div>
 
-        <div className='flex items-center gap-1.5 bg-[#1A1A1A] p-1 rounded border border-[#1A1A1A] text-xs font-mono'>
+        <div className='flex items-center gap-1.5 bg-muted/60 p-1 rounded border border-border text-xs font-mono'>
           {(['ALL', 'CRITICAL', 'HIGH', 'WARNING'] as const).map((sev) => (
             <button
               key={sev}
               onClick={() => setFilterSeverity(sev)}
-              className={`px-3 py-1 rounded transition-all font-semibold ${
+              className={cn(
+                'px-3 py-1 rounded transition-all font-semibold',
                 filterSeverity === sev
-                  ? 'bg-white text-black font-bold'
-                  : 'text-[#8A8A8A] hover:text-white'
-              }`}
+                  ? 'bg-background text-foreground font-bold shadow-2xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
             >
               {sev}
             </button>
