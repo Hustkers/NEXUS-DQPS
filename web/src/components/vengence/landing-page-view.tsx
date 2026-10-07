@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Icons } from '@/components/icons';
 import { VGPUCanvas } from './vgpu-canvas';
 import { GlowButton } from './glow-button';
@@ -203,7 +204,16 @@ export function LandingPageView() {
               variant='default'
               className='font-mono text-sm shadow-md'
             >
-              Launch Growth Engine →
+              Enter NEXUS D2C →
+            </GlowButton>
+
+            <GlowButton
+              href='/dashboard/playground'
+              size='lg'
+              variant='outline'
+              className='font-mono text-sm'
+            >
+              Live Ad Playground →
             </GlowButton>
 
             <GlowButton
@@ -212,16 +222,7 @@ export function LandingPageView() {
               variant='outline'
               className='font-mono text-sm'
             >
-              Explore Campaign Simulator
-            </GlowButton>
-
-            <GlowButton
-              href='/dashboard/fingerprint'
-              size='lg'
-              variant='outline'
-              className='font-mono text-sm'
-            >
-              Hardware Fingerprint Demo
+              Campaign Simulator
             </GlowButton>
           </div>
 
@@ -299,6 +300,8 @@ export function LandingPageView() {
             title='Equi-Marginal Bounded Budget Optimizer (PuLP / Scipy)'
             description='Solves the Karush-Kuhn-Tucker (KKT) constrained optimization problem across channels. Reallocates capital to equalize marginal contribution profit under strict ±20% daily liquidity stability bounds to preserve ad platform algorithmic learning phases.'
             icon={<Icons.trendingUp className='size-5' />}
+            href='/dashboard/reallocations'
+            actionText='Launch Convex Reallocations →'
             badge={
               <span className='font-mono text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold'>
                 KKT CONVEX SOLVER
@@ -334,6 +337,8 @@ export function LandingPageView() {
             title='Counterfactual DAG Engine'
             description='Separates ad copy failures from external confounders. When ROAS drops, factor decomposition isolates website latency, buy-box undercutting, and ERP stockouts before touching creative spend.'
             icon={<Icons.checkCircle className='size-5' />}
+            href='/dashboard/anomalies'
+            actionText='Launch Causal Diagnostics →'
             badge={
               <span className='font-mono text-[10px] px-2 py-0.5 rounded bg-sky-500/10 text-sky-600 dark:text-sky-400 font-bold'>
                 DAG CAUSALITY
@@ -362,6 +367,8 @@ export function LandingPageView() {
             title='Walled-Garden Hardware Stitcher'
             description='99.8% deterministic hardware entropy fingerprinting stitches YouTube impressions, TikTok ads, and Amazon marketplace checkouts without 3rd-party cookies or UTM parameters.'
             icon={<Icons.lock className='size-5' />}
+            href='/dashboard/fingerprint'
+            actionText='Launch Identity Fingerprinter →'
             badge={
               <span className='font-mono text-[10px] px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold'>
                 ZERO COOKIES
@@ -391,6 +398,8 @@ export function LandingPageView() {
             title='Autonomous Execution Ledger with Reinforcement Feedback'
             description='Every single budget shift is committed to an immutable ledger with predicted vs realized contribution margin. Model weights and adstock decay curves automatically tune in DuckDB/PostgreSQL based on accuracy variances.'
             icon={<Icons.clipboardText className='size-5' />}
+            href='/dashboard/ledger'
+            actionText='Open Decision Ledger →'
             badge={
               <span className='font-mono text-[10px] px-2 py-0.5 rounded bg-primary/10 text-primary font-bold'>
                 DUCKDB + POSTGRES
@@ -452,25 +461,29 @@ export function LandingPageView() {
               step: '01',
               title: 'Multi-Channel Ingestion',
               desc: 'Unifies ad spend from Meta, Google, Amazon, and TikTok with Shopify orders, GA4 events, and ERP inventory into DuckDB.',
-              badge: 'DUCKDB / POSTGRES'
+              badge: 'DUCKDB / POSTGRES',
+              href: '/dashboard/matrix'
             },
             {
               step: '02',
               title: 'Causal Anomaly Diagnostic',
               desc: 'Z-score metric monitors detect spikes and run counterfactual DAG logic to separate ad issues from inventory stockouts.',
-              badge: 'ROOT CAUSE RCA'
+              badge: 'ROOT CAUSE RCA',
+              href: '/dashboard/anomalies'
             },
             {
               step: '03',
               title: 'Convex Capital Allocation',
               desc: 'Equi-marginal solver shifts capital across channels and SKUs along response saturation curves under ±20% safety guardrails.',
-              badge: 'SCIPY SOLVER'
+              badge: 'SCIPY SOLVER',
+              href: '/dashboard/reallocations'
             },
             {
               step: '04',
               title: 'Autonomous Dispatch & Audit',
               desc: 'Dispatches API mutations with instant 1-click rollback, comparing realized outcome vs predicted margin in the ledger.',
-              badge: 'CLOSED LOOP'
+              badge: 'CLOSED LOOP',
+              href: '/dashboard/ledger'
             }
           ].map((phase, idx) => (
             <CardSpotlight
@@ -491,9 +504,13 @@ export function LandingPageView() {
                   {phase.desc}
                 </p>
               </div>
-              <div className='pt-2 border-t border-border/60 text-[11px] font-mono text-primary font-semibold'>
-                Active Phase →
-              </div>
+              <Link
+                href={phase.href}
+                className='pt-2.5 border-t border-border/60 text-[11px] font-mono text-primary font-semibold hover:text-primary/80 flex items-center justify-between group/link'
+              >
+                <span>Launch {phase.title.split(' ')[0]} Module</span>
+                <span className='group-hover/link:translate-x-0.5 transition-transform'>→</span>
+              </Link>
             </CardSpotlight>
           ))}
         </div>
