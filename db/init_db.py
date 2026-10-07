@@ -119,11 +119,112 @@ CREATE TABLE IF NOT EXISTS decision_ledger (
     logged_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- ============================================================================
+-- Visitor-Level Event Tracking & Customer Identity Layer
+-- ============================================================================
+
+-- Customers Catalog (Identified via SHA-256 hashed email, zero raw emails)
+CREATE TABLE IF NOT EXISTS customers (
+    customer_id VARCHAR(64) PRIMARY KEY, -- SHA-256 hash of trim(lower(email))
+    first_seen_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    last_seen_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    total_orders INTEGER NOT NULL DEFAULT 0,
+    total_revenue NUMERIC(12, 2) NOT NULL DEFAULT 0.00,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Anonymous Visitors (UUID generated on first touch)
+CREATE TABLE IF NOT EXISTS visitors (
+    visitor_id VARCHAR(64) PRIMARY KEY,
+    first_seen_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    last_seen_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    first_touch_campaign VARCHAR(128),
+    last_touch_campaign VARCHAR(128),
+    first_touch_platform VARCHAR(32),
+    last_touch_platform VARCHAR(32),
+    consent_granted BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Identity Stitching Links (visitor_id -> customer_id mapping)
+CREATE TABLE IF NOT EXISTS identity_links (
+    id SERIAL PRIMARY KEY,
+    visitor_id VARCHAR(64) NOT NULL REFERENCES visitors(visitor_id) ON DELETE CASCADE,
+    customer_id VARCHAR(64) NOT NULL REFERENCES customers(customer_id) ON DELETE CASCADE,
+    method VARCHAR(32) NOT NULL DEFAULT 'checkout', -- checkout, login, subscribe
+    linked_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (visitor_id, customer_id)
+);
+
+-- Visitor Browsing Sessions (30-minute inactivity sliding window)
+CREATE TABLE IF NOT EXISTS sessions (
+    session_id VARCHAR(64) PRIMARY KEY,
+    visitor_id VARCHAR(64) NOT NULL REFERENCES visitors(visitor_id) ON DELETE CASCADE,
+    customer_id VARCHAR(64) REFERENCES customers(customer_id) ON DELETE SET NULL,
+    started_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    last_active_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    campaign_id VARCHAR(128),
+    platform VARCHAR(32),
+    click_id VARCHAR(128),
+    utm_source VARCHAR(64),
+    utm_medium VARCHAR(64),
+    utm_campaign VARCHAR(128),
+    utm_content VARCHAR(128),
+    landing_url TEXT,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+-- Orders Table (D2C store purchases)
+CREATE TABLE IF NOT EXISTS orders (
+    order_id VARCHAR(64) PRIMARY KEY,
+    customer_id VARCHAR(64) REFERENCES customers(customer_id) ON DELETE SET NULL,
+    visitor_id VARCHAR(64) REFERENCES visitors(visitor_id) ON DELETE SET NULL,
+    session_id VARCHAR(64) REFERENCES sessions(session_id) ON DELETE SET NULL,
+    product_id VARCHAR(64) REFERENCES products(product_id) ON DELETE SET NULL,
+    amount NUMERIC(12, 2) NOT NULL DEFAULT 0.00,
+    currency VARCHAR(16) NOT NULL DEFAULT 'USD',
+    status VARCHAR(32) NOT NULL DEFAULT 'completed',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Visitor Events Stream (Idempotent, deduplicated on event_id)
+CREATE TABLE IF NOT EXISTS events (
+    event_id VARCHAR(64) PRIMARY KEY,
+    visitor_id VARCHAR(64) NOT NULL REFERENCES visitors(visitor_id) ON DELETE CASCADE,
+    session_id VARCHAR(64) NOT NULL REFERENCES sessions(session_id) ON DELETE CASCADE,
+    customer_id VARCHAR(64) REFERENCES customers(customer_id) ON DELETE SET NULL,
+    event_type VARCHAR(32) NOT NULL, -- page_view, ad_click, product_view, add_to_cart, begin_checkout, purchase
+    timestamp TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    product_id VARCHAR(64) REFERENCES products(product_id) ON DELETE SET NULL,
+    value NUMERIC(12, 2),
+    campaign_id VARCHAR(128),
+    platform VARCHAR(32),
+    click_id VARCHAR(128),
+    utm_source VARCHAR(64),
+    utm_medium VARCHAR(64),
+    utm_campaign VARCHAR(128),
+    utm_content VARCHAR(128),
+    page_url TEXT,
+    order_id VARCHAR(64) REFERENCES orders(order_id) ON DELETE SET NULL,
+    is_server_side BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Indexes for high performance
 CREATE INDEX IF NOT EXISTS idx_products_cat ON products(category);
 CREATE INDEX IF NOT EXISTS idx_products_rating ON products(rating DESC);
 CREATE INDEX IF NOT EXISTS idx_metrics_date ON campaign_daily_metrics(metric_date);
 CREATE INDEX IF NOT EXISTS idx_metrics_camp ON campaign_daily_metrics(campaign_name);
+CREATE INDEX IF NOT EXISTS idx_events_visitor ON events(visitor_id);
+CREATE INDEX IF NOT EXISTS idx_events_campaign ON events(campaign_id);
+CREATE INDEX IF NOT EXISTS idx_events_product ON events(product_id);
+CREATE INDEX IF NOT EXISTS idx_events_type ON events(event_type);
+CREATE INDEX IF NOT EXISTS idx_events_timestamp ON events(timestamp);
+CREATE INDEX IF NOT EXISTS idx_events_customer ON events(customer_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_visitor ON sessions(visitor_id);
+CREATE INDEX IF NOT EXISTS idx_identity_links_visitor ON identity_links(visitor_id);
+CREATE INDEX IF NOT EXISTS idx_identity_links_customer ON identity_links(customer_id);
 """
 
 def init_db(database_url: str = DATABASE_URL):

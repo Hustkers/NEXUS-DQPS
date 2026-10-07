@@ -48,7 +48,7 @@ export function UserNav() {
             Mission Control
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => router.push('/dashboard/simulator')} className='cursor-pointer text-xs'>
-            <Icons.terminal className='mr-2 h-3.5 w-3.5 text-cyan-400' />
+            <Icons.code className='mr-2 h-3.5 w-3.5 text-cyan-400' />
             Scenario Injector
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => router.push('/dashboard/ledger')} className='cursor-pointer text-xs'>
