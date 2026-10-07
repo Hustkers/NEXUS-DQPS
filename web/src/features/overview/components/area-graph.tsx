@@ -31,35 +31,36 @@ const chartData = [
 const chartConfig = {
   desktop: {
     label: 'Desktop',
-    color: 'var(--chart-1)'
+    color: '#FFFFFF'
   },
   mobile: {
     label: 'Mobile',
-    color: 'var(--chart-2)'
+    color: '#8A8A8A'
   }
 } satisfies ChartConfig;
 
 export function AreaGraph() {
   return (
-    <Card>
+    <Card className='bg-[#1A1A1A] border-[#8A8A8A] shadow-none'>
       <CardHeader>
-        <CardTitle>
-          Dotted Area Chart
-          <Badge variant='outline'>
-            <Icons.trendingUp />
-            -5.2%
+        <CardTitle className='text-white font-mono flex items-center justify-between'>
+          <span>Traffic Telemetry Area</span>
+          <Badge variant='outline' className='border-[#8A8A8A] text-white bg-transparent font-mono'>
+            <Icons.trendingUp className='text-white' />
+            +5.2%
           </Badge>
         </CardTitle>
-        <CardDescription>Showing total visitors for the last 6 months</CardDescription>
+        <CardDescription className='text-[#8A8A8A] font-mono'>Showing total visitors for the last 6 months</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
           <AreaChart accessibilityLayer data={chartData}>
-            <CartesianGrid vertical={false} strokeDasharray='3 3' />
+            <CartesianGrid vertical={false} stroke='#1A1A1A' strokeDasharray='3 3' />
             <XAxis
               dataKey='month'
               tickLine={false}
-              axisLine={false}
+              axisLine={{ stroke: '#1A1A1A' }}
+              stroke='#8A8A8A'
               tickMargin={8}
               tickFormatter={(value) => value.slice(0, 3)}
             />
@@ -72,18 +73,19 @@ export function AreaGraph() {
               type='natural'
               fill='url(#dotted-background-pattern-mobile)'
               fillOpacity={0.4}
-              stroke='var(--color-mobile)'
+              stroke='#8A8A8A'
               stackId='a'
-              strokeWidth={0.8}
+              strokeWidth={1.5}
+              strokeDasharray='4 4'
             />
             <Area
               dataKey='desktop'
               type='natural'
               fill='url(#dotted-background-pattern-desktop)'
               fillOpacity={0.4}
-              stroke='var(--color-desktop)'
+              stroke='#FFFFFF'
               stackId='a'
-              strokeWidth={0.8}
+              strokeWidth={2}
             />
           </AreaChart>
         </ChartContainer>

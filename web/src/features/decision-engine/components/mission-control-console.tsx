@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
@@ -14,6 +14,7 @@ import { CausalDagVisualizer } from './causal-dag-visualizer';
 import { RcaWaterfallChart } from './rca-waterfall-chart';
 import { ScenarioSandbox } from './scenario-sandbox';
 import { ExecutiveGraphBanner } from './executive-graph-banner';
+import { VoiceBriefingAgent } from '@/features/voice/voice-briefing-agent';
 import { USE_MOCKS, FASTAPI_BASE_URL, approveDirective } from '@/lib/api-adapter';
 import { ProductAnalysisModal, type ProductAnalysisTarget } from './product-analysis-modal';
 import { GithubGlobe } from './github-globe';
@@ -123,21 +124,21 @@ export function MissionControlConsole() {
     });
   };
 
-  useEffect(() => {
-    const handleRemoteDirective = (e: any) => {
-      const planId = e.detail?.directiveId || 'dir_meta_hero_shoe';
+  const handleVoiceAuthorize = async (planId: string) => {
+    try {
+      const receipt = await approveDirective(planId, 'VOICE_BRIEFING_AUTHORIZED');
       setState((prev) => {
         const newLedgerItem = {
-          id: `ledg-copilot-${Date.now()}`,
+          id: `ledg-voice-${Date.now()}`,
           timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
-          decision: `Copilot-Executed: Throttled stocked-out Meta Hero SKU -> $0/day; Scaled Google Search -> +$800/day`,
+          decision: `Voice-Authorized: Throttled stocked-out Meta Hero SKU -> $0/day; Scaled Google Search -> +$800/day`,
           expectedMargin: 2450.0,
           realizedMargin: 2390.0,
           variancePct: -2.4,
           accuracyPct: 97.6,
           confidence: 0.98,
           status: 'executed',
-          feedback: 'Function Calling authenticated (NEXUS AI Copilot)'
+          feedback: 'Voice token authenticated (ElevenLabs HITL)'
         };
         return {
           ...prev,
@@ -149,54 +150,74 @@ export function MissionControlConsole() {
           }
         };
       });
-    };
-
-    const handleRemoteScenario = (e: any) => {
-      const type = e.detail?.scenarioType;
-      handleTriggerScenario({
-        id: type === 'ad_fatigue' ? 'scenario-fatigue' : 'scenario-stockout',
-        name: 'Operational Shock (AppWide Copilot)',
-        description: 'Injected via AI Assistant function calling',
-        injectedEvent: 'Operational crisis degradation',
-        autonomousResponse: 'Autonomous budget reallocation ready',
-        expectedSavedWaste: '+$1,148',
-        severity: 'CRITICAL'
+      toast.success('Directive Executed via Voice Authorization', {
+        description: `Plan ${planId} signed. Atomic API budget mutate dispatched.`
       });
-    };
-
-    window.addEventListener('nexus:directive_executed', handleRemoteDirective);
-    window.addEventListener('nexus:scenario_injected', handleRemoteScenario);
-    return () => {
-      window.removeEventListener('nexus:directive_executed', handleRemoteDirective);
-      window.removeEventListener('nexus:scenario_injected', handleRemoteScenario);
-    };
-  }, []);
+    } catch (e: any) {
+      toast.error('Voice Authorization Failed', { description: e.message });
+    }
+  };
 
   const filteredCampaigns = state.campaigns.filter((c: any) =>
     activeTab === 'all' ? true : c.platform === activeTab
   );
 
   return (
-    <div className='relative flex flex-1 flex-col gap-8 p-5 md:p-8 bg-slate-50/50 dark:bg-[#08090c] text-foreground min-h-screen selection:bg-slate-200 dark:selection:bg-zinc-800 selection:text-foreground'>
+    <div className='relative flex flex-1 flex-col gap-8 p-5 md:p-8 bg-[#000000] text-white min-h-screen selection:bg-[#1A1A1A] selection:text-white'>
       {/* 1. Header & Live Telemetry (Utilitarian Minimalist) */}
-      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/80 pb-5'>
+      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#8A8A8A] pb-5'>
         <div>
           <div className='flex items-center gap-2.5'>
-            <h1 className='text-xl font-bold font-mono tracking-tight text-foreground'>
+            <span className='size-2 rounded-full bg-white' />
+            <h1 className='text-xl font-bold font-mono tracking-tight text-white'>
               NEXUS D2C
             </h1>
-            <span className='text-muted-foreground/60 font-mono text-sm'>/</span>
-            <span className='text-sm font-mono text-muted-foreground font-medium'>
+            <span className='text-[#8A8A8A] font-mono text-sm'>/</span>
+            <span className='text-sm font-mono text-[#8A8A8A] font-medium'>
               Nike Direct Decision Engine
             </span>
           </div>
-          <p className='text-xs text-muted-foreground font-mono mt-1'>
+          <p className='text-xs text-[#8A8A8A] font-mono mt-1'>
             DuckDB &amp; PostgreSQL 16 • Columnar Store • Analytical SLSQP Optimizer • Dual-Knapsack Bandits • Floor ROAS 1.80x
           </p>
         </div>
+
+        <div className='flex flex-wrap items-center gap-3 text-xs font-mono'>
+          {/* Live vs Mock Data Mode Badge Toggle */}
+          <button
+            onClick={() => {
+              setLiveMode(!liveMode);
+              toast.info(`Switched to ${!liveMode ? 'Live Backend (FastAPI)' : 'Deterministic Mock Mode'}`);
+            }}
+            className={cn(
+              'flex items-center gap-2 px-2.5 py-1.5 rounded border text-[11px] transition-colors',
+              liveMode
+                ? 'bg-white border-white text-black font-bold'
+                : 'bg-[#1A1A1A] border-[#8A8A8A] text-[#8A8A8A]'
+            )}
+            title="Click to toggle between live backend API and deterministic mock replay"
+          >
+            <span className={cn('size-1.5 rounded-full', liveMode ? 'bg-black' : 'bg-white')} />
+            <span>{liveMode ? 'API: LIVE FASTAPI (8000)' : 'API: DETERMINISTIC MOCKS'}</span>
+          </button>
+
+          <div className='flex items-center gap-2 text-white bg-[#1A1A1A] px-3 py-1.5 rounded border border-[#8A8A8A] shadow-none'>
+            <span className='size-1.5 rounded-full bg-white' />
+            <span className='font-semibold'>Cycle {state.metadata.cycleId}</span>
+          </div>
+          <span className='text-[#8A8A8A] hidden sm:block text-[11px] font-mono'>
+            SLSQP Convex Optimization
+          </span>
+        </div>
       </div>
 
-      {/* 2. Executive Overview KPI Banner & Trajectory Graphs */}
+      {/* 2. Voice HITL Briefing Agent Bar */}
+      <VoiceBriefingAgent
+        onAuthorizePlan={handleVoiceAuthorize}
+        activeDirectiveId="dir_meta_hero_shoe"
+      />
+
+      {/* 3. Executive Overview KPI Banner & Trajectory Graphs */}
       <ExecutiveGraphBanner
         state={state}
         hasCriticalAnomaly={hasCriticalAnomaly}
@@ -211,25 +232,25 @@ export function MissionControlConsole() {
       />
 
       {/* 3.5. Live 3D Global Telemetry & Heatmap Command Center */}
-      <div className='rounded-2xl border border-zinc-800 bg-zinc-950/70 p-5 shadow-xl flex flex-col lg:flex-row items-center justify-between gap-6 overflow-hidden'>
+      <div className='rounded border border-[#8A8A8A] bg-[#1A1A1A] p-5 shadow-none flex flex-col lg:flex-row items-center justify-between gap-6 overflow-hidden'>
         <div className='flex-1 space-y-3.5 w-full'>
-          <div className='flex flex-wrap items-center justify-between gap-2 border-b border-zinc-900 pb-2.5'>
+          <div className='flex flex-wrap items-center justify-between gap-2 border-b border-[#000000] pb-2.5'>
             <div className='flex items-center gap-2'>
-              <Icons.globe className='size-5 text-cyan-400' />
-              <h3 className='font-mono text-sm font-bold text-zinc-100 uppercase tracking-tight'>
+              <Icons.globe className='size-5 text-white' />
+              <h3 className='font-mono text-sm font-bold text-white uppercase tracking-tight'>
                 Live 3D Global Ad &amp; Sales Telemetry
               </h3>
             </div>
             <div className='flex items-center gap-2'>
               {/* Globe Switcher */}
-              <div className='flex items-center bg-zinc-900 rounded-lg border border-zinc-800 p-0.5 text-xs font-mono'>
+              <div className='flex items-center bg-[#000000] rounded border border-[#8A8A8A] p-0.5 text-xs font-mono'>
                 <button
                   onClick={() => setConsoleGlobeMode('pulse')}
                   className={cn(
                     'px-2.5 py-1 rounded font-semibold transition-all',
                     consoleGlobeMode === 'pulse'
-                      ? 'bg-rose-950 text-rose-300 border border-rose-800/60'
-                      : 'text-zinc-500 hover:text-zinc-300'
+                      ? 'bg-white text-black font-bold'
+                      : 'text-[#8A8A8A] hover:text-white'
                   )}
                 >
                   Sales Pulse
@@ -239,8 +260,8 @@ export function MissionControlConsole() {
                   className={cn(
                     'px-2.5 py-1 rounded font-semibold transition-all',
                     consoleGlobeMode === 'arcs'
-                      ? 'bg-cyan-950 text-cyan-300 border border-cyan-800/60'
-                      : 'text-zinc-500 hover:text-zinc-300'
+                      ? 'bg-white text-black font-bold'
+                      : 'text-[#8A8A8A] hover:text-white'
                   )}
                 >
                   Analysing Arcs
@@ -249,7 +270,7 @@ export function MissionControlConsole() {
 
               <Link
                 href='/dashboard/globe'
-                className='px-2.5 py-1 rounded-md bg-zinc-900 border border-zinc-800 text-xs font-mono text-zinc-300 hover:text-white transition-colors flex items-center gap-1.5'
+                className='px-2.5 py-1 rounded bg-[#000000] border border-[#8A8A8A] text-xs font-mono text-white hover:bg-white hover:text-black transition-colors flex items-center gap-1.5'
               >
                 <span>Full Globe Hub</span>
                 <Icons.arrowRight className='size-3' />
@@ -257,33 +278,33 @@ export function MissionControlConsole() {
             </div>
           </div>
 
-          <p className='text-xs font-mono text-zinc-400 leading-relaxed'>
+          <p className='text-xs font-mono text-[#8A8A8A] leading-relaxed'>
             {consoleGlobeMode === 'pulse'
-              ? 'Real-time customer interaction pulse: Regions with high sales and engagement rendered in Red, decreasingly Yellow, and No Grey. Powered by cobe-globe-pulse.'
-              : 'WebGL ad delivery vectors across Meta, Google, Amazon & TikTok. Visualizing network latency and delivery hops via github.com/globe.'}
+              ? 'Real-time customer interaction pulse: High engagement rendered via mechanical telemetry contrast. Powered by cobe-globe-pulse.'
+              : 'WebGL ad delivery vectors across Meta, Google, Amazon & Shopify. Visualizing network latency and delivery hops via github.com/globe.'}
           </p>
 
           <div className='grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 font-mono text-xs'>
-            <div className='p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/70'>
-              <div className='text-[10px] text-zinc-500'>US-EAST / WEST</div>
-              <div className='text-red-400 font-bold'>High Sales (78%)</div>
+            <div className='p-2.5 rounded bg-[#000000] border border-[#8A8A8A]'>
+              <div className='text-[10px] text-[#8A8A8A]'>US-EAST / WEST</div>
+              <div className='text-white font-bold'>High Sales (78%)</div>
             </div>
-            <div className='p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/70'>
-              <div className='text-[10px] text-zinc-500'>WESTERN EUROPE</div>
-              <div className='text-orange-400 font-bold'>Strong (56%)</div>
+            <div className='p-2.5 rounded bg-[#000000] border border-[#8A8A8A]'>
+              <div className='text-[10px] text-[#8A8A8A]'>WESTERN EUROPE</div>
+              <div className='text-white font-bold'>Strong (56%)</div>
             </div>
-            <div className='p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/70'>
-              <div className='text-[10px] text-zinc-500'>ASIA-PACIFIC</div>
-              <div className='text-yellow-400 font-bold'>Moderate (44%)</div>
+            <div className='p-2.5 rounded bg-[#000000] border border-[#8A8A8A]'>
+              <div className='text-[10px] text-[#8A8A8A]'>ASIA-PACIFIC</div>
+              <div className='text-[#8A8A8A] font-bold'>Moderate (44%)</div>
             </div>
-            <div className='p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/70'>
-              <div className='text-[10px] text-zinc-500'>LATAM &amp; SEA</div>
-              <div className='text-cyan-400 font-bold'>RL Suppressed</div>
+            <div className='p-2.5 rounded bg-[#000000] border border-[#8A8A8A]'>
+              <div className='text-[10px] text-[#8A8A8A]'>LATAM &amp; SEA</div>
+              <div className='text-white font-bold'>RL Suppressed</div>
             </div>
           </div>
 
           <div className='pt-2 flex flex-wrap items-center gap-2'>
-            <span className='text-[11px] font-mono text-zinc-500'>Click any active SKU to open 3D Analysis Modal:</span>
+            <span className='text-[11px] font-mono text-[#8A8A8A]'>Click any active SKU to open 3D Analysis Modal:</span>
             {state.campaigns.slice(0, 3).map((c: any) => (
               <button
                 key={c.campaign}
@@ -300,8 +321,9 @@ export function MissionControlConsole() {
                     severity: c.inventory === 0 ? 'CRITICAL' : 'HEALTHY'
                   });
                 }}
-                className='px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:border-cyan-500/60 text-xs font-mono text-zinc-300 hover:text-cyan-300 transition-colors flex items-center gap-1.5'
+                className='px-2.5 py-1 rounded bg-[#000000] border border-[#8A8A8A] hover:border-white text-xs font-mono text-white transition-colors flex items-center gap-1.5'
               >
+                <span className='size-1.5 rounded-full bg-white' />
                 <span>{c.productName || c.sku}</span>
               </button>
             ))}
@@ -315,7 +337,7 @@ export function MissionControlConsole() {
               className='w-full h-full'
               activeSku='315122-001'
               activePlatform='meta'
-              accentColor={[0.95, 0.35, 0.45]}
+              accentColor={[1, 1, 1]}
             />
           ) : (
             <GlobePulse className='w-full h-full' speed={0.0035} />
@@ -329,22 +351,22 @@ export function MissionControlConsole() {
         <RcaWaterfallChart
           totalLoss={hasCriticalAnomaly ? 3008.25 : 0}
           items={hasCriticalAnomaly ? undefined : [
-            { driver: 'Baseline Equilibrium', category: 'Nominal Operations', dollarImpact: 0, percentageShare: 100, color: 'bg-emerald-500' }
+            { driver: 'Baseline Equilibrium', category: 'Nominal Operations', dollarImpact: 0, percentageShare: 100, color: 'bg-white' }
           ]}
         />
       </div>
       <div className='space-y-3.5'>
-        <div className='flex items-center justify-between border-b border-border/80 pb-2.5'>
+        <div className='flex items-center justify-between border-b border-[#8A8A8A] pb-2.5'>
           <div className='flex items-center gap-2'>
-            <Icons.warning className='size-3.5 text-rose-500' />
-            <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
+            <Icons.warning className='size-3.5 text-white' />
+            <h3 className='font-mono text-xs font-bold text-white uppercase tracking-wider'>
               Active Diagnostic Anomalies
             </h3>
-            <span className='text-xs font-mono text-muted-foreground'>
+            <span className='text-xs font-mono text-[#8A8A8A]'>
               ({state.anomalies.length})
             </span>
           </div>
-          <span className='text-xs font-mono text-muted-foreground'>
+          <span className='text-xs font-mono text-[#8A8A8A]'>
             14d Baseline • |Z| &gt; 2.2
           </span>
         </div>
@@ -421,29 +443,29 @@ export function MissionControlConsole() {
       />
 
       {/* 10. ROAS Gauges & Health Scoring Matrix */}
-      <div className='space-y-4 rounded-xl border border-border/80 bg-card p-5 shadow-xs'>
-        <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-3'>
+      <div className='space-y-4 rounded border border-[#8A8A8A] bg-[#1A1A1A] p-5 shadow-none'>
+        <div className='flex flex-wrap items-center justify-between gap-3 border-b border-[#000000] pb-3'>
           <div className='flex items-center gap-2'>
-            <Icons.trendingUp className='size-3.5 text-emerald-600 dark:text-emerald-400' />
-            <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
+            <Icons.trendingUp className='size-3.5 text-white' />
+            <h3 className='font-mono text-xs font-bold text-white uppercase tracking-wider'>
               Real-Time Campaign Gauges &amp; Health Scoring
             </h3>
-            <span className='text-xs font-mono text-muted-foreground'>
+            <span className='text-xs font-mono text-[#8A8A8A]'>
               ({filteredCampaigns.length} campaigns)
             </span>
           </div>
 
           {/* Platform Tab Filters */}
-          <div className='flex items-center gap-1 bg-slate-100 dark:bg-zinc-900/60 p-1 rounded-lg border border-border text-xs font-mono'>
+          <div className='flex items-center gap-1 bg-[#000000] p-1 rounded border border-[#8A8A8A] text-xs font-mono'>
             {(['all', 'amazon', 'google', 'meta'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={cn(
-                  'px-3 py-1 rounded-md transition-all uppercase text-[11px] font-mono tracking-wider active:scale-[0.98]',
+                  'px-3 py-1 rounded transition-all uppercase text-[11px] font-mono tracking-wider active:scale-[0.98]',
                   activeTab === tab
-                    ? 'bg-card text-foreground font-bold border border-border shadow-2xs'
-                    : 'text-muted-foreground hover:text-foreground'
+                    ? 'bg-white text-black font-bold'
+                    : 'text-[#8A8A8A] hover:text-white'
                 )}
               >
                 {tab}

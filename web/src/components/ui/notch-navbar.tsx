@@ -109,7 +109,7 @@ const NotchThemeToggle = () => {
       aria-label="Toggle color theme"
       title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
     >
-      {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-zinc-700" />}
+      {isDark ? <Sun className="w-4 h-4 text-foreground" /> : <Moon className="w-4 h-4 text-foreground" />}
     </button>
   );
 };
@@ -151,12 +151,13 @@ export function NotchNavbar({
 
   const defaultLogo = (
     <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-      <div className="size-8 rounded-lg bg-zinc-950 text-white dark:bg-white dark:text-zinc-950 flex items-center justify-center font-mono font-bold text-sm shadow-xs group-hover:scale-105 transition-transform">
+      <div className="size-8 rounded-[4px] bg-foreground text-background flex items-center justify-center font-mono font-bold text-sm group-hover:scale-105 transition-transform">
         N
       </div>
       <div className="flex flex-col text-left">
-        <div className="font-mono font-extrabold text-xs tracking-tight flex items-center gap-1.5 leading-none">
+        <div className="font-mono font-extrabold text-xs tracking-tight flex items-center gap-1.5 leading-none text-foreground">
           <span>NEXUS-DQPS</span>
+          <span className="size-1.5 rounded-full bg-foreground" />
         </div>
         <span className="text-[9px] text-muted-foreground font-mono leading-none tracking-tighter mt-0.5">
           AUTONOMOUS AD ENGINE
@@ -172,7 +173,7 @@ export function NotchNavbar({
         {...props}
       >
         {/* Left Side Bar - Flexible width */}
-        <div className="flex-1 h-10 bg-background/90 dark:bg-zinc-950/90 backdrop-blur-md z-20 relative min-w-0 pointer-events-auto">
+        <div className="flex-1 h-10 bg-background/90 dark:bg-background/90 backdrop-blur-md z-20 relative min-w-0 pointer-events-auto">
           <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none">
             <line
               x1="0"
@@ -203,7 +204,7 @@ export function NotchNavbar({
           <div className="w-[50px] h-full relative shrink-0">
             {/* Glass Background */}
             <div
-              className="absolute inset-0 bg-background/90 dark:bg-zinc-950/90 backdrop-blur-md"
+              className="absolute inset-0 bg-background/90 dark:bg-background/90 backdrop-blur-md"
               style={{ clipPath: "path('M0 0 H50 V64 C25 64 25 40 0 40 Z')" }}
             />
             {/* Outlines */}
@@ -233,7 +234,7 @@ export function NotchNavbar({
           {/* Center Slice (Flexible Content Area) */}
           <div className="flex-1 h-full relative min-w-0 -ml-px">
             {/* Background & Lines Layer */}
-            <div className="absolute inset-0 bg-background/90 dark:bg-zinc-950/90 backdrop-blur-md">
+            <div className="absolute inset-0 bg-background/90 dark:bg-background/90 backdrop-blur-md">
               <svg
                 className="absolute inset-0 w-full h-full pointer-events-none"
                 preserveAspectRatio="none"
@@ -308,7 +309,7 @@ export function NotchNavbar({
 
                   <Link
                     href={ctaHref}
-                    className="px-3.5 py-1.5 text-xs font-mono font-medium text-white bg-zinc-950 hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200 rounded-full transition-all shadow-xs hover:shadow-sm whitespace-nowrap"
+                    className="px-3.5 py-1.5 text-xs font-mono font-medium text-background bg-foreground hover:bg-muted-foreground rounded-[4px] transition-all whitespace-nowrap"
                   >
                     {ctaText}
                   </Link>
@@ -326,7 +327,7 @@ export function NotchNavbar({
           <div className="w-[50px] h-full relative shrink-0 -ml-px">
             {/* Glass Background */}
             <div
-              className="absolute inset-0 bg-background/90 dark:bg-zinc-950/90 backdrop-blur-md"
+              className="absolute inset-0 bg-background/90 dark:bg-background/90 backdrop-blur-md"
               style={{ clipPath: "path('M0 0 H50 V40 C25 40 25 64 0 64 Z')" }}
             />
             {/* Outlines */}
@@ -355,7 +356,7 @@ export function NotchNavbar({
         </div>
 
         {/* Right Side Bar - Flexible width */}
-        <div className="flex-1 h-10 bg-background/90 dark:bg-zinc-950/90 backdrop-blur-md z-20 relative min-w-0 -ml-px pointer-events-auto">
+        <div className="flex-1 h-10 bg-background/90 dark:bg-background/90 backdrop-blur-md z-20 relative min-w-0 -ml-px pointer-events-auto">
           <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none">
             <line
               x1="0"
@@ -389,7 +390,7 @@ export function NotchNavbar({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-16 z-40 bg-background/95 dark:bg-zinc-950/95 backdrop-blur-md border-b border-border/80 p-5 md:hidden shadow-xl"
+            className="fixed inset-x-0 top-16 z-40 bg-background/95 dark:bg-background/95 backdrop-blur-md border-b border-border/80 p-5 md:hidden shadow-xl"
           >
             <nav className="flex flex-col gap-2">
               {[...leftItems, ...rightItems].map((item) => {

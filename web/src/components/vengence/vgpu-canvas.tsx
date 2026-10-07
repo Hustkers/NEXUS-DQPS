@@ -48,8 +48,6 @@ export function VGPUCanvas({ className = '', intensity = 1.0 }: VGPUCanvasProps)
     window.addEventListener('resize', handleResize);
     window.addEventListener('mousemove', handleMouseMove);
 
-    const isDarkMode = () => document.documentElement.classList.contains('dark');
-
     const render = () => {
       time += 0.008;
       // Smooth mouse interpolation
@@ -58,7 +56,6 @@ export function VGPUCanvas({ className = '', intensity = 1.0 }: VGPUCanvasProps)
 
       ctx.clearRect(0, 0, width, height);
 
-      const dark = isDarkMode();
       const rows = 18;
       const cols = 28;
       const spacingX = width / (cols - 1);
@@ -94,11 +91,9 @@ export function VGPUCanvas({ className = '', intensity = 1.0 }: VGPUCanvasProps)
           }
         }
 
-        // Color gradient matching light-mode aesthetic
-        const alpha = (0.04 + (r / rows) * 0.06) * (dark ? 1.2 : 0.85);
-        ctx.strokeStyle = dark
-          ? `rgba(56, 189, 248, ${alpha})`
-          : `rgba(14, 116, 144, ${alpha})`;
+        // Achromatic monochrome response field lines
+        const lineAlpha = 0.03 + (r / rows) * 0.05;
+        ctx.strokeStyle = `rgba(255, 255, 255, ${lineAlpha})`;
         ctx.stroke();
       }
 
@@ -121,9 +116,7 @@ export function VGPUCanvas({ className = '', intensity = 1.0 }: VGPUCanvasProps)
             ctx.beginPath();
             const radius = (1.5 + mouseFactor * 2.5);
             ctx.arc(x, y, radius, 0, Math.PI * 2);
-            ctx.fillStyle = dark
-              ? `rgba(16, 185, 129, ${mouseFactor * 0.8})`
-              : `rgba(16, 185, 129, ${mouseFactor * 0.65})`;
+            ctx.fillStyle = `rgba(255, 255, 255, ${mouseFactor * 0.75})`;
             ctx.fill();
           }
         }
@@ -148,8 +141,8 @@ export function VGPUCanvas({ className = '', intensity = 1.0 }: VGPUCanvasProps)
         className='absolute inset-0 w-full h-full block'
         style={{ width: '100%', height: '100%' }}
       />
-      {/* Subtle radial mask so it gently fades at edges */}
-      <div className='absolute inset-0 bg-radial-at-c from-transparent via-background/40 to-background pointer-events-none' />
+      {/* Monochrome radial vignette to Canvas Black (#000000) */}
+      <div className='absolute inset-0 [background:radial-gradient(ellipse_at_center,transparent_20%,#000000_85%)] pointer-events-none' />
     </div>
   );
 }

@@ -96,6 +96,14 @@ export const navGroups: NavGroup[] = [
         isActive: false,
         shortcut: ['s', 'm'],
         items: []
+      },
+      {
+        title: 'Live Schema Normalizer',
+        url: '/dashboard/normalization',
+        icon: 'normalization',
+        isActive: false,
+        shortcut: ['s', 'n'],
+        items: []
       }
     ]
   }

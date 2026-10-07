@@ -39,23 +39,23 @@ export function GlowButton({
 
   const variantClasses = {
     default:
-      'bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 font-medium hover:bg-zinc-800 dark:hover:bg-zinc-100 shadow-sm hover:shadow-md border border-zinc-900/10 dark:border-white/20',
+      'bg-[#FFFFFF] text-[#000000] font-semibold hover:bg-[#8A8A8A] hover:text-[#000000] border-0 shadow-none',
     shimmer:
-      'relative bg-zinc-900 text-white dark:bg-zinc-950 dark:text-white font-medium overflow-hidden border border-zinc-700/60 shadow-md group',
+      'relative bg-[#1A1A1A] text-[#FFFFFF] font-medium overflow-hidden border border-[#8A8A8A] hover:border-[#FFFFFF] shadow-none group',
     glow:
-      'bg-primary text-primary-foreground font-semibold hover:shadow-[0_0_24px_rgba(16,185,129,0.35)] dark:hover:shadow-[0_0_24px_rgba(56,189,248,0.35)] border border-primary/20',
+      'bg-[#FFFFFF] text-[#000000] font-semibold hover:bg-[#8A8A8A] hover:text-[#000000] border-0 shadow-none',
     outline:
-      'bg-background hover:bg-muted text-foreground border border-border/90 hover:border-foreground/30 font-mono shadow-2xs',
+      'bg-[#1A1A1A] text-[#FFFFFF] border border-[#8A8A8A] hover:bg-[#000000] hover:border-[#FFFFFF] font-mono shadow-none',
     pill:
-      'rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border/80 font-mono text-xs'
+      'rounded-[6px] bg-[#1A1A1A] text-[#FFFFFF] border border-[#8A8A8A] hover:bg-[#000000] hover:border-[#FFFFFF] font-mono text-xs shadow-none'
   }[variant];
 
   const content = (
     <>
-      {/* Animated Shimmer Runner for variant="shimmer" */}
+      {/* Monochromatic Shimmer Runner for variant="shimmer" */}
       {variant === 'shimmer' && (
         <span
-          className='pointer-events-none absolute -inset-full w-[200%] h-[200%] animate-[spin_4s_linear_infinite] opacity-30 bg-[conic-gradient(from_0deg,transparent_0_340deg,#38bdf8_360deg)]'
+          className='pointer-events-none absolute -inset-full w-[200%] h-[200%] animate-[spin_4s_linear_infinite] opacity-15 bg-[conic-gradient(from_0deg,transparent_0_340deg,#FFFFFF_360deg)]'
           aria-hidden='true'
         />
       )}
@@ -65,7 +65,7 @@ export function GlowButton({
         {icon && iconPosition === 'left' && <span className='shrink-0'>{icon}</span>}
         <span>{children}</span>
         {icon && iconPosition === 'right' && (
-          <span className='shrink-0 transition-transform duration-200 group-hover:translate-x-0.5'>
+          <span className='shrink-0 transition-transform duration-150 group-hover:translate-x-0.5'>
             {icon}
           </span>
         )}
@@ -74,7 +74,7 @@ export function GlowButton({
   );
 
   const buttonClasses = cn(
-    'relative inline-flex items-center justify-center cursor-pointer select-none rounded-xl transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+    'relative inline-flex items-center justify-center cursor-pointer select-none rounded-[6px] transition-all duration-150 outline-none focus-visible:ring-1 focus-visible:ring-[#FFFFFF] disabled:pointer-events-none disabled:bg-[#1A1A1A] disabled:text-[#8A8A8A] disabled:border-[#1A1A1A] disabled:cursor-not-allowed',
     sizeClasses,
     variantClasses,
     className
@@ -84,8 +84,8 @@ export function GlowButton({
     return (
       <Link href={href} className={buttonClasses}>
         <motion.span
-          whileHover={{ scale: 1.015 }}
-          whileTap={{ scale: 0.985 }}
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.98 }}
           className='flex items-center gap-2 size-full justify-center'
         >
           {content}
@@ -96,8 +96,8 @@ export function GlowButton({
 
   return (
     <motion.button
-      whileHover={{ scale: 1.015 }}
-      whileTap={{ scale: 0.985 }}
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.98 }}
       disabled={disabled}
       onClick={onClick}
       className={buttonClasses}

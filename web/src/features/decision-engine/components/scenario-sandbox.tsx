@@ -32,28 +32,30 @@ export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?:
   };
 
   return (
-    <Card className="p-5 border-border/40 bg-card/60 backdrop-blur-md">
-      <div className="flex items-center justify-between mb-4">
+    <Card className="p-5 border border-[#8A8A8A] bg-[#1A1A1A] shadow-none rounded text-[#FFFFFF]">
+      <div className="flex items-center justify-between mb-4 border-b border-[#8A8A8A]/40 pb-3">
         <div>
-          <h3 className="text-sm font-semibold text-foreground tracking-tight flex items-center gap-2">
-            <IconAdjustmentsHorizontal className="h-4 w-4 text-indigo-400" />
+          <h3 className="text-sm font-semibold text-[#FFFFFF] tracking-tight flex items-center gap-2 font-mono">
+            <IconAdjustmentsHorizontal className="h-4 w-4 text-[#FFFFFF]" />
             Interactive What-If Scenario Sandbox
           </h3>
-          <p className="text-xs text-muted-foreground">
-            Adjust channel spend allocations in real-time with instant SLSQP Hill saturation & profit recalculation
+          <p className="text-xs text-[#8A8A8A] font-mono mt-0.5">
+            Adjust channel spend allocations in real-time with instant SLSQP Hill saturation &amp; profit recalculation
           </p>
         </div>
-        <Button size="sm" onClick={handleApply} className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs">
+        <Button size="sm" onClick={handleApply} className="bg-[#FFFFFF] hover:bg-[#8A8A8A] text-[#000000] text-xs font-mono font-semibold border-none active:scale-[0.98]">
           Apply Scenario Vector
         </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
         {/* Meta Slider */}
-        <div className="p-3.5 rounded-xl bg-background/50 border border-border/30 space-y-2">
-          <div className="flex items-center justify-between text-xs font-medium">
-            <span className="text-foreground font-medium">Meta Ads</span>
-            <span className="font-mono text-muted-foreground font-bold">${metaSpend} / day</span>
+        <div className="p-3.5 rounded bg-[#000000] border border-[#8A8A8A]/40 space-y-2">
+          <div className="flex items-center justify-between text-xs font-mono font-medium">
+            <span className="flex items-center gap-1.5 text-[#FFFFFF]">
+              <span className="size-2 rounded-full border border-[#8A8A8A]" /> Meta Ads
+            </span>
+            <span className="font-mono text-[#FFFFFF] font-bold">${metaSpend} / day</span>
           </div>
           <input
             type="range"
@@ -62,19 +64,21 @@ export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?:
             step={25}
             value={metaSpend}
             onChange={(e) => setMetaSpend(Number(e.target.value))}
-            className="w-full accent-blue-500 cursor-pointer"
+            className="w-full accent-[#FFFFFF] cursor-pointer"
           />
-          <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+          <div className="flex items-center justify-between text-[11px] font-mono text-[#8A8A8A]">
             <span>Forecasted Rev: ${metaRev.toFixed(0)}</span>
-            <Badge variant="outline" className="text-[10px]">Stockout Throttled</Badge>
+            <Badge variant="outline" className="text-[10px] font-mono border-[#8A8A8A] text-[#8A8A8A] bg-[#1A1A1A]">Stockout Throttled</Badge>
           </div>
         </div>
 
         {/* Google Slider */}
-        <div className="p-3.5 rounded-xl bg-background/50 border border-border/30 space-y-2">
-          <div className="flex items-center justify-between text-xs font-medium">
-            <span className="text-foreground font-medium">Google Search</span>
-            <span className="font-mono text-muted-foreground font-bold">${googleSpend} / day</span>
+        <div className="p-3.5 rounded bg-[#000000] border border-[#8A8A8A]/40 space-y-2">
+          <div className="flex items-center justify-between text-xs font-mono font-medium">
+            <span className="flex items-center gap-1.5 text-[#FFFFFF]">
+              <span className="size-2 rounded-full bg-[#FFFFFF]" /> Google Search
+            </span>
+            <span className="font-mono text-[#FFFFFF] font-bold">${googleSpend} / day</span>
           </div>
           <input
             type="range"
@@ -83,19 +87,21 @@ export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?:
             step={25}
             value={googleSpend}
             onChange={(e) => setGoogleSpend(Number(e.target.value))}
-            className="w-full accent-emerald-500 cursor-pointer"
+            className="w-full accent-[#FFFFFF] cursor-pointer"
           />
-          <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+          <div className="flex items-center justify-between text-[11px] font-mono text-[#8A8A8A]">
             <span>Forecasted Rev: ${googleRev.toFixed(0)}</span>
-            <Badge variant="outline" className="text-[10px] text-emerald-400 border-emerald-500/30">In-Stock Hero</Badge>
+            <Badge variant="outline" className="text-[10px] font-mono border-[#8A8A8A] text-[#FFFFFF] bg-[#1A1A1A]">In-Stock Hero</Badge>
           </div>
         </div>
 
         {/* Amazon Slider */}
-        <div className="p-3.5 rounded-xl bg-background/50 border border-border/30 space-y-2">
-          <div className="flex items-center justify-between text-xs font-medium">
-            <span className="text-foreground font-medium">Amazon SP</span>
-            <span className="font-mono text-muted-foreground font-bold">${amazonSpend} / day</span>
+        <div className="p-3.5 rounded bg-[#000000] border border-[#8A8A8A]/40 space-y-2">
+          <div className="flex items-center justify-between text-xs font-mono font-medium">
+            <span className="flex items-center gap-1.5 text-[#FFFFFF]">
+              <span className="size-2 rounded-full bg-[#8A8A8A]" /> Amazon SP
+            </span>
+            <span className="font-mono text-[#FFFFFF] font-bold">${amazonSpend} / day</span>
           </div>
           <input
             type="range"
@@ -104,32 +110,32 @@ export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?:
             step={25}
             value={amazonSpend}
             onChange={(e) => setAmazonSpend(Number(e.target.value))}
-            className="w-full accent-amber-500 cursor-pointer"
+            className="w-full accent-[#FFFFFF] cursor-pointer"
           />
-          <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+          <div className="flex items-center justify-between text-[11px] font-mono text-[#8A8A8A]">
             <span>Forecasted Rev: ${amazonRev.toFixed(0)}</span>
-            <Badge variant="outline" className="text-[10px] text-amber-400 border-amber-500/30">High Buy-Box</Badge>
+            <Badge variant="outline" className="text-[10px] font-mono border-[#8A8A8A] text-[#FFFFFF] bg-[#1A1A1A]">High Buy-Box</Badge>
           </div>
         </div>
       </div>
 
       {/* Instant Outcome Banner */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-3 border-t border-border/30 text-xs">
-        <div className="p-2.5 rounded-lg bg-secondary/30">
-          <span className="text-muted-foreground block text-[11px]">Total Budget</span>
-          <span className="text-sm font-mono font-bold text-foreground">${totalSpend.toLocaleString()}</span>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-3 border-t border-[#8A8A8A]/40 text-xs font-mono">
+        <div className="p-2.5 rounded bg-[#000000] border border-[#1A1A1A]">
+          <span className="text-[#8A8A8A] block text-[11px]">Total Budget</span>
+          <span className="text-sm font-mono font-bold text-[#FFFFFF]">${totalSpend.toLocaleString()}</span>
         </div>
-        <div className="p-2.5 rounded-lg bg-secondary/30">
-          <span className="text-muted-foreground block text-[11px]">Forecasted Blended ROAS</span>
-          <span className="text-sm font-mono font-bold text-emerald-400">{blendedRoas.toFixed(2)}x</span>
+        <div className="p-2.5 rounded bg-[#000000] border border-[#1A1A1A]">
+          <span className="text-[#8A8A8A] block text-[11px]">Forecasted Blended ROAS</span>
+          <span className="text-sm font-mono font-bold text-[#FFFFFF]">{blendedRoas.toFixed(2)}x</span>
         </div>
-        <div className="p-2.5 rounded-lg bg-secondary/30">
-          <span className="text-muted-foreground block text-[11px]">Blended POAS</span>
-          <span className="text-sm font-mono font-bold text-emerald-400">{poas.toFixed(2)}x</span>
+        <div className="p-2.5 rounded bg-[#000000] border border-[#1A1A1A]">
+          <span className="text-[#8A8A8A] block text-[11px]">Blended POAS</span>
+          <span className="text-sm font-mono font-bold text-[#FFFFFF]">{poas.toFixed(2)}x</span>
         </div>
-        <div className="p-2.5 rounded-lg bg-secondary/30">
-          <span className="text-muted-foreground block text-[11px]">Net Contribution Margin</span>
-          <span className="text-sm font-mono font-bold text-indigo-400">+${netContribution.toFixed(2)}</span>
+        <div className="p-2.5 rounded bg-[#000000] border border-[#1A1A1A]">
+          <span className="text-[#8A8A8A] block text-[11px]">Net Contribution Margin</span>
+          <span className="text-sm font-mono font-bold text-[#FFFFFF]">+${netContribution.toFixed(2)}</span>
         </div>
       </div>
     </Card>

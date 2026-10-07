@@ -41,24 +41,24 @@ const salesData = [
 
 export function RecentSales() {
   return (
-    <Card className='h-full'>
+    <Card className='h-full bg-[#1A1A1A] border-[#8A8A8A] shadow-none'>
       <CardHeader>
-        <CardTitle>Recent Sales</CardTitle>
-        <CardDescription>You made 265 sales this month.</CardDescription>
+        <CardTitle className='text-white font-mono'>Recent Transactions</CardTitle>
+        <CardDescription className='text-[#8A8A8A] font-mono'>265 orders processed this telemetry cycle.</CardDescription>
       </CardHeader>
       <CardContent>
         <div className='space-y-8'>
           {salesData.map((sale, index) => (
             <div key={index} className='flex items-center'>
-              <Avatar className='h-9 w-9'>
+              <Avatar className='h-9 w-9 border border-[#8A8A8A]'>
                 <AvatarImage src={sale.avatar} alt='Avatar' />
-                <AvatarFallback>{sale.fallback}</AvatarFallback>
+                <AvatarFallback className='bg-[#000000] text-white font-mono text-xs'>{sale.fallback}</AvatarFallback>
               </Avatar>
               <div className='ml-4 space-y-1'>
-                <p className='text-sm leading-none font-medium'>{sale.name}</p>
-                <p className='text-muted-foreground text-sm'>{sale.email}</p>
+                <p className='text-sm leading-none font-medium text-white'>{sale.name}</p>
+                <p className='text-[#8A8A8A] text-xs font-mono'>{sale.email}</p>
               </div>
-              <div className='ml-auto font-medium'>{sale.amount}</div>
+              <div className='ml-auto font-mono text-white text-sm font-semibold'>{sale.amount}</div>
             </div>
           ))}
         </div>

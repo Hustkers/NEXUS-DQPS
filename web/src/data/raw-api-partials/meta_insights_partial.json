@@ -1,0 +1,128 @@
+[
+  {
+    "account_id": null,
+    "campaign_id": "916",
+    "campaign_name": "meta-CD4371-001",
+    "adset_id": null,
+    "adset_name": null,
+    "ad_id": "708746",
+    "ad_name": null,
+    "spend": 1.429999948,
+    "impressions": 7350,
+    "clicks": 1,
+    "cpc": 1.43,
+    "cpm": 0.19,
+    "frequency": 1.25,
+    "date_start": "2026-10-01",
+    "date_stop": "2026-10-07",
+    "actions": [
+      {
+        "action_type": "link_click",
+        "value": 1.0,
+        "view_1d": null,
+        "click_7d": null,
+        "click_28d": null
+      },
+      {
+        "action_type": "omni_purchase",
+        "value": 1.0,
+        "view_1d": null,
+        "click_7d": null,
+        "click_28d": null
+      }
+    ],
+    "action_values": [
+      {
+        "action_type": "omni_purchase",
+        "value": 168.61,
+        "view_1d": null,
+        "click_7d": null,
+        "click_28d": null
+      }
+    ]
+  },
+  {
+    "account_id": null,
+    "campaign_id": "916",
+    "campaign_name": "meta-AO2924-401",
+    "adset_id": null,
+    "adset_name": null,
+    "ad_id": "708749",
+    "ad_name": null,
+    "spend": 1.820000023,
+    "impressions": 17861,
+    "clicks": 2,
+    "cpc": 0.91,
+    "cpm": 0.1,
+    "frequency": 1.4,
+    "date_start": "2026-10-01",
+    "date_stop": "2026-10-07",
+    "actions": [
+      {
+        "action_type": "link_click",
+        "value": 2.0,
+        "view_1d": null,
+        "click_7d": null,
+        "click_28d": null
+      },
+      {
+        "action_type": "omni_purchase",
+        "value": 0.0,
+        "view_1d": null,
+        "click_7d": null,
+        "click_28d": null
+      }
+    ],
+    "action_values": [
+      {
+        "action_type": "omni_purchase",
+        "value": 0.0,
+        "view_1d": null,
+        "click_7d": null,
+        "click_28d": null
+      }
+    ]
+  },
+  {
+    "account_id": null,
+    "campaign_id": "916",
+    "campaign_name": "meta-880848-005",
+    "adset_id": null,
+    "adset_name": null,
+    "ad_id": "708771",
+    "ad_name": null,
+    "spend": 0.0,
+    "impressions": 693,
+    "clicks": 0,
+    "cpc": null,
+    "cpm": 0.0,
+    "frequency": 1.1,
+    "date_start": "2026-10-01",
+    "date_stop": "2026-10-07",
+    "actions": [
+      {
+        "action_type": "link_click",
+        "value": 0.0,
+        "view_1d": null,
+        "click_7d": null,
+        "click_28d": null
+      },
+      {
+        "action_type": "omni_purchase",
+        "value": 0.0,
+        "view_1d": null,
+        "click_7d": null,
+        "click_28d": null
+      }
+    ],
+    "action_values": [
+      {
+        "action_type": "omni_purchase",
+        "value": 0.0,
+        "view_1d": null,
+        "click_7d": null,
+        "click_28d": null
+      }
+    ]
+  }
+]

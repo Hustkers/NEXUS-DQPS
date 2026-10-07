@@ -75,38 +75,38 @@ export function ReallocationFeed({
   };
 
   return (
-    <div className={cn('rounded-xl border border-border/80 bg-card p-5 shadow-xs', className)}>
+    <div className={cn('rounded border border-[#8A8A8A] bg-[#1A1A1A] p-5 shadow-none text-[#FFFFFF]', className)}>
       {/* Header */}
-      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-border/80 pb-3 mb-4'>
+      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-[#8A8A8A]/40 pb-3 mb-4'>
         <div className='flex items-center gap-2'>
-          <Icons.adjustments className='size-3.5 text-muted-foreground' />
-          <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
+          <Icons.adjustments className='size-3.5 text-[#8A8A8A]' />
+          <h3 className='font-mono text-xs font-bold text-[#FFFFFF] uppercase tracking-wider'>
             Autonomous Capital Reallocation Stream
           </h3>
-          <span className='text-xs font-mono text-muted-foreground'>
+          <span className='text-xs font-mono text-[#8A8A8A]'>
             ({items.filter((it) => it.status !== 'EXECUTED_TO_AD_API').length} pending)
           </span>
         </div>
 
         <div className='flex items-center gap-4'>
-          <div className='flex items-center gap-2 text-xs font-mono text-muted-foreground'>
+          <div className='flex items-center gap-2 text-xs font-mono text-[#8A8A8A]'>
             <span>Auto-Pilot</span>
             <Switch
               checked={autoPilot}
               onCheckedChange={setAutoPilot}
+              className='data-[state=checked]:bg-[#FFFFFF] data-[state=unchecked]:bg-[#000000] border border-[#8A8A8A]'
             />
           </div>
 
           <Button
             size='sm'
-            variant='outline'
             onClick={handleExecuteAll}
             disabled={executingId !== null}
-            className='h-8 text-xs font-mono border border-border bg-secondary hover:bg-secondary/80 text-foreground font-semibold shadow-2xs active:scale-[0.98]'
+            className='h-8 text-xs font-mono bg-[#FFFFFF] hover:bg-[#8A8A8A] text-[#000000] font-semibold border-none active:scale-[0.98]'
           >
             {executingId === 'all' ? (
               <>
-                <Icons.spinner className='mr-1.5 size-3 animate-spin' />
+                <Icons.spinner className='mr-1.5 size-3 animate-spin text-[#000000]' />
                 Executing...
               </>
             ) : (
@@ -126,12 +126,12 @@ export function ReallocationFeed({
             <div
               key={item.id}
               className={cn(
-                'flex flex-col md:flex-row md:items-center justify-between gap-3 rounded-xl border p-3.5 transition-all',
+                'flex flex-col md:flex-row md:items-center justify-between gap-3 rounded border p-3.5 transition-all',
                 isExecuted
-                  ? 'border-border/40 bg-muted/30 opacity-60'
+                  ? 'border-[#1A1A1A] bg-[#000000] opacity-50'
                   : isKill
-                  ? 'border-rose-200 dark:border-rose-950/40 bg-rose-50/40 dark:bg-rose-950/10 hover:border-rose-300'
-                  : 'border-border/80 bg-slate-50/50 dark:bg-zinc-950/30 hover:border-border hover:shadow-2xs'
+                  ? 'border-2 border-[#FFFFFF] bg-[#000000]'
+                  : 'border border-[#8A8A8A]/40 bg-[#000000] hover:border-[#8A8A8A]'
               )}
             >
               {/* Route & Flow */}
@@ -139,41 +139,41 @@ export function ReallocationFeed({
                 <div className='flex items-center gap-2 text-xs font-mono flex-wrap'>
                   <span
                     className={cn(
-                      'text-[10px] font-mono font-bold px-1.5 py-0.5 rounded uppercase tracking-wider border',
+                      'text-[10px] font-mono font-bold px-1.5 py-0.5 rounded uppercase tracking-wider',
                       isKill
-                        ? 'text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-500/20'
+                        ? 'bg-[#FFFFFF] text-[#000000]'
                         : item.deltaSpend > 0
-                        ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-500/20'
-                        : 'text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-500/20'
+                        ? 'bg-[#1A1A1A] text-[#FFFFFF] border border-[#8A8A8A]'
+                        : 'bg-[#1A1A1A] text-[#8A8A8A] border border-[#8A8A8A]'
                     )}
                   >
-                    {item.actionType.replace('_', ' ')}
+                    {isKill ? '[CRITICAL] ' : ''}{item.actionType.replace('_', ' ')}
                   </span>
-                  <span className='text-muted-foreground line-through text-[11px]'>{item.sourceCampaign}</span>
-                  <Icons.arrowRight className='size-3 text-muted-foreground shrink-0' />
-                  <span className='font-bold text-foreground truncate'>
+                  <span className='text-[#8A8A8A] line-through text-[11px]'>{item.sourceCampaign}</span>
+                  <Icons.arrowRight className='size-3 text-[#8A8A8A] shrink-0' />
+                  <span className='font-bold text-[#FFFFFF] truncate'>
                     {item.targetProductName || item.targetCampaign}
                   </span>
-                  <span className='text-muted-foreground text-[11px] ml-auto md:ml-0'>
+                  <span className='text-[#8A8A8A] text-[11px] ml-auto md:ml-0'>
                     {(item.confidence * 100).toFixed(0)}% conf
                   </span>
                 </div>
 
                 {/* Plain Numbers inline */}
-                <div className='flex items-center gap-3 text-xs font-mono text-muted-foreground flex-wrap'>
+                <div className='flex items-center gap-3 text-xs font-mono text-[#8A8A8A] flex-wrap'>
                   <span>
-                    Spend: <span className='text-foreground font-medium'>₹{item.currentSpend.toFixed(0)}</span> →{' '}
-                    <span className={cn('font-bold', item.deltaSpend > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400')}>
+                    Spend: <span className='text-[#FFFFFF] font-medium'>₹{item.currentSpend.toFixed(0)}</span> →{' '}
+                    <span className='font-bold text-[#FFFFFF]'>
                       ₹{item.recommendedSpend.toFixed(0)}/d ({item.deltaSpend > 0 ? '+' : ''}₹{item.deltaSpend.toFixed(0)})
                     </span>
                   </span>
-                  <span className='text-muted-foreground/30'>•</span>
+                  <span>•</span>
                   <span>
-                    Lift: <span className='text-emerald-600 dark:text-emerald-400 font-bold'>+₹{item.expectedDailyMargin.toFixed(0)}/d</span>
+                    Lift: <span className='text-[#FFFFFF] font-bold'>+₹{item.expectedDailyMargin.toFixed(0)}/d</span>
                   </span>
-                  <span className='text-muted-foreground/30'>•</span>
+                  <span>•</span>
                   <span>
-                    ROAS: <span className='text-foreground font-bold'>{item.predictedRoas.toFixed(2)}x</span>
+                    ROAS: <span className='text-[#FFFFFF] font-bold'>{item.predictedRoas.toFixed(2)}x</span>
                   </span>
                 </div>
               </div>
@@ -181,8 +181,8 @@ export function ReallocationFeed({
               {/* Execution Action */}
               <div className='shrink-0 flex items-center gap-2'>
                 {isExecuted ? (
-                  <span className='text-[11px] font-mono text-muted-foreground flex items-center gap-1 font-semibold'>
-                    <Icons.check className='size-3 text-emerald-600' />
+                  <span className='text-[11px] font-mono text-[#8A8A8A] flex items-center gap-1 font-semibold'>
+                    <Icons.check className='size-3 text-[#FFFFFF]' />
                     Dispatched
                   </span>
                 ) : (
@@ -191,10 +191,10 @@ export function ReallocationFeed({
                     variant='outline'
                     disabled={executingId === item.id}
                     onClick={() => handleExecute(item)}
-                    className='h-7.5 text-xs font-mono border border-border bg-card hover:bg-accent text-foreground font-semibold shadow-2xs active:scale-[0.98]'
+                    className='h-7.5 text-xs font-mono border border-[#8A8A8A] bg-[#1A1A1A] hover:bg-[#000000] hover:border-[#FFFFFF] text-[#FFFFFF] font-semibold active:scale-[0.98]'
                   >
                     {executingId === item.id ? (
-                      <Icons.spinner className='size-3 animate-spin' />
+                      <Icons.spinner className='size-3 animate-spin text-[#FFFFFF]' />
                     ) : (
                       'Execute'
                     )}

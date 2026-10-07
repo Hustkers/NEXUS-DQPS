@@ -40,31 +40,35 @@ interface AnomalyCardProps {
 }
 
 export function AnomalyCard({ anomaly, onMitigate, onAnalyze, className }: AnomalyCardProps) {
-  const isCritical = anomaly.severity === 'CRITICAL';
+  const isCritical = anomaly.severity === 'CRITICAL' || anomaly.inventory === 0;
+
   return (
     <div
       className={cn(
-        'group relative flex flex-col justify-between rounded-xl border border-border/80 bg-card p-4.5 transition-all hover:border-border hover:shadow-sm shadow-xs',
+        'group relative flex flex-col justify-between rounded border border-[#8A8A8A] bg-[#1A1A1A] p-4 text-[#FFFFFF] transition-all hover:border-[#FFFFFF] shadow-none',
         className
       )}
     >
       <div>
-        {/* Minimal header */}
-        <div className='flex items-center justify-between text-xs font-mono text-muted-foreground mb-2.5'>
+        {/* Monochromatic header */}
+        <div className='flex items-center justify-between text-xs font-mono text-[#8A8A8A] mb-2.5'>
           <div className='flex items-center gap-2'>
-            <span className='capitalize font-semibold text-foreground'>{anomaly.platform}</span>
-            <span className='text-muted-foreground/40'>/</span>
-            <span className='text-muted-foreground text-[11px]'>{anomaly.date}</span>
+            <span className='text-xs font-mono font-bold text-[#FFFFFF]'>
+              {isCritical ? '■' : '○'}
+            </span>
+            <span className='capitalize font-semibold text-[#FFFFFF]'>{anomaly.platform}</span>
+            <span className='text-[#8A8A8A]'>/</span>
+            <span className='text-[#8A8A8A] text-[11px]'>{anomaly.date}</span>
           </div>
           <span
             className={cn(
-              'font-mono font-bold text-[10px] px-1.5 py-0.5 rounded border',
+              'font-mono font-bold text-[10px] px-1.5 py-0.5 rounded',
               isCritical
-                ? 'text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-500/30'
-                : 'text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-500/30'
+                ? 'bg-[#FFFFFF] text-[#000000]'
+                : 'bg-[#1A1A1A] text-[#FFFFFF] border border-[#8A8A8A]'
             )}
           >
-            Z {anomaly.zScore > 0 ? `+${anomaly.zScore}` : anomaly.zScore}
+            {isCritical ? '[CRITICAL] ' : '[WARN] '}Z {anomaly.zScore > 0 ? `+${anomaly.zScore}` : anomaly.zScore}
           </span>
         </div>
 
@@ -75,7 +79,7 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, className }: Anoma
           title='Click to inspect product telemetry'
         >
           {anomaly.photoUrl && (
-            <div className='relative size-10 rounded-lg border border-border bg-muted overflow-hidden shrink-0 group-hover/shoe:border-cyan-500/50 transition-colors shadow-2xs'>
+            <div className='relative size-10 rounded border border-[#8A8A8A] bg-[#000000] overflow-hidden shrink-0 group-hover/shoe:border-[#FFFFFF] transition-colors'>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={anomaly.photoUrl}
@@ -86,19 +90,19 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, className }: Anoma
           )}
           <div className='flex-1 min-w-0'>
             <div className='flex items-center justify-between gap-1'>
-              <h4 className='font-mono text-xs font-bold text-foreground truncate group-hover/shoe:text-cyan-400 transition-colors'>
+              <h4 className='font-mono text-xs font-bold text-[#FFFFFF] truncate group-hover/shoe:underline'>
                 {anomaly.productName || anomaly.campaign}
               </h4>
               {anomaly.inventory === 0 && (
-                <span className='text-[10px] text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-500/30 px-1 py-0.2 rounded font-mono font-semibold shrink-0'>
-                  Stock 0
+                <span className='text-[10px] bg-[#FFFFFF] text-[#000000] px-1.5 py-0.5 rounded font-mono font-bold shrink-0'>
+                  STOCK 0
                 </span>
               )}
             </div>
-            <div className='flex items-center gap-2 text-[11px] font-mono text-muted-foreground mt-0.5'>
-              <span>₹{anomaly.spend.toLocaleString()}/d</span>
-              <span className='text-muted-foreground/40'>•</span>
-              <span className={cn('font-semibold', anomaly.roas < 1.8 ? 'text-rose-600 dark:text-rose-400' : 'text-amber-600 dark:text-amber-400')}>
+            <div className='flex items-center gap-2 text-[11px] font-mono text-[#8A8A8A] mt-0.5'>
+              <span className='text-[#FFFFFF]'>₹{anomaly.spend.toLocaleString()}/d</span>
+              <span>•</span>
+              <span className='font-bold text-[#FFFFFF]'>
                 {anomaly.roas.toFixed(2)}x ROAS
               </span>
             </div>
@@ -106,32 +110,25 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, className }: Anoma
         </div>
 
         {/* Plain diagnostic explanation */}
-        <p className='text-xs text-muted-foreground leading-relaxed font-sans mb-3 line-clamp-2'>
+        <p className='text-xs text-[#8A8A8A] leading-relaxed font-sans mb-3 line-clamp-2'>
           {anomaly.explanation}
         </p>
 
-        {/* Minimal Factor Waterfall: hairline bars */}
-        <div className='space-y-1.5 mb-3 pt-2.5 border-t border-border/80'>
+        {/* Minimal Factor Waterfall: hairline bars in monochrome */}
+        <div className='space-y-1.5 mb-3 pt-2.5 border-t border-[#8A8A8A]/40'>
           {anomaly.factors.slice(0, 2).map((f, i) => {
             const barWidth = Math.min(Math.abs(f.impactPts) * 1.3, 100);
             return (
               <div key={i} className='space-y-1'>
                 <div className='flex items-center justify-between text-[11px] font-mono'>
-                  <span className='text-muted-foreground'>{f.name}</span>
-                  <span className={cn('font-semibold', f.impactPts < 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400')}>
+                  <span className='text-[#8A8A8A]'>{f.name}</span>
+                  <span className='font-bold text-[#FFFFFF]'>
                     {f.impactPts > 0 ? `+${f.impactPts.toFixed(1)}` : f.impactPts.toFixed(1)} pts
                   </span>
                 </div>
-                <div className='h-1 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden'>
+                <div className='h-1.5 w-full bg-[#000000] border border-[#1A1A1A] overflow-hidden'>
                   <div
-                    className={cn(
-                      'h-full rounded-full',
-                      f.color === 'rose'
-                        ? 'bg-rose-500'
-                        : f.color === 'amber'
-                        ? 'bg-amber-500'
-                        : 'bg-slate-400 dark:bg-zinc-500'
-                    )}
+                    className={cn('h-full', isCritical ? 'bg-[#FFFFFF]' : 'bg-[#8A8A8A]')}
                     style={{ width: `${barWidth}%` }}
                   />
                 </div>
@@ -141,24 +138,23 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, className }: Anoma
         </div>
       </div>
 
-      {/* Action buttons: Analyse Globe & Auto-Reallocate */}
+      {/* Action buttons strictly per DESIGN.md */}
       <div className='flex items-center gap-2'>
         <Button
           size='sm'
           variant='outline'
           onClick={() => onAnalyze?.(anomaly)}
-          className='flex-1 text-xs font-mono h-8 border border-cyan-800/60 dark:border-cyan-800/60 bg-cyan-950/40 text-cyan-400 dark:text-cyan-300 hover:bg-cyan-900/60 hover:text-cyan-100 font-semibold shadow-2xs active:scale-[0.98]'
+          className='flex-1 text-xs font-mono h-8 border border-[#8A8A8A] bg-[#1A1A1A] text-[#FFFFFF] hover:bg-[#000000] hover:border-[#FFFFFF] font-semibold active:scale-[0.98]'
         >
-          <IconWorld className='mr-1.5 size-3.5 text-cyan-400' />
+          <IconWorld className='mr-1.5 size-3.5 text-[#FFFFFF]' />
           Analyse Globe
         </Button>
         <Button
           size='sm'
-          variant='outline'
           onClick={() => onMitigate?.(anomaly)}
-          className='flex-1 text-xs font-mono h-8 border border-border bg-secondary hover:bg-secondary/80 text-foreground font-semibold shadow-2xs active:scale-[0.98]'
+          className='flex-1 text-xs font-mono h-8 bg-[#FFFFFF] hover:bg-[#8A8A8A] text-[#000000] font-semibold active:scale-[0.98] border-none'
         >
-          <Icons.arrowRight className='mr-1.5 size-3 text-muted-foreground' />
+          <Icons.arrowRight className='mr-1.5 size-3 text-[#000000]' />
           Auto-Reallocate
         </Button>
       </div>

@@ -21,98 +21,98 @@ export default function OverViewPage() {
     <PageContainer>
       <div className='flex flex-1 flex-col space-y-2'>
         <div className='flex items-center justify-between space-y-2'>
-          <h2 className='text-2xl font-bold tracking-tight'>Hi, Welcome back</h2>
+          <h2 className='text-2xl font-bold tracking-tight text-white font-mono'>System Overview</h2>
           <div className='hidden items-center space-x-2 md:flex'>
-            <Button>Download</Button>
+            <Button className='bg-white text-black hover:bg-[#8A8A8A] font-semibold'>Export Telemetry</Button>
           </div>
         </div>
         <Tabs defaultValue='overview' className='space-y-4'>
-          <TabsList>
-            <TabsTrigger value='overview'>Overview</TabsTrigger>
-            <TabsTrigger value='analytics' disabled>
+          <TabsList className='bg-[#1A1A1A] border border-[#8A8A8A]'>
+            <TabsTrigger value='overview' className='data-[state=active]:bg-white data-[state=active]:text-black'>Overview</TabsTrigger>
+            <TabsTrigger value='analytics' disabled className='text-[#8A8A8A]'>
               Analytics
             </TabsTrigger>
           </TabsList>
           <TabsContent value='overview' className='space-y-4'>
-            <div className='*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4'>
-              <Card className='@container/card'>
+            <div className='grid grid-cols-1 gap-4 px-4 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4'>
+              <Card className='@container/card bg-[#1A1A1A] border-[#8A8A8A] shadow-none'>
                 <CardHeader>
-                  <CardDescription>Total Revenue</CardDescription>
-                  <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
+                  <CardDescription className='text-[#8A8A8A] font-mono'>Total Revenue</CardDescription>
+                  <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl text-white font-mono'>
                     ₹1,250.00
                   </CardTitle>
                   <CardAction>
-                    <Badge variant='outline'>
-                      <Icons.trendingUp />
+                    <Badge variant='outline' className='border-[#8A8A8A] text-white bg-transparent font-mono'>
+                      <Icons.trendingUp className='text-white' />
                       +12.5%
                     </Badge>
                   </CardAction>
                 </CardHeader>
                 <CardFooter className='flex-col items-start gap-1.5 text-sm'>
-                  <div className='line-clamp-1 flex gap-2 font-medium'>
-                    Trending up this month <Icons.trendingUp className='size-4' />
+                  <div className='line-clamp-1 flex gap-2 font-medium text-white'>
+                    Trending up this month <Icons.trendingUp className='size-4 text-white' />
                   </div>
-                  <div className='text-muted-foreground'>Visitors for the last 6 months</div>
+                  <div className='text-[#8A8A8A] text-xs font-mono'>Visitors for the last 6 months</div>
                 </CardFooter>
               </Card>
-              <Card className='@container/card'>
+              <Card className='@container/card bg-[#1A1A1A] border-[#8A8A8A] shadow-none'>
                 <CardHeader>
-                  <CardDescription>New Customers</CardDescription>
-                  <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
+                  <CardDescription className='text-[#8A8A8A] font-mono'>New Customers</CardDescription>
+                  <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl text-white font-mono'>
                     1,234
                   </CardTitle>
                   <CardAction>
-                    <Badge variant='outline'>
-                      <Icons.trendingDown />
+                    <Badge variant='outline' className='border-[#8A8A8A] text-white bg-transparent font-mono'>
+                      <Icons.trendingDown className='text-[#8A8A8A]' />
                       -20%
                     </Badge>
                   </CardAction>
                 </CardHeader>
                 <CardFooter className='flex-col items-start gap-1.5 text-sm'>
-                  <div className='line-clamp-1 flex gap-2 font-medium'>
-                    Down 20% this period <Icons.trendingDown className='size-4' />
+                  <div className='line-clamp-1 flex gap-2 font-medium text-white'>
+                    Down 20% this period <Icons.trendingDown className='size-4 text-[#8A8A8A]' />
                   </div>
-                  <div className='text-muted-foreground'>Acquisition needs attention</div>
+                  <div className='text-[#8A8A8A] text-xs font-mono'>Acquisition needs attention</div>
                 </CardFooter>
               </Card>
-              <Card className='@container/card'>
+              <Card className='@container/card bg-[#1A1A1A] border-[#8A8A8A] shadow-none'>
                 <CardHeader>
-                  <CardDescription>Active Accounts</CardDescription>
-                  <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
+                  <CardDescription className='text-[#8A8A8A] font-mono'>Active Accounts</CardDescription>
+                  <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl text-white font-mono'>
                     45,678
                   </CardTitle>
                   <CardAction>
-                    <Badge variant='outline'>
-                      <Icons.trendingUp />
+                    <Badge variant='outline' className='border-[#8A8A8A] text-white bg-transparent font-mono'>
+                      <Icons.trendingUp className='text-white' />
                       +12.5%
                     </Badge>
                   </CardAction>
                 </CardHeader>
                 <CardFooter className='flex-col items-start gap-1.5 text-sm'>
-                  <div className='line-clamp-1 flex gap-2 font-medium'>
-                    Strong user retention <Icons.trendingUp className='size-4' />
+                  <div className='line-clamp-1 flex gap-2 font-medium text-white'>
+                    Strong user retention <Icons.trendingUp className='size-4 text-white' />
                   </div>
-                  <div className='text-muted-foreground'>Engagement exceed targets</div>
+                  <div className='text-[#8A8A8A] text-xs font-mono'>Engagement exceed targets</div>
                 </CardFooter>
               </Card>
-              <Card className='@container/card'>
+              <Card className='@container/card bg-[#1A1A1A] border-[#8A8A8A] shadow-none'>
                 <CardHeader>
-                  <CardDescription>Growth Rate</CardDescription>
-                  <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
+                  <CardDescription className='text-[#8A8A8A] font-mono'>Growth Rate</CardDescription>
+                  <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl text-white font-mono'>
                     4.5%
                   </CardTitle>
                   <CardAction>
-                    <Badge variant='outline'>
-                      <Icons.trendingUp />
+                    <Badge variant='outline' className='border-[#8A8A8A] text-white bg-transparent font-mono'>
+                      <Icons.trendingUp className='text-white' />
                       +4.5%
                     </Badge>
                   </CardAction>
                 </CardHeader>
                 <CardFooter className='flex-col items-start gap-1.5 text-sm'>
-                  <div className='line-clamp-1 flex gap-2 font-medium'>
-                    Steady performance increase <Icons.trendingUp className='size-4' />
+                  <div className='line-clamp-1 flex gap-2 font-medium text-white'>
+                    Steady performance increase <Icons.trendingUp className='size-4 text-white' />
                   </div>
-                  <div className='text-muted-foreground'>Meets growth projections</div>
+                  <div className='text-[#8A8A8A] text-xs font-mono'>Meets growth projections</div>
                 </CardFooter>
               </Card>
             </div>
@@ -120,7 +120,7 @@ export default function OverViewPage() {
               <div className='col-span-4'>
                 <BarGraph />
               </div>
-              <Card className='col-span-4 md:col-span-3'>
+              <Card className='col-span-4 md:col-span-3 bg-[#1A1A1A] border-[#8A8A8A] shadow-none'>
                 <RecentSales />
               </Card>
               <div className='col-span-4'>

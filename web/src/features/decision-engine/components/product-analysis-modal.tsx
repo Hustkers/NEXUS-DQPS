@@ -117,6 +117,20 @@ export function ProductAnalysisModal({
         {/* Top Diagnostic Phase Header */}
         <div className='flex flex-wrap items-center justify-between border-b border-zinc-800/80 px-4 sm:px-6 py-3.5 bg-zinc-950/90 gap-3'>
           <div className='flex items-center gap-3'>
+            <div className='relative flex size-3 items-center justify-center'>
+              <span
+                className={cn(
+                  'absolute size-3 rounded-full opacity-75 animate-ping',
+                  analysisStage === 'analysing' ? 'bg-cyan-400' : 'bg-emerald-400'
+                )}
+              />
+              <span
+                className={cn(
+                  'size-2 rounded-full',
+                  analysisStage === 'analysing' ? 'bg-cyan-400' : 'bg-emerald-400'
+                )}
+              />
+            </div>
             <div>
               <div className='flex items-center gap-2'>
                 <span
@@ -247,6 +261,7 @@ export function ProductAnalysisModal({
                       </>
                     ) : (
                       <>
+                        <span className='size-2 rounded-full bg-rose-500 animate-pulse' />
                         <span className='font-bold text-rose-300'>RL CUSTOMER INTERACTION &amp; SALES PULSE</span>
                       </>
                     )}
@@ -275,17 +290,21 @@ export function ProductAnalysisModal({
                 {/* Legend & Channel Strip */}
                 {analysisStage === 'completed' ? (
                   <div className='w-full flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-zinc-900 font-mono text-[10px]'>
-                    <div className='text-red-400 font-medium'>
-                      High Sales &amp; Intent: US East/West (78% P_conv)
+                    <div className='flex items-center gap-1.5 text-zinc-300'>
+                      <span className='size-2 rounded-full bg-red-500 ring-2 ring-red-500/20' />
+                      <span>High Sales &amp; Intent: US East/West (78% P_conv)</span>
                     </div>
-                    <div className='text-orange-400 font-medium'>
-                      EMEA (56% P_conv)
+                    <div className='flex items-center gap-1.5 text-zinc-300'>
+                      <span className='size-2 rounded-full bg-orange-500' />
+                      <span>EMEA (56% P_conv)</span>
                     </div>
-                    <div className='text-yellow-400 font-medium'>
-                      APAC (44% P_conv)
+                    <div className='flex items-center gap-1.5 text-zinc-300'>
+                      <span className='size-2 rounded-full bg-yellow-400' />
+                      <span>APAC (44% P_conv)</span>
                     </div>
-                    <div className='text-cyan-400 font-medium'>
-                      Low Prob: Suppressed (Zero Grey)
+                    <div className='flex items-center gap-1.5 text-cyan-400'>
+                      <span className='size-2 rounded-full bg-cyan-400' />
+                      <span>Low Prob: Suppressed (Zero Grey)</span>
                     </div>
                   </div>
                 ) : (

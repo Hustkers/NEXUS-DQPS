@@ -12,14 +12,14 @@ export interface GithubGlobeProps {
 }
 
 const DEFAULT_MARKERS: Marker[] = [
-  { location: [37.7749, -122.4194], size: 0.09, color: [0.2, 0.9, 0.5] }, // SF (Meta HQ / US-West)
-  { location: [40.7128, -74.006], size: 0.08, color: [0.2, 0.7, 1.0] }, // NY (Google Ads / US-East)
-  { location: [51.5074, -0.1278], size: 0.07, color: [0.95, 0.45, 0.2] }, // London (EMEA Hub)
-  { location: [35.6762, 139.6503], size: 0.08, color: [0.85, 0.3, 0.95] }, // Tokyo (APAC Hub)
-  { location: [1.3521, 103.8198], size: 0.07, color: [0.15, 0.95, 0.75] }, // Singapore (TikTok SEA)
-  { location: [19.076, 72.8777], size: 0.07, color: [0.95, 0.75, 0.15] }, // Mumbai (India Direct)
-  { location: [50.1109, 8.6821], size: 0.06, color: [0.35, 0.8, 0.95] }, // Frankfurt (EU Central)
-  { location: [-33.8688, 151.2093], size: 0.06, color: [0.95, 0.35, 0.55] } // Sydney (Oceania)
+  { location: [37.7749, -122.4194], size: 0.09, color: [1.0, 1.0, 1.0] }, // SF (Meta HQ / US-West)
+  { location: [40.7128, -74.006], size: 0.08, color: [1.0, 1.0, 1.0] }, // NY (Google Ads / US-East)
+  { location: [51.5074, -0.1278], size: 0.07, color: [0.54, 0.54, 0.54] }, // London (EMEA Hub)
+  { location: [35.6762, 139.6503], size: 0.08, color: [0.54, 0.54, 0.54] }, // Tokyo (APAC Hub)
+  { location: [1.3521, 103.8198], size: 0.07, color: [0.54, 0.54, 0.54] }, // Singapore (TikTok SEA)
+  { location: [19.076, 72.8777], size: 0.07, color: [0.54, 0.54, 0.54] }, // Mumbai (India Direct)
+  { location: [50.1109, 8.6821], size: 0.06, color: [0.54, 0.54, 0.54] }, // Frankfurt (EU Central)
+  { location: [-33.8688, 151.2093], size: 0.06, color: [0.54, 0.54, 0.54] } // Sydney (Oceania)
 ];
 
 const DEFAULT_ARCS: Arc[] = [
@@ -37,7 +37,7 @@ export function GithubGlobe({
   className,
   activeSku,
   activePlatform,
-  accentColor = [0.2, 0.85, 0.6]
+  accentColor = [1.0, 1.0, 1.0]
 }: GithubGlobeProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pointerInteracting = useRef<number | null>(null);
@@ -61,16 +61,16 @@ export function GithubGlobe({
       phi: 0,
       theta: 0.25,
       dark: 1,
-      diffuse: 1.3,
+      diffuse: 1.1,
       mapSamples: 16000,
-      mapBrightness: 5.5,
-      baseColor: [0.22, 0.28, 0.42],
-      markerColor: accentColor,
-      glowColor: [0.12, 0.25, 0.55],
+      mapBrightness: 4.0,
+      baseColor: [0.1, 0.1, 0.1],
+      markerColor: [1.0, 1.0, 1.0],
+      glowColor: [0.1, 0.1, 0.1],
       markers: DEFAULT_MARKERS,
       arcs: DEFAULT_ARCS,
-      arcColor: [0.25, 0.72, 0.98],
-      arcWidth: 0.9,
+      arcColor: [1.0, 1.0, 1.0],
+      arcWidth: 0.8,
       arcHeight: 0.35,
       scale: 1.05
     });
@@ -132,40 +132,39 @@ export function GithubGlobe({
   return (
     <div
       className={cn(
-        'relative flex items-center justify-center overflow-hidden',
+        'relative flex items-center justify-center overflow-hidden bg-[#000000]',
         className
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Background glow radial */}
-      <div className='pointer-events-none absolute inset-0 bg-radial from-cyan-500/15 via-blue-500/5 to-transparent blur-2xl' />
-
       {/* Canvas */}
       <canvas
         ref={canvasRef}
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
         onPointerMove={handlePointerMove}
-        className='size-full max-w-[620px] aspect-square cursor-grab touch-none opacity-95 transition-opacity duration-500'
+        className='size-full max-w-[620px] aspect-square cursor-grab touch-none opacity-95 transition-opacity duration-300'
       />
 
-      {/* Atmospheric Ring Overlay */}
+      {/* Atmospheric Ring Overlay (Monochrome) */}
       <div className='pointer-events-none absolute inset-0 flex items-center justify-center'>
-        <div className='size-[82%] rounded-full ring-1 ring-cyan-500/20 ring-offset-2 ring-offset-transparent shadow-[0_0_50px_rgba(34,211,238,0.1)]' />
+        <div className='size-[82%] rounded-full ring-1 ring-[#8A8A8A]/30 ring-offset-2 ring-offset-transparent' />
       </div>
 
       {/* Interactive Telemetry HUD tags floating over Globe */}
       <div className='pointer-events-none absolute bottom-3 left-4 flex flex-col gap-1 text-[10px] font-mono'>
-        <div className='flex items-center gap-1.5 text-emerald-400 bg-zinc-950/80 px-2.5 py-1 rounded-md border border-zinc-800 backdrop-blur-sm'>
-          <span>GLOBAL TELEMETRY STREAM</span>
+        <div className='flex items-center gap-1.5 text-[#FFFFFF] bg-[#000000] px-2.5 py-1 rounded border border-[#8A8A8A]'>
+          <span className='size-1.5 rounded-full bg-[#FFFFFF]' />
+          <span className='font-bold'>GLOBAL TELEMETRY STREAM</span>
         </div>
-        <div className='text-zinc-500 text-[9px] px-1'>
+        <div className='text-[#8A8A8A] text-[9px] px-1'>
           Lat: 37.77° N • Lon: -122.42° W • 8 Edge Hubs Active
         </div>
       </div>
 
-      <div className='pointer-events-none absolute top-3 right-4 flex items-center gap-2 text-[10px] font-mono text-zinc-400 bg-zinc-950/80 px-2.5 py-1 rounded-md border border-zinc-800 backdrop-blur-sm'>
+      <div className='pointer-events-none absolute top-3 right-4 flex items-center gap-2 text-[10px] font-mono text-[#FFFFFF] bg-[#000000] px-2.5 py-1 rounded border border-[#8A8A8A]'>
+        <span className='size-1.5 rounded-full bg-[#FFFFFF]' />
         <span>github.com/globe WebGL</span>
       </div>
     </div>

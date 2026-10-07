@@ -57,7 +57,7 @@ export default function AppSidebar() {
         {filteredGroups.map((group) => (
           <SidebarGroup key={group.label || 'ungrouped'} className='py-1.5'>
             {group.label && (
-              <SidebarGroupLabel className='font-mono text-[10px] uppercase tracking-wider text-zinc-500 font-semibold px-2'>
+              <SidebarGroupLabel className='font-mono text-[10px] uppercase tracking-wider text-[#8A8A8A] font-semibold px-2'>
                 {group.label}
               </SidebarGroupLabel>
             )}
@@ -136,17 +136,17 @@ export default function AppSidebar() {
                   <div className='flex items-center gap-2 w-full min-w-0'>
                     <UserAvatarProfile className='h-8 w-8 rounded-lg shrink-0' user={user} />
                     <div className='grid flex-1 text-left text-sm leading-tight min-w-0 group-data-[collapsible=icon]:hidden'>
-                      <span className='truncate font-medium text-zinc-200'>{user.fullName}</span>
-                      <span className='truncate text-xs text-zinc-500 font-mono'>
+                      <span className='truncate font-medium text-white'>{user.fullName}</span>
+                      <span className='truncate text-xs text-[#8A8A8A] font-mono'>
                         {user.emailAddresses[0].emailAddress}
                       </span>
                     </div>
-                    <Icons.chevronsDown className='ml-auto size-4 text-muted-foreground shrink-0 group-data-[collapsible=icon]:hidden' />
+                    <Icons.chevronsDown className='ml-auto size-4 text-[#8A8A8A] shrink-0 group-data-[collapsible=icon]:hidden' />
                   </div>
                 )}
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className='w-64 rounded-lg bg-zinc-950 border-zinc-800'
+                className='w-64 rounded-lg bg-[#1A1A1A] border-[#8A8A8A]'
                 side={state === 'collapsed' ? 'right' : 'top'}
                 align='end'
                 sideOffset={state === 'collapsed' ? 12 : 8}
@@ -156,48 +156,48 @@ export default function AppSidebar() {
                     <div className='flex items-center gap-2 px-2 py-2 text-left text-sm'>
                       <UserAvatarProfile className='h-8 w-8 rounded-lg shrink-0' user={user} />
                       <div className='grid flex-1 text-left text-sm leading-tight min-w-0'>
-                        <span className='truncate font-medium text-zinc-100'>{user.fullName}</span>
-                        <span className='truncate text-xs text-zinc-400 font-mono'>
+                        <span className='truncate font-medium text-white'>{user.fullName}</span>
+                        <span className='truncate text-xs text-[#8A8A8A] font-mono'>
                           {user.emailAddresses[0].emailAddress}
                         </span>
                       </div>
                     </div>
                   </DropdownMenuLabel>
                 </DropdownMenuGroup>
-                <DropdownMenuSeparator className='bg-zinc-800' />
+                <DropdownMenuSeparator className='bg-[#8A8A8A]' />
 
                 <DropdownMenuGroup>
                   <DropdownMenuItem
                     onClick={() => router.push('/dashboard/profile')}
-                    className='cursor-pointer hover:bg-zinc-900'
+                    className='cursor-pointer text-white hover:bg-[#000000]'
                   >
-                    <Icons.account className='mr-2 h-4 w-4' />
+                    <Icons.account className='mr-2 h-4 w-4 text-[#8A8A8A]' />
                     Profile
                   </DropdownMenuItem>
                   {organization && (
                     <DropdownMenuItem
                       onClick={() => router.push('/dashboard/billing')}
-                      className='cursor-pointer hover:bg-zinc-900'
+                      className='cursor-pointer text-white hover:bg-[#000000]'
                     >
-                      <Icons.creditCard className='mr-2 h-4 w-4' />
+                      <Icons.creditCard className='mr-2 h-4 w-4 text-[#8A8A8A]' />
                       Billing
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem
                     onClick={() => router.push('/dashboard/notifications')}
-                    className='cursor-pointer hover:bg-zinc-900'
+                    className='cursor-pointer text-white hover:bg-[#000000]'
                   >
-                    <Icons.notification className='mr-2 h-4 w-4' />
+                    <Icons.notification className='mr-2 h-4 w-4 text-[#8A8A8A]' />
                     Notifications
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
-                <DropdownMenuSeparator className='bg-zinc-800' />
+                <DropdownMenuSeparator className='bg-[#8A8A8A]' />
                 <DropdownMenuGroup>
                   <DropdownMenuItem
                     onClick={() => signOut()}
-                    className='cursor-pointer hover:bg-zinc-900 text-rose-400 focus:text-rose-400'
+                    className='cursor-pointer hover:bg-[#000000] text-white focus:text-white'
                   >
-                    <Icons.logout aria-hidden className='mr-2 h-4 w-4' />
+                    <Icons.logout aria-hidden className='mr-2 h-4 w-4 text-[#8A8A8A]' />
                     Sign out
                   </DropdownMenuItem>
                 </DropdownMenuGroup>

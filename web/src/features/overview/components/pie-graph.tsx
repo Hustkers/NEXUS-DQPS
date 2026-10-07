@@ -13,11 +13,11 @@ import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
 
 const chartData = [
-  { browser: 'chrome', visitors: 275, fill: 'var(--color-chrome)' },
-  { browser: 'safari', visitors: 200, fill: 'var(--color-safari)' },
-  { browser: 'firefox', visitors: 187, fill: 'var(--color-firefox)' },
-  { browser: 'edge', visitors: 173, fill: 'var(--color-edge)' },
-  { browser: 'other', visitors: 90, fill: 'var(--color-other)' }
+  { browser: 'chrome', visitors: 275, fill: '#FFFFFF' },
+  { browser: 'safari', visitors: 200, fill: '#8A8A8A' },
+  { browser: 'firefox', visitors: 187, fill: '#1A1A1A' },
+  { browser: 'edge', visitors: 173, fill: '#8A8A8A' },
+  { browser: 'other', visitors: 90, fill: '#FFFFFF' }
 ];
 
 const chartConfig = {
@@ -26,43 +26,43 @@ const chartConfig = {
   },
   chrome: {
     label: 'Chrome',
-    color: 'var(--chart-1)'
+    color: '#FFFFFF'
   },
   safari: {
     label: 'Safari',
-    color: 'var(--chart-2)'
+    color: '#8A8A8A'
   },
   firefox: {
     label: 'Firefox',
-    color: 'var(--chart-3)'
+    color: '#1A1A1A'
   },
   edge: {
     label: 'Edge',
-    color: 'var(--chart-4)'
+    color: '#8A8A8A'
   },
   other: {
     label: 'Other',
-    color: 'var(--chart-5)'
+    color: '#FFFFFF'
   }
 } satisfies ChartConfig;
 
 export function PieGraph() {
   return (
-    <Card className='flex h-full flex-col'>
+    <Card className='flex h-full flex-col bg-[#1A1A1A] border-[#8A8A8A] shadow-none'>
       <CardHeader className='items-center pb-0'>
-        <CardTitle>
-          Pie Chart
-          <Badge variant='outline'>
-            <Icons.trendingUp />
+        <CardTitle className='text-white font-mono flex items-center justify-between w-full'>
+          <span>Device Distribution</span>
+          <Badge variant='outline' className='border-[#8A8A8A] text-white bg-transparent font-mono'>
+            <Icons.trendingUp className='text-white' />
             +5.2%
           </Badge>
         </CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardDescription className='text-[#8A8A8A] font-mono'>January - June 2024</CardDescription>
       </CardHeader>
       <CardContent className='flex flex-1 items-center justify-center pb-0'>
         <ChartContainer
           config={chartConfig}
-          className='[&_.recharts-text]:fill-background mx-auto aspect-square max-h-[300px] min-h-[250px]'
+          className='mx-auto aspect-square max-h-[300px] min-h-[250px]'
         >
           <PieChart>
             <ChartTooltip content={<ChartTooltipContent nameKey='visitors' hideLabel />} />
@@ -71,15 +71,17 @@ export function PieGraph() {
               innerRadius={30}
               dataKey='visitors'
               radius={10}
-              cornerRadius={8}
+              cornerRadius={2}
               paddingAngle={4}
+              stroke='#8A8A8A'
+              strokeWidth={1}
             >
               <LabelList
                 dataKey='visitors'
                 stroke='none'
                 fontSize={12}
-                fontWeight={500}
-                fill='currentColor'
+                fontWeight={600}
+                fill='#FFFFFF'
                 formatter={(value) => String(value ?? '')}
               />
             </Pie>

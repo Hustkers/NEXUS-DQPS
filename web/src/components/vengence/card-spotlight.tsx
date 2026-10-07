@@ -18,7 +18,7 @@ interface CardSpotlightProps extends React.HTMLAttributes<HTMLDivElement> {
 export function CardSpotlight({
   children,
   radius = 350,
-  color = 'rgba(14, 165, 233, 0.12)',
+  color = 'rgba(255, 255, 255, 0.05)',
   className = '',
   ...props
 }: CardSpotlightProps) {
@@ -42,14 +42,14 @@ export function CardSpotlight({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        'group relative overflow-hidden rounded-2xl border border-border/80 bg-card p-6 text-card-foreground transition-all duration-300 hover:shadow-lg hover:border-primary/40',
+        'group relative overflow-hidden rounded-[6px] border border-[#8A8A8A] bg-[#1A1A1A] p-6 text-[#FFFFFF] transition-colors duration-150 hover:border-[#FFFFFF] shadow-none',
         className
       )}
       {...props}
     >
-      {/* Dynamic Cursor Spotlight Radial Layer */}
+      {/* Dynamic Cursor Spotlight Radial Layer: pure white low-opacity illumination */}
       <div
-        className='pointer-events-none absolute -inset-px transition-opacity duration-300'
+        className='pointer-events-none absolute -inset-px transition-opacity duration-150'
         style={{
           opacity: isHovered ? 1 : 0,
           background: `radial-gradient(${radius}px circle at ${position.x}px ${position.y}px, ${color}, transparent 80%)`

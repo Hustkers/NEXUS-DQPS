@@ -24,26 +24,26 @@ const chartData = [
 const chartConfig = {
   desktop: {
     label: 'Desktop',
-    color: 'var(--chart-1)'
+    color: '#FFFFFF'
   },
   mobile: {
     label: 'Mobile',
-    color: 'var(--chart-2)'
+    color: '#8A8A8A'
   }
 } satisfies ChartConfig;
 
 export function BarGraph() {
   return (
-    <Card>
+    <Card className='bg-[#1A1A1A] border-[#8A8A8A] shadow-none'>
       <CardHeader>
-        <CardTitle>
-          Bar Chart - Multiple
-          <Badge variant='outline'>
-            <Icons.trendingDown />
+        <CardTitle className='text-white font-mono flex items-center justify-between'>
+          <span>Channel Execution Breakdown</span>
+          <Badge variant='outline' className='border-[#8A8A8A] text-white bg-transparent font-mono'>
+            <Icons.trendingDown className='text-[#8A8A8A]' />
             -5.2%
           </Badge>
         </CardTitle>
-        <CardDescription>January - June 2025</CardDescription>
+        <CardDescription className='text-[#8A8A8A] font-mono'>January - June 2025 (Monochrome Telemetry)</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -62,7 +62,8 @@ export function BarGraph() {
               dataKey='month'
               tickLine={false}
               tickMargin={10}
-              axisLine={false}
+              axisLine={{ stroke: '#1A1A1A' }}
+              stroke='#8A8A8A'
               tickFormatter={(value) => value.slice(0, 3)}
             />
             <ChartTooltip
@@ -71,16 +72,16 @@ export function BarGraph() {
             />
             <Bar
               dataKey='desktop'
-              color='var(--chart-1)'
-              fill='var(--color-desktop)'
+              color='#FFFFFF'
+              fill='#FFFFFF'
               shape={<CustomHatchedBar isHatched={false} />}
-              radius={4}
+              radius={2}
             />
             <Bar
               dataKey='mobile'
-              fill='var(--color-mobile)'
+              fill='#8A8A8A'
               shape={<CustomHatchedBar />}
-              radius={4}
+              radius={2}
             />
           </BarChart>
         </ChartContainer>
@@ -102,7 +103,7 @@ const CustomHatchedBar = (
   return (
     <>
       <rect
-        rx={4}
+        rx={2}
         x={x}
         y={y}
         width={width}
@@ -121,7 +122,7 @@ const CustomHatchedBar = (
           patternUnits='userSpaceOnUse'
           patternTransform='rotate(-45)'
         >
-          <rect width='10' height='10' opacity={0.5} fill={fill}></rect>
+          <rect width='10' height='10' opacity={0.3} fill={fill}></rect>
           <rect width='1' height='10' fill={fill}></rect>
         </pattern>
       </defs>
@@ -138,7 +139,7 @@ const DottedBackgroundPattern = () => {
       height='10'
       patternUnits='userSpaceOnUse'
     >
-      <circle className='dark:text-muted/40 text-muted' cx='2' cy='2' r='1' fill='currentColor' />
+      <circle cx='2' cy='2' r='1' fill='#1A1A1A' />
     </pattern>
   );
 };

@@ -319,6 +319,7 @@ export function FingerprintTrackerDemo() {
                 Cookieless Cross-Channel Attribution
               </Badge>
               <Badge variant='outline' className='border-emerald-200 dark:border-emerald-500/40 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-mono text-[11px] px-2 py-0.5 flex items-center gap-1'>
+                <span className='size-1.5 rounded-full bg-emerald-500 animate-pulse' />
                 Live Graph Engine
               </Badge>
             </div>
@@ -518,12 +519,13 @@ export function FingerprintTrackerDemo() {
                   </span>
 
                   {isCompleted && <Icons.circleCheck className='size-3.5 text-emerald-600 dark:text-emerald-400' />}
+                  {isCurrent && <span className='size-2 rounded-full bg-sky-500 dark:bg-cyan-400 animate-ping' />}
                 </div>
 
                 <div className='text-xs font-bold text-foreground line-clamp-1'>
-                  {step.platform === 'youtube' && 'YouTube'}
-                  {step.platform === 'amazon' && 'Amazon'}
-                  {step.platform === 'nexus' && 'NEXUS Graph'}
+                  {step.platform === 'youtube' && '📺 YouTube'}
+                  {step.platform === 'amazon' && '🛒 Amazon'}
+                  {step.platform === 'nexus' && '⚡ NEXUS Graph'}
                 </div>
                 <div className='text-[11px] text-muted-foreground line-clamp-1 mt-0.5'>
                   {step.title.split(':')[1]?.trim() || step.title}
@@ -587,7 +589,10 @@ export function FingerprintTrackerDemo() {
               {/* Browser Mock Window Header */}
               <div className='bg-slate-100 dark:bg-zinc-900/90 border-b border-border px-4 py-2.5 flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
-                  <span className='text-xs font-mono text-muted-foreground truncate max-w-[200px]'>
+                  <span className='size-3 rounded-full bg-rose-400 inline-block' />
+                  <span className='size-3 rounded-full bg-amber-400 inline-block' />
+                  <span className='size-3 rounded-full bg-emerald-400 inline-block' />
+                  <span className='ml-2 text-xs font-mono text-muted-foreground truncate max-w-[200px]'>
                     {currentStep <= 2 ? 'youtube.com/watch?v=running-shoe-tech-2026' : 'amazon.com/s?k=nike+air+max+dn'}
                   </span>
                 </div>
@@ -811,7 +816,7 @@ export function FingerprintTrackerDemo() {
 
                       <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono'>
                         <div className='bg-card border border-rose-200 dark:border-zinc-800 rounded-lg p-3 shadow-xs'>
-                          <span className='text-rose-700 dark:text-red-400 font-bold block mb-1'>Without Single Fingerprint:</span>
+                          <span className='text-rose-700 dark:text-red-400 font-bold block mb-1'>❌ Without Single Fingerprint:</span>
                           <ul className='text-muted-foreground space-y-1 text-[11px]'>
                             <li>• YouTube Spend: ₹0.874</li>
                             <li>• YouTube Revenue: ₹0.00 (0.0x ROAS)</li>
@@ -821,7 +826,7 @@ export function FingerprintTrackerDemo() {
                         </div>
 
                         <div className='bg-card border border-emerald-200 dark:border-cyan-800/80 rounded-lg p-3 shadow-xs'>
-                          <span className='text-emerald-700 dark:text-emerald-400 font-bold block mb-1'>With NEXUS Single Fingerprint:</span>
+                          <span className='text-emerald-700 dark:text-emerald-400 font-bold block mb-1'>✅ With NEXUS Single Fingerprint:</span>
                           <ul className='text-foreground space-y-1 text-[11px]'>
                             <li>• YouTube Spend: ₹0.874</li>
                             <li>• Attributed Amazon Sale: ₹170.00</li>

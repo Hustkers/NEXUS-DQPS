@@ -102,6 +102,7 @@ import {
   IconMicrophone,
   IconRobot,
   IconMessage2,
+  IconArrowsSplit2,
   IconX
 } from '@tabler/icons-react';
 
@@ -109,6 +110,7 @@ export type Icon = React.ComponentType<IconProps>;
 
 export const Icons = {
   // General
+  normalization: IconArrowsSplit2,
   alertCircle: IconAlertCircle,
   warning: IconAlertTriangle,
   arrowRight: IconArrowRight,

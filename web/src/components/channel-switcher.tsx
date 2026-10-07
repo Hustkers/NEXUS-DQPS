@@ -132,34 +132,34 @@ export function ChannelSwitcher() {
                 <DropdownMenuItem
                   key={ch.id}
                   onClick={() => setChannel(ch.id)}
-                  className={`cursor-pointer flex items-start gap-2.5 p-2 rounded-lg hover:bg-accent focus:bg-accent ${
-                    isSelected ? 'bg-accent/80 border-l-2 border-emerald-500' : ''
+                  className={`cursor-pointer flex items-start gap-2.5 p-2 rounded-lg hover:bg-[#1A1A1A] focus:bg-[#1A1A1A] ${
+                    isSelected ? 'bg-[#1A1A1A] border-l-2 border-white' : ''
                   }`}
                 >
-                  <div className={`mt-0.5 flex aspect-square size-6 items-center justify-center rounded-md border ${CHANNELS[ch.id]?.accentColor || 'text-muted-foreground border-border'}`}>
+                  <div className={`mt-0.5 flex aspect-square size-6 items-center justify-center rounded-md border ${CHANNELS[ch.id]?.accentColor || 'text-[#8A8A8A] border-[#8A8A8A]'}`}>
                     {getChannelIcon(ch.id, 'size-3.5')}
                   </div>
                   <div className='flex flex-col flex-1 min-w-0'>
                     <div className='flex items-center justify-between'>
-                      <span className={`text-xs font-semibold ${isSelected ? 'text-foreground font-bold' : 'text-foreground/90'}`}>
+                      <span className={`text-xs font-semibold ${isSelected ? 'text-white font-bold' : 'text-white/90'}`}>
                         {ch.name}
                       </span>
                       {isSelected && (
-                        <Badge variant='outline' className='text-[9px] py-0 px-1 border-emerald-300 dark:border-emerald-500/40 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 font-mono'>
+                        <Badge variant='outline' className='text-[9px] py-0 px-1 border-white text-black bg-white font-mono font-bold'>
                           Selected
                         </Badge>
                       )}
                     </div>
-                    <span className='text-[10px] text-muted-foreground truncate'>{ch.details}</span>
+                    <span className='text-[10px] text-[#8A8A8A] truncate'>{ch.details}</span>
                   </div>
                 </DropdownMenuItem>
               );
             })}
 
-            <DropdownMenuSeparator className='bg-border' />
-            <div className='p-2 text-[10px] text-muted-foreground font-mono flex items-center justify-between'>
+            <DropdownMenuSeparator className='bg-[#8A8A8A]' />
+            <div className='p-2 text-[10px] text-[#8A8A8A] font-mono flex items-center justify-between'>
               <span>SYNC: REAL-TIME (POSTGRES)</span>
-              <span className='text-emerald-600 dark:text-emerald-400 font-semibold'>ACTIVE</span>
+              <span className='text-white font-semibold'>ACTIVE</span>
             </div>
           </DropdownMenuContent>
         </DropdownMenu>

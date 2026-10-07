@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import {
   IconSparkles,
   IconMicrophone,
   IconMessageChatbot,
   IconSearch,
   IconX,
-  IconChevronUp,
+  IconChevronDown,
 } from '@tabler/icons-react';
 import { AssistantSearch } from './assistant-search';
 import { AssistantVoice } from './assistant-voice';
@@ -18,8 +18,6 @@ import { Kbd } from '@/components/ui/kbd';
 
 export function AppAiAssistant() {
   const router = useRouter();
-  const pathname = usePathname();
-  const isDashboard = pathname?.startsWith('/dashboard');
   const { isOpen, activeTab, open, close, toggle, setActiveTab } = useAiAssistant();
 
   // Keyboard Shortcuts: Cmd+K opens search; Cmd+J toggles assistant; Escape closes it
@@ -54,41 +52,50 @@ export function AppAiAssistant() {
 
   return (
     <>
-      {/* Floating Action Button - Positioned in the Top Right (on non-dashboard pages; on dashboard it is in the header) */}
-      {!isDashboard && (
-        <div className="fixed top-3.5 right-4 sm:right-6 z-50 pointer-events-auto">
-          <button
-            onClick={() => toggle()}
-            aria-expanded={isOpen}
-            aria-label="Toggle AppWide AI Assistant"
-            className={`group flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-300 shadow-xl backdrop-blur-xl ${
-              isOpen
-                ? 'bg-zinc-900 border-emerald-500/70 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.25)] ring-2 ring-emerald-500/20'
-                : 'bg-zinc-950/85 hover:bg-zinc-900/95 border-zinc-800 hover:border-zinc-700 text-zinc-200 hover:text-white shadow-[0_4px_16px_rgba(0,0,0,0.5)]'
-            }`}
-          >
-            {/* Icons + Title */}
-            <div className="flex items-center gap-1.5 text-xs font-mono font-medium tracking-tight">
-              <IconSparkles className="size-3.5 text-emerald-400" />
-              <span>AI Copilot</span>
-            </div>
+      {/* Floating Action Button - Fixed on the Bottom Middle */}
+      <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
+        <button
+          onClick={() => toggle()}
+          aria-expanded={isOpen}
+          aria-label="Toggle AppWide AI Assistant"
+          className={`group flex items-center gap-2.5 px-4 py-2 rounded-full border transition-all duration-300 shadow-2xl backdrop-blur-xl ${
+            isOpen
+              ? 'bg-zinc-900 border-emerald-500/70 text-emerald-400 shadow-[0_0_25px_rgba(16,185,129,0.25)] ring-2 ring-emerald-500/20'
+              : 'bg-zinc-950/90 hover:bg-zinc-900/95 border-zinc-800 hover:border-zinc-700 text-zinc-100 hover:text-white shadow-[0_10px_30px_rgba(0,0,0,0.6)]'
+          }`}
+        >
+          {/* Animated Status Beacon */}
+          <div className="relative flex items-center justify-center">
+            <span
+              className={`size-2 rounded-full transition-all duration-300 ${
+                isOpen ? 'bg-emerald-400' : 'bg-emerald-500 group-hover:scale-125'
+              }`}
+            />
+            <span className="absolute size-3.5 rounded-full bg-emerald-500/20 animate-pulse pointer-events-none" />
+          </div>
 
-            {/* Shortcut hint */}
-            <div className="flex items-center gap-1 pl-1 border-l border-zinc-800 text-[10px] text-zinc-400 font-mono">
-              <Kbd className="text-[9px] px-1 py-0 bg-zinc-800/80 border-zinc-700 text-zinc-300">
-                ⌘K
-              </Kbd>
-            </div>
-          </button>
-        </div>
-      )}
+          {/* Icons + Title */}
+          <div className="flex items-center gap-1.5 text-xs font-mono font-medium tracking-tight">
+            <IconSparkles className="size-3.5 text-emerald-400" />
+            <span>NEXUS AI</span>
+          </div>
 
-      {/* Floating Minimalist Assistant Modal / Dock - Dropping from Top Right */}
+          {/* Mode Badges & Shortcut hint */}
+          <div className="flex items-center gap-1.5 pl-1.5 border-l border-zinc-800 text-[10px] text-zinc-400 font-mono">
+            <span className="hidden sm:inline">Search &amp; Voice</span>
+            <Kbd className="text-[9px] px-1 py-0 bg-zinc-800/80 border-zinc-700 text-zinc-300">
+              ⌘K
+            </Kbd>
+          </div>
+        </button>
+      </div>
+
+      {/* Floating Minimalist Assistant Modal / Dock - Anchored at the Bottom Middle */}
       {isOpen && (
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed top-14 sm:top-16 right-4 sm:right-6 z-50 w-[94vw] max-w-lg md:max-w-xl rounded-2xl border border-zinc-800/90 bg-zinc-950/95 backdrop-blur-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_35px_rgba(16,185,129,0.12)] text-zinc-100 overflow-hidden flex flex-col origin-top-right animate-in fade-in slide-in-from-top-4 duration-200"
+          className="fixed bottom-18 sm:bottom-20 left-1/2 -translate-x-1/2 z-50 w-[94vw] max-w-lg md:max-w-xl rounded-2xl border border-zinc-800/90 bg-zinc-950/95 backdrop-blur-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_35px_rgba(16,185,129,0.12)] text-zinc-100 overflow-hidden flex flex-col origin-bottom animate-in fade-in slide-in-from-bottom-4 duration-200"
         >
           {/* Top Header Bar */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 bg-zinc-900/60">
@@ -111,7 +118,7 @@ export function AppAiAssistant() {
               <button
                 type="button"
                 onClick={() => setActiveTab('search')}
-                className={`flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-mono transition-all ${
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-mono transition-all ${
                   activeTab === 'search'
                     ? 'bg-zinc-800 text-emerald-400 shadow-xs font-medium'
                     : 'text-zinc-400 hover:text-zinc-200'
@@ -124,7 +131,7 @@ export function AppAiAssistant() {
               <button
                 type="button"
                 onClick={() => setActiveTab('voice')}
-                className={`flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-mono transition-all ${
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-mono transition-all ${
                   activeTab === 'voice'
                     ? 'bg-zinc-800 text-emerald-400 shadow-xs font-medium'
                     : 'text-zinc-400 hover:text-zinc-200'
@@ -137,7 +144,7 @@ export function AppAiAssistant() {
               <button
                 type="button"
                 onClick={() => setActiveTab('chat')}
-                className={`flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-mono transition-all ${
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-mono transition-all ${
                   activeTab === 'chat'
                     ? 'bg-zinc-800 text-emerald-400 shadow-xs font-medium'
                     : 'text-zinc-400 hover:text-zinc-200'
@@ -168,16 +175,17 @@ export function AppAiAssistant() {
 
           {/* Footer Bar */}
           <div className="px-4 py-1.5 bg-zinc-900/40 border-t border-zinc-800/60 flex items-center justify-between text-[10px] font-mono text-zinc-400">
-            <span>
-              Search &amp; Omnibar · ElevenLabs Voice · Autonomous Tools
+            <span className="flex items-center gap-1">
+              <span className="size-1 rounded-full bg-emerald-500" />
+              Omnibar Search · ElevenLabs Voice · Autonomous Tools
             </span>
             <button
               type="button"
               onClick={close}
               className="text-zinc-400 hover:text-zinc-200 flex items-center gap-0.5"
             >
-              <span>Close</span>
-              <IconChevronUp className="size-3" />
+              <span>Minimize</span>
+              <IconChevronDown className="size-3" />
             </button>
           </div>
         </div>

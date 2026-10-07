@@ -42,41 +42,45 @@ export function CausalDagVisualizer({ activeAnomaly = true }: { activeAnomaly?: 
   const nodeMap = new Map(nodes.map((n) => [n.id, n]));
 
   return (
-    <Card className="p-5 border-border/40 bg-card/60 backdrop-blur-md relative overflow-hidden">
-      <div className="flex items-center justify-between mb-4">
+    <Card className="p-5 border border-[#8A8A8A] bg-[#1A1A1A] shadow-none rounded text-[#FFFFFF] relative overflow-hidden">
+      <div className="flex items-center justify-between mb-4 border-b border-[#8A8A8A]/40 pb-3">
         <div className="flex items-center gap-2.5">
-          <div className="h-8 w-8 rounded-lg bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
-            <IconGitBranch className="h-4 w-4 text-indigo-400" />
+          <div className="h-8 w-8 rounded bg-[#000000] flex items-center justify-center border border-[#8A8A8A]">
+            <IconGitBranch className="h-4 w-4 text-[#FFFFFF]" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-foreground tracking-tight flex items-center gap-2">
-              Structural Causal DAG & Counterfactual Attribution Path
+            <h3 className="text-sm font-semibold text-[#FFFFFF] tracking-tight flex items-center gap-2 font-mono">
+              Structural Causal DAG &amp; Counterfactual Attribution Path
               {activeAnomaly && (
-                <Badge variant="destructive" className="bg-rose-500/20 text-rose-400 border-rose-500/30 text-[10px] animate-pulse">
-                  Anomaly Path Active
+                <Badge variant="outline" className="bg-[#FFFFFF] text-[#000000] border-none font-bold text-[10px] font-mono">
+                  [CRITICAL] Anomaly Path Active
                 </Badge>
               )}
             </h3>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-[#8A8A8A] font-mono mt-0.5">
               DoWhy-GCM Counterfactual Attribution Flow: Spend → Clicks → Shopify Inventory Gate → Net Margin
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="text-emerald-400 font-medium">Healthy Flow</span>
-          <span className="text-rose-400 font-medium">Bottleneck / Stockout Path</span>
+        <div className="flex items-center gap-3 text-xs font-mono text-[#8A8A8A]">
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-[#FFFFFF]" /> Healthy Flow
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full border border-[#8A8A8A] bg-[#000000]" /> Bottleneck Path
+          </span>
         </div>
       </div>
 
-      <div className="w-full h-72 border border-border/30 rounded-xl bg-background/50 relative overflow-hidden flex items-center justify-center">
+      <div className="w-full h-72 border border-[#8A8A8A]/40 rounded bg-[#000000] relative overflow-hidden flex items-center justify-center">
         <svg className="w-full h-full absolute inset-0 pointer-events-none">
           <defs>
             <marker id="arrow" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#8A8A8A" />
             </marker>
             <marker id="arrow-crit" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#f43f5e" />
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#FFFFFF" />
             </marker>
           </defs>
 
@@ -90,50 +94,56 @@ export function CausalDagVisualizer({ activeAnomaly = true }: { activeAnomaly?: 
                 y1={src.y + 20}
                 x2={dst.x + 50}
                 y2={dst.y + 20}
-                stroke={e.critical ? '#f43f5e' : '#334155'}
-                strokeWidth={e.critical ? 2.5 : 1.5}
-                strokeDasharray={e.critical ? '4 2' : undefined}
-                className={e.critical ? 'animate-pulse' : ''}
+                stroke={e.critical ? '#FFFFFF' : '#8A8A8A'}
+                strokeWidth={e.critical ? 2 : 1.5}
+                strokeDasharray={e.critical ? '4 4' : undefined}
                 markerEnd={e.critical ? 'url(#arrow-crit)' : 'url(#arrow)'}
               />
             );
           })}
         </svg>
 
-        {nodes.map((node) => (
-          <div
-            key={node.id}
-            onClick={() => setSelectedNode(node.id)}
-            style={{ left: `${node.x}px`, top: `${node.y}px` }}
-            className={cn(
-              'absolute w-36 px-3 py-2 rounded-lg border text-left cursor-pointer transition-all duration-200 backdrop-blur-sm select-none',
-              node.status === 'critical'
-                ? 'bg-rose-950/40 border-rose-500/60 shadow-[0_0_15px_rgba(244,63,94,0.3)] ring-1 ring-rose-500/40'
-                : 'bg-card/90 border-border/60 hover:border-border hover:shadow-md',
-              selectedNode === node.id && 'ring-2 ring-indigo-500/50'
-            )}
-          >
-            <div className="flex items-center justify-between text-[11px] font-medium">
-              <span className={node.status === 'critical' ? 'text-rose-300 font-semibold' : 'text-foreground'}>
-                {node.label}
-              </span>
+        {nodes.map((node) => {
+          const isCritical = node.status === 'critical';
+          const isSelected = selectedNode === node.id;
+          return (
+            <div
+              key={node.id}
+              onClick={() => setSelectedNode(node.id)}
+              style={{ left: `${node.x}px`, top: `${node.y}px` }}
+              className={cn(
+                'absolute w-36 px-3 py-2 rounded border text-left cursor-pointer transition-all duration-200 select-none font-mono',
+                isCritical
+                  ? 'bg-[#FFFFFF] text-[#000000] border-none font-bold'
+                  : 'bg-[#1A1A1A] border-[#8A8A8A] text-[#FFFFFF] hover:border-[#FFFFFF]',
+                isSelected && (isCritical ? 'outline outline-2 outline-[#FFFFFF] ring-2 ring-[#000000]' : 'outline outline-1 outline-[#FFFFFF]')
+              )}
+            >
+              <div className="flex items-center justify-between text-[11px] font-semibold">
+                <span className={isCritical ? 'text-[#000000]' : 'text-[#FFFFFF]'}>
+                  {node.label}
+                </span>
+                <span className={cn('text-[10px]', isCritical ? 'text-[#000000]' : 'text-[#FFFFFF]')}>
+                  {isCritical ? '■' : '●'}
+                </span>
+              </div>
+              <div className={cn('text-[11px] font-mono mt-0.5 truncate', isCritical ? 'text-[#000000] font-bold' : 'text-[#8A8A8A]')}>
+                {node.metric}
+              </div>
             </div>
-            <div className="text-[12px] font-mono font-semibold mt-0.5 text-muted-foreground truncate">
-              {node.metric}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {selectedNode === 'orders' && activeAnomaly && (
-        <div className="mt-3 p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-xs flex items-center justify-between">
+        <div className="mt-3 p-3 rounded bg-[#000000] border border-[#8A8A8A] text-xs font-mono flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <IconAlertCircle className="h-4 w-4 text-rose-400 shrink-0" />
-            <span className="text-rose-300">
+            <IconAlertCircle className="h-4 w-4 text-[#FFFFFF] shrink-0" />
+            <span className="text-[#FFFFFF]">
               <strong>Counterfactual Structural Intervention:</strong> Orders node conditioned on physical stockout: Q = min(0, page_views &times; cvr) = 0. Ad spend continues burning with $0 conversions.
             </span>
           </div>
-          <Badge className="bg-rose-500 text-white shrink-0">66% Shapley Share</Badge>
+          <Badge className="bg-[#FFFFFF] text-[#000000] border-none font-bold shrink-0 ml-3">66% Shapley Share</Badge>
         </div>
       )}
     </Card>
