@@ -43,13 +43,13 @@ DATASETS = {
 def download_all(dest_dir: Path = DATA_DIR):
     """Download all public benchmark datasets into local cache."""
     dest_dir.mkdir(parents=True, exist_ok=True)
-    print(f"\n📥 Downloading {len(DATASETS)} real AD & e-commerce datasets into {dest_dir}...")
+    print(f"\n Downloading {len(DATASETS)} real AD & e-commerce datasets into {dest_dir}...")
 
     success_count = 0
     for filename, url in DATASETS.items():
         file_path = dest_dir / filename
         try:
-            print(f"  ⬇️  Fetching {filename}...")
+            print(f"⬇️  Fetching {filename}...")
             req = urllib.request.Request(
                 url,
                 headers={"User-Agent": "Mozilla/5.0 (compatible; NexusDQPS/1.0)"}
@@ -59,12 +59,12 @@ def download_all(dest_dir: Path = DATA_DIR):
                 file_path.write_bytes(content)
                 size_kb = len(content) / 1024
                 lines = len(content.decode("utf-8", errors="ignore").splitlines())
-                print(f"     ✓ Saved {filename} ({size_kb:.1f} KB, {lines:,} lines)")
+                print(f"Saved {filename} ({size_kb:.1f} KB, {lines:,} lines)")
                 success_count += 1
         except Exception as e:
-            print(f"     ❌ Failed {filename} from {url}: {e}")
+            print(f"Failed {filename} from {url}: {e}")
 
-    print(f"\n✨ Successfully downloaded {success_count}/{len(DATASETS)} datasets.\n")
+    print(f"\n Successfully downloaded {success_count}/{len(DATASETS)} datasets.\n")
     return success_count
 
 

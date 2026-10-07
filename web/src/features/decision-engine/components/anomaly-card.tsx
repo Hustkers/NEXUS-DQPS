@@ -41,14 +41,6 @@ interface AnomalyCardProps {
 
 export function AnomalyCard({ anomaly, onMitigate, onAnalyze, className }: AnomalyCardProps) {
   const isCritical = anomaly.severity === 'CRITICAL';
-  const isHigh = anomaly.severity === 'HIGH';
-
-  const severityDot = isCritical
-    ? 'bg-rose-500'
-    : isHigh
-    ? 'bg-amber-500'
-    : 'bg-blue-500';
-
   return (
     <div
       className={cn(
@@ -60,7 +52,6 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, className }: Anoma
         {/* Minimal header */}
         <div className='flex items-center justify-between text-xs font-mono text-muted-foreground mb-2.5'>
           <div className='flex items-center gap-2'>
-            <span className={cn('size-1.5 rounded-full', severityDot)} />
             <span className='capitalize font-semibold text-foreground'>{anomaly.platform}</span>
             <span className='text-muted-foreground/40'>/</span>
             <span className='text-muted-foreground text-[11px]'>{anomaly.date}</span>

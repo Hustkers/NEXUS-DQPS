@@ -14,7 +14,6 @@ import { CausalDagVisualizer } from './causal-dag-visualizer';
 import { RcaWaterfallChart } from './rca-waterfall-chart';
 import { ScenarioSandbox } from './scenario-sandbox';
 import { ExecutiveGraphBanner } from './executive-graph-banner';
-import { VoiceBriefingAgent } from '@/features/voice/voice-briefing-agent';
 import { USE_MOCKS, FASTAPI_BASE_URL, approveDirective } from '@/lib/api-adapter';
 import { ProductAnalysisModal, type ProductAnalysisTarget } from './product-analysis-modal';
 import { GithubGlobe } from './github-globe';
@@ -124,40 +123,6 @@ export function MissionControlConsole() {
     });
   };
 
-  const handleVoiceAuthorize = async (planId: string) => {
-    try {
-      const receipt = await approveDirective(planId, 'VOICE_BRIEFING_AUTHORIZED');
-      setState((prev) => {
-        const newLedgerItem = {
-          id: `ledg-voice-${Date.now()}`,
-          timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
-          decision: `Voice-Authorized: Throttled stocked-out Meta Hero SKU -> $0/day; Scaled Google Search -> +$800/day`,
-          expectedMargin: 2450.0,
-          realizedMargin: 2390.0,
-          variancePct: -2.4,
-          accuracyPct: 97.6,
-          confidence: 0.98,
-          status: 'executed',
-          feedback: 'Voice token authenticated (ElevenLabs HITL)'
-        };
-        return {
-          ...prev,
-          ledger: [newLedgerItem, ...prev.ledger],
-          telemetry: {
-            ...prev.telemetry,
-            activeAnomaliesCount: Math.max(0, prev.telemetry.activeAnomaliesCount - 1),
-            projectedMarginUplift: prev.telemetry.projectedMarginUplift + 1148
-          }
-        };
-      });
-      toast.success('Directive Executed via Voice Authorization', {
-        description: `Plan ${planId} signed. Atomic API budget mutate dispatched.`
-      });
-    } catch (e: any) {
-      toast.error('Voice Authorization Failed', { description: e.message });
-    }
-  };
-
   useEffect(() => {
     const handleRemoteDirective = (e: any) => {
       const planId = e.detail?.directiveId || 'dir_meta_hero_shoe';
@@ -229,41 +194,9 @@ export function MissionControlConsole() {
             DuckDB &amp; PostgreSQL 16 • Columnar Store • Analytical SLSQP Optimizer • Dual-Knapsack Bandits • Floor ROAS 1.80x
           </p>
         </div>
-
-        <div className='flex flex-wrap items-center gap-3 text-xs font-mono'>
-          {/* Live vs Mock Data Mode Badge Toggle */}
-          <button
-            onClick={() => {
-              setLiveMode(!liveMode);
-              toast.info(`Switched to ${!liveMode ? 'Live Backend (FastAPI)' : 'Deterministic Mock Mode'}`);
-            }}
-            className={cn(
-              'flex items-center gap-2 px-2.5 py-1.5 rounded-lg border text-[11px] transition-colors',
-              liveMode
-                ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700/60 text-emerald-700 dark:text-emerald-300'
-                : 'bg-muted/40 border-border text-muted-foreground'
-            )}
-            title="Click to toggle between live backend API and deterministic mock replay"
-          >
-            <span>{liveMode ? 'API: LIVE FASTAPI (8000)' : 'API: DETERMINISTIC MOCKS'}</span>
-          </button>
-
-          <div className='flex items-center gap-2 text-foreground bg-card px-3 py-1.5 rounded-lg border border-border shadow-2xs'>
-            <span className='font-semibold'>Cycle {state.metadata.cycleId}</span>
-          </div>
-          <span className='text-muted-foreground hidden sm:block text-[11px] font-mono'>
-            SLSQP Convex Optimization
-          </span>
-        </div>
       </div>
 
-      {/* 2. Voice HITL Briefing Agent Bar */}
-      <VoiceBriefingAgent
-        onAuthorizePlan={handleVoiceAuthorize}
-        activeDirectiveId="dir_meta_hero_shoe"
-      />
-
-      {/* 3. Executive Overview KPI Banner & Trajectory Graphs */}
+      {/* 2. Executive Overview KPI Banner & Trajectory Graphs */}
       <ExecutiveGraphBanner
         state={state}
         hasCriticalAnomaly={hasCriticalAnomaly}

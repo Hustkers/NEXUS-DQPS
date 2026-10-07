@@ -65,18 +65,9 @@ export function PlatformBreakdownChart({
               </p>
             </div>
             <div className='flex items-center gap-3 text-xs font-mono'>
-              <div className='flex items-center gap-1.5'>
-                <span className='size-1.5 rounded-full bg-emerald-500' />
-                <span className='text-muted-foreground text-[11px] font-medium'>Revenue</span>
-              </div>
-              <div className='flex items-center gap-1.5'>
-                <span className='size-1.5 rounded-full bg-sky-500' />
-                <span className='text-muted-foreground text-[11px] font-medium'>Margin</span>
-              </div>
-              <div className='flex items-center gap-1.5'>
-                <span className='size-1.5 rounded-full bg-indigo-500' />
-                <span className='text-muted-foreground text-[11px] font-medium'>Spend</span>
-              </div>
+              <span className='text-emerald-500 text-[11px] font-semibold'>Revenue</span>
+              <span className='text-sky-500 text-[11px] font-semibold'>Margin</span>
+              <span className='text-indigo-500 text-[11px] font-semibold'>Spend</span>
             </div>
           </div>
 
@@ -205,7 +196,6 @@ export function PlatformBreakdownChart({
                 <div key={p.platform} className='space-y-1.5'>
                   <div className='flex items-center justify-between text-xs font-mono'>
                     <div className='flex items-center gap-2'>
-                      <span className='size-2 rounded-full' style={{ backgroundColor: p.color }} />
                       <span className='font-semibold text-foreground'>{p.displayName}</span>
                     </div>
                     <div className='flex items-center gap-2'>

@@ -239,7 +239,6 @@ export function RLVisualAnalytics({
               <div>
                 <div className='flex items-center justify-between text-xs font-mono text-cyan-400 mb-2'>
                   <span className='font-bold flex items-center gap-1.5'>
-                    <span className='size-2 rounded-full bg-cyan-400 animate-pulse' />
                     1. STATE (S_t)
                   </span>
                   <Badge variant='outline' className='text-[9px] border-cyan-700 text-cyan-300'>Ingestion</Badge>
@@ -272,7 +271,6 @@ export function RLVisualAnalytics({
               <div>
                 <div className='flex items-center justify-between text-xs font-mono text-purple-400 mb-2'>
                   <span className='font-bold flex items-center gap-1.5'>
-                    <span className='size-2 rounded-full bg-purple-400 animate-pulse' />
                     2. POLICY EVALUATION
                   </span>
                   <Badge variant='outline' className='text-[9px] border-purple-700 text-purple-300'>Bandit Q(s,a)</Badge>
@@ -305,7 +303,6 @@ export function RLVisualAnalytics({
               <div>
                 <div className='flex items-center justify-between text-xs font-mono text-amber-400 mb-2'>
                   <span className='font-bold flex items-center gap-1.5'>
-                    <span className='size-2 rounded-full bg-amber-400 animate-pulse' />
                     3. ACTION (A_t)
                   </span>
                   <Badge variant='outline' className='text-[9px] border-amber-700 text-amber-300'>Reallocation</Badge>
@@ -338,7 +335,6 @@ export function RLVisualAnalytics({
               <div>
                 <div className='flex items-center justify-between text-xs font-mono text-emerald-400 mb-2'>
                   <span className='font-bold flex items-center gap-1.5'>
-                    <span className='size-2 rounded-full bg-emerald-400 animate-pulse' />
                     4. REWARD (R_t)
                   </span>
                   <Badge variant='outline' className='text-[9px] border-emerald-700 text-emerald-300'>Feedback</Badge>
@@ -556,7 +552,6 @@ export function RLVisualAnalytics({
                 {data.spendDistribution.map((item, idx) => (
                   <div key={idx} className='flex items-center justify-between p-1 rounded bg-zinc-900/50 border border-zinc-800/40'>
                     <div className='flex items-center gap-1.5 truncate'>
-                      <span className='size-2 rounded-full shrink-0' style={{ backgroundColor: item.color }} />
                       <span className='text-zinc-300 truncate'>{item.region}</span>
                     </div>
                     <span className='font-bold text-zinc-100 ml-1'>
@@ -569,8 +564,8 @@ export function RLVisualAnalytics({
 
             <div className='pt-2 mt-2 border-t border-zinc-900 text-[10px] font-mono text-zinc-400'>
               {pieMode === 'post'
-                ? '✅ Post-RL: North America receives 68% of budget; low-probability zones pruned to 0-3%.'
-                : '⚠️ Pre-RL: 16% of daily ad budget wasted in LatAm & SEA with low conversion probabilities.'}
+                ? 'Post-RL: North America receives 68% of budget; low-probability zones pruned to 0-3%.'
+                : 'Pre-RL: 16% of daily ad budget wasted in LatAm & SEA with low conversion probabilities.'}
             </div>
           </div>
         )}
@@ -662,8 +657,7 @@ export function RLVisualAnalytics({
               <tbody className='divide-y divide-zinc-800/60 bg-zinc-950/40'>
                 {data.regionalStates.map((r, i) => (
                   <tr key={i} className='hover:bg-zinc-900/40 transition-colors'>
-                    <td className='p-2.5 font-bold text-zinc-200 flex items-center gap-2'>
-                      <span className='size-2.5 rounded-full' style={{ backgroundColor: r.color }} />
+                    <td className='p-2.5 font-bold text-zinc-200'>
                       {r.region}
                     </td>
                     <td className='p-2.5'>
@@ -696,11 +690,11 @@ export function RLVisualAnalytics({
                           'border-zinc-800 bg-zinc-900 text-zinc-500'
                         )}
                       >
-                        {r.rlAction === 'BOOST_ADS' && '🚀 DISPLAY MORE ADS (HIGH HEADROOM)'}
-                        {r.rlAction === 'EXPAND_ADS' && '📈 EXPAND ADS (STRONG ROAS)'}
-                        {r.rlAction === 'MAINTAIN' && '⚖️ MAINTAIN TEST'}
-                        {r.rlAction === 'SCALE_DOWN' && '📉 SLASH ADS (-72%)'}
-                        {r.rlAction === 'SUPPRESS_ADS' && '🛑 SUPPRESS ADS (LOW PROBABILITY)'}
+                        {r.rlAction === 'BOOST_ADS' && 'DISPLAY MORE ADS (HIGH HEADROOM)'}
+                        {r.rlAction === 'EXPAND_ADS' && 'EXPAND ADS (STRONG ROAS)'}
+                        {r.rlAction === 'MAINTAIN' && 'MAINTAIN TEST'}
+                        {r.rlAction === 'SCALE_DOWN' && 'SLASH ADS (-72%)'}
+                        {r.rlAction === 'SUPPRESS_ADS' && 'SUPPRESS ADS (LOW PROBABILITY)'}
                       </Badge>
                     </td>
                   </tr>

@@ -33,7 +33,6 @@ export function UserNav() {
             <div className='flex flex-col space-y-1'>
               <p className='text-sm leading-none font-semibold text-foreground flex items-center gap-1.5'>
                 Nexus AI Operator
-                <span className='size-1.5 rounded-full bg-emerald-500' />
               </p>
               <p className='text-muted-foreground text-xs leading-none font-mono'>
                 operator@nexus-d2c.internal

@@ -136,7 +136,6 @@ export default function GlobeIntelligencePage() {
             <div>
               <div className='flex items-center justify-between border-b border-zinc-800/80 pb-3 mb-3'>
                 <div className='flex items-center gap-2'>
-                  <span className='size-2.5 rounded-full bg-cyan-400 animate-ping' />
                   <h3 className='font-mono text-sm font-bold text-zinc-100'>
                     STAGE 1: ANALYSING PHASE (AD DELIVERY ARCS)
                   </h3>
@@ -190,7 +189,6 @@ export default function GlobeIntelligencePage() {
             <div>
               <div className='flex items-center justify-between border-b border-zinc-800/80 pb-3 mb-3'>
                 <div className='flex items-center gap-2'>
-                  <span className='size-2.5 rounded-full bg-rose-500 animate-pulse' />
                   <h3 className='font-mono text-sm font-bold text-rose-300'>
                     STAGE 2: ANALYSIS COMPLETED (SALES &amp; INTERACTION PULSE)
                   </h3>
@@ -210,17 +208,14 @@ export default function GlobeIntelligencePage() {
             </div>
 
             <div className='flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-zinc-900 font-mono text-[10px]'>
-              <div className='flex items-center gap-1.5 text-zinc-300'>
-                <span className='size-2 rounded-full bg-red-500 ring-2 ring-red-500/20' />
-                <span>High Sales (US East/West: 78% P_conv)</span>
+              <div className='text-red-400 font-medium'>
+                High Sales (US East/West: 78% P_conv)
               </div>
-              <div className='flex items-center gap-1.5 text-zinc-300'>
-                <span className='size-2 rounded-full bg-orange-500' />
-                <span>EMEA (56% P_conv)</span>
+              <div className='text-orange-400 font-medium'>
+                EMEA (56% P_conv)
               </div>
-              <div className='flex items-center gap-1.5 text-zinc-300'>
-                <span className='size-2 rounded-full bg-yellow-400' />
-                <span>APAC (44% P_conv)</span>
+              <div className='text-yellow-400 font-medium'>
+                APAC (44% P_conv)
               </div>
               <div className='text-cyan-400 font-bold'>
                 No Grey • Suppressed Low-Prob

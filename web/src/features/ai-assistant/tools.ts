@@ -10,7 +10,7 @@ export interface ToolDefinition {
   name: string;
   description: string;
   parameters: Record<string, { type: string; description: string; required?: boolean }>;
-  execute: (args: any, router?: any) => Promise<{ success: boolean; data: any; summary: string }>;
+  execute: (args?: any, router?: any) => Promise<{ success: boolean; data: any; summary: string }>;
 }
 
 export const ASSISTANT_TOOLS: Record<string, ToolDefinition> = {

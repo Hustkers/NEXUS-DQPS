@@ -24,9 +24,7 @@ export default function Header() {
           <span>← Pitch & Overview</span>
         </a>
         <CtaGithub />
-        <div className='hidden md:flex'>
-          <SearchInput />
-        </div>
+        <SearchInput />
         <NotificationCenter />
       </div>
     </header>

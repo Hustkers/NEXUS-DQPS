@@ -47,7 +47,6 @@ export function StatsMatrix({ stats, className = '' }: StatsMatrixProps) {
             )}
             {stat.trend === 'live' && (
               <span className='flex items-center gap-1 font-mono text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold shrink-0'>
-                <span className='size-1.5 rounded-full bg-emerald-500 animate-pulse' />
                 ACTIVE
               </span>
             )}

@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import {
   IconSend,
-  IconRobot,
   IconUser,
   IconCode,
   IconCheck,
@@ -37,15 +36,17 @@ interface AssistantChatProps {
   router?: any;
 }
 
+const INITIAL_MESSAGES: ChatMessage[] = [
+  {
+    id: 'm-init',
+    sender: 'assistant',
+    text: 'NEXUS Autonomous Copilot online. I possess direct tool-calling capabilities to execute budget reallocations, query live ROAS telemetry, audit inventory levels, and inject simulator shocks.',
+    timestamp: 'Just now',
+  },
+];
+
 export function AssistantChat({ onToolExecuted, router }: AssistantChatProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 'm-init',
-      sender: 'assistant',
-      text: 'NEXUS Autonomous Copilot online. I possess direct tool-calling capabilities to execute budget reallocations, query live ROAS telemetry, audit inventory levels, and inject simulator shocks.',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
   const [inputValue, setInputValue] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [expandedToolId, setExpandedToolId] = useState<string | null>(null);
@@ -155,11 +156,12 @@ export function AssistantChat({ onToolExecuted, router }: AssistantChatProps) {
                 {/* Self-Contained Function Calling Visualization Card */}
                 {m.toolCall && (
                   <div className="mt-2.5 pt-2 border-t border-zinc-800 font-mono text-[10px]">
-                    <div
+                    <button
+                      type="button"
                       onClick={() =>
                         setExpandedToolId(expandedToolId === m.id ? null : m.id)
                       }
-                      className="flex items-center justify-between gap-2 p-1.5 rounded-lg bg-zinc-950/80 border border-emerald-500/30 text-emerald-400 cursor-pointer hover:bg-zinc-950 transition-colors"
+                      className="w-full flex items-center justify-between gap-2 p-1.5 rounded-lg bg-zinc-950/80 border border-emerald-500/30 text-emerald-400 cursor-pointer hover:bg-zinc-950 transition-colors text-left"
                     >
                       <div className="flex items-center gap-1.5 overflow-hidden">
                         <IconCode className="size-3.5 shrink-0 text-emerald-400" />
@@ -181,7 +183,7 @@ export function AssistantChat({ onToolExecuted, router }: AssistantChatProps) {
                           <IconChevronRight className="size-3 text-zinc-400" />
                         )}
                       </div>
-                    </div>
+                    </button>
 
                     {/* Expandable Tool Payload Inspector */}
                     {expandedToolId === m.id && (

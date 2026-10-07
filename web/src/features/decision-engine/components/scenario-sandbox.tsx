@@ -52,9 +52,7 @@ export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?:
         {/* Meta Slider */}
         <div className="p-3.5 rounded-xl bg-background/50 border border-border/30 space-y-2">
           <div className="flex items-center justify-between text-xs font-medium">
-            <span className="flex items-center gap-1.5 text-foreground">
-              <span className="h-2 w-2 rounded-full bg-blue-500" /> Meta Ads
-            </span>
+            <span className="text-foreground font-medium">Meta Ads</span>
             <span className="font-mono text-muted-foreground font-bold">${metaSpend} / day</span>
           </div>
           <input
@@ -75,9 +73,7 @@ export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?:
         {/* Google Slider */}
         <div className="p-3.5 rounded-xl bg-background/50 border border-border/30 space-y-2">
           <div className="flex items-center justify-between text-xs font-medium">
-            <span className="flex items-center gap-1.5 text-foreground">
-              <span className="h-2 w-2 rounded-full bg-emerald-500" /> Google Search
-            </span>
+            <span className="text-foreground font-medium">Google Search</span>
             <span className="font-mono text-muted-foreground font-bold">${googleSpend} / day</span>
           </div>
           <input
@@ -98,9 +94,7 @@ export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?:
         {/* Amazon Slider */}
         <div className="p-3.5 rounded-xl bg-background/50 border border-border/30 space-y-2">
           <div className="flex items-center justify-between text-xs font-medium">
-            <span className="flex items-center gap-1.5 text-foreground">
-              <span className="h-2 w-2 rounded-full bg-amber-500" /> Amazon SP
-            </span>
+            <span className="text-foreground font-medium">Amazon SP</span>
             <span className="font-mono text-muted-foreground font-bold">${amazonSpend} / day</span>
           </div>
           <input

@@ -171,25 +171,25 @@ def create_endpoint_exact_fixtures(target_dir: Path):
 
 def main():
     print("\n=================================================================")
-    print("  NEXUS-DQPS: Section 1 Schema Ingestion & Ad Decision Engine")
+    print("NEXUS-DQPS: Section 1 Schema Ingestion & Ad Decision Engine")
     print("=================================================================\n")
 
     payloads_dir = Path("data/payloads")
     raw_dir = Path("data/raw_datasets")
 
     if (raw_dir / "meta_kaggle_conversion.csv").exists() and "--mock" not in sys.argv:
-        print("📦 Ingesting real public benchmark datasets from data/raw_datasets/...")
+        print(" Ingesting real public benchmark datasets from data/raw_datasets/...")
         from ingest.raw_dataset_importer import RawAdDatasetImporter
         importer = RawAdDatasetImporter(raw_dir=raw_dir, output_dir=payloads_dir)
         importer.transform_all()
     else:
-        print("🔧 Generating endpoint-exact fixtures...")
+        print(" Generating endpoint-exact fixtures...")
         create_endpoint_exact_fixtures(payloads_dir)
 
     pipeline = CanonicalPipeline(data_dir=str(payloads_dir))
 
     # 1. Load and Validate Raw Payloads against Section 1 Pydantic v2 Models
-    print("🔍 1. Validating payloads against Section 1 Pydantic v2 contracts...")
+    print(" 1. Validating payloads against Section 1 Pydantic v2 contracts...")
     meta_raw = json.loads((payloads_dir / "meta_insights.json").read_text())
     google_raw = json.loads((payloads_dir / "google_ads_rows.json").read_text())
     amazon_raw = json.loads((payloads_dir / "amazon_sponsored_products.json").read_text())
@@ -200,29 +200,29 @@ def main():
     amazon_models = pipeline.validate_amazon_payloads(amazon_raw)
     inv_models = pipeline.validate_shopify_inventory(inv_raw)
 
-    print(f"   ✓ Validated {len(meta_models)} MetaAdInsights models (/v19.0/{{ad_id}}/insights)")
-    print(f"   ✓ Validated {len(google_models)} GoogleAdsRow models (SearchStream)")
-    print(f"   ✓ Validated {len(amazon_models)} AmazonSponsoredProductsRow models (Reporting v3)")
-    print(f"   ✓ Validated {len(inv_models)} ShopifyInventoryLevel models (Shopify REST/Webhooks)")
+    print(f"Validated {len(meta_models)} MetaAdInsights models (/v19.0/{{ad_id}}/insights)")
+    print(f"Validated {len(google_models)} GoogleAdsRow models (SearchStream)")
+    print(f"Validated {len(amazon_models)} AmazonSponsoredProductsRow models (Reporting v3)")
+    print(f"Validated {len(inv_models)} ShopifyInventoryLevel models (Shopify REST/Webhooks)")
 
     # 2. Reconcile Cross-Platform Ad Performance with Shopify Inventory & Unit COGS
-    print("\n🔄 2. Harmonizing Cross-Platform Spend with Shopify Gross Margins...")
+    print("\n 2. Harmonizing Cross-Platform Spend with Shopify Gross Margins...")
     metrics_df = pipeline.reconcile_to_metrics(
         meta_models=meta_models,
         google_models=google_models,
         amazon_models=amazon_models,
         inventory_models=inv_models,
     )
-    print(f"   ✓ Reconciled dataset: {len(metrics_df)} rows across {metrics_df['platform'].nunique()} ad channels.")
+    print(f"Reconciled dataset: {len(metrics_df)} rows across {metrics_df['platform'].nunique()} ad channels.")
 
     # Ingest into DuckDB & data/metrics.csv
     metrics_path = Path("data/metrics.csv")
     metrics_df.to_csv(metrics_path, index=False)
     load("data/dqps.duckdb", metrics_df, events=[])
-    print(f"   ✓ Saved to {metrics_path} and data/dqps.duckdb")
+    print(f"Saved to {metrics_path} and data/dqps.duckdb")
 
     # 3. Generate Ad Budget Reallocations via SLSQP Convex Optimizer
-    print("\n📈 3. Generating Autonomous Ad Budget Recommendations (scipy SLSQP)...")
+    print("\n 3. Generating Autonomous Ad Budget Recommendations (scipy SLSQP)...")
     recs = pipeline.run_optimization(metrics_df)
 
     print("\n" + "=" * 95)
@@ -234,16 +234,16 @@ def main():
         curr = f"${r['current_daily_spend']:,.2f}"
         rec_spend = f"${r['recommended_daily_spend']:,.2f}"
         margin = f"${r['expected_daily_margin']:,.2f}"
-        action = "🚨 KILL (STOCKOUT = 0)" if r["stockout_kill"] else ("⬆️ SCALE" if r["recommended_daily_spend"] > r["current_daily_spend"] else "⬇️ TRIM")
+        action = " KILL (STOCKOUT = 0)" if r["stockout_kill"] else ("⬆️ SCALE" if r["recommended_daily_spend"] > r["current_daily_spend"] else "⬇️ TRIM")
         print(f"{camp:<32} | {curr:<12} | {rec_spend:<16} | {margin:<12} | {action}")
 
     print("=" * 95)
 
     # 4. Refresh Web Console State
-    print("\n🚀 4. Refreshing Dark Autonomous Web Console...")
+    print("\n 4. Refreshing Dark Autonomous Web Console...")
     try:
         generate_state()
-        print("✨ State compiled! Open http://localhost:3000/dashboard/reallocations to view recommendations.")
+        print(" State compiled! Open http://localhost:3000/dashboard/reallocations to view recommendations.")
     except Exception as ex:
         print(f"Note on state generation: {ex}")
 

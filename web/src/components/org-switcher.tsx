@@ -45,7 +45,6 @@ export function OrgSwitcher() {
             <div className='grid flex-1 text-left text-sm leading-tight'>
               <div className='flex items-center gap-1.5'>
                 <span className='truncate font-bold tracking-tight text-emerald-700 dark:text-emerald-400'>NEXUS D2C</span>
-                <span className='size-1.5 rounded-full bg-emerald-500 animate-ping' />
               </div>
               <span className='truncate text-[11px] text-muted-foreground'>{activeBrand}</span>
             </div>

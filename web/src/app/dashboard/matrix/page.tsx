@@ -26,7 +26,6 @@ export default function MatrixPage() {
         </div>
         <div className='flex items-center gap-2'>
           <Badge variant='outline' className='font-mono text-xs border-emerald-200 dark:border-emerald-500/40 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 py-1 px-2.5 shadow-xs'>
-            <span className='size-1.5 rounded-full bg-emerald-500 mr-2 animate-ping' />
             POSTGRESQL 16 CONNECTED
           </Badge>
           <Badge variant='outline' className='font-mono text-xs border-border text-muted-foreground bg-muted/40 py-1 px-2.5'>

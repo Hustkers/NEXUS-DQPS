@@ -20,7 +20,7 @@ def main():
     args = parser.parse_args()
 
     print("\n========================================================")
-    print("  NEXUS-DQPS: Live Multi-Channel Pipeline Sync")
+    print("NEXUS-DQPS: Live Multi-Channel Pipeline Sync")
     print("========================================================\n")
 
     engine = LiveReconciliationEngine()
@@ -47,31 +47,31 @@ def main():
     # Check if at least one platform is active
     any_active = any(s["configured"] for s in status.values())
     if not any_active:
-        print("⚠️  No live platforms are configured in your `.env` file yet.")
-        print("👉 Edit `/Users/jaygopal/NEXUS-DQPS/.env` and paste your tokens, then re-run:")
-        print("   python scripts/sync_live_ads.py\n")
+        print("️  No live platforms are configured in your `.env` file yet.")
+        print(" Edit `/Users/jaygopal/NEXUS-DQPS/.env` and paste your tokens, then re-run:")
+        print("python scripts/sync_live_ads.py\n")
         return
 
-    print(f"🔄 Pulling and reconciling live performance (lookback = {args.days} days)...")
+    print(f" Pulling and reconciling live performance (lookback = {args.days} days)...")
     df = engine.pull_and_reconcile(days=args.days)
 
     if df.empty:
-        print("❌ Reconciled dataset was empty. Check credentials or campaign activity.\n")
+        print(" Reconciled dataset was empty. Check credentials or campaign activity.\n")
         return
 
     # Save to CSV & DuckDB
     metrics_path = Path("data/metrics.csv")
     df.to_csv(metrics_path, index=False)
     load("data/dqps.duckdb", df, events=[])
-    print(f"✅ Successfully written {len(df)} reconciled rows to {metrics_path} and data/dqps.duckdb")
+    print(f" Successfully written {len(df)} reconciled rows to {metrics_path} and data/dqps.duckdb")
 
     if args.export:
-        print("🚀 Refreshing web console state (web/src/data/nexus-engine-state.json)...")
+        print(" Refreshing web console state (web/src/data/nexus-engine-state.json)...")
         try:
             generate_state()
-            print("✨ Console updated! Open http://localhost:3000/dashboard/overview")
+            print(" Console updated! Open http://localhost:3000/dashboard/overview")
         except Exception as ex:
-            print(f"⚠️  Export state completed with note: {ex}")
+            print(f"️  Export state completed with note: {ex}")
 
     print("\n========================================================\n")
 

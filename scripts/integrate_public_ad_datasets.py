@@ -32,8 +32,8 @@ from scripts.export_engine_state import generate_state
 
 def run_integration(download: bool = False):
     print("\n" + "=" * 80)
-    print("  NEXUS-DQPS: PUBLIC AD DATASET INGESTION & RECOMMENDATION ENGINE")
-    print("  Platforms: Meta Graph API | Google Ads API | Amazon Ads | Shopify Admin")
+    print("NEXUS-DQPS: PUBLIC AD DATASET INGESTION & RECOMMENDATION ENGINE")
+    print("Platforms: Meta Graph API | Google Ads API | Amazon Ads | Shopify Admin")
     print("=" * 80 + "\n")
 
     raw_dir = Path("data/raw_datasets")
@@ -42,18 +42,18 @@ def run_integration(download: bool = False):
 
     # Step 1: Download if requested or if missing
     if download or not (raw_dir / "meta_kaggle_conversion.csv").exists():
-        print("🌐 Step 1: Downloading public datasets from Kaggle & GitHub...")
+        print(" Step 1: Downloading public datasets from Kaggle & GitHub...")
         download_all(raw_dir)
     else:
-        print("📁 Step 1: Using cached raw datasets in data/raw_datasets/")
+        print(" Step 1: Using cached raw datasets in data/raw_datasets/")
 
     # Step 2: Transform raw datasets into Section 1 canonical payloads
-    print("\n🔄 Step 2: Transforming raw records into Section 1 Pydantic contracts...")
+    print("\n Step 2: Transforming raw records into Section 1 Pydantic contracts...")
     importer = RawAdDatasetImporter(raw_dir=raw_dir, output_dir=payloads_dir)
     transform_summary = importer.transform_all()
 
     # Step 3: Validate against Section 1 Pydantic v2 Models
-    print("\n🔍 Step 3: Validating payloads via Pydantic v2 schemas...")
+    print("\n Step 3: Validating payloads via Pydantic v2 schemas...")
     pipeline = CanonicalPipeline(data_dir=str(payloads_dir))
 
     meta_raw = json.loads((payloads_dir / "meta_insights.json").read_text())
@@ -68,13 +68,13 @@ def run_integration(download: bool = False):
     inv_models = pipeline.validate_shopify_inventory(inv_raw)
     order_models = pipeline.validate_shopify_orders(orders_raw)
 
-    print(f"   ✓ Meta:    {len(meta_models):,d} MetaAdInsights models (/v19.0/{{ad_id}}/insights)")
-    print(f"   ✓ Google:  {len(google_models):,d} GoogleAdsRow models (Google Ads SearchStream)")
-    print(f"   ✓ Amazon:  {len(amazon_models):,d} AmazonSponsoredProductsRow models (Reporting v3)")
-    print(f"   ✓ Shopify: {len(inv_models):,d} ShopifyInventoryLevel models + {len(order_models)} orders")
+    print(f"Meta:    {len(meta_models):,d} MetaAdInsights models (/v19.0/{{ad_id}}/insights)")
+    print(f"Google:  {len(google_models):,d} GoogleAdsRow models (Google Ads SearchStream)")
+    print(f"Amazon:  {len(amazon_models):,d} AmazonSponsoredProductsRow models (Reporting v3)")
+    print(f"Shopify: {len(inv_models):,d} ShopifyInventoryLevel models + {len(order_models)} orders")
 
     # Step 4: Reconcile with Shopify gross margins & inventory stockouts
-    print("\n📊 Step 4: Reconciling Ad Spend with Shopify Gross Margins...")
+    print("\n Step 4: Reconciling Ad Spend with Shopify Gross Margins...")
     metrics_df = pipeline.reconcile_to_metrics(
         meta_models=meta_models,
         google_models=google_models,
@@ -93,15 +93,15 @@ def run_integration(download: bool = False):
     for plat, row in platform_stats.iterrows():
         roas = row["total_revenue"] / max(row["total_spend"], 1.0)
         margin_pct = (row["total_margin"] / max(row["total_revenue"], 1.0)) * 100
-        print(f"  [{plat.upper():<7}] Records: {int(row['record_count']):>5} | Spend: ${row['total_spend']:>10,.2f} | Rev: ${row['total_revenue']:>10,.2f} | Margin: ${row['total_margin']:>10,.2f} ({margin_pct:.1f}%) | ROAS: {roas:.2f}x")
+        print(f"[{plat.upper():<7}] Records: {int(row['record_count']):>5} | Spend: ${row['total_spend']:>10,.2f} | Rev: ${row['total_revenue']:>10,.2f} | Margin: ${row['total_margin']:>10,.2f} ({margin_pct:.1f}%) | ROAS: {roas:.2f}x")
 
     # Save to metrics.csv & DuckDB
     metrics_df.to_csv(metrics_path, index=False)
     load("data/dqps.duckdb", metrics_df, events=[])
-    print(f"\n   ✓ Persisted unified dataset to {metrics_path} & data/dqps.duckdb")
+    print(f"\n    Persisted unified dataset to {metrics_path} & data/dqps.duckdb")
 
     # Step 5: Execute SLSQP Convex Optimizer to generate budget reallocations
-    print("\n🧠 Step 5: Running SLSQP Convex Optimization & Safety Kill-Switch...")
+    print("\n Step 5: Running SLSQP Convex Optimization & Safety Kill-Switch...")
     recs = pipeline.run_optimization(metrics_df)
 
     print("\n" + "=" * 105)
@@ -114,7 +114,7 @@ def run_integration(download: bool = False):
         rec_spend = f"${r['recommended_daily_spend']:,.2f}"
         margin = f"${r['expected_daily_margin']:,.2f}"
         if r["stockout_kill"]:
-            action = "🚨 KILL-SWITCH (0 WAREHOUSE UNITS REMAINING)"
+            action = " KILL-SWITCH (0 WAREHOUSE UNITS REMAINING)"
         elif r["recommended_daily_spend"] > r["current_daily_spend"]:
             action = f"⬆️ SCALE (+{((r['recommended_daily_spend']/max(r['current_daily_spend'], 1e-6))-1)*100:.0f}%)"
         else:
@@ -124,15 +124,15 @@ def run_integration(download: bool = False):
     print("=" * 105)
 
     # Step 6: Export updated engine state for Web Dashboard
-    print("\n🚀 Step 6: Updating Dark Autonomous Web Console State...")
+    print("\n Step 6: Updating Dark Autonomous Web Console State...")
     try:
         generate_state()
-        print("   ✓ State compiled successfully into web/src/data/nexus-engine-state.json")
+        print("State compiled successfully into web/src/data/nexus-engine-state.json")
     except Exception as e:
-        print(f"   ⚠️ Note on state export: {e}")
+        print(f"️ Note on state export: {e}")
 
-    print("\n✨ Ingestion, Reconciliation, and Optimization complete!")
-    print("👉 View live interactive console at: http://localhost:3000/dashboard/reallocations\n")
+    print("\n Ingestion, Reconciliation, and Optimization complete!")
+    print(" View live interactive console at: http://localhost:3000/dashboard/reallocations\n")
 
 
 if __name__ == "__main__":

@@ -2,20 +2,18 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
   IconMicrophone,
   IconMicrophoneOff,
   IconVolume,
   IconVolumeOff,
   IconPlayerPlay,
-  IconCheck,
   IconBolt,
   IconChartBar,
   IconBox,
   IconAlertTriangle,
 } from '@tabler/icons-react';
-import { ASSISTANT_TOOLS, executeAssistantTurn } from './tools';
+import { executeAssistantTurn } from './tools';
 import { toast } from 'sonner';
 
 interface AssistantVoiceProps {
@@ -23,30 +21,30 @@ interface AssistantVoiceProps {
   router?: any;
 }
 
+const DEFAULT_WAVE_HEIGHTS = [6, 10, 14, 8, 12, 16, 10, 12, 8, 14, 10, 6];
+
 export function AssistantVoice({ onToolExecuted, router }: AssistantVoiceProps) {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [voiceMuted, setVoiceMuted] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [lastAction, setLastAction] = useState<string | null>(null);
-  const [waveHeights, setWaveHeights] = useState([8, 14, 22, 12, 28, 16, 20, 10]);
+  const [waveHeights, setWaveHeights] = useState(DEFAULT_WAVE_HEIGHTS);
 
   const recognitionRef = useRef<any>(null);
 
-  // Animated Waveform Effect
+  // Animated Waveform Effect during active speech or listening
   useEffect(() => {
-    let timer: any;
-    if (isSpeaking || isListening) {
-      timer = setInterval(() => {
-        setWaveHeights(
-          Array.from({ length: 12 }, () =>
-            isSpeaking ? Math.floor(Math.random() * 32) + 8 : Math.floor(Math.random() * 20) + 6
-          )
-        );
-      }, 90);
-    } else {
-      setWaveHeights([6, 10, 14, 8, 12, 16, 10, 12, 8, 14, 10, 6]);
+    if (!isSpeaking && !isListening) {
+      return;
     }
+    const timer = setInterval(() => {
+      setWaveHeights(
+        Array.from({ length: 12 }, () =>
+          isSpeaking ? Math.floor(Math.random() * 32) + 8 : Math.floor(Math.random() * 20) + 6
+        )
+      );
+    }, 90);
     return () => clearInterval(timer);
   }, [isSpeaking, isListening]);
 
@@ -147,7 +145,7 @@ export function AssistantVoice({ onToolExecuted, router }: AssistantVoiceProps) 
       };
 
       recognition.start();
-    } catch (e) {
+    } catch (_e) {
       setIsListening(false);
     }
   };

@@ -157,7 +157,6 @@ export function NotchNavbar({
       <div className="flex flex-col text-left">
         <div className="font-mono font-extrabold text-xs tracking-tight flex items-center gap-1.5 leading-none">
           <span>NEXUS-DQPS</span>
-          <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
         </div>
         <span className="text-[9px] text-muted-foreground font-mono leading-none tracking-tighter mt-0.5">
           AUTONOMOUS AD ENGINE

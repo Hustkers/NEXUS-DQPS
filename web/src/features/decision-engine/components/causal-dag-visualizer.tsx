@@ -64,12 +64,8 @@ export function CausalDagVisualizer({ activeAnomaly = true }: { activeAnomaly?: 
         </div>
 
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" /> Healthy Flow
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]" /> Bottleneck / Stockout Path
-          </span>
+          <span className="text-emerald-400 font-medium">Healthy Flow</span>
+          <span className="text-rose-400 font-medium">Bottleneck / Stockout Path</span>
         </div>
       </div>
 
@@ -118,15 +114,9 @@ export function CausalDagVisualizer({ activeAnomaly = true }: { activeAnomaly?: 
             )}
           >
             <div className="flex items-center justify-between text-[11px] font-medium">
-              <span className={node.status === 'critical' ? 'text-rose-300' : 'text-foreground'}>
+              <span className={node.status === 'critical' ? 'text-rose-300 font-semibold' : 'text-foreground'}>
                 {node.label}
               </span>
-              <span
-                className={cn(
-                  'h-1.5 w-1.5 rounded-full',
-                  node.status === 'critical' ? 'bg-rose-500 shadow-[0_0_6px_#f43f5e]' : 'bg-emerald-400'
-                )}
-              />
             </div>
             <div className="text-[12px] font-mono font-semibold mt-0.5 text-muted-foreground truncate">
               {node.metric}

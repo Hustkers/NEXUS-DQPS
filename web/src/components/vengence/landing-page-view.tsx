@@ -56,7 +56,6 @@ export function LandingPageView() {
         <div className='relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center'>
           {/* Hackathon Pill */}
           <div className='inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-mono font-medium mb-6 animate-in fade-in slide-in-from-top-2 duration-500'>
-            <span className='size-1.5 rounded-full bg-emerald-500' />
             <span>DataQuest 3.0 • Problem Statement Finalist</span>
           </div>
 
