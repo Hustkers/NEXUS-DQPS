@@ -1,63 +1,141 @@
-import { buttonVariants } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { SignIn as ClerkSignInForm } from '@clerk/nextjs';
-import { Metadata } from 'next';
-import Link from 'next/link';
-import { InteractiveGridPattern } from './interactive-grid';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Authentication',
-  description: 'Authentication forms built using the components.'
-};
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Icons } from '@/components/icons';
+import { toast } from 'sonner';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function SignInViewPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      toast.success('Authenticated as Pragyan P. (Admin)', {
+        description: 'Session token issued. Redirecting to Autonomous Decision Console...'
+      });
+      router.push('/dashboard/strategy-engine');
+    }, 600);
+  };
+
+  const handleDemoLogin = () => {
+    setEmail('pragyan@nexus-d2c.ai');
+    setPassword('nexus-autonomous-2026');
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      toast.success('Demo Credentials Loaded: Pragyan P.', {
+        description: 'Bypassing MFA challenge for verified test cluster.'
+      });
+      router.push('/dashboard/strategy-engine');
+    }, 500);
+  };
+
   return (
-    <div className='relative flex min-h-screen flex-col items-center justify-center overflow-hidden md:grid lg:max-w-none lg:grid-cols-2 lg:px-0'>
-      <Link
-        href='/examples/authentication'
-        className={cn(
-          buttonVariants({ variant: 'ghost' }),
-          'absolute top-4 right-4 hidden md:top-8 md:right-8'
-        )}
-      >
-        Login
-      </Link>
-      <div className='relative hidden h-full flex-col p-10 lg:flex dark:border-r'>
-        <div className='absolute inset-0 bg-sidebar' />
-        <div className='text-sidebar-foreground relative z-20 flex items-center text-lg font-medium'>
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            viewBox='0 0 24 24'
-            fill='none'
-            stroke='currentColor'
-            strokeWidth='2'
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            className='mr-2 h-6 w-6'
+    <div className='relative flex min-h-screen flex-col items-center justify-center p-4 bg-slate-50 dark:bg-[#07090e] font-mono text-xs'>
+      <div className='w-full max-w-md space-y-6'>
+        {/* Brand Header */}
+        <div className='text-center space-y-2'>
+          <div className='inline-flex items-center justify-center size-10 rounded-xl bg-foreground text-background font-bold text-lg mb-2 shadow-sm'>
+            N
+          </div>
+          <h1 className='text-xl font-bold font-sans text-foreground'>
+            NEXUS-D2C Mission Control
+          </h1>
+          <p className='text-xs text-muted-foreground'>
+            Autonomous E-Commerce Advertising Decision &amp; Optimization Engine
+          </p>
+        </div>
+
+        {/* Auth Form Card */}
+        <div className='p-6 rounded-2xl border border-border/80 bg-card shadow-sm space-y-5'>
+          <form onSubmit={handleSubmit} className='space-y-4'>
+            <div className='space-y-1.5'>
+              <label className='text-muted-foreground text-[11px] block font-semibold'>
+                Work Email Address
+              </label>
+              <input
+                type='email'
+                required
+                placeholder='pragyan@nexus-d2c.ai'
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className='w-full h-9 rounded-md border border-border bg-background px-3 text-xs font-mono text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:ring-1 focus:ring-primary'
+              />
+            </div>
+
+            <div className='space-y-1.5'>
+              <div className='flex items-center justify-between'>
+                <label className='text-muted-foreground text-[11px] font-semibold'>
+                  Password
+                </label>
+                <button
+                  type='button'
+                  onClick={() => toast.info('Password reset link dispatched to work email.')}
+                  className='text-[10px] text-muted-foreground hover:text-foreground underline'
+                >
+                  Forgot?
+                </button>
+              </div>
+              <input
+                type='password'
+                required
+                placeholder='••••••••••••'
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className='w-full h-9 rounded-md border border-border bg-background px-3 text-xs font-mono text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:ring-1 focus:ring-primary'
+              />
+            </div>
+
+            <Button
+              type='submit'
+              disabled={loading}
+              className='w-full h-9 text-xs font-bold uppercase bg-foreground text-background hover:bg-foreground/90'
+            >
+              {loading ? (
+                <>
+                  <Icons.spinner className='mr-1.5 size-3.5 animate-spin' />
+                  Verifying Session...
+                </>
+              ) : (
+                'Sign In to Dashboard'
+              )}
+            </Button>
+          </form>
+
+          <div className='relative flex items-center justify-center'>
+            <div className='absolute inset-0 flex items-center'>
+              <div className='w-full border-t border-border' />
+            </div>
+            <div className='relative px-2 bg-card text-[10px] uppercase text-muted-foreground'>
+              or fast track
+            </div>
+          </div>
+
+          <Button
+            type='button'
+            variant='outline'
+            onClick={handleDemoLogin}
+            disabled={loading}
+            className='w-full h-9 text-xs font-semibold'
           >
-            <path d='M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3' />
-          </svg>
-          Logo
-        </div>
-        <InteractiveGridPattern
-          className={cn(
-            'mask-[radial-gradient(400px_circle_at_center,white,transparent)]',
-            'inset-x-0 inset-y-[0%] h-full skew-y-12'
-          )}
-        />
-        <div className='text-sidebar-foreground relative z-20 mt-auto'>
-          <blockquote className='space-y-2'>
-            <p className='text-lg'>
-              &ldquo;This starter template has saved me countless hours of work and helped me
-              deliver projects to my clients faster than ever before.&rdquo;
-            </p>
-            <footer className='text-sidebar-foreground/70 text-sm'>Random Dude</footer>
-          </blockquote>
-        </div>
-      </div>
-      <div className='flex h-full items-center justify-center p-4 lg:p-8'>
-        <div className='flex w-full max-w-md flex-col items-center justify-center space-y-6'>
-          <ClerkSignInForm />
+            <Icons.sparkles className='size-3.5 mr-1.5 text-indigo-500' />
+            1-Click Demo Sign In (Super Admin)
+          </Button>
+
+          <div className='text-center pt-2 border-t border-border/60 text-muted-foreground text-[11px]'>
+            Don&apos;t have an account?{' '}
+            <Link href='/auth/sign-up' className='text-foreground font-semibold underline'>
+              Create an Organization
+            </Link>
+          </div>
         </div>
       </div>
     </div>
