@@ -3,6 +3,7 @@ import {
   MetaLogo,
   AmazonLogo,
   ShopifyLogo,
+  TikTokLogo,
   PlatformLogo
 } from '@/components/icons/platform-logos';
 import {
@@ -34,13 +35,11 @@ import {
   IconClock,
   IconCode,
   IconCommand,
-  IconCopy,
   IconCreditCard,
   IconTerminal,
   IconDeviceLaptop,
   IconDots,
   IconDotsVertical,
-  IconDownload,
   IconEdit,
   IconExternalLink,
   IconEyeOff,
@@ -112,8 +111,6 @@ import {
   IconRobot,
   IconMessage2,
   IconArrowsSplit2,
-  IconRefresh,
-  IconChartLine,
   IconX
 } from '@tabler/icons-react';
 
@@ -131,9 +128,7 @@ export const Icons = {
   close: IconX,
   clock: IconClock,
   code: IconCode,
-  copy: IconCopy,
   dots: IconDots,
-  download: IconDownload,
   ellipsis: IconDotsVertical,
   externalLink: IconExternalLink,
   help: IconHelpCircle,
@@ -168,7 +163,6 @@ export const Icons = {
   employee: IconUserX,
   userPen: IconUserEdit,
   teams: IconUsers,
-  users: IconUsers,
 
   // Brand
   github: IconBrandGithub,
@@ -200,7 +194,6 @@ export const Icons = {
 
   // Actions
   add: IconPlus,
-  plus: IconPlus,
   edit: IconEdit,
   upload: IconUpload,
   share: IconShare,
@@ -267,6 +260,7 @@ export const Icons = {
   google: GoogleLogo,
   meta: MetaLogo,
   shopify: ShopifyLogo,
+  tiktok: TikTokLogo,
   platformLogo: PlatformLogo,
   topology: IconTopologyComplex,
   play: IconPlayerPlay,
@@ -274,8 +268,6 @@ export const Icons = {
   shieldCheck: IconShieldCheck,
   gitBranch: IconGitBranch,
   barChart: IconChartBar,
-  lineChart: IconChartLine,
-  refresh: IconRefresh,
   sliders: IconAdjustmentsHorizontal,
   volume2: IconVolume2,
   mic: IconMicrophone,
@@ -283,4 +275,4 @@ export const Icons = {
   messageSquare: IconMessage2
 };
 
-export { GoogleLogo, MetaLogo, AmazonLogo, ShopifyLogo, PlatformLogo };
+export { GoogleLogo, MetaLogo, AmazonLogo, ShopifyLogo, TikTokLogo, PlatformLogo };
