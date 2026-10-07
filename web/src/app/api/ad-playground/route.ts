@@ -82,11 +82,15 @@ export async function POST(request: NextRequest) {
 
     const result = computePlaygroundRecommendations({
       sku: body.sku || '310805-137',
-      total_budget: Number(body.total_budget) || 5000,
-      duration_days: Number(body.duration_days) || 14,
+      daily_budget: body.daily_budget ? Number(body.daily_budget) : undefined,
+      total_budget: body.total_budget ? Number(body.total_budget) : 14000,
+      duration_days: Number(body.duration_days) || 7,
       target_roas_floor: Number(body.target_roas_floor) || 1.8,
       platforms: body.platforms,
-      strategy_focus: body.strategy_focus || 'MAX_PROFIT'
+      strategy_focus: body.strategy_focus || 'MAX_PROFIT',
+      audience: body.audience,
+      creative: body.creative,
+      placement: body.placement
     });
 
     return NextResponse.json(result);
