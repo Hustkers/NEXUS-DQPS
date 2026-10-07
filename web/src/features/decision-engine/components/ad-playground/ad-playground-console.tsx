@@ -110,6 +110,28 @@ export function AdPlaygroundConsole() {
     }, 120);
   }, [constraints]);
 
+  // Reset experiment to default initial state
+  const handleResetExperiment = useCallback(() => {
+    const defaultSku = '315122-001';
+    const defaultConstraints: AdPlaygroundConstraints = {
+      sku: defaultSku,
+      daily_budget: 2000,
+      total_budget: 14000,
+      duration_days: 7,
+      target_roas_floor: 1.8,
+      strategy_focus: 'MAX_PROFIT',
+      audience: 'broad',
+      creative: 'ugc_video',
+      placement: 'auto',
+      platforms: ['meta', 'google', 'amazon', 'tiktok']
+    };
+    setSelectedSku(defaultSku);
+    setConstraints(defaultConstraints);
+    const resetResult = computePlaygroundRecommendations(defaultConstraints);
+    setResult(resetResult);
+    toast.success('Experiment parameters reset to default baseline');
+  }, []);
+
   const isInventoryConstrained = result.candidates[0]?.stockout_risk;
 
   return (
@@ -131,8 +153,19 @@ export function AdPlaygroundConsole() {
           </p>
         </div>
 
-        {/* Primary CTA in header */}
-        <div className='flex items-center gap-3'>
+        {/* Primary CTAs in header */}
+        <div className='flex items-center gap-2.5'>
+          <button
+            type='button'
+            onClick={handleResetExperiment}
+            disabled={isCalculating}
+            className='px-3.5 py-2.5 rounded-xl border border-border/80 bg-muted/20 hover:bg-muted/50 text-muted-foreground hover:text-foreground text-xs uppercase font-bold tracking-wider transition-all flex items-center gap-1.5 shrink-0 disabled:opacity-50'
+            title='Reset experiment to initial default parameters'
+          >
+            <IconAdjustments className='size-3.5' />
+            <span>RESET EXPERIMENT</span>
+          </button>
+
           <button
             type='button'
             onClick={handleRunExperiment}
