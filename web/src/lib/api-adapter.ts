@@ -135,6 +135,11 @@ export interface VertexAiStatus {
   model_name: string;
   has_adc: boolean;
   token_valid: boolean;
+  discovered_gemini_models?: string[];
+  deepseek_configured?: boolean;
+  deepseek_model?: string;
+  last_used_provider?: string;
+  last_used_model?: string;
 }
 
 export async function fetchVertexAiStatus(): Promise<VertexAiStatus> {
@@ -152,6 +157,11 @@ export async function fetchVertexAiStatus(): Promise<VertexAiStatus> {
       model_name: 'gemini-3.8-flash',
       has_adc: true,
       token_valid: true,
+      discovered_gemini_models: ['gemini-3.8-flash', 'gemini-2.5-flash', 'gemini-2.5-pro'],
+      deepseek_configured: true,
+      deepseek_model: 'deepseek-chat',
+      last_used_provider: 'Google Cloud Vertex AI',
+      last_used_model: 'gemini-3.8-flash',
     };
   }
 }
