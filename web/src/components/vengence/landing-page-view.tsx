@@ -529,7 +529,7 @@ export function LandingPageView() {
               Engineered with Modern Full-Stack Precision
             </h2>
             <p className='text-sm sm:text-base text-muted-foreground max-w-2xl'>
-              Glide across the real-time DuckDB columnar analytics, SciPy KKT solvers, Next.js 16 architecture, and multi-platform ad APIs powering NEXUS.
+              Glide across the real-time DuckDB columnar analytics, SciPy KKT solvers, Next.js 16 architecture, and modern full-stack libraries powering NEXUS.
             </p>
           </div>
 
