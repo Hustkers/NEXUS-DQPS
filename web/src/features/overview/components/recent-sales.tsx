@@ -41,7 +41,7 @@ const salesData = [
 
 export function RecentSales() {
   return (
-    <Card className='h-full bg-[#1A1A1A] border-[#8A8A8A] shadow-none'>
+    <Card className='h-full bg-[#1A1A1A] border-[#1A1A1A] shadow-none'>
       <CardHeader>
         <CardTitle className='text-white font-mono'>Recent Transactions</CardTitle>
         <CardDescription className='text-[#8A8A8A] font-mono'>265 orders processed this telemetry cycle.</CardDescription>
@@ -50,7 +50,7 @@ export function RecentSales() {
         <div className='space-y-8'>
           {salesData.map((sale, index) => (
             <div key={index} className='flex items-center'>
-              <Avatar className='h-9 w-9 border border-[#8A8A8A]'>
+              <Avatar className='h-9 w-9 border border-[#1A1A1A]'>
                 <AvatarImage src={sale.avatar} alt='Avatar' />
                 <AvatarFallback className='bg-[#000000] text-white font-mono text-xs'>{sale.fallback}</AvatarFallback>
               </Avatar>
