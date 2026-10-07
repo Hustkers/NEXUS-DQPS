@@ -91,13 +91,17 @@ export function VGPUCanvas({ className = '', intensity = 1.0 }: VGPUCanvasProps)
           }
         }
 
-        // Achromatic monochrome response field lines
-        const lineAlpha = 0.03 + (r / rows) * 0.05;
-        ctx.strokeStyle = `rgba(255, 255, 255, ${lineAlpha})`;
+        // Adaptive monochrome response field lines
+        const isDarkTheme = document.documentElement.classList.contains('dark') || !document.documentElement.classList.contains('light');
+        const strokeRgb = isDarkTheme ? '255, 255, 255' : '15, 23, 42';
+        const lineAlpha = (0.03 + (r / rows) * 0.05) * (isDarkTheme ? 1.0 : 1.3);
+        ctx.strokeStyle = `rgba(${strokeRgb}, ${lineAlpha})`;
         ctx.stroke();
       }
 
       // Draw floating nodes at vertex intersections near mouse
+      const isDarkTheme = document.documentElement.classList.contains('dark') || !document.documentElement.classList.contains('light');
+      const nodeRgb = isDarkTheme ? '255, 255, 255' : '15, 23, 42';
       const nodeStep = 2;
       for (let r = 0; r < rows; r += nodeStep) {
         for (let c = 0; c < cols; c += nodeStep) {
@@ -116,7 +120,7 @@ export function VGPUCanvas({ className = '', intensity = 1.0 }: VGPUCanvasProps)
             ctx.beginPath();
             const radius = (1.5 + mouseFactor * 2.5);
             ctx.arc(x, y, radius, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(255, 255, 255, ${mouseFactor * 0.75})`;
+            ctx.fillStyle = `rgba(${nodeRgb}, ${mouseFactor * (isDarkTheme ? 0.75 : 0.5)})`;
             ctx.fill();
           }
         }

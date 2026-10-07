@@ -1,9 +1,20 @@
 'use client';
 
+import { useTheme } from 'next-themes';
 import { ConstellationField } from '@designcodeio/threeui';
 import '@designcodeio/threeui/style.css';
+import { useEffect, useState } from 'react';
 
 export function BackgroundShader() {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = !mounted || resolvedTheme === 'dark';
+
   return (
     <div
       className='fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-30 select-none'
@@ -12,12 +23,12 @@ export function BackgroundShader() {
       <div className='shader-frame w-full h-full pointer-events-none'>
         <ConstellationField
           variant='interface-lines'
-          mode='dark'
+          mode={isDark ? 'dark' : 'light'}
           speed={1.0}
           size={1.0}
           length={1.0}
           density={1.0}
-          opacity={1.0}
+          opacity={isDark ? 1.0 : 0.4}
           hue={0}
           saturation={1.0}
           brightness={1.0}
