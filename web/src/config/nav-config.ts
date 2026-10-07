@@ -2,18 +2,10 @@ import { NavGroup } from '@/types';
 
 export const navGroups: NavGroup[] = [
   {
-    label: '',
+    label: 'Mission Intelligence',
     items: [
       {
-        title: 'Pitch & Overview',
-        url: '/',
-        icon: 'externalLink',
-        isActive: false,
-        shortcut: ['h', 'o'],
-        items: []
-      },
-      {
-        title: 'Mission Control',
+        title: 'Mission Control Cockpit',
         url: '/dashboard/overview',
         icon: 'dashboard',
         isActive: true,
@@ -28,6 +20,19 @@ export const navGroups: NavGroup[] = [
         shortcut: ['3', 'g'],
         items: []
       },
+      {
+        title: 'Landing Pitch & Story',
+        url: '/',
+        icon: 'externalLink',
+        isActive: false,
+        shortcut: ['h', 'o'],
+        items: []
+      }
+    ]
+  },
+  {
+    label: 'Decision Intelligence',
+    items: [
       {
         title: 'Diagnostic Anomalies & RCA',
         url: '/dashboard/anomalies',
@@ -59,7 +64,12 @@ export const navGroups: NavGroup[] = [
         isActive: false,
         shortcut: ['d', 'l'],
         items: []
-      },
+      }
+    ]
+  },
+  {
+    label: 'Attribution & Sandbox',
+    items: [
       {
         title: 'Fingerprint Identity Tracker',
         url: '/dashboard/fingerprint',
@@ -75,7 +85,12 @@ export const navGroups: NavGroup[] = [
         isActive: false,
         shortcut: ['s', 's'],
         items: []
-      },
+      }
+    ]
+  },
+  {
+    label: 'Commerce & Catalog',
+    items: [
       {
         title: 'Nike Footwear Catalog',
         url: '/dashboard/product',
