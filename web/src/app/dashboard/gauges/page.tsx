@@ -25,6 +25,37 @@ type FilterChip = 'all' | 'needs_fix' | 'fixed';
 const LOCAL_STORAGE_PRODUCTS_KEY = 'nexus_roas_gauges_products_v2';
 const LOCAL_STORAGE_LEDGER_KEY = 'nexus_roas_gauges_ledger_v2';
 
+/** Hydrates gauges products/ledger from localStorage on client mount. */
+function loadGaugesFromStorage(
+  setProducts: React.Dispatch<React.SetStateAction<ProductModel[]>>,
+  setLedgerEntries: React.Dispatch<React.SetStateAction<GaugesLedgerItem[]>>,
+  setIsClientLoaded: React.Dispatch<React.SetStateAction<boolean>>
+) {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const savedProducts = localStorage.getItem(LOCAL_STORAGE_PRODUCTS_KEY);
+      const savedLedger = localStorage.getItem(LOCAL_STORAGE_LEDGER_KEY);
+
+      if (savedProducts) {
+        const parsed = JSON.parse(savedProducts);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setProducts(parsed);
+        }
+      }
+      if (savedLedger) {
+        const parsed = JSON.parse(savedLedger);
+        if (Array.isArray(parsed)) {
+          setLedgerEntries(parsed);
+        }
+      }
+    }
+  } catch {
+    // Fallback silently to default in-memory state
+  } finally {
+    setIsClientLoaded(true);
+  }
+}
+
 export default function GaugesPage() {
   const [, startTransition] = useTransition();
 
@@ -48,29 +79,7 @@ export default function GaugesPage() {
 
   // Load from LocalStorage on mount
   useEffect(() => {
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        const savedProducts = localStorage.getItem(LOCAL_STORAGE_PRODUCTS_KEY);
-        const savedLedger = localStorage.getItem(LOCAL_STORAGE_LEDGER_KEY);
-
-        if (savedProducts) {
-          const parsed = JSON.parse(savedProducts);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setProducts(parsed);
-          }
-        }
-        if (savedLedger) {
-          const parsed = JSON.parse(savedLedger);
-          if (Array.isArray(parsed)) {
-            setLedgerEntries(parsed);
-          }
-        }
-      }
-    } catch {
-      // Fallback silently to default in-memory state
-    } finally {
-      setIsClientLoaded(true);
-    }
+    loadGaugesFromStorage(setProducts, setLedgerEntries, setIsClientLoaded);
   }, []);
 
   // Save to LocalStorage upon updates

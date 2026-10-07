@@ -147,16 +147,17 @@ export function RoasGauge({
             </div>
           ) : null}
           <div className='flex flex-col text-left min-w-0'>
-            <span
+            <button
+              type='button'
               onClick={onAnalyze}
               className={cn(
-                'text-xs font-semibold text-foreground truncate max-w-[150px]',
+                'text-xs font-semibold text-foreground truncate max-w-[150px] text-left',
                 onAnalyze && 'cursor-pointer hover:underline'
               )}
               title={displayName}
             >
               {displayName}
-            </span>
+            </button>
             <span className='text-[10px] text-muted-foreground uppercase tracking-wider truncate flex items-center gap-1.5 mt-0.5'>
               <PlatformLogo platform={displayChannel.toLowerCase()} size={11} className='shrink-0' />
               <span>{displayChannel}</span>

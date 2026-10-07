@@ -128,6 +128,13 @@ export function MissionControlConsole() {
         </div>
 
         <div className='flex items-center gap-3 text-xs font-mono'>
+          <Link
+            href='/dashboard/autonomous-engine'
+            className='flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-foreground text-background font-bold text-xs uppercase hover:bg-foreground/90 transition-all shadow-xs'
+          >
+            <Icons.sparkles className='size-3.5 text-emerald-400' />
+            Autonomous Ad Learning Engine →
+          </Link>
           <div className='flex items-center gap-2 text-foreground bg-card px-3 py-1.5 rounded-lg border border-border shadow-2xs'>
             <span className='size-1.5 rounded-full bg-emerald-500' />
             <span className='font-semibold'>Cycle {state.metadata.cycleId}</span>
@@ -136,6 +143,32 @@ export function MissionControlConsole() {
             SLSQP Convex Optimization
           </span>
         </div>
+      </div>
+
+      {/* Flagship Product Feature Banner: Autonomous Learning & Live What-If Simulator */}
+      <div className='rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 via-card to-card p-5 font-mono shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4'>
+        <div className='space-y-1 max-w-2xl'>
+          <div className='flex items-center gap-2'>
+            <span className='size-2 rounded-full bg-emerald-500 animate-pulse' />
+            <span className='text-[10px] uppercase font-bold tracking-widest text-emerald-600 dark:text-emerald-400'>
+              Flagship Capability • Primary Autonomous Loop
+            </span>
+          </div>
+          <h2 className='text-base sm:text-lg font-bold uppercase tracking-tight text-foreground'>
+            WHERE SHOULD THE NEXT ₹ GO?
+          </h2>
+          <p className='text-xs text-muted-foreground leading-relaxed'>
+            The engine analyzes historical campaign outcomes, models non-linear diminishing returns (Hill saturation curves), and continuously re-allocates multi-channel budgets to maximize incremental profit.
+          </p>
+        </div>
+
+        <Link
+          href='/dashboard/autonomous-engine'
+          className='px-4 py-2.5 rounded-xl bg-foreground text-background font-bold text-xs uppercase tracking-wider hover:bg-foreground/90 transition-all shrink-0 flex items-center gap-2 shadow-sm'
+        >
+          <Icons.sliders className='size-3.5 text-emerald-400' />
+          Launch Live What-If Simulator →
+        </Link>
       </div>
 
       {/* 2. Key Performance Bento Strip */}

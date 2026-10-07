@@ -1,14 +1,15 @@
 'use client';
 
-import * as React from 'react';
+import { useSyncExternalStore } from 'react';
 import { MoonStar, SunDim } from 'lucide-react';
 import { useTheme } from 'next-themes';
-
 import { Button } from '@/components/ui/button';
 import { startThemeTransition } from '@/lib/theme-transition';
 
+const emptySubscribe = () => () => {};
+
 export const ThemeToggle = () => {
-  const [mounted, setMounted] = React.useState(false);
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const { theme, setTheme, systemTheme } = useTheme();
 
   const getTheme = () => {
@@ -17,10 +18,6 @@ export const ThemeToggle = () => {
     }
     return theme;
   };
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleToggle = (event: React.MouseEvent<HTMLButtonElement>) => {
     const curTheme =

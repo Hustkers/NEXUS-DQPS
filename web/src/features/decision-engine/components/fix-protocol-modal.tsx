@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useId } from 'react';
 import { Icons } from '@/components/icons';
 import { PlatformLogo } from '@/components/icons/platform-logos';
 import { cn } from '@/lib/utils';
@@ -28,8 +28,9 @@ export function FixProtocolModal({
   const [executingStepIndex, setExecutingStepIndex] = useState<number>(0);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // Initialize or reset step state
-  useEffect(() => {
+  const [prevOpen, setPrevOpen] = useState(isOpen);
+  if (prevOpen !== isOpen) {
+    setPrevOpen(isOpen);
     if (isOpen) {
       if (isSummaryOnly || product?.isFixed) {
         setStep(3);
@@ -38,7 +39,11 @@ export function FixProtocolModal({
         setExecutingStepIndex(0);
       }
     }
-  }, [isOpen, isSummaryOnly, product?.isFixed]);
+  }
+
+  const [resultTime, setResultTime] = useState<string | null>(null);
+
+  const titleId = useId();
 
   // Handle ESC key to close modal
   useEffect(() => {
@@ -71,6 +76,7 @@ export function FixProtocolModal({
           onExecute(plan);
           setTimeout(() => {
             setStep(3);
+            setResultTime(new Date().toTimeString().slice(0, 5));
           }, prefersReducedMotion ? 50 : 350);
           return prev;
         }
@@ -83,24 +89,24 @@ export function FixProtocolModal({
   if (!isOpen || !product || !plan) return null;
 
   const currentPlan = product.appliedPlan || plan;
-  const fixedTimeStr = product.fixedAt
-    ? product.fixedAt.includes(' ')
-      ? product.fixedAt.split(' ')[1]
-      : product.fixedAt
-    : new Date().toTimeString().slice(0, 5);
+  const fixedTimeStr = resultTime ?? product.fixedAt;
 
   return (
     <div
-      className='fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-in fade-in duration-150'
-      onClick={onClose}
-      role='dialog'
-      aria-modal='true'
-      aria-labelledby='fix-protocol-title'
+      className='fixed inset-0 z-50 flex items-center justify-center p-4'
     >
+      <button
+        type='button'
+        aria-label='Close modal'
+        onClick={onClose}
+        className='absolute inset-0 bg-black/85 backdrop-blur-md cursor-default'
+      />
       <div
         ref={modalRef}
-        onClick={(e) => e.stopPropagation()}
-        className='relative w-full max-w-xl rounded-xl border border-[#262626] bg-[#0A0A0A] p-6 text-white shadow-2xl font-mono'
+        role='dialog'
+        aria-modal='true'
+        aria-labelledby={titleId}
+        className='relative z-10 w-full max-w-xl rounded-xl border border-[#262626] bg-[#0A0A0A] p-6 text-white shadow-2xl font-mono'
       >
         {/* Header Bar */}
         <div className='flex items-center justify-between border-b border-[#1F1F1F] pb-4 mb-4'>
@@ -118,8 +124,8 @@ export function FixProtocolModal({
             <div className='min-w-0'>
               <div className='flex items-center gap-2'>
                 <h3
-                  id='fix-protocol-title'
                   className='text-sm font-bold text-white uppercase tracking-tight truncate'
+                  id={titleId}
                 >
                   {product.name}
                 </h3>
