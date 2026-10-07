@@ -52,21 +52,21 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, onViewReceipt, isM
   return (
     <div
       className={cn(
-        'group relative flex flex-col justify-between rounded border border-[#1A1A1A] bg-[#1A1A1A] p-4 text-[#FFFFFF] transition-all hover:border-[#8A8A8A] shadow-none',
+        'group relative flex flex-col justify-between rounded border border-border bg-card p-4 text-card-foreground transition-all hover:border-foreground/30 shadow-none',
         className
       )}
     >
       <div>
         {/* Monochromatic header */}
-        <div className='flex items-center justify-between text-xs font-mono text-[#8A8A8A] mb-2.5'>
+        <div className='flex items-center justify-between text-xs font-mono text-muted-foreground mb-2.5'>
           <div className='flex items-center gap-2'>
-            <span className='text-xs font-mono font-bold text-[#FFFFFF]'>
+            <span className={cn('text-xs font-mono font-bold', isCritical ? 'text-rose-500' : 'text-foreground')}>
               {isCritical ? '■' : '○'}
             </span>
             <PlatformLogo platform={anomaly.platform} size={14} className='shrink-0' />
-            <span className='capitalize font-semibold text-[#FFFFFF]'>{anomaly.platform}</span>
-            <span className='text-[#8A8A8A]'>/</span>
-            <span className='text-[#8A8A8A] text-[11px]'>{anomaly.date}</span>
+            <span className='capitalize font-semibold text-foreground'>{anomaly.platform}</span>
+            <span className='text-muted-foreground'>/</span>
+            <span className='text-muted-foreground text-[11px]'>{anomaly.date}</span>
           </div>
           <div className='flex items-center gap-1.5'>
             {isReallocated && (
@@ -102,7 +102,7 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, onViewReceipt, isM
           title='Click to inspect product telemetry'
         >
           {anomaly.photoUrl && (
-            <div className='relative size-10 rounded border border-[#1A1A1A] bg-[#000000] overflow-hidden shrink-0 group-hover/shoe:border-[#FFFFFF] transition-colors'>
+            <div className='relative size-10 rounded border border-border bg-muted/60 overflow-hidden shrink-0 group-hover/shoe:border-foreground transition-colors'>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={anomaly.photoUrl}
@@ -113,19 +113,19 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, onViewReceipt, isM
           )}
           <div className='flex-1 min-w-0'>
             <div className='flex items-center justify-between gap-1'>
-              <h4 className='font-mono text-xs font-bold text-[#FFFFFF] truncate group-hover/shoe:underline'>
+              <h4 className='font-mono text-xs font-bold text-foreground truncate group-hover/shoe:underline'>
                 {anomaly.productName || anomaly.campaign}
               </h4>
               {anomaly.inventory === 0 && (
-                <span className='text-[10px] bg-[#FFFFFF] text-[#000000] px-1.5 py-0.5 rounded font-mono font-bold shrink-0'>
+                <span className='text-[10px] bg-rose-500 text-white px-1.5 py-0.5 rounded font-mono font-bold shrink-0'>
                   STOCK 0
                 </span>
               )}
             </div>
-            <div className='flex items-center gap-2 text-[11px] font-mono text-[#8A8A8A] mt-0.5'>
-              <span className='text-[#FFFFFF]'>₹{anomaly.spend.toLocaleString()}/d</span>
+            <div className='flex items-center gap-2 text-[11px] font-mono text-muted-foreground mt-0.5'>
+              <span className='text-foreground'>₹{anomaly.spend.toLocaleString()}/d</span>
               <span>•</span>
-              <span className='font-bold text-[#FFFFFF]'>
+              <span className='font-bold text-foreground'>
                 {anomaly.roas.toFixed(2)}x ROAS
               </span>
             </div>
@@ -133,25 +133,25 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, onViewReceipt, isM
         </div>
 
         {/* Plain diagnostic explanation */}
-        <p className='text-xs text-[#8A8A8A] leading-relaxed font-sans mb-3 line-clamp-2'>
+        <p className='text-xs text-muted-foreground leading-relaxed font-sans mb-3 line-clamp-2'>
           {anomaly.explanation}
         </p>
 
         {/* Minimal Factor Waterfall: hairline bars in monochrome */}
-        <div className='space-y-1.5 mb-3 pt-2.5 border-t border-[#000000]'>
+        <div className='space-y-1.5 mb-3 pt-2.5 border-t border-border'>
           {anomaly.factors.slice(0, 2).map((f, i) => {
             const barWidth = Math.min(Math.abs(f.impactPts) * 1.3, 100);
             return (
               <div key={i} className='space-y-1'>
                 <div className='flex items-center justify-between text-[11px] font-mono'>
-                  <span className='text-[#8A8A8A]'>{f.name}</span>
-                  <span className='font-bold text-[#FFFFFF]'>
+                  <span className='text-muted-foreground'>{f.name}</span>
+                  <span className='font-bold text-foreground'>
                     {f.impactPts > 0 ? `+${f.impactPts.toFixed(1)}` : f.impactPts.toFixed(1)} pts
                   </span>
                 </div>
-                <div className='h-1.5 w-full bg-[#000000] overflow-hidden'>
+                <div className='h-1.5 w-full bg-muted overflow-hidden'>
                   <div
-                    className={cn('h-full', isCritical ? 'bg-[#FFFFFF]' : 'bg-[#8A8A8A]')}
+                    className={cn('h-full', isCritical ? 'bg-rose-500' : 'bg-foreground')}
                     style={{ width: `${barWidth}%` }}
                   />
                 </div>
@@ -167,9 +167,9 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, onViewReceipt, isM
           size='sm'
           variant='outline'
           onClick={() => onAnalyze?.(anomaly)}
-          className='flex-1 text-xs font-mono h-8 border border-[#1A1A1A] bg-[#000000] text-[#FFFFFF] hover:bg-[#1A1A1A] hover:border-[#FFFFFF] font-semibold active:scale-[0.98]'
+          className='flex-1 text-xs font-mono h-8 border border-border bg-card text-foreground hover:bg-muted font-semibold active:scale-[0.98]'
         >
-          <IconWorld className='mr-1.5 size-3.5 text-[#FFFFFF]' />
+          <IconWorld className='mr-1.5 size-3.5 text-foreground' />
           Analyse Globe
         </Button>
         {isReallocated ? (

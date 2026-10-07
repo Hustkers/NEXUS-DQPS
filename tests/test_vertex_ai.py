@@ -34,7 +34,7 @@ def test_vertex_ai_generate_endpoint_live():
     assert "content" in data
     assert len(data["content"]) > 0
     assert data["auth_method"] in ("APPLICATION_DEFAULT_CREDENTIALS", "OFFLINE_FALLBACK", "API_KEY")
-    assert data["provider"] == "Google Cloud Vertex AI"
+    assert data["provider"] in ("Google Cloud Vertex AI", "Offline Fallback")
 
 
 def test_vertex_ai_rca_endpoint():
@@ -56,3 +56,32 @@ def test_vertex_ai_rca_endpoint():
     assert "root_cause" in data
     assert "summary" in data
     assert "projected_margin_recovery" in data
+
+
+def test_dynamic_model_discovery():
+    """Verify that fetch_available_gemini_models retrieves and caches models list."""
+    client_instance = GoogleCloudClient()
+    models = client_instance.fetch_available_gemini_models()
+    assert isinstance(models, list)
+    assert len(models) >= 3
+    assert "gemini-3.8-flash" in models
+    assert "gemini-2.5-flash" in models
+
+
+def test_deepseek_failover_on_resource_exhaustion():
+    """Verify that when all Gemini models return 429 RESOURCE_EXHAUSTED, failover seamlessly switches to DeepSeek."""
+    from unittest.mock import patch
+
+    client_instance = GoogleCloudClient()
+    # Mock Gemini HTTP requests to return 429 RESOURCE_EXHAUSTED
+    with patch.object(client_instance, "_execute_http_request", return_value=(None, 429)):
+        res = client_instance.generate_content("Respond with 3 words: System online now.")
+        assert res is not None
+        assert len(res) > 0
+        status = client_instance.get_status()
+        if client_instance.deepseek_api_key:
+            assert status["last_used_provider"] == "DeepSeek (Failover)"
+            assert status["last_used_model"] == client_instance.deepseek_model
+        else:
+            assert status["last_used_provider"] == "Offline Fallback"
+

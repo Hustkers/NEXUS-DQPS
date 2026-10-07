@@ -59,8 +59,8 @@ def generate_vertex_ai_content(req: GenerateContentRequest) -> GenerateContentRe
         status = client.get_status()
         return GenerateContentResponse(
             content=content,
-            model=status.get("model_name", "gemini-3.8-flash"),
-            provider=status.get("provider", "Google Cloud Vertex AI"),
+            model=status.get("last_used_model") or status.get("model_name", "gemini-3.8-flash"),
+            provider=status.get("last_used_provider") or status.get("provider", "Google Cloud Vertex AI"),
             auth_method=status.get("auth_method", "APPLICATION_DEFAULT_CREDENTIALS"),
             project_id=status.get("project_id"),
             location=status.get("location"),

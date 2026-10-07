@@ -29,14 +29,32 @@ export default function LedgerPage() {
   }, []);
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#000000] text-white min-h-screen'>
-      <div>
-        <h1 className='text-xl font-mono font-bold text-white uppercase tracking-tight'>
-          Closed-Loop Decision Ledger &amp; Reinforcement Learning Store
-        </h1>
-        <p className='text-xs font-mono text-[#8A8A8A] mt-1'>
-          Every executed directive logged • Expected vs Realized Margin measured • Online model calibration
-        </p>
+    <div className='flex flex-1 flex-col gap-4 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen'>
+      {/* Compact Terminal-Style Header */}
+      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-3'>
+        <div className='space-y-0.5'>
+          <div className='flex items-center gap-2.5'>
+            <h1 className='text-lg md:text-xl font-mono font-bold text-foreground uppercase tracking-tight'>
+              DECISION LEDGER
+            </h1>
+            <span className='inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'>
+              <span className='h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse' />
+              ✓ AUDITED
+            </span>
+          </div>
+          <p className='text-[11px] font-mono text-muted-foreground'>
+            Closed-loop execution • Expected vs realized • Model calibration
+          </p>
+        </div>
+
+        <div className='text-right'>
+          <div className='text-lg font-mono font-bold text-foreground leading-tight'>
+            {initialEngineState.ledger.length}
+          </div>
+          <div className='text-[10px] font-mono uppercase tracking-wider text-muted-foreground'>
+            AUDITED DECISIONS
+          </div>
+        </div>
       </div>
 
       <DecisionLedgerTable entries={entries} />

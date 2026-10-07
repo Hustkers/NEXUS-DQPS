@@ -2,20 +2,13 @@
 
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
-import { PlatformLogo } from '@/components/icons/platform-logos';
 import { AnomalyCard } from './anomaly-card';
 import { ReallocationFeed } from './reallocation-feed';
 import { ScenarioController, ScenarioDefinition } from './scenario-controller';
 import { RoasGauge } from './roas-gauge';
 import { PlatformBreakdownChart } from './platform-breakdown-chart';
 import { DecisionLedgerTable } from './decision-ledger-table';
-import { CausalDagVisualizer } from './causal-dag-visualizer';
-import { RcaWaterfallChart } from './rca-waterfall-chart';
-import { ScenarioSandbox } from './scenario-sandbox';
-import { ExecutiveGraphBanner } from './executive-graph-banner';
-import { USE_MOCKS, FASTAPI_BASE_URL, approveDirective } from '@/lib/api-adapter';
 import { ProductAnalysisModal, type ProductAnalysisTarget } from './product-analysis-modal';
 import { GithubGlobe } from './github-globe';
 import { GlobePulse } from '@/components/ui/cobe-globe-pulse';
@@ -27,16 +20,11 @@ import { useChannel, AdChannel } from '@/context/channel-context';
 
 export function MissionControlConsole() {
   const [state, setState] = useState(initialEngineState);
-  const [liveMode, setLiveMode] = useState(!USE_MOCKS);
   const [analyzingProduct, setAnalyzingProduct] = useState<ProductAnalysisTarget | null>(null);
   const [consoleGlobeMode, setConsoleGlobeMode] = useState<'arcs' | 'pulse'>('pulse');
   const { channel, setChannel } = useChannel();
   const activeTab = channel;
   const setActiveTab = (tab: string) => setChannel(tab as AdChannel);
-
-  const hasCriticalAnomaly = state.anomalies.some(
-    (a: any) => a.severity === 'CRITICAL' || a.factors?.some((f: any) => f.badge === 'Stockout')
-  );
 
   const handleTriggerScenario = (scenario: ScenarioDefinition) => {
     if (scenario.id === 'scenario-stockout') {
@@ -66,7 +54,7 @@ export function MissionControlConsole() {
           roas: 0.15,
           spend: 4200,
           inventory: 0,
-          explanation: 'Stock level reached zero on Nike ERP SKU 315122-001. ROAS collapsed from 3.8x to 0.15x (-96%).',
+          explanation: 'Stock level reached zero on Nike ERP SKU 315122-001. ROAS collapsed from 3.8x to 0.15x.',
           factors: [
             {
               name: 'Inventory Stockout',
@@ -98,9 +86,6 @@ export function MissionControlConsole() {
           }
         };
       });
-      toast.error('Operational Shock Injected', {
-        description: 'Hero SKU stockout triggered. ROAS collapsed across Meta channels.'
-      });
     } else {
       setState((prev) => {
         const updatedCampaigns = prev.campaigns.map((c: any) => {
@@ -111,17 +96,11 @@ export function MissionControlConsole() {
         });
         return { ...prev, campaigns: updatedCampaigns };
       });
-      toast.warning('Ad Fatigue Shock Injected', {
-        description: 'Meta creative fatigue simulated with 25% efficiency degradation.'
-      });
     }
   };
 
   const handleResetBaseline = () => {
     setState(initialEngineState);
-    toast.info('Telemetry Restored', {
-      description: 'Reset to canonical baseline with optimal channel balance.'
-    });
   };
 
   const filteredCampaigns = state.campaigns.filter((c: any) =>
@@ -129,17 +108,121 @@ export function MissionControlConsole() {
   );
 
   return (
-    <div className='relative flex flex-1 flex-col gap-8 p-5 md:p-8 bg-[#000000] text-white min-h-screen selection:bg-[#1A1A1A] selection:text-white'>
+    <div className='relative flex flex-1 flex-col gap-8 p-5 md:p-8 bg-slate-50/50 dark:bg-[#08090c] text-foreground min-h-screen selection:bg-slate-200 dark:selection:bg-zinc-800 selection:text-foreground'>
+      {/* 1. Header & Live Telemetry (Utilitarian Minimalist) */}
+      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/80 pb-5'>
+        <div>
+          <div className='flex items-center gap-2.5'>
+            <span className='size-2 rounded-full bg-emerald-500 shadow-xs' />
+            <h1 className='text-xl font-bold font-mono tracking-tight text-foreground'>
+              NEXUS D2C
+            </h1>
+            <span className='text-muted-foreground/60 font-mono text-sm'>/</span>
+            <span className='text-sm font-mono text-muted-foreground font-medium'>
+              Nike Direct Decision Engine
+            </span>
+          </div>
+          <p className='text-xs text-muted-foreground font-mono mt-1'>
+            PostgreSQL 16 • Autonomous allocation active • Floor ROAS 1.80x
+          </p>
+        </div>
 
+        <div className='flex items-center gap-3 text-xs font-mono'>
+          <div className='flex items-center gap-2 text-foreground bg-card px-3 py-1.5 rounded-lg border border-border shadow-2xs'>
+            <span className='size-1.5 rounded-full bg-emerald-500' />
+            <span className='font-semibold'>Cycle {state.metadata.cycleId}</span>
+          </div>
+          <span className='text-muted-foreground hidden sm:block text-[11px] font-mono'>
+            SLSQP Convex Optimization
+          </span>
+        </div>
+      </div>
 
-      {/* 2. Executive Overview KPI Banner & Trajectory Graphs */}
-      <ExecutiveGraphBanner
-        state={state}
-        hasCriticalAnomaly={hasCriticalAnomaly}
-        channel={channel}
-      />
+      {/* 2. Key Performance Bento Strip */}
+      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+        {/* Blended ROAS */}
+        <Card className='border-border/80 bg-card p-5 rounded-xl shadow-xs hover:border-border hover:shadow-sm transition-all'>
+          <div className='flex items-center justify-between text-xs font-mono text-muted-foreground uppercase tracking-wider'>
+            <span>Blended ROAS</span>
+            <span className='text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-500/30 px-1.5 py-0.5 rounded text-[10px] font-bold'>
+              {state.telemetry.roasDelta30d}
+            </span>
+          </div>
+          <div className='mt-2.5 flex items-baseline justify-between'>
+            <span className='text-2xl font-bold font-mono tracking-tight text-foreground'>
+              {state.telemetry.blendedRoas30d.toFixed(2)}x
+            </span>
+            <span className='text-xs font-mono text-muted-foreground'>
+              Target: {state.telemetry.targetRoas.toFixed(2)}x
+            </span>
+          </div>
+          <div className='mt-3 h-1 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden'>
+            <div
+              className='h-full bg-emerald-500 rounded-full'
+              style={{ width: `${Math.min(100, (state.telemetry.blendedRoas30d / state.telemetry.targetRoas) * 100)}%` }}
+            />
+          </div>
+        </Card>
 
-      {/* 4. Scenario Controller (Operational Shock Simulator) */}
+        {/* 30D Spend */}
+        <Card className='border-border/80 bg-card p-5 rounded-xl shadow-xs hover:border-border hover:shadow-sm transition-all'>
+          <div className='flex items-center justify-between text-xs font-mono text-muted-foreground uppercase tracking-wider'>
+            <span>30D Ad Spend</span>
+            <span className='text-muted-foreground text-[11px] font-mono'>79% pace</span>
+          </div>
+          <div className='mt-2.5 flex items-baseline justify-between'>
+            <span className='text-2xl font-bold font-mono tracking-tight text-foreground'>
+              ₹{(state.telemetry.totalSpend30d / 1000).toFixed(1)}k
+            </span>
+            <span className='text-xs font-mono text-muted-foreground'>
+              Budget: ₹{(state.telemetry.totalManagedBudget / 1000).toFixed(0)}k
+            </span>
+          </div>
+          <div className='mt-3 h-1 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden'>
+            <div className='h-full bg-blue-500 rounded-full' style={{ width: '79%' }} />
+          </div>
+        </Card>
+
+        {/* Net Contribution Margin */}
+        <Card className='border-border/80 bg-card p-5 rounded-xl shadow-xs hover:border-border hover:shadow-sm transition-all'>
+          <div className='flex items-center justify-between text-xs font-mono text-muted-foreground uppercase tracking-wider'>
+            <span>Contribution Margin</span>
+            <span className='text-sky-700 dark:text-cyan-400 text-[11px] font-semibold'>56.8% gross</span>
+          </div>
+          <div className='mt-2.5 flex items-baseline justify-between'>
+            <span className='text-2xl font-bold font-mono tracking-tight text-foreground'>
+              ₹{(state.telemetry.totalMargin30d / 1000).toFixed(1)}k
+            </span>
+            <span className='text-xs font-mono text-muted-foreground'>
+              Rev: ₹{(state.telemetry.totalRevenue30d / 1000).toFixed(1)}k
+            </span>
+          </div>
+          <div className='mt-3 h-1 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden'>
+            <div className='h-full bg-sky-500 dark:bg-cyan-400 rounded-full' style={{ width: '56.8%' }} />
+          </div>
+        </Card>
+
+        {/* Protected Margin Lift */}
+        <Card className='border-border/80 bg-card p-5 rounded-xl shadow-xs hover:border-border hover:shadow-sm transition-all'>
+          <div className='flex items-center justify-between text-xs font-mono text-muted-foreground uppercase tracking-wider'>
+            <span>Protected Lift</span>
+            <span className='text-rose-600 dark:text-rose-400 text-[11px] font-mono'>{state.telemetry.activeAnomaliesCount} anomalies</span>
+          </div>
+          <div className='mt-2.5 flex items-baseline justify-between'>
+            <span className='text-2xl font-bold font-mono tracking-tight text-emerald-600 dark:text-emerald-400'>
+              +₹{(state.telemetry.projectedMarginUplift / 1000).toFixed(1)}k
+            </span>
+            <span className='text-xs font-mono text-muted-foreground'>
+              Reallocated: ₹{(state.telemetry.reallocationCapitalMoved / 1000).toFixed(1)}k
+            </span>
+          </div>
+          <div className='mt-3 h-1 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden'>
+            <div className='h-full bg-emerald-500 rounded-full' style={{ width: '92%' }} />
+          </div>
+        </Card>
+      </div>
+
+      {/* 3. Scenario Controller (Utilitarian Sandbox) */}
       <ScenarioController
         scenarios={state.scenarios}
         onTriggerScenario={handleTriggerScenario}
@@ -147,25 +230,25 @@ export function MissionControlConsole() {
       />
 
       {/* 3.5. Live 3D Global Telemetry & Heatmap Command Center */}
-      <div className='rounded border border-[#1A1A1A] bg-[#1A1A1A] p-5 shadow-none flex flex-col lg:flex-row items-center justify-between gap-6 overflow-hidden'>
+      <div className='rounded-2xl border border-zinc-800 bg-zinc-950/70 p-5 shadow-xl flex flex-col lg:flex-row items-center justify-between gap-6 overflow-hidden'>
         <div className='flex-1 space-y-3.5 w-full'>
-          <div className='flex flex-wrap items-center justify-between gap-2 border-b border-[#000000] pb-2.5'>
+          <div className='flex flex-wrap items-center justify-between gap-2 border-b border-zinc-900 pb-2.5'>
             <div className='flex items-center gap-2'>
-              <Icons.globe className='size-5 text-white' />
-              <h3 className='font-mono text-sm font-bold text-white uppercase tracking-tight'>
+              <Icons.globe className='size-5 text-cyan-400' />
+              <h3 className='font-mono text-sm font-bold text-zinc-100 uppercase tracking-tight'>
                 Live 3D Global Ad &amp; Sales Telemetry
               </h3>
             </div>
             <div className='flex items-center gap-2'>
               {/* Globe Switcher */}
-              <div className='flex items-center bg-[#000000] rounded border border-[#1A1A1A] p-0.5 text-xs font-mono'>
+              <div className='flex items-center bg-zinc-900 rounded-lg border border-zinc-800 p-0.5 text-xs font-mono'>
                 <button
                   onClick={() => setConsoleGlobeMode('pulse')}
                   className={cn(
                     'px-2.5 py-1 rounded font-semibold transition-all',
                     consoleGlobeMode === 'pulse'
-                      ? 'bg-white text-black font-bold'
-                      : 'text-[#8A8A8A] hover:text-white'
+                      ? 'bg-rose-950 text-rose-300 border border-rose-800/60'
+                      : 'text-zinc-500 hover:text-zinc-300'
                   )}
                 >
                   Sales Pulse
@@ -175,8 +258,8 @@ export function MissionControlConsole() {
                   className={cn(
                     'px-2.5 py-1 rounded font-semibold transition-all',
                     consoleGlobeMode === 'arcs'
-                      ? 'bg-white text-black font-bold'
-                      : 'text-[#8A8A8A] hover:text-white'
+                      ? 'bg-cyan-950 text-cyan-300 border border-cyan-800/60'
+                      : 'text-zinc-500 hover:text-zinc-300'
                   )}
                 >
                   Analysing Arcs
@@ -185,7 +268,7 @@ export function MissionControlConsole() {
 
               <Link
                 href='/dashboard/globe'
-                className='px-2.5 py-1 rounded bg-[#000000] border border-[#1A1A1A] text-xs font-mono text-white hover:bg-white hover:text-black transition-colors flex items-center gap-1.5'
+                className='px-2.5 py-1 rounded-md bg-zinc-900 border border-zinc-800 text-xs font-mono text-zinc-300 hover:text-white transition-colors flex items-center gap-1.5'
               >
                 <span>Full Globe Hub</span>
                 <Icons.arrowRight className='size-3' />
@@ -193,33 +276,33 @@ export function MissionControlConsole() {
             </div>
           </div>
 
-          <p className='text-xs font-mono text-[#8A8A8A] leading-relaxed'>
+          <p className='text-xs font-mono text-zinc-400 leading-relaxed'>
             {consoleGlobeMode === 'pulse'
-              ? 'Real-time customer interaction pulse: High engagement rendered via mechanical telemetry contrast. Powered by cobe-globe-pulse.'
-              : 'WebGL ad delivery vectors across Meta, Google, Amazon & Shopify. Visualizing network latency and delivery hops via github.com/globe.'}
+              ? 'Real-time customer interaction pulse: Regions with high sales and engagement rendered in Red, decreasingly Yellow, and No Grey. Powered by cobe-globe-pulse.'
+              : 'WebGL ad delivery vectors across Meta, Google, Amazon & TikTok. Visualizing network latency and delivery hops via github.com/globe.'}
           </p>
 
           <div className='grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 font-mono text-xs'>
-            <div className='p-2.5 rounded bg-[#000000]'>
-              <div className='text-[10px] text-[#8A8A8A]'>US-EAST / WEST</div>
-              <div className='text-white font-bold'>High Sales (78%)</div>
+            <div className='p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/70'>
+              <div className='text-[10px] text-zinc-500'>US-EAST / WEST</div>
+              <div className='text-red-400 font-bold'>High Sales (78%)</div>
             </div>
-            <div className='p-2.5 rounded bg-[#000000]'>
-              <div className='text-[10px] text-[#8A8A8A]'>WESTERN EUROPE</div>
-              <div className='text-white font-bold'>Strong (56%)</div>
+            <div className='p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/70'>
+              <div className='text-[10px] text-zinc-500'>WESTERN EUROPE</div>
+              <div className='text-orange-400 font-bold'>Strong (56%)</div>
             </div>
-            <div className='p-2.5 rounded bg-[#000000]'>
-              <div className='text-[10px] text-[#8A8A8A]'>ASIA-PACIFIC</div>
-              <div className='text-[#8A8A8A] font-bold'>Moderate (44%)</div>
+            <div className='p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/70'>
+              <div className='text-[10px] text-zinc-500'>ASIA-PACIFIC</div>
+              <div className='text-yellow-400 font-bold'>Moderate (44%)</div>
             </div>
-            <div className='p-2.5 rounded bg-[#000000]'>
-              <div className='text-[10px] text-[#8A8A8A]'>LATAM &amp; SEA</div>
-              <div className='text-white font-bold'>RL Suppressed</div>
+            <div className='p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/70'>
+              <div className='text-[10px] text-zinc-500'>LATAM &amp; SEA</div>
+              <div className='text-cyan-400 font-bold'>RL Suppressed</div>
             </div>
           </div>
 
           <div className='pt-2 flex flex-wrap items-center gap-2'>
-            <span className='text-[11px] font-mono text-[#8A8A8A]'>Click any active SKU to open 3D Analysis Modal:</span>
+            <span className='text-[11px] font-mono text-zinc-500'>Click any active SKU to open 3D Analysis Modal:</span>
             {state.campaigns.slice(0, 3).map((c: any) => (
               <button
                 key={c.campaign}
@@ -236,9 +319,9 @@ export function MissionControlConsole() {
                     severity: c.inventory === 0 ? 'CRITICAL' : 'HEALTHY'
                   });
                 }}
-                className='px-2.5 py-1 rounded bg-[#000000] border border-[#1A1A1A] hover:border-white text-xs font-mono text-white transition-colors flex items-center gap-1.5'
+                className='px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:border-cyan-500/60 text-xs font-mono text-zinc-300 hover:text-cyan-300 transition-colors flex items-center gap-1.5'
               >
-                <PlatformLogo platform={c.platform} size={12} className='shrink-0' />
+                <span className='size-1.5 rounded-full bg-cyan-400' />
                 <span>{c.productName || c.sku}</span>
               </button>
             ))}
@@ -252,7 +335,7 @@ export function MissionControlConsole() {
               size={260}
               activeSku='315122-001'
               activePlatform='meta'
-              accentColor={[1, 1, 1]}
+              accentColor={[0.95, 0.35, 0.45]}
             />
           ) : (
             <GlobePulse size={260} speed={0.0035} />
@@ -260,28 +343,19 @@ export function MissionControlConsole() {
         </div>
       </div>
 
-      {/* 5. Causal DAG Visualizer & RCA Waterfall Decomposition */}
-      <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
-        <CausalDagVisualizer activeAnomaly={hasCriticalAnomaly} />
-        <RcaWaterfallChart
-          totalLoss={hasCriticalAnomaly ? 3008.25 : 0}
-          items={hasCriticalAnomaly ? undefined : [
-            { driver: 'Baseline Equilibrium', category: 'Nominal Operations', dollarImpact: 0, percentageShare: 100, color: 'bg-white' }
-          ]}
-        />
-      </div>
+      {/* 4. Diagnostic Anomalies Feed */}
       <div className='space-y-3.5'>
-        <div className='flex items-center justify-between border-b border-[#1A1A1A] pb-2.5'>
+        <div className='flex items-center justify-between border-b border-border/80 pb-2.5'>
           <div className='flex items-center gap-2'>
-            <Icons.warning className='size-3.5 text-white' />
-            <h3 className='font-mono text-xs font-bold text-white uppercase tracking-wider'>
+            <Icons.warning className='size-3.5 text-rose-500' />
+            <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
               Active Diagnostic Anomalies
             </h3>
-            <span className='text-xs font-mono text-[#8A8A8A]'>
+            <span className='text-xs font-mono text-muted-foreground'>
               ({state.anomalies.length})
             </span>
           </div>
-          <span className='text-xs font-mono text-[#8A8A8A]'>
+          <span className='text-xs font-mono text-muted-foreground'>
             14d Baseline • |Z| &gt; 2.2
           </span>
         </div>
@@ -317,23 +391,15 @@ export function MissionControlConsole() {
         </div>
       </div>
 
-      {/* 7. Interactive What-If Scenario Sandbox */}
-      <ScenarioSandbox
-        onApplyReallocation={(alloc) => {
-          toast.success('What-If Scenario Vector Applied', {
-            description: `Meta: $${alloc.meta}/d | Google: $${alloc.google}/d | Amazon: $${alloc.amazon}/d`
-          });
-        }}
-      />
-
-      {/* 8. Autonomous Budget Reallocation Stream */}
+      {/* 5. Autonomous Budget Reallocation Stream */}
       <ReallocationFeed
         initialItems={state.reallocations}
-        onExecuteReallocation={(item) => {
+        campaigns={state.campaigns}
+        onExecuteReallocation={(item, details) => {
           setState((prev) => {
             const newLedgerItem = {
-              id: `ledg-live-${Date.now()}`,
-              timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+              id: details?.ledgerRecord?.id || `ledg-live-${Date.now()}`,
+              timestamp: details?.ledgerRecord?.timestamp || new Date().toISOString().replace('T', ' ').substring(0, 19),
               decision: `Set ${item.targetCampaign} spend -> ₹${item.recommendedSpend.toFixed(0)}/day (shifted ₹${Math.abs(item.deltaSpend).toFixed(0)} from ${item.sourceCampaign})`,
               expectedMargin: item.expectedDailyMargin,
               realizedMargin: item.expectedDailyMargin * 0.94,
@@ -343,48 +409,75 @@ export function MissionControlConsole() {
               status: 'executed',
               feedback: 'Reinforced: Model weights updated'
             };
+
+            // Update cumulative capital moved and projected uplift in telemetry
+            const updatedTelemetry = {
+              ...prev.telemetry,
+              reallocationCapitalMoved: +(prev.telemetry.reallocationCapitalMoved + Math.abs(item.deltaSpend)).toFixed(2),
+              projectedMarginUplift: +(prev.telemetry.projectedMarginUplift + item.expectedDailyMargin).toFixed(2)
+            };
+
+            // Mutate campaigns safely so ROAS gauges reflect the newly executed allocation
+            const updatedCampaigns = prev.campaigns.map((c: any) => {
+              if (c.campaign === item.targetCampaign) {
+                return {
+                  ...c,
+                  currentDailySpend: Math.round(item.recommendedSpend),
+                  roas: item.predictedRoas
+                };
+              }
+              if (c.campaign === item.sourceCampaign) {
+                return {
+                  ...c,
+                  currentDailySpend: Math.max(0, Math.round(c.currentDailySpend - Math.abs(item.deltaSpend)))
+                };
+              }
+              return c;
+            });
+
             return {
               ...prev,
+              campaigns: updatedCampaigns,
+              telemetry: updatedTelemetry,
               ledger: [newLedgerItem, ...prev.ledger]
             };
           });
         }}
       />
 
-      {/* 9. Multi-Platform Financial Telemetry (Time-Series Trends & Share) */}
+      {/* 6. Multi-Platform Financial Telemetry */}
       <PlatformBreakdownChart
         platforms={state.platforms}
         dailyTrend={state.dailyTrend}
       />
 
-      {/* 10. ROAS Gauges & Health Scoring Matrix */}
-      <div className='space-y-4 rounded border border-[#1A1A1A] bg-[#1A1A1A]/40 p-5 shadow-none'>
-        <div className='flex flex-wrap items-center justify-between gap-3 border-b border-[#000000] pb-3'>
+      {/* 7. ROAS Gauges & Health Scoring Matrix */}
+      <div className='space-y-4 rounded-xl border border-border/80 bg-card p-5 shadow-xs'>
+        <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-3'>
           <div className='flex items-center gap-2'>
-            <Icons.trendingUp className='size-3.5 text-white' />
-            <h3 className='font-mono text-xs font-bold text-white uppercase tracking-wider'>
+            <Icons.trendingUp className='size-3.5 text-emerald-600 dark:text-emerald-400' />
+            <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
               Real-Time Campaign Gauges &amp; Health Scoring
             </h3>
-            <span className='text-xs font-mono text-[#8A8A8A]'>
+            <span className='text-xs font-mono text-muted-foreground'>
               ({filteredCampaigns.length} campaigns)
             </span>
           </div>
 
           {/* Platform Tab Filters */}
-          <div className='flex items-center gap-1 bg-[#000000] p-1 rounded border border-[#1A1A1A] text-xs font-mono'>
+          <div className='flex items-center gap-1 bg-slate-100 dark:bg-zinc-900/60 p-1 rounded-lg border border-border text-xs font-mono'>
             {(['all', 'amazon', 'google', 'meta'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={cn(
-                  'px-3 py-1 rounded transition-all uppercase text-[11px] font-mono tracking-wider active:scale-[0.98] inline-flex items-center gap-1.5',
+                  'px-3 py-1 rounded-md transition-all uppercase text-[11px] font-mono tracking-wider active:scale-[0.98]',
                   activeTab === tab
-                    ? 'bg-white text-black font-bold'
-                    : 'text-[#8A8A8A] hover:text-white'
+                    ? 'bg-card text-foreground font-bold border border-border shadow-2xs'
+                    : 'text-muted-foreground hover:text-foreground'
                 )}
               >
-                {tab !== 'all' && <PlatformLogo platform={tab} size={12} className='shrink-0' />}
-                <span>{tab}</span>
+                {tab}
               </button>
             ))}
           </div>
@@ -423,8 +516,8 @@ export function MissionControlConsole() {
         </div>
       </div>
 
-      {/* 11. Closed-Loop Decision Ledger & Audit Trail */}
-      <DecisionLedgerTable entries={state.ledger} />
+      {/* 8. Closed-Loop Decision Ledger */}
+      <DecisionLedgerTable entries={state.ledger} showHeader />
 
       {/* 9. Analysing Phase Modal featuring 3D GitHub Globe */}
       <ProductAnalysisModal

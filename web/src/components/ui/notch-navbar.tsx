@@ -9,14 +9,12 @@ import {
   Layers,
   Menu,
   X,
-  Sun,
-  Moon,
   ArrowRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
-import { startThemeTransition } from '@/lib/theme-transition';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export interface NavItem {
   label: string;
@@ -65,43 +63,6 @@ const TerminalPromptIcon = ({ className }: { className?: string }) => (
     <line x1="12" y1="19" x2="20" y2="19" />
   </svg>
 );
-
-// Theme Toggle with circular transition
-const NotchThemeToggle = () => {
-  const { setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return <div className="w-8 h-8 rounded-full" />;
-  }
-
-  const isDark = resolvedTheme === 'dark';
-
-  const toggleTheme = (e: React.MouseEvent) => {
-    const nextTheme = isDark ? 'light' : 'dark';
-    startThemeTransition(() => setTheme(nextTheme), e);
-  };
-
-  return (
-    <button
-      onClick={toggleTheme}
-      type="button"
-      className="flex items-center justify-center w-8 h-8 rounded-full border border-border/80 bg-background/80 hover:bg-muted text-foreground/80 hover:text-foreground transition-colors cursor-pointer"
-      aria-label="Toggle color theme"
-      title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-    >
-      {isDark ? (
-        <Sun className="w-4 h-4 text-amber-400" />
-      ) : (
-        <Moon className="w-4 h-4 text-zinc-700" />
-      )}
-    </button>
-  );
-};
 
 const DEFAULT_LEFT_ITEMS: NavItem[] = [
   { label: 'Overview', href: '#overview', icon: Home },
@@ -357,7 +318,7 @@ export function NotchNavbar({
                   <div className="h-4 w-px bg-border/70 mx-0.5 shrink-0" />
 
                   {/* Circular Theme Toggle */}
-                  {showThemeToggle && <NotchThemeToggle />}
+                  {showThemeToggle && <ThemeToggle />}
 
                   {/* Circular GitHub Repo Button */}
                   {githubHref && (
@@ -376,7 +337,7 @@ export function NotchNavbar({
 
               {/* Mobile Right Actions */}
               <div className="md:hidden flex items-center gap-2 mb-1 ml-auto z-20">
-                {showThemeToggle && <NotchThemeToggle />}
+                {showThemeToggle && <ThemeToggle />}
               </div>
             </div>
           </div>

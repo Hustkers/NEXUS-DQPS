@@ -15,9 +15,19 @@ export function ThemeModeToggle() {
   const handleThemeToggle = React.useCallback(
     (e?: React.MouseEvent) => {
       const newMode = resolvedTheme === 'dark' ? 'light' : 'dark';
-      // Circular reveal from the click point (falls back to center for the
+      // Circular reveal from the click point (falls back to top-right/center for the
       // keyboard shortcut, which passes no event).
-      startThemeTransition(() => setTheme(newMode), e);
+      startThemeTransition(() => {
+        if (newMode === 'dark') {
+          document.documentElement.classList.add('dark');
+          document.documentElement.classList.remove('light');
+        } else {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.classList.add('light');
+        }
+        document.documentElement.setAttribute('data-theme', newMode);
+        setTheme(newMode);
+      }, e);
     },
     [resolvedTheme, setTheme]
   );
