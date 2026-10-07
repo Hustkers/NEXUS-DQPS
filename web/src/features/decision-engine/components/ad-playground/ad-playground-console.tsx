@@ -86,28 +86,14 @@ export function AdPlaygroundConsole() {
     toast.info(`Loaded catalog model for SKU ${newSku}`);
   }, [constraints]);
 
-  // Deterministic 5-stage calculation sequence when user explicitly presses [ RUN EXPERIMENT ]
+  // Deterministic calculation when user explicitly presses [ RUN EXPERIMENT ]
   const handleRunExperiment = useCallback(() => {
     setIsCalculating(true);
-    setCalculationStage('CALCULATING...');
-
-    // Progressively reveal calculation stages
-    setTimeout(() => {
-      setCalculationStage('EVALUATING RESPONSE CURVE...');
-      setTimeout(() => {
-        setCalculationStage('CHECKING INVENTORY...');
-        setTimeout(() => {
-          setCalculationStage('OPTIMIZING...');
-          setTimeout(() => {
-            const finalResult = computePlaygroundRecommendations(constraints);
-            setResult(finalResult);
-            setIsCalculating(false);
-            setCalculationStage('');
-            toast.success('Simulation complete: Hill response curve & 10 candidates evaluated!');
-          }, 120);
-        }, 120);
-      }, 120);
-    }, 120);
+    const finalResult = computePlaygroundRecommendations(constraints);
+    setResult(finalResult);
+    setIsCalculating(false);
+    setCalculationStage('');
+    toast.success('Simulation complete: Hill response curve & 10 candidates evaluated!');
   }, [constraints]);
 
   // Reset experiment to default initial state

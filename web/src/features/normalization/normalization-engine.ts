@@ -236,7 +236,7 @@ export function normalizeGoogleAdsRow(item: any, inventoryMap: Record<string, nu
   const poas = spend > 0 ? Number((gross_margin / spend).toFixed(2)) : undefined;
 
   return {
-    id: `google_${item.campaign?.id || Math.random()}`,
+    id: `google_${item.campaign?.id || (campName || sku || 'feed')}`,
     timestamp: item.segments?.date ? `${item.segments.date}T00:00:00Z` : new Date().toISOString(),
     channel: 'google',
     campaign_id: String(item.campaign?.id || 'google_camp'),

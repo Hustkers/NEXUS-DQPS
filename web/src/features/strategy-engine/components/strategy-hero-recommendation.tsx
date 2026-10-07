@@ -33,11 +33,13 @@ export function StrategyHeroRecommendation({
   const ev = strategy.evaluation;
   const curSym = '₹';
 
-  const roas = ev?.expectedRoas ?? 11.66;
-  const revenue = ev?.expectedRevenue ?? 69930;
-  const cpa = ev?.expectedCpa ?? 428.57;
+  const roas = ev?.expectedRoas ?? 0;
+  const revenue = ev?.expectedRevenue ?? 0;
+  const cpa = ev?.expectedCpa ?? 0;
+  const netProfit = ev?.expectedNetProfit ?? 0;
+  const isProfitable = ev?.isProfitable ?? (netProfit > 0 || (roas >= (ev?.breakevenRoas ?? targetRoasFloor)));
   const roasLift = +(roas - targetRoasFloor).toFixed(2);
-  const classification = ev?.classification || 'PROVEN';
+  const classification = isProfitable ? (ev?.classification || 'PROVEN') : 'NO_PROFITABLE_CONFIGURATION';
 
   // Dynamic causal chain inferred from real strategy metadata
   const platformName = strategy.platform.toUpperCase();
@@ -50,22 +52,53 @@ export function StrategyHeroRecommendation({
         : 'CREATIVE HOOK';
 
   return (
-    <div className='rounded-2xl border-2 border-emerald-500/50 bg-gradient-to-b from-emerald-950/20 via-card to-card p-6 md:p-8 font-mono shadow-xl relative overflow-hidden'>
+    <div
+      className={cn(
+        'rounded-2xl border-2 p-6 md:p-8 font-mono shadow-xl relative overflow-hidden',
+        isProfitable
+          ? 'border-emerald-500/50 bg-gradient-to-b from-emerald-950/20 via-card to-card'
+          : 'border-rose-500/50 bg-gradient-to-b from-rose-950/20 via-card to-card'
+      )}
+    >
       {/* Glow decorative backdrop */}
-      <div className='absolute -right-16 -top-16 w-56 h-56 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none' />
+      <div
+        className={cn(
+          'absolute -right-16 -top-16 w-56 h-56 rounded-full blur-3xl pointer-events-none',
+          isProfitable ? 'bg-emerald-500/10' : 'bg-rose-500/10'
+        )}
+      />
 
       {/* Top Header Label & Classification Badge */}
       <div className='flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-border/60'>
         <div className='flex items-center gap-2.5'>
-          <div className='size-2.5 rounded-full bg-emerald-400 animate-pulse' />
-          <span className='text-xs uppercase font-bold tracking-widest text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5'>
-            <IconCrown className='size-4 text-emerald-400' />
-            AI RECOMMENDATION
+          <div
+            className={cn(
+              'size-2.5 rounded-full animate-pulse',
+              isProfitable ? 'bg-emerald-400' : 'bg-rose-400'
+            )}
+          />
+          <span
+            className={cn(
+              'text-xs uppercase font-bold tracking-widest flex items-center gap-1.5',
+              isProfitable
+                ? 'text-emerald-600 dark:text-emerald-400'
+                : 'text-rose-600 dark:text-rose-400'
+            )}
+          >
+            <IconCrown className={cn('size-4', isProfitable ? 'text-emerald-400' : 'text-rose-400')} />
+            {isProfitable ? 'AI RECOMMENDATION' : 'DEFENSIVE RECOMMENDATION (UNPROFITABLE REGIME)'}
           </span>
         </div>
 
         <div className='flex items-center gap-2'>
-          <span className='text-[10px] font-bold tracking-wider px-2.5 py-1 rounded-md border border-emerald-500/40 bg-emerald-500/10 text-emerald-400 uppercase'>
+          <span
+            className={cn(
+              'text-[10px] font-bold tracking-wider px-2.5 py-1 rounded-md border uppercase',
+              isProfitable
+                ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400'
+                : 'border-rose-500/40 bg-rose-500/10 text-rose-400'
+            )}
+          >
             ● {classification}
           </span>
           <span className='text-[10px] font-bold px-2 py-1 rounded-md border border-cyan-500/30 bg-cyan-950/30 text-cyan-400 uppercase'>
@@ -81,28 +114,44 @@ export function StrategyHeroRecommendation({
             {strategy.strategyName.split('—')[0].trim()}
           </h2>
           <p className='text-xs text-muted-foreground mt-1 max-w-2xl'>
-            {strategy.strategyName.includes('—')
-              ? strategy.strategyName.split('—')[1].trim()
-              : `${strategy.adFormat} with ${strategy.biddingStrategy} targeting ${strategy.targetAudience}.`}
+            {isProfitable
+              ? strategy.strategyName.includes('—')
+                ? strategy.strategyName.split('—')[1].trim()
+                : `${strategy.adFormat} with ${strategy.biddingStrategy} targeting ${strategy.targetAudience}.`
+              : 'CRITICAL MARGIN ALERT: All evaluated configurations generate negative net profit at current CPA and margin levels. Model recommends spend reduction.'}
           </p>
         </div>
 
         {/* Primary Metric Hero Display */}
         <div className='flex flex-wrap items-baseline gap-4 pt-1'>
           <div className='flex items-baseline gap-2'>
-            <span className='text-4xl sm:text-5xl lg:text-6xl font-black text-emerald-400 tracking-tight'>
+            <span
+              className={cn(
+                'text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight',
+                isProfitable ? 'text-emerald-400' : 'text-rose-400'
+              )}
+            >
               {roas.toFixed(2)}x
             </span>
-            <span className='text-sm sm:text-base font-bold text-emerald-500/80 uppercase'>
+            <span
+              className={cn(
+                'text-sm sm:text-base font-bold uppercase',
+                isProfitable ? 'text-emerald-500/80' : 'text-rose-500/80'
+              )}
+            >
               ROAS
             </span>
           </div>
 
-          {roasLift > 0 && (
+          {isProfitable && roasLift > 0 ? (
             <div className='inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400 font-bold'>
               <span>↑ +{roasLift.toFixed(2)}x vs target floor ({targetRoasFloor.toFixed(1)}x)</span>
             </div>
-          )}
+          ) : !isProfitable ? (
+            <div className='inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-rose-500/10 border border-rose-500/20 text-xs text-rose-400 font-bold'>
+              <span>↓ Below breakeven floor ({ev?.breakevenRoas?.toFixed(2) ?? '1.61'}x)</span>
+            </div>
+          ) : null}
         </div>
 
         {/* Small Secondary Metrics Trio (ROAS, Revenue, CPA) */}
@@ -111,23 +160,35 @@ export function StrategyHeroRecommendation({
             <span className='text-[10px] uppercase font-bold text-muted-foreground block tracking-wider'>
               PROJECTED ROAS
             </span>
-            <span className='text-xl font-bold text-emerald-400 mt-1 block'>
+            <span
+              className={cn(
+                'text-xl font-bold mt-1 block',
+                isProfitable ? 'text-emerald-400' : 'text-rose-400'
+              )}
+            >
               {roas.toFixed(2)}x
             </span>
             <span className='text-[10px] text-muted-foreground block mt-0.5'>
-              Calculated return ratio
+              {isProfitable ? 'Calculated return ratio' : 'Below breakeven'}
             </span>
           </div>
 
           <div className='p-3.5 rounded-xl border border-border/60 bg-muted/20'>
             <span className='text-[10px] uppercase font-bold text-muted-foreground block tracking-wider'>
-              EXPECTED REVENUE
+              {isProfitable ? 'EXPECTED REVENUE' : 'NET CONTRIBUTION'}
             </span>
-            <span className='text-xl font-bold text-foreground mt-1 block'>
-              {curSym}{revenue.toLocaleString('en-IN')}
+            <span
+              className={cn(
+                'text-xl font-bold mt-1 block',
+                isProfitable ? 'text-foreground' : 'text-rose-400'
+              )}
+            >
+              {isProfitable
+                ? `${curSym}${revenue.toLocaleString('en-IN')}`
+                : `-₹${Math.abs(Math.round(netProfit)).toLocaleString('en-IN')}`}
             </span>
             <span className='text-[10px] text-muted-foreground block mt-0.5'>
-              Forecasted sales volume
+              {isProfitable ? 'Forecasted sales volume' : 'Projected loss'}
             </span>
           </div>
 
@@ -204,19 +265,29 @@ export function StrategyHeroRecommendation({
         <button
           type='button'
           onClick={() => onApplyStrategy(strategy)}
-          className='px-5 py-2.5 rounded-xl border border-emerald-500/50 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-xs'
+          className={cn(
+            'px-5 py-2.5 rounded-xl border font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-xs',
+            isProfitable
+              ? 'border-emerald-500/50 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400'
+              : 'border-rose-500/50 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400'
+          )}
         >
           <IconCheck className='size-4' />
-          <span>Apply Strategy</span>
+          <span>{isProfitable ? 'Apply Strategy' : 'Enforce Defensive Spend Cap'}</span>
         </button>
 
         <button
           type='button'
           onClick={() => onOpenLaunchModal(strategy)}
-          className='px-6 py-2.5 rounded-xl bg-foreground text-background hover:bg-foreground/90 font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-md'
+          className={cn(
+            'px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-md',
+            isProfitable
+              ? 'bg-foreground text-background hover:bg-foreground/90'
+              : 'bg-rose-600 text-white hover:bg-rose-500'
+          )}
         >
           <IconRocket className='size-4' />
-          <span>Approve &amp; Launch</span>
+          <span>{isProfitable ? 'Approve & Launch' : 'Deploy Defensive Plan'}</span>
         </button>
 
         <button
