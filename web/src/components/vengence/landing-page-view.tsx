@@ -9,7 +9,6 @@ import { CardSpotlight } from './card-spotlight';
 import { BentoGrid, BentoGridItem } from './bento-grid';
 import { StatsMatrix } from './stats-matrix';
 import { ShockSimulatorShowcase } from './shock-simulator-showcase';
-import { NotchNavbar } from './notch-navbar';
 
 const HERO_STATS = [
   {
@@ -45,11 +44,8 @@ const HERO_STATS = [
 export function LandingPageView() {
   return (
     <div className='relative min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-foreground'>
-      {/* 1. VENGEANCE UI NOTCH NAVIGATION BAR */}
-      <NotchNavbar />
-
-      {/* 2. HERO SECTION WITH VGPU CANVAS BACKGROUND */}
-      <section id='overview' className='relative pt-24 pb-20 md:pt-28 md:pb-28 overflow-hidden border-b border-border/60 scroll-mt-16'>
+      {/* HERO SECTION WITH VGPU CANVAS BACKGROUND */}
+      <section id='overview' className='relative pt-16 pb-20 md:pt-24 md:pb-28 overflow-hidden border-b border-border/60 scroll-mt-16'>
         {/* VGPU Canvas Dynamic Waveform */}
         <VGPUCanvas className='opacity-80' intensity={1.1} />
 
@@ -57,18 +53,17 @@ export function LandingPageView() {
           {/* Hackathon Pill */}
           <div className='inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-mono font-medium mb-6 animate-in fade-in slide-in-from-top-2 duration-500'>
             <span className='size-1.5 rounded-full bg-emerald-500' />
-            <span>DataQuest 3.0 • Problem Statement Finalist</span>
+            <span>DataQuest 3.0 • Problem Statement & Solution</span>
           </div>
 
-          {/* Master Headline with High-Impact Typography */}
-          <h1 className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground max-w-4xl leading-[1.08] mb-6'>
-            Next-Generation Autonomous D2C Ad Intelligence & Decision Engine
+          {/* Master Headline as the Central Problem Question */}
+          <h1 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground max-w-5xl leading-[1.12] mb-6'>
+            How Can Multi-Channel D2C Brands Stop Ad Budget Hemorrhaging When Platforms Obscure Attribution, SKUs Stock Out, and AI Hallucinates Spend?
           </h1>
 
-          {/* Subtitle */}
-          <p className='text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl font-normal leading-relaxed mb-8'>
-            Stops ad budget hemorrhaging from stockouts, CPM spikes, and walled-garden attribution blind spots.
-            NEXUS decouples deterministic convex budget math from causal LLM diagnostics to guarantee positive contribution profit.
+          {/* Proposed Solution Subtitle */}
+          <p className='text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl font-normal leading-relaxed mb-8'>
+            <span className='text-foreground font-semibold'>The NEXUS Solution:</span> An AI-native closed-loop decision engine that decouples deterministic convex budget optimization (<span className='font-mono text-xs sm:text-sm px-1.5 py-0.5 rounded bg-muted text-primary border border-primary/20'>Scipy SLSQP</span> with strict ±20% platform stability bounds and &lt;15m stockout circuit breakers) from causal root-cause diagnostics. Powered by DuckDB cross-channel reconciliation, deterministic hardware attribution, and an append-only decision ledger auditing expected vs. realized margin lift, NEXUS guarantees positive Net Contribution Profit (POAS) across every ad channel.
           </p>
 
           {/* Primary Button Group with VengenceUI Button Forge Styling */}
