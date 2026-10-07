@@ -80,10 +80,7 @@ export default function ReallocationsPage() {
 
       {/* Reallocation Feed Directives */}
       {(activeView === 'both' || activeView === 'feed') && (
-        <ReallocationFeed
-          initialItems={initialEngineState.reallocations}
-          campaigns={initialEngineState.campaigns}
-        />
+        <ReallocationFeed initialItems={initialEngineState.reallocations} />
       )}
     </div>
   );

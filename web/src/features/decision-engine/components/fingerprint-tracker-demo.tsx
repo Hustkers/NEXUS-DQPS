@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
@@ -222,7 +222,7 @@ export function FingerprintTrackerDemo() {
       timestamp: 'Real-Time Sync • Just Now',
       details: [
         `Without Fingerprint: Marketer sees ₹0.87 YouTube ad spend with ₹0 revenue -> Cuts YouTube budget!`,
-        `With NEXUS Fingerprint: Full cross-channel journey proven (YouTube View -> YouTube Click -> Amazon Buy).`,
+        `With NEXUS Single Fingerprint: Full cross-channel journey proven (YouTube View -> YouTube Click -> Amazon Buy).`,
         `Assisted ROAS calculated: ₹170.00 revenue / ₹0.874 total ad spend = 194.5x ROAS!`,
         `NEXUS SLSQP Optimizer Recommendation: Scale YouTube campaign budget by +25% (₹4,500/day shift).`
       ],
@@ -305,63 +305,60 @@ export function FingerprintTrackerDemo() {
   const currentStepData = journeySteps[currentStep - 1];
 
   return (
-    <div className='flex flex-col gap-6 text-foreground'>
+    <div className='flex flex-col gap-6 text-[#FFFFFF]'>
       {/* Hero Banner with Fingerprint HUD */}
-      <div className='relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-card via-card to-slate-50/80 dark:from-zinc-950 dark:via-[#0a0d16] dark:to-zinc-950 p-6 shadow-xs'>
-        <div className='absolute -right-16 -top-16 size-72 rounded-full bg-sky-500/10 blur-3xl pointer-events-none' />
-        <div className='absolute -left-16 -bottom-16 size-72 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none' />
-
+      <div className='relative overflow-hidden rounded border border-[#8A8A8A] bg-[#1A1A1A] p-6 shadow-none'>
         <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 relative z-10'>
           <div>
             <div className='flex items-center gap-2 mb-2'>
-              <Badge variant='outline' className='border-sky-200 dark:border-cyan-500/40 bg-sky-50 dark:bg-cyan-950/40 text-sky-700 dark:text-cyan-300 font-mono text-[11px] px-2.5 py-0.5 uppercase tracking-wider flex items-center gap-1.5'>
-                <Icons.fingerprint className='size-3.5 text-sky-600 dark:text-cyan-400' />
+              <Badge variant='outline' className='border border-[#8A8A8A] bg-[#000000] text-[#FFFFFF] font-mono text-[11px] px-2.5 py-0.5 uppercase tracking-wider flex items-center gap-1.5'>
+                <Icons.fingerprint className='size-3.5 text-[#FFFFFF]' />
                 Cookieless Cross-Channel Attribution
               </Badge>
-              <Badge variant='outline' className='border-emerald-200 dark:border-emerald-500/40 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-mono text-[11px] px-2 py-0.5 flex items-center gap-1'>
-                <span className='size-1.5 rounded-full bg-emerald-500 animate-pulse' />
+              <Badge variant='outline' className='border border-[#8A8A8A] bg-[#1A1A1A] text-[#FFFFFF] font-mono text-[11px] px-2 py-0.5 flex items-center gap-1 font-bold'>
+                <span className='size-1.5 rounded-full bg-[#FFFFFF]' />
                 Live Graph Engine
               </Badge>
             </div>
-            <h2 className='text-2xl md:text-3xl font-mono font-bold text-foreground tracking-tight'>
+            <h2 className='text-2xl md:text-3xl font-mono font-bold text-[#FFFFFF] tracking-tight'>
               Single Fingerprint ID Journey Tracking Demo
             </h2>
-            <p className='text-xs md:text-sm font-sans text-muted-foreground mt-1 max-w-3xl leading-relaxed'>
+            <p className='text-xs md:text-sm font-sans text-[#8A8A8A] mt-1 max-w-3xl leading-relaxed'>
               Witness how a single deterministic device fingerprint tracks a user from seeing and clicking a 
-              <span className='text-rose-600 dark:text-red-400 font-medium'> YouTube video ad</span> to an independent, non-cookie, non-UTM search and checkout on 
-              <span className='text-amber-700 dark:text-amber-400 font-medium'> Amazon</span> — seamlessly attributing true ROI.
+              <span className='text-[#FFFFFF] font-bold'> YouTube video ad</span> to an independent, non-cookie, non-UTM search and checkout on 
+              <span className='text-[#FFFFFF] font-bold'> Amazon</span> — seamlessly attributing true ROI.
             </p>
           </div>
 
           {/* Persistent Fingerprint ID Badge */}
-          <div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-muted/40 dark:bg-zinc-900/90 border border-border dark:border-zinc-700/80 rounded-xl p-3.5 backdrop-blur-md shadow-xs'>
+          <div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-[#000000] border border-[#8A8A8A] rounded p-3.5'>
             <div className='flex items-center gap-3'>
-              <div className='size-11 rounded-lg bg-sky-50 dark:bg-cyan-500/10 border border-sky-200 dark:border-cyan-500/30 flex items-center justify-center shrink-0'>
-                <Icons.fingerprint className='size-6 text-sky-600 dark:text-cyan-400 animate-pulse' />
+              <div className='size-11 rounded bg-[#1A1A1A] border border-[#8A8A8A] flex items-center justify-center shrink-0'>
+                <Icons.fingerprint className='size-6 text-[#FFFFFF]' />
               </div>
               <div>
-                <div className='text-[10px] font-mono uppercase tracking-wider text-muted-foreground flex items-center gap-1.5'>
+                <div className='text-[10px] font-mono uppercase tracking-wider text-[#8A8A8A] flex items-center gap-1.5'>
                   Active Device Fingerprint ID
-                  <span className='text-emerald-600 dark:text-emerald-400 text-[10px] font-mono font-bold'>({selectedDevice.confidenceScore}% match)</span>
+                  <span className='text-[#FFFFFF] text-[10px] font-mono font-bold'>({selectedDevice.confidenceScore}% match)</span>
                 </div>
-                <div className='font-mono font-bold text-sm md:text-base text-sky-700 dark:text-cyan-300 tracking-wider flex items-center gap-2'>
+                <div className='font-mono font-bold text-sm md:text-base text-[#FFFFFF] tracking-wider flex items-center gap-2'>
                   {selectedDevice.fingerprintId}
                   <button
                     onClick={handleCopyFp}
-                    className='text-muted-foreground hover:text-foreground transition-colors'
+                    className='text-[#8A8A8A] hover:text-[#FFFFFF] transition-colors'
                     title='Copy Fingerprint ID'
                   >
-                    {copiedFp ? <Icons.check className='size-4 text-emerald-600 dark:text-emerald-400' /> : <Icons.post className='size-4' />}
+                    {copiedFp ? <Icons.check className='size-4 text-[#FFFFFF]' /> : <Icons.post className='size-4 text-[#8A8A8A]' />}
                   </button>
                 </div>
               </div>
             </div>
 
-            <div className='h-8 w-px bg-border hidden sm:block' />
+            <div className='h-8 w-px bg-[#8A8A8A]/40 hidden sm:block' />
 
             {/* Device Switcher */}
             <div className='flex items-center gap-1.5'>
-              <span className='text-[10px] font-mono text-muted-foreground uppercase'>Device:</span>
+              <span className='text-[10px] font-mono text-[#8A8A8A] uppercase'>Device:</span>
               <select
                 aria-label='Select Device Profile'
                 value={selectedDevice.id}
@@ -374,10 +371,10 @@ export function FingerprintTrackerDemo() {
                     });
                   }
                 }}
-                className='h-8 text-xs font-mono bg-card border border-border rounded-md px-2 text-foreground focus:outline-none focus:ring-1 focus:ring-primary'
+                className='h-8 text-xs font-mono bg-[#000000] border border-[#8A8A8A] rounded px-2 text-[#FFFFFF] focus:outline-none focus:border-[#FFFFFF]'
               >
                 {SAMPLE_DEVICES.map((d) => (
-                  <option key={d.id} value={d.id}>
+                  <option key={d.id} value={d.id} className='bg-[#000000] text-[#FFFFFF]'>
                     {d.name}
                   </option>
                 ))}
@@ -387,44 +384,44 @@ export function FingerprintTrackerDemo() {
         </div>
 
         {/* Device Entropy Factors Bar */}
-        <div className='mt-5 pt-4 border-t border-border grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-[11px] font-mono'>
-          <div className='bg-card border border-border rounded-lg p-2.5 shadow-xs'>
-            <span className='text-muted-foreground block text-[10px] uppercase'>Canvas 2D Hash</span>
-            <span className='text-sky-700 dark:text-cyan-400 font-semibold truncate block'>{selectedDevice.canvasHash}</span>
+        <div className='mt-5 pt-4 border-t border-[#8A8A8A]/40 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-[11px] font-mono'>
+          <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded p-2.5'>
+            <span className='text-[#8A8A8A] block text-[10px] uppercase'>Canvas 2D Hash</span>
+            <span className='text-[#FFFFFF] font-semibold truncate block'>{selectedDevice.canvasHash}</span>
           </div>
-          <div className='bg-card border border-border rounded-lg p-2.5 shadow-xs'>
-            <span className='text-muted-foreground block text-[10px] uppercase'>WebGL GPU</span>
-            <span className='text-indigo-700 dark:text-purple-400 font-semibold truncate block' title={selectedDevice.gpuRenderer}>
+          <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded p-2.5'>
+            <span className='text-[#8A8A8A] block text-[10px] uppercase'>WebGL GPU</span>
+            <span className='text-[#FFFFFF] font-semibold truncate block' title={selectedDevice.gpuRenderer}>
               {selectedDevice.gpuRenderer.split('(')[0]}
             </span>
           </div>
-          <div className='bg-card border border-border rounded-lg p-2.5 shadow-xs'>
-            <span className='text-muted-foreground block text-[10px] uppercase'>Audio Latency</span>
-            <span className='text-emerald-700 dark:text-emerald-400 font-semibold truncate block'>{selectedDevice.audioHash}</span>
+          <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded p-2.5'>
+            <span className='text-[#8A8A8A] block text-[10px] uppercase'>Audio Latency</span>
+            <span className='text-[#FFFFFF] font-semibold truncate block'>{selectedDevice.audioHash}</span>
           </div>
-          <div className='bg-card border border-border rounded-lg p-2.5 shadow-xs'>
-            <span className='text-muted-foreground block text-[10px] uppercase'>Resolution / DPR</span>
-            <span className='text-amber-700 dark:text-amber-400 font-semibold truncate block'>{selectedDevice.screenResolution}</span>
+          <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded p-2.5'>
+            <span className='text-[#8A8A8A] block text-[10px] uppercase'>Resolution / DPR</span>
+            <span className='text-[#FFFFFF] font-semibold truncate block'>{selectedDevice.screenResolution}</span>
           </div>
-          <div className='bg-card border border-border rounded-lg p-2.5 shadow-xs'>
-            <span className='text-muted-foreground block text-[10px] uppercase'>CPU Cores / RAM</span>
-            <span className='text-foreground font-semibold truncate block'>
+          <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded p-2.5'>
+            <span className='text-[#8A8A8A] block text-[10px] uppercase'>CPU Cores / RAM</span>
+            <span className='text-[#FFFFFF] font-semibold truncate block'>
               {selectedDevice.hardwareConcurrency} Cores • {selectedDevice.deviceMemoryGb}GB
             </span>
           </div>
-          <div className='bg-card border border-border rounded-lg p-2.5 shadow-xs'>
-            <span className='text-muted-foreground block text-[10px] uppercase'>Subnet Geohash</span>
-            <span className='text-sky-700 dark:text-blue-400 font-semibold truncate block'>{selectedDevice.ipSubnet.split(' ')[0]}</span>
+          <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded p-2.5'>
+            <span className='text-[#8A8A8A] block text-[10px] uppercase'>Subnet Geohash</span>
+            <span className='text-[#FFFFFF] font-semibold truncate block'>{selectedDevice.ipSubnet.split(' ')[0]}</span>
           </div>
         </div>
       </div>
 
       {/* Interactive Step-by-Step Navigation Bar */}
-      <div className='rounded-xl border border-border bg-card p-4 shadow-xs'>
-        <div className='flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-3 border-b border-border'>
+      <div className='rounded border border-[#8A8A8A] bg-[#1A1A1A] p-4'>
+        <div className='flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-3 border-b border-[#8A8A8A]/40'>
           <div className='flex items-center gap-2'>
-            <Icons.topology className='size-5 text-sky-600 dark:text-cyan-400' />
-            <h3 className='font-mono text-sm font-bold text-foreground uppercase tracking-tight'>
+            <Icons.topology className='size-5 text-[#FFFFFF]' />
+            <h3 className='font-mono text-sm font-bold text-[#FFFFFF] uppercase tracking-tight'>
               Interactive Journey Timeline (Single User Flow)
             </h3>
           </div>
@@ -433,23 +430,22 @@ export function FingerprintTrackerDemo() {
           <div className='flex items-center gap-2'>
             <Button
               size='sm'
-              variant={isPlaying ? 'destructive' : 'default'}
               onClick={() => setIsPlaying(!isPlaying)}
               className={cn(
-                'h-8 text-xs font-mono font-medium',
+                'h-8 text-xs font-mono font-bold border-none active:scale-[0.98]',
                 isPlaying
-                  ? 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 dark:bg-red-950 dark:text-red-300 dark:border-red-800'
-                  : 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                  ? 'bg-[#FFFFFF] text-[#000000] hover:bg-[#8A8A8A]'
+                  : 'bg-[#FFFFFF] text-[#000000] hover:bg-[#8A8A8A]'
               )}
             >
               {isPlaying ? (
                 <>
-                  <Icons.eyeOff className='mr-1.5 size-3.5' />
+                  <Icons.eyeOff className='mr-1.5 size-3.5 text-[#000000]' />
                   Pause Auto-Play
                 </>
               ) : (
                 <>
-                  <Icons.play className='mr-1.5 size-3.5' />
+                  <Icons.play className='mr-1.5 size-3.5 text-[#000000]' />
                   Auto-Play Journey
                 </>
               )}
@@ -460,9 +456,9 @@ export function FingerprintTrackerDemo() {
               variant='outline'
               onClick={handlePrevStep}
               disabled={currentStep === 1}
-              className='h-8 text-xs font-mono border-border bg-card hover:bg-muted text-foreground disabled:opacity-40'
+              className='h-8 text-xs font-mono border border-[#8A8A8A] bg-[#1A1A1A] hover:bg-[#000000] text-[#FFFFFF] disabled:opacity-40'
             >
-              <Icons.chevronLeft className='size-3.5 mr-1' />
+              <Icons.chevronLeft className='size-3.5 mr-1 text-[#FFFFFF]' />
               Prev
             </Button>
 
@@ -471,17 +467,17 @@ export function FingerprintTrackerDemo() {
               variant='outline'
               onClick={handleNextStep}
               disabled={currentStep === 5}
-              className='h-8 text-xs font-mono border-border bg-card hover:bg-muted text-foreground disabled:opacity-40'
+              className='h-8 text-xs font-mono border border-[#8A8A8A] bg-[#1A1A1A] hover:bg-[#000000] text-[#FFFFFF] disabled:opacity-40'
             >
               Next
-              <Icons.chevronRight className='size-3.5 ml-1' />
+              <Icons.chevronRight className='size-3.5 ml-1 text-[#FFFFFF]' />
             </Button>
 
             <Button
               size='sm'
               variant='ghost'
               onClick={handleReset}
-              className='h-8 text-xs font-mono text-muted-foreground hover:text-foreground hover:bg-muted px-2'
+              className='h-8 text-xs font-mono text-[#8A8A8A] hover:text-[#FFFFFF] hover:bg-[#000000] px-2'
               title='Reset to Step 1'
             >
               <Icons.clock className='size-3.5 mr-1' />
@@ -502,32 +498,30 @@ export function FingerprintTrackerDemo() {
                 key={step.stepNumber}
                 onClick={() => handleStepClick(step.stepNumber)}
                 className={cn(
-                  'text-left rounded-lg p-3 transition-all border font-mono relative overflow-hidden',
-                  isCurrent && 'border-sky-500 bg-sky-50/70 dark:bg-cyan-950/40 text-foreground ring-1 ring-sky-500/40 shadow-xs',
-                  isCompleted && 'border-emerald-300 dark:border-emerald-600/60 bg-emerald-50/50 dark:bg-emerald-950/20 hover:border-emerald-400',
-                  isPending && 'border-border bg-muted/20 opacity-75 hover:opacity-100 hover:border-border/80'
+                  'text-left rounded p-3 transition-all font-mono relative overflow-hidden',
+                  isCurrent && 'border-2 border-[#FFFFFF] bg-[#000000] text-[#FFFFFF]',
+                  isCompleted && 'border border-[#8A8A8A] bg-[#1A1A1A] text-[#FFFFFF] hover:border-[#FFFFFF]',
+                  isPending && 'border border-[#1A1A1A] bg-[#000000] text-[#8A8A8A] opacity-75 hover:opacity-100 hover:border-[#8A8A8A]'
                 )}
               >
                 <div className='flex items-center justify-between mb-1.5'>
                   <span className={cn(
                     'text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded',
-                    step.platform === 'youtube' && 'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-red-950 dark:text-red-300 dark:border-red-800/60',
-                    step.platform === 'amazon' && 'bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800/60',
-                    step.platform === 'nexus' && 'bg-sky-50 text-sky-700 border border-sky-200 dark:bg-cyan-950 dark:text-cyan-300 dark:border-cyan-800/60'
+                    isCurrent ? 'bg-[#FFFFFF] text-[#000000]' : 'bg-[#000000] text-[#8A8A8A] border border-[#8A8A8A]/40'
                   )}>
                     Step 0{step.stepNumber}
                   </span>
 
-                  {isCompleted && <Icons.circleCheck className='size-3.5 text-emerald-600 dark:text-emerald-400' />}
-                  {isCurrent && <span className='size-2 rounded-full bg-sky-500 dark:bg-cyan-400 animate-ping' />}
+                  {isCompleted && <span className='text-xs font-bold text-[#FFFFFF]'>●</span>}
+                  {isCurrent && <span className='size-2 rounded-full bg-[#FFFFFF]' />}
                 </div>
 
-                <div className='text-xs font-bold text-foreground line-clamp-1'>
-                  {step.platform === 'youtube' && '📺 YouTube'}
-                  {step.platform === 'amazon' && '🛒 Amazon'}
-                  {step.platform === 'nexus' && '⚡ NEXUS Graph'}
+                <div className='text-xs font-bold text-[#FFFFFF] line-clamp-1'>
+                  {step.platform === 'youtube' && 'YouTube'}
+                  {step.platform === 'amazon' && 'Amazon'}
+                  {step.platform === 'nexus' && 'NEXUS Graph'}
                 </div>
-                <div className='text-[11px] text-muted-foreground line-clamp-1 mt-0.5'>
+                <div className='text-[11px] text-[#8A8A8A] line-clamp-1 mt-0.5'>
                   {step.title.split(':')[1]?.trim() || step.title}
                 </div>
               </button>
@@ -536,13 +530,13 @@ export function FingerprintTrackerDemo() {
         </div>
       </div>
 
-      {/* Main View Tabs (Simulation Screen, Graph Visualizer, Raw Telemetry, SDK Code) */}
-      <div className='flex items-center gap-2 border-b border-border pb-2 text-xs font-mono overflow-x-auto'>
+      {/* Main View Tabs */}
+      <div className='flex items-center gap-2 border-b border-[#8A8A8A]/40 pb-2 text-xs font-mono overflow-x-auto'>
         <button
           onClick={() => setActiveTab('simulation')}
           className={cn(
-            'px-3 py-1.5 rounded-lg transition-colors flex items-center gap-2 shrink-0',
-            activeTab === 'simulation' ? 'bg-primary text-primary-foreground font-bold shadow-xs' : 'text-muted-foreground hover:text-foreground hover:bg-muted/40'
+            'px-3 py-1.5 rounded transition-colors flex items-center gap-2 shrink-0',
+            activeTab === 'simulation' ? 'bg-[#FFFFFF] text-[#000000] font-bold' : 'text-[#8A8A8A] hover:text-[#FFFFFF] hover:bg-[#1A1A1A]'
           )}
         >
           <Icons.laptop className='size-3.5' />
@@ -551,8 +545,8 @@ export function FingerprintTrackerDemo() {
         <button
           onClick={() => setActiveTab('graph')}
           className={cn(
-            'px-3 py-1.5 rounded-lg transition-colors flex items-center gap-2 shrink-0',
-            activeTab === 'graph' ? 'bg-primary text-primary-foreground font-bold shadow-xs' : 'text-muted-foreground hover:text-foreground hover:bg-muted/40'
+            'px-3 py-1.5 rounded transition-colors flex items-center gap-2 shrink-0',
+            activeTab === 'graph' ? 'bg-[#FFFFFF] text-[#000000] font-bold' : 'text-[#8A8A8A] hover:text-[#FFFFFF] hover:bg-[#1A1A1A]'
           )}
         >
           <Icons.topology className='size-3.5' />
@@ -561,8 +555,8 @@ export function FingerprintTrackerDemo() {
         <button
           onClick={() => setActiveTab('telemetry')}
           className={cn(
-            'px-3 py-1.5 rounded-lg transition-colors flex items-center gap-2 shrink-0',
-            activeTab === 'telemetry' ? 'bg-primary text-primary-foreground font-bold shadow-xs' : 'text-muted-foreground hover:text-foreground hover:bg-muted/40'
+            'px-3 py-1.5 rounded transition-colors flex items-center gap-2 shrink-0',
+            activeTab === 'telemetry' ? 'bg-[#FFFFFF] text-[#000000] font-bold' : 'text-[#8A8A8A] hover:text-[#FFFFFF] hover:bg-[#1A1A1A]'
           )}
         >
           <Icons.code className='size-3.5' />
@@ -571,8 +565,8 @@ export function FingerprintTrackerDemo() {
         <button
           onClick={() => setActiveTab('code')}
           className={cn(
-            'px-3 py-1.5 rounded-lg transition-colors flex items-center gap-2 shrink-0',
-            activeTab === 'code' ? 'bg-primary text-primary-foreground font-bold shadow-xs' : 'text-muted-foreground hover:text-foreground hover:bg-muted/40'
+            'px-3 py-1.5 rounded transition-colors flex items-center gap-2 shrink-0',
+            activeTab === 'code' ? 'bg-[#FFFFFF] text-[#000000] font-bold' : 'text-[#8A8A8A] hover:text-[#FFFFFF] hover:bg-[#1A1A1A]'
           )}
         >
           <Icons.file className='size-3.5' />
@@ -585,61 +579,61 @@ export function FingerprintTrackerDemo() {
         <div className='grid grid-cols-1 lg:grid-cols-12 gap-6'>
           {/* Left Side: Mock Screen / Device View */}
           <div className='lg:col-span-7 flex flex-col gap-4'>
-            <div className='rounded-xl border border-border bg-card overflow-hidden shadow-xs'>
+            <div className='rounded border border-[#8A8A8A] bg-[#1A1A1A] overflow-hidden'>
               {/* Browser Mock Window Header */}
-              <div className='bg-slate-100 dark:bg-zinc-900/90 border-b border-border px-4 py-2.5 flex items-center justify-between'>
+              <div className='bg-[#000000] border-b border-[#8A8A8A]/40 px-4 py-2.5 flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
-                  <span className='size-3 rounded-full bg-rose-400 inline-block' />
-                  <span className='size-3 rounded-full bg-amber-400 inline-block' />
-                  <span className='size-3 rounded-full bg-emerald-400 inline-block' />
-                  <span className='ml-2 text-xs font-mono text-muted-foreground truncate max-w-[200px]'>
+                  <span className='size-2.5 rounded-full bg-[#FFFFFF] inline-block' />
+                  <span className='size-2.5 rounded-full bg-[#8A8A8A] inline-block' />
+                  <span className='size-2.5 rounded-full border border-[#8A8A8A] inline-block' />
+                  <span className='ml-2 text-xs font-mono text-[#8A8A8A] truncate max-w-[200px]'>
                     {currentStep <= 2 ? 'youtube.com/watch?v=running-shoe-tech-2026' : 'amazon.com/s?k=nike+air+max+dn'}
                   </span>
                 </div>
 
                 <div className='flex items-center gap-2'>
-                  <Badge variant='outline' className='border-sky-200 dark:border-cyan-500/40 bg-sky-50 dark:bg-cyan-950/40 text-sky-700 dark:text-cyan-300 text-[10px] font-mono px-2 py-0.5 flex items-center gap-1'>
-                    <Icons.fingerprint className='size-3 text-sky-600 dark:text-cyan-400' />
+                  <Badge variant='outline' className='border border-[#8A8A8A] bg-[#1A1A1A] text-[#FFFFFF] text-[10px] font-mono px-2 py-0.5 flex items-center gap-1'>
+                    <Icons.fingerprint className='size-3 text-[#FFFFFF]' />
                     {selectedDevice.fingerprintId}
                   </Badge>
                 </div>
               </div>
 
               {/* Screen Body */}
-              <div className='p-5 min-h-[420px] flex flex-col justify-between bg-slate-50/70 dark:bg-gradient-to-b dark:from-zinc-950 dark:to-[#080a0f]'>
+              <div className='p-5 min-h-[420px] flex flex-col justify-between bg-[#1A1A1A]'>
                 {/* STEP 1 & 2: YOUTUBE UI */}
                 {currentStep <= 2 && (
                   <div className='flex flex-col gap-4'>
                     {/* YouTube Video Player Mock */}
-                    <div className='relative aspect-video rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800 flex flex-col justify-between p-4 group shadow-md'>
+                    <div className='relative aspect-video rounded overflow-hidden bg-[#000000] border border-[#8A8A8A] flex flex-col justify-between p-4 group'>
                       <div className='flex items-center justify-between z-10'>
-                        <div className='flex items-center gap-2 bg-black/60 backdrop-blur px-2.5 py-1 rounded-md text-xs font-mono text-zinc-300'>
-                          <Icons.youtube className='size-4 text-red-500' />
+                        <div className='flex items-center gap-2 bg-[#1A1A1A] border border-[#8A8A8A]/40 px-2.5 py-1 rounded text-xs font-mono text-[#FFFFFF]'>
+                          <Icons.youtube className='size-4 text-[#FFFFFF]' />
                           YouTube Video Player
                         </div>
-                        <Badge className='bg-amber-500 text-black font-bold text-[10px] uppercase font-mono'>
+                        <Badge className='bg-[#FFFFFF] text-[#000000] font-bold text-[10px] uppercase font-mono border-none'>
                           Ad 1 of 2 • 0:08 / 0:15
                         </Badge>
                       </div>
 
                       {/* Video Center / Ad Content */}
                       <div className='my-auto flex flex-col items-center justify-center text-center p-4 z-10'>
-                        <div className='size-14 rounded-full bg-red-600/20 border border-red-500/40 flex items-center justify-center mb-3 animate-pulse'>
-                          <Icons.play className='size-7 text-red-400 fill-red-400 ml-0.5' />
+                        <div className='size-14 rounded-full bg-[#1A1A1A] border border-[#8A8A8A] flex items-center justify-center mb-3'>
+                          <Icons.play className='size-7 text-[#FFFFFF] fill-[#FFFFFF] ml-0.5' />
                         </div>
-                        <span className='text-xs font-mono uppercase text-red-400 tracking-wider font-semibold'>
+                        <span className='text-xs font-mono uppercase text-[#8A8A8A] tracking-wider font-semibold'>
                           Nike Sponsored Preroll Ad
                         </span>
-                        <h4 className='text-xl md:text-2xl font-black text-white tracking-tight mt-1'>
+                        <h4 className='text-xl md:text-2xl font-black text-[#FFFFFF] tracking-tight mt-1'>
                           Nike Air Max Dn — Feel The Unreal.
                         </h4>
-                        <p className='text-xs text-zinc-400 max-w-md mt-1'>
+                        <p className='text-xs text-[#8A8A8A] max-w-md mt-1'>
                           Dynamic dual-chamber air tubes deliver energized bounce with every stride. Available now.
                         </p>
                       </div>
 
                       {/* Video Controls & CTA overlay */}
-                      <div className='flex items-center justify-between z-10 bg-black/70 backdrop-blur-md -mx-4 -mb-4 p-3 border-t border-zinc-800'>
+                      <div className='flex items-center justify-between z-10 bg-[#000000] -mx-4 -mb-4 p-3 border-t border-[#8A8A8A]/40'>
                         <div className='flex items-center gap-3'>
                           <Button
                             size='sm'
@@ -650,37 +644,37 @@ export function FingerprintTrackerDemo() {
                               });
                             }}
                             className={cn(
-                              'h-8 font-mono text-xs font-bold transition-all',
+                              'h-8 font-mono text-xs font-bold transition-all border-none',
                               currentStep === 2
-                                ? 'bg-emerald-500 text-zinc-950 hover:bg-emerald-400'
-                                : 'bg-red-600 text-white hover:bg-red-500'
+                                ? 'bg-[#FFFFFF] text-[#000000] hover:bg-[#8A8A8A]'
+                                : 'bg-[#1A1A1A] text-[#FFFFFF] hover:bg-[#000000] border border-[#8A8A8A]'
                             )}
                           >
                             <Icons.externalLink className='size-3.5 mr-1.5' />
-                            {currentStep === 2 ? 'Ad Clicked (Engaged)' : 'Shop Now (Click Ad)'}
+                            {currentStep === 2 ? '● Ad Clicked (Engaged)' : 'Shop Now (Click Ad)'}
                           </Button>
-                          <span className='text-[11px] font-mono text-zinc-400 hidden sm:inline'>
+                          <span className='text-[11px] font-mono text-[#8A8A8A] hidden sm:inline'>
                             nike.com/airmax-dn
                           </span>
                         </div>
 
-                        <div className='text-xs font-mono text-zinc-400'>
+                        <div className='text-xs font-mono text-[#8A8A8A]'>
                           Skip in 4s
                         </div>
                       </div>
 
                       {/* Video Progress Bar */}
-                      <div className='absolute bottom-0 left-0 right-0 h-1 bg-zinc-800'>
-                        <div className='h-full bg-red-600 transition-all duration-500 w-[55%]' />
+                      <div className='absolute bottom-0 left-0 right-0 h-1 bg-[#1A1A1A]'>
+                        <div className='h-full bg-[#FFFFFF] transition-all duration-500 w-[55%]' />
                       </div>
                     </div>
 
                     {/* Telemetry pill */}
-                    <div className='rounded-lg border border-rose-200 dark:border-red-900/40 bg-rose-50/80 dark:bg-red-950/20 p-3 flex items-start gap-3 text-xs font-mono text-foreground'>
-                      <Icons.info className='size-4 text-rose-600 dark:text-red-400 shrink-0 mt-0.5' />
+                    <div className='rounded border border-[#8A8A8A] bg-[#000000] p-3 flex items-start gap-3 text-xs font-mono text-[#FFFFFF]'>
+                      <Icons.info className='size-4 text-[#FFFFFF] shrink-0 mt-0.5' />
                       <div>
-                        <span className='text-rose-700 dark:text-red-400 font-bold'>Client WebGL / Canvas Entropy Captured: </span>
-                        NEXUS tag executed silently on YouTube ad render. Fingerprint <code className='text-sky-700 dark:text-cyan-300 font-bold'>{selectedDevice.fingerprintId}</code> registered with 0 cookies.
+                        <span className='font-bold text-[#FFFFFF]'>Client WebGL / Canvas Entropy Captured: </span>
+                        NEXUS tag executed silently on YouTube ad render. Fingerprint <code className='text-[#FFFFFF] underline'>{selectedDevice.fingerprintId}</code> registered with 0 cookies.
                       </div>
                     </div>
                   </div>
@@ -690,22 +684,22 @@ export function FingerprintTrackerDemo() {
                 {(currentStep === 3 || currentStep === 4) && (
                   <div className='flex flex-col gap-4'>
                     {/* Amazon Search & Header Mock */}
-                    <div className='bg-[#131921] rounded-lg p-3 border border-zinc-800 flex items-center justify-between gap-3'>
+                    <div className='bg-[#000000] rounded p-3 border border-[#8A8A8A] flex items-center justify-between gap-3'>
                       <div className='flex items-center gap-2'>
-                        <span className='font-bold text-lg text-white font-sans tracking-tight flex items-center'>
-                          amazon<span className='text-amber-500'>.com</span>
+                        <span className='font-bold text-lg text-[#FFFFFF] font-sans tracking-tight'>
+                          amazon<span className='text-[#8A8A8A]'>.com</span>
                         </span>
                       </div>
-                      <div className='flex-1 max-w-md bg-white rounded-md flex items-center px-3 py-1 text-zinc-900 text-xs font-sans'>
-                        <Icons.search className='size-3.5 text-zinc-500 mr-2' />
-                        <span className='font-medium text-zinc-800'>nike air max dn</span>
+                      <div className='flex-1 max-w-md bg-[#1A1A1A] border border-[#8A8A8A]/40 rounded flex items-center px-3 py-1 text-[#FFFFFF] text-xs font-sans'>
+                        <Icons.search className='size-3.5 text-[#8A8A8A] mr-2' />
+                        <span className='font-medium text-[#FFFFFF]'>nike air max dn</span>
                       </div>
-                      <div className='flex items-center gap-2 text-xs text-white font-sans'>
-                        <span className='text-amber-400 font-bold text-xs'>Prime</span>
+                      <div className='flex items-center gap-2 text-xs text-[#FFFFFF] font-sans'>
+                        <span className='font-bold text-xs'>Prime</span>
                         <div className='relative'>
-                          <Icons.cart className='size-5 text-white' />
+                          <Icons.cart className='size-5 text-[#FFFFFF]' />
                           {cartState !== 'idle' && (
-                            <span className='absolute -top-1.5 -right-2 bg-amber-500 text-black text-[9px] font-bold rounded-full size-4 flex items-center justify-center'>
+                            <span className='absolute -top-1.5 -right-2 bg-[#FFFFFF] text-[#000000] text-[9px] font-bold rounded-full size-4 flex items-center justify-center'>
                               1
                             </span>
                           )}
@@ -714,16 +708,16 @@ export function FingerprintTrackerDemo() {
                     </div>
 
                     {/* Amazon Product Display Card */}
-                    <div className='rounded-xl border border-border bg-card p-4 grid grid-cols-1 sm:grid-cols-12 gap-4 items-center shadow-xs'>
-                      <div className='sm:col-span-4 rounded-lg bg-slate-100/70 dark:bg-zinc-950 p-3 border border-border flex items-center justify-center'>
-                        {/* Nike Shoe Mock Preview */}
+                    <div className='rounded border border-[#8A8A8A] bg-[#000000] p-4 grid grid-cols-1 sm:grid-cols-12 gap-4 items-center'>
+                      <div className='sm:col-span-4 rounded bg-[#1A1A1A] p-3 border border-[#8A8A8A]/40 flex items-center justify-center'>
                         <div className='relative text-center'>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src='https://c.static-nike.com/a/images/t_PDP_1728_v1/awjogtdnqxniqqk0wpgf/air-max-270-shoe-2V5C4p.jpg'
                             alt='Nike Air Max Dn'
-                            className='w-full h-32 object-contain rounded drop-shadow-md'
+                            className='w-full h-32 object-contain rounded'
                           />
-                          <Badge className='absolute top-0 right-0 bg-muted text-foreground text-[10px] font-mono border border-border'>
+                          <Badge className='absolute top-0 right-0 bg-[#000000] text-[#FFFFFF] text-[10px] font-mono border border-[#8A8A8A]'>
                             AH8050-100
                           </Badge>
                         </div>
@@ -731,28 +725,28 @@ export function FingerprintTrackerDemo() {
 
                       <div className='sm:col-span-8 flex flex-col justify-between h-full'>
                         <div>
-                          <div className='flex items-center justify-between text-xs font-mono text-muted-foreground'>
+                          <div className='flex items-center justify-between text-xs font-mono text-[#8A8A8A]'>
                             <div className='flex items-center gap-2'>
-                              <span className='text-emerald-600 dark:text-emerald-400 font-semibold'>ASIN: B0CWV8N21K</span>
+                              <span className='font-semibold text-[#FFFFFF]'>ASIN: B0CWV8N21K</span>
                               <span>•</span>
                               <span>SKU: AH8050-100</span>
                             </div>
-                            <div className='text-xs font-sans text-amber-600 dark:text-amber-500 flex items-center gap-1'>
+                            <div className='text-xs font-sans text-[#FFFFFF] flex items-center gap-1'>
                               <span>★★★★★</span>
-                              <span className='text-muted-foreground text-[11px]'>(4.8 from 1,280 ratings)</span>
+                              <span className='text-[#8A8A8A] text-[11px]'>(4.8 from 1,280 ratings)</span>
                             </div>
                           </div>
-                          <h4 className='text-sm md:text-base font-bold text-foreground mt-1'>
+                          <h4 className='text-sm md:text-base font-bold text-[#FFFFFF] mt-1'>
                             Nike Men's Air Max Dn Running &amp; Street Shoes (Triple Black)
                           </h4>
-                          <div className='text-xs font-mono text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-2'>
-                            <span className='text-lg font-bold text-foreground'>₹170.00</span>
-                            <Badge variant='outline' className='border-emerald-200 dark:border-emerald-500/40 text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/30 text-[10px] font-bold'>
-                              In Stock (Prime 1-Day)
+                          <div className='text-xs font-mono text-[#FFFFFF] mt-1 flex items-center gap-2'>
+                            <span className='text-lg font-bold text-[#FFFFFF]'>₹170.00</span>
+                            <Badge variant='outline' className='border border-[#8A8A8A] text-[#FFFFFF] bg-[#1A1A1A] text-[10px] font-bold'>
+                              ● In Stock (Prime 1-Day)
                             </Badge>
                           </div>
-                          <p className='text-[11px] text-muted-foreground mt-1'>
-                            Size: <span className='text-foreground font-bold'>10.5 US</span> • Color: Black/Metallic Dark Grey
+                          <p className='text-[11px] text-[#8A8A8A] mt-1'>
+                            Size: <span className='text-[#FFFFFF] font-bold'>10.5 US</span> • Color: Black/Metallic Dark Grey
                           </p>
                         </div>
 
@@ -768,18 +762,18 @@ export function FingerprintTrackerDemo() {
                                   description: `Conversion logged with Fingerprint ID ${selectedDevice.fingerprintId}`
                                 });
                               }}
-                              className='bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold font-sans text-xs h-8 px-4 flex-1 shadow-xs'
+                              className='bg-[#FFFFFF] hover:bg-[#8A8A8A] text-[#000000] font-bold font-sans text-xs h-8 px-4 flex-1 border-none'
                             >
                               <Icons.cart className='size-3.5 mr-1.5' />
                               Buy Now (1-Click Checkout ₹170.00)
                             </Button>
                           ) : (
-                            <div className='rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-500/40 p-2.5 w-full flex items-center justify-between text-xs font-mono text-emerald-700 dark:text-emerald-300'>
+                            <div className='rounded bg-[#1A1A1A] border border-[#8A8A8A] p-2.5 w-full flex items-center justify-between text-xs font-mono text-[#FFFFFF]'>
                               <div className='flex items-center gap-2'>
-                                <Icons.circleCheck className='size-4 text-emerald-600 dark:text-emerald-400' />
-                                <span className='font-bold'>Order Confirmed: #AMZ-9482-DN77</span>
+                                <Icons.circleCheck className='size-4 text-[#FFFFFF]' />
+                                <span className='font-bold'>● Order Confirmed: #AMZ-9482-DN77</span>
                               </div>
-                              <span className='text-foreground font-bold'>₹170.00</span>
+                              <span className='font-bold text-[#FFFFFF]'>₹170.00</span>
                             </div>
                           )}
                         </div>
@@ -787,12 +781,12 @@ export function FingerprintTrackerDemo() {
                     </div>
 
                     {/* Attribution Reality Pill */}
-                    <div className='rounded-lg border border-amber-200 dark:border-amber-900/40 bg-amber-50/80 dark:bg-amber-950/20 p-3 flex items-start gap-3 text-xs font-mono text-foreground'>
-                      <Icons.warning className='size-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5' />
+                    <div className='rounded border border-[#8A8A8A] bg-[#000000] p-3 flex items-start gap-3 text-xs font-mono text-[#FFFFFF]'>
+                      <Icons.warning className='size-4 text-[#FFFFFF] shrink-0 mt-0.5' />
                       <div>
-                        <span className='text-amber-700 dark:text-amber-400 font-bold'>Walled-Garden Isolation Overcome: </span>
+                        <span className='font-bold text-[#FFFFFF]'>Walled-Garden Isolation Overcome: </span>
                         User came to Amazon directly via organic search (no UTMs). Amazon has no Google cookies. 
-                        Yet NEXUS regenerated Fingerprint <code className='text-sky-700 dark:text-cyan-300 font-bold'>{selectedDevice.fingerprintId}</code> with 99.8% match confidence.
+                        Yet NEXUS regenerated Fingerprint <code className='text-[#FFFFFF] underline'>{selectedDevice.fingerprintId}</code> with 99.8% match confidence.
                       </div>
                     </div>
                   </div>
@@ -801,48 +795,48 @@ export function FingerprintTrackerDemo() {
                 {/* STEP 5: NEXUS CLOSED-LOOP RESOLUTION UI */}
                 {currentStep === 5 && (
                   <div className='flex flex-col gap-4'>
-                    <div className='rounded-xl border border-sky-200 dark:border-cyan-500/40 bg-sky-50/50 dark:bg-cyan-950/20 p-4'>
+                    <div className='rounded border border-[#8A8A8A] bg-[#000000] p-4'>
                       <div className='flex items-center justify-between mb-3'>
                         <div className='flex items-center gap-2'>
-                          <Icons.shieldCheck className='size-5 text-sky-600 dark:text-cyan-400' />
-                          <h4 className='font-mono text-sm font-bold text-foreground uppercase tracking-tight'>
+                          <Icons.shieldCheck className='size-5 text-[#FFFFFF]' />
+                          <h4 className='font-mono text-sm font-bold text-[#FFFFFF] uppercase tracking-tight'>
                             Deterministic Multi-Touch Attribution Resolved
                           </h4>
                         </div>
-                        <Badge className='bg-emerald-600 text-white dark:bg-emerald-500 dark:text-zinc-950 font-bold text-xs font-mono'>
+                        <Badge className='bg-[#FFFFFF] text-[#000000] font-bold text-xs font-mono border-none'>
                           194.5x Assisted ROAS
                         </Badge>
                       </div>
 
                       <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono'>
-                        <div className='bg-card border border-rose-200 dark:border-zinc-800 rounded-lg p-3 shadow-xs'>
-                          <span className='text-rose-700 dark:text-red-400 font-bold block mb-1'>❌ Without Single Fingerprint:</span>
-                          <ul className='text-muted-foreground space-y-1 text-[11px]'>
+                        <div className='bg-[#1A1A1A] border border-[#8A8A8A]/40 rounded p-3'>
+                          <span className='text-[#FFFFFF] font-bold block mb-1'>× Without Single Fingerprint:</span>
+                          <ul className='text-[#8A8A8A] space-y-1 text-[11px]'>
                             <li>• YouTube Spend: ₹0.874</li>
                             <li>• YouTube Revenue: ₹0.00 (0.0x ROAS)</li>
                             <li>• Amazon Sale: 100% "Organic Direct"</li>
-                            <li className='text-rose-700 dark:text-red-300 font-semibold'>• Result: Marketer cancels YouTube ad!</li>
+                            <li className='text-[#FFFFFF] font-semibold'>• Result: Marketer cancels YouTube ad!</li>
                           </ul>
                         </div>
 
-                        <div className='bg-card border border-emerald-200 dark:border-cyan-800/80 rounded-lg p-3 shadow-xs'>
-                          <span className='text-emerald-700 dark:text-emerald-400 font-bold block mb-1'>✅ With NEXUS Single Fingerprint:</span>
-                          <ul className='text-foreground space-y-1 text-[11px]'>
+                        <div className='bg-[#1A1A1A] border border-[#8A8A8A] rounded p-3'>
+                          <span className='text-[#FFFFFF] font-bold block mb-1'>● With NEXUS Single Fingerprint:</span>
+                          <ul className='text-[#FFFFFF] space-y-1 text-[11px]'>
                             <li>• YouTube Spend: ₹0.874</li>
                             <li>• Attributed Amazon Sale: ₹170.00</li>
-                            <li>• Realized ROAS: <strong className='text-emerald-600 dark:text-emerald-300'>194.5x</strong></li>
-                            <li className='text-sky-700 dark:text-cyan-300 font-semibold'>• Result: AI scales YouTube budget +25%!</li>
+                            <li>• Realized ROAS: <strong className='font-bold'>194.5x</strong></li>
+                            <li className='text-[#FFFFFF] font-semibold'>• Result: AI scales YouTube budget +25%!</li>
                           </ul>
                         </div>
                       </div>
                     </div>
 
-                    <div className='rounded-lg border border-indigo-200 dark:border-purple-900/40 bg-indigo-50/70 dark:bg-purple-950/20 p-3 flex items-start gap-3 text-xs font-mono text-foreground'>
-                      <Icons.sparkles className='size-4 text-indigo-600 dark:text-purple-400 shrink-0 mt-0.5' />
+                    <div className='rounded border border-[#8A8A8A] bg-[#000000] p-3 flex items-start gap-3 text-xs font-mono text-[#FFFFFF]'>
+                      <Icons.sparkles className='size-4 text-[#FFFFFF] shrink-0 mt-0.5' />
                       <div>
-                        <span className='text-indigo-700 dark:text-purple-400 font-bold'>Autonomous Decision Engine Action: </span>
+                        <span className='font-bold text-[#FFFFFF]'>Autonomous Decision Engine Action: </span>
                         scipy SLSQP optimizer ingested this graph event. Convex response curve shifts 
-                        <strong className='text-foreground'> ₹4,500/day</strong> into YouTube top-of-funnel campaigns to feed downstream Amazon conversion loops.
+                        <strong className='text-[#FFFFFF]'> ₹4,500/day</strong> into YouTube top-of-funnel campaigns to feed downstream Amazon conversion loops.
                       </div>
                     </div>
                   </div>
@@ -853,36 +847,31 @@ export function FingerprintTrackerDemo() {
 
           {/* Right Side: Step Deep-Dive & Journey Metadata */}
           <div className='lg:col-span-5 flex flex-col gap-4'>
-            <div className='rounded-xl border border-border bg-card p-5 shadow-xs flex flex-col justify-between h-full'>
+            <div className='rounded border border-[#8A8A8A] bg-[#1A1A1A] p-5 flex flex-col justify-between h-full'>
               <div>
-                <div className='flex items-center justify-between border-b border-border pb-3 mb-4'>
-                  <Badge variant='outline' className={cn(
-                    'text-[10px] font-mono px-2 py-0.5 uppercase tracking-wider',
-                    currentStepData.platform === 'youtube' && 'border-rose-200 dark:border-red-500/40 text-rose-700 dark:text-red-400 bg-rose-50 dark:bg-red-950/30',
-                    currentStepData.platform === 'amazon' && 'border-amber-200 dark:border-amber-500/40 text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30',
-                    currentStepData.platform === 'nexus' && 'border-sky-200 dark:border-cyan-500/40 text-sky-700 dark:text-cyan-400 bg-sky-50 dark:bg-cyan-950/30'
-                  )}>
+                <div className='flex items-center justify-between border-b border-[#8A8A8A]/40 pb-3 mb-4'>
+                  <Badge variant='outline' className='text-[10px] font-mono px-2 py-0.5 uppercase tracking-wider border border-[#8A8A8A] bg-[#000000] text-[#FFFFFF] font-bold'>
                     {currentStepData.badgeLabel}
                   </Badge>
-                  <span className='text-[11px] font-mono text-muted-foreground'>
+                  <span className='text-[11px] font-mono text-[#8A8A8A]'>
                     {currentStepData.timestamp}
                   </span>
                 </div>
 
-                <h3 className='font-mono text-base font-bold text-foreground mb-2'>
+                <h3 className='font-mono text-base font-bold text-[#FFFFFF] mb-2'>
                   {currentStepData.title}
                 </h3>
-                <p className='text-xs text-muted-foreground font-sans leading-relaxed mb-4'>
+                <p className='text-xs text-[#8A8A8A] font-sans leading-relaxed mb-4'>
                   {currentStepData.summary}
                 </p>
 
                 <div className='space-y-2 mb-4'>
-                  <span className='text-[10px] font-mono uppercase text-muted-foreground tracking-wider block font-medium'>
+                  <span className='text-[10px] font-mono uppercase text-[#8A8A8A] tracking-wider block font-medium'>
                     Key Technical Observations:
                   </span>
                   {currentStepData.details.map((detail, idx) => (
-                    <div key={idx} className='flex items-start gap-2 text-xs font-mono text-foreground'>
-                      <Icons.arrowRight className='size-3 text-sky-600 dark:text-cyan-400 shrink-0 mt-0.5' />
+                    <div key={idx} className='flex items-start gap-2 text-xs font-mono text-[#FFFFFF]'>
+                      <Icons.arrowRight className='size-3 text-[#FFFFFF] shrink-0 mt-0.5' />
                       <span className='leading-tight'>{detail}</span>
                     </div>
                   ))}
@@ -890,19 +879,19 @@ export function FingerprintTrackerDemo() {
               </div>
 
               {/* Fingerprint Entropy Verification Box */}
-              <div className='rounded-lg border border-border bg-slate-50/60 dark:bg-zinc-900/60 p-3 mt-4'>
+              <div className='rounded border border-[#8A8A8A] bg-[#000000] p-3 mt-4'>
                 <div className='flex items-center justify-between text-[11px] font-mono mb-2'>
-                  <span className='text-muted-foreground uppercase tracking-wider'>Identity Match Consistency</span>
-                  <span className='text-emerald-600 dark:text-emerald-400 font-bold'>{selectedDevice.confidenceScore}% Certainty</span>
+                  <span className='text-[#8A8A8A] uppercase tracking-wider'>Identity Match Consistency</span>
+                  <span className='text-[#FFFFFF] font-bold'>{selectedDevice.confidenceScore}% Certainty</span>
                 </div>
-                <div className='w-full bg-slate-200 dark:bg-zinc-800 rounded-full h-1.5 overflow-hidden mb-2'>
+                <div className='w-full bg-[#1A1A1A] border border-[#1A1A1A] h-1.5 overflow-hidden mb-2'>
                   <div
-                    className='bg-gradient-to-r from-sky-500 to-emerald-500 h-full rounded-full transition-all'
+                    className='bg-[#FFFFFF] h-full transition-all'
                     style={{ width: `${selectedDevice.confidenceScore}%` }}
                   />
                 </div>
-                <div className='flex items-center justify-between text-[10px] font-mono text-muted-foreground'>
-                  <span>Hash: <code className='text-sky-700 dark:text-cyan-300 font-bold'>{selectedDevice.fingerprintId}</code></span>
+                <div className='flex items-center justify-between text-[10px] font-mono text-[#8A8A8A]'>
+                  <span>Hash: <code className='text-[#FFFFFF] font-bold'>{selectedDevice.fingerprintId}</code></span>
                   <span>Method: Canvas+WebGL+Audio</span>
                 </div>
               </div>
@@ -913,18 +902,18 @@ export function FingerprintTrackerDemo() {
 
       {/* TAB CONTENT 2: IDENTITY GRAPH VISUALIZER */}
       {activeTab === 'graph' && (
-        <div className='rounded-xl border border-border bg-card p-6 shadow-xs'>
-          <div className='flex items-center justify-between mb-6 border-b border-border pb-4'>
+        <div className='rounded border border-[#8A8A8A] bg-[#1A1A1A] p-6'>
+          <div className='flex items-center justify-between mb-6 border-b border-[#8A8A8A]/40 pb-4'>
             <div>
-              <h3 className='font-mono text-base font-bold text-foreground uppercase tracking-tight flex items-center gap-2'>
-                <Icons.topology className='size-5 text-sky-600 dark:text-cyan-400' />
+              <h3 className='font-mono text-base font-bold text-[#FFFFFF] uppercase tracking-tight flex items-center gap-2'>
+                <Icons.topology className='size-5 text-[#FFFFFF]' />
                 Identity Graph: Cross-Channel Node Connectivity
               </h3>
-              <p className='text-xs text-muted-foreground font-sans mt-0.5'>
+              <p className='text-xs text-[#8A8A8A] font-sans mt-0.5'>
                 How disparate events across Google YouTube and Amazon Marketplaces are unified by the deterministic device fingerprint.
               </p>
             </div>
-            <Badge variant='outline' className='border-sky-200 dark:border-cyan-500/40 text-sky-700 dark:text-cyan-300 bg-sky-50 dark:bg-cyan-950/30 font-mono text-xs'>
+            <Badge variant='outline' className='border border-[#8A8A8A] text-[#FFFFFF] bg-[#000000] font-mono text-xs'>
               Fingerprint: {selectedDevice.fingerprintId}
             </Badge>
           </div>
@@ -932,105 +921,90 @@ export function FingerprintTrackerDemo() {
           {/* Node Flow Diagram */}
           <div className='relative flex flex-col md:flex-row items-center justify-between gap-6 py-8 px-4'>
             {/* Connection Wire */}
-            <div className='hidden md:block absolute top-1/2 left-12 right-12 h-1 bg-gradient-to-r from-rose-400 via-purple-400 to-emerald-400 -translate-y-1/2 z-0 opacity-40' />
+            <div className='hidden md:block absolute top-1/2 left-12 right-12 h-0.5 bg-[#8A8A8A] -translate-y-1/2 z-0' />
 
             {/* Node 1: YouTube Impression */}
             <div className={cn(
-              'relative z-10 w-full md:w-60 rounded-xl border p-4 font-mono text-center transition-all bg-card shadow-xs',
-              currentStep >= 1 ? 'border-rose-400 dark:border-red-500/80' : 'border-border opacity-50'
+              'relative z-10 w-full md:w-60 rounded border p-4 font-mono text-center transition-all bg-[#000000]',
+              currentStep >= 1 ? 'border-[#FFFFFF]' : 'border-[#8A8A8A]/40 opacity-50'
             )}>
-              <div className='size-10 rounded-full bg-rose-50 dark:bg-red-600/20 border border-rose-200 dark:border-red-500/50 flex items-center justify-center mx-auto mb-2 text-rose-600 dark:text-red-400'>
+              <div className='size-10 rounded-full bg-[#1A1A1A] border border-[#8A8A8A] flex items-center justify-center mx-auto mb-2 text-[#FFFFFF]'>
                 <Icons.youtube className='size-5' />
               </div>
-              <span className='text-[10px] text-rose-700 dark:text-red-400 font-bold uppercase tracking-wider block'>Node 01</span>
-              <h4 className='text-xs font-bold text-foreground mt-1'>YouTube Ad Impression</h4>
-              <p className='text-[11px] text-muted-foreground mt-1'>Campaign: YT_AirMaxDn_Q4</p>
-              <div className='mt-2 pt-2 border-t border-border text-[10px] text-muted-foreground'>
-                FP: <code className='text-sky-700 dark:text-cyan-400 font-bold'>{selectedDevice.fingerprintId.slice(0, 11)}...</code>
+              <span className='text-[10px] text-[#8A8A8A] font-bold uppercase tracking-wider block'>Node 01</span>
+              <h4 className='text-xs font-bold text-[#FFFFFF] mt-1'>YouTube Ad Impression</h4>
+              <p className='text-[11px] text-[#8A8A8A] mt-1'>Campaign: YT_AirMaxDn_Q4</p>
+              <div className='mt-2 pt-2 border-t border-[#8A8A8A]/40 text-[10px] text-[#8A8A8A]'>
+                FP: <code className='text-[#FFFFFF] font-bold'>{selectedDevice.fingerprintId.slice(0, 11)}...</code>
               </div>
-            </div>
-
-            {/* Edge 1 to 2 */}
-            <div className='flex md:hidden items-center justify-center text-muted-foreground'>
-              <Icons.chevronDown className='size-5 text-rose-600 dark:text-red-400' />
             </div>
 
             {/* Node 2: YouTube Click */}
             <div className={cn(
-              'relative z-10 w-full md:w-60 rounded-xl border p-4 font-mono text-center transition-all bg-card shadow-xs',
-              currentStep >= 2 ? 'border-rose-400 dark:border-red-400/80' : 'border-border opacity-50'
+              'relative z-10 w-full md:w-60 rounded border p-4 font-mono text-center transition-all bg-[#000000]',
+              currentStep >= 2 ? 'border-[#FFFFFF]' : 'border-[#8A8A8A]/40 opacity-50'
             )}>
-              <div className='size-10 rounded-full bg-rose-50 dark:bg-red-600/20 border border-rose-200 dark:border-red-500/50 flex items-center justify-center mx-auto mb-2 text-rose-600 dark:text-red-400'>
+              <div className='size-10 rounded-full bg-[#1A1A1A] border border-[#8A8A8A] flex items-center justify-center mx-auto mb-2 text-[#FFFFFF]'>
                 <Icons.externalLink className='size-5' />
               </div>
-              <span className='text-[10px] text-rose-700 dark:text-red-400 font-bold uppercase tracking-wider block'>Node 02</span>
-              <h4 className='text-xs font-bold text-foreground mt-1'>YouTube Ad Click</h4>
-              <p className='text-[11px] text-muted-foreground mt-1'>CPC Cost: ₹0.85</p>
-              <div className='mt-2 pt-2 border-t border-border text-[10px] text-muted-foreground'>
+              <span className='text-[10px] text-[#8A8A8A] font-bold uppercase tracking-wider block'>Node 02</span>
+              <h4 className='text-xs font-bold text-[#FFFFFF] mt-1'>YouTube Ad Click</h4>
+              <p className='text-[11px] text-[#8A8A8A] mt-1'>CPC Cost: ₹0.85</p>
+              <div className='mt-2 pt-2 border-t border-[#8A8A8A]/40 text-[10px] text-[#8A8A8A]'>
                 Dwell Time: 14.2s (Bounced)
               </div>
             </div>
 
-            {/* Edge 2 to 3 */}
-            <div className='flex md:hidden items-center justify-center text-muted-foreground'>
-              <Icons.chevronDown className='size-5 text-amber-600 dark:text-amber-400' />
-            </div>
-
             {/* Node 3: Amazon Search & View */}
             <div className={cn(
-              'relative z-10 w-full md:w-60 rounded-xl border p-4 font-mono text-center transition-all bg-card shadow-xs',
-              currentStep >= 3 ? 'border-amber-400 dark:border-amber-500/80' : 'border-border opacity-50'
+              'relative z-10 w-full md:w-60 rounded border p-4 font-mono text-center transition-all bg-[#000000]',
+              currentStep >= 3 ? 'border-[#FFFFFF]' : 'border-[#8A8A8A]/40 opacity-50'
             )}>
-              <div className='size-10 rounded-full bg-amber-50 dark:bg-amber-600/20 border border-amber-200 dark:border-amber-500/50 flex items-center justify-center mx-auto mb-2 text-amber-700 dark:text-amber-400'>
+              <div className='size-10 rounded-full bg-[#1A1A1A] border border-[#8A8A8A] flex items-center justify-center mx-auto mb-2 text-[#FFFFFF]'>
                 <Icons.amazon className='size-5' />
               </div>
-              <span className='text-[10px] text-amber-800 dark:text-amber-400 font-bold uppercase tracking-wider block'>Node 03</span>
-              <h4 className='text-xs font-bold text-foreground mt-1'>Amazon Direct Visit</h4>
-              <p className='text-[11px] text-muted-foreground mt-1'>Zero Cookies • Direct Search</p>
-              <div className='mt-2 pt-2 border-t border-border text-[10px] text-emerald-600 dark:text-emerald-400 font-bold'>
-                FP Match: 100% Identical
+              <span className='text-[10px] text-[#8A8A8A] font-bold uppercase tracking-wider block'>Node 03</span>
+              <h4 className='text-xs font-bold text-[#FFFFFF] mt-1'>Amazon Direct Visit</h4>
+              <p className='text-[11px] text-[#8A8A8A] mt-1'>Zero Cookies • Direct Search</p>
+              <div className='mt-2 pt-2 border-t border-[#8A8A8A]/40 text-[10px] text-[#FFFFFF] font-bold'>
+                ● FP Match: 100% Identical
               </div>
-            </div>
-
-            {/* Edge 3 to 4 */}
-            <div className='flex md:hidden items-center justify-center text-muted-foreground'>
-              <Icons.chevronDown className='size-5 text-emerald-600 dark:text-emerald-400' />
             </div>
 
             {/* Node 4: Amazon Conversion */}
             <div className={cn(
-              'relative z-10 w-full md:w-60 rounded-xl border p-4 font-mono text-center transition-all bg-card shadow-xs',
-              currentStep >= 4 ? 'border-emerald-400 dark:border-emerald-500/80' : 'border-border opacity-50'
+              'relative z-10 w-full md:w-60 rounded border p-4 font-mono text-center transition-all bg-[#000000]',
+              currentStep >= 4 ? 'border-[#FFFFFF]' : 'border-[#8A8A8A]/40 opacity-50'
             )}>
-              <div className='size-10 rounded-full bg-emerald-50 dark:bg-emerald-600/20 border border-emerald-200 dark:border-emerald-500/50 flex items-center justify-center mx-auto mb-2 text-emerald-600 dark:text-emerald-400'>
+              <div className='size-10 rounded-full bg-[#1A1A1A] border border-[#8A8A8A] flex items-center justify-center mx-auto mb-2 text-[#FFFFFF]'>
                 <Icons.cart className='size-5' />
               </div>
-              <span className='text-[10px] text-emerald-700 dark:text-emerald-400 font-bold uppercase tracking-wider block'>Node 04</span>
-              <h4 className='text-xs font-bold text-foreground mt-1'>Amazon Purchase</h4>
-              <p className='text-[11px] text-muted-foreground mt-1'>Order ₹170.00 Confirmed</p>
-              <div className='mt-2 pt-2 border-t border-border text-[10px] text-emerald-600 dark:text-emerald-400 font-bold'>
-                Revenue Attributed!
+              <span className='text-[10px] text-[#8A8A8A] font-bold uppercase tracking-wider block'>Node 04</span>
+              <h4 className='text-xs font-bold text-[#FFFFFF] mt-1'>Amazon Purchase</h4>
+              <p className='text-[11px] text-[#8A8A8A] mt-1'>Order ₹170.00 Confirmed</p>
+              <div className='mt-2 pt-2 border-t border-[#8A8A8A]/40 text-[10px] text-[#FFFFFF] font-bold'>
+                ● Revenue Attributed!
               </div>
             </div>
           </div>
 
           {/* Graph Metrics Summary */}
-          <div className='mt-8 pt-6 border-t border-border grid grid-cols-1 md:grid-cols-4 gap-4 font-mono text-xs'>
-            <div className='bg-slate-50/70 dark:bg-zinc-900/70 border border-border rounded-lg p-3 shadow-xs'>
-              <span className='text-muted-foreground block text-[10px] uppercase'>Journey Time-to-Convert</span>
-              <span className='text-foreground font-bold text-sm'>6 Hours 21 Minutes</span>
+          <div className='mt-8 pt-6 border-t border-[#8A8A8A]/40 grid grid-cols-1 md:grid-cols-4 gap-4 font-mono text-xs'>
+            <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded p-3'>
+              <span className='text-[#8A8A8A] block text-[10px] uppercase'>Journey Time-to-Convert</span>
+              <span className='text-[#FFFFFF] font-bold text-sm'>6 Hours 21 Minutes</span>
             </div>
-            <div className='bg-slate-50/70 dark:bg-zinc-900/70 border border-border rounded-lg p-3 shadow-xs'>
-              <span className='text-muted-foreground block text-[10px] uppercase'>Total Incurred Ad Cost</span>
-              <span className='text-rose-600 dark:text-red-400 font-bold text-sm'>₹0.874 (CPM + CPC)</span>
+            <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded p-3'>
+              <span className='text-[#8A8A8A] block text-[10px] uppercase'>Total Incurred Ad Cost</span>
+              <span className='text-[#FFFFFF] font-bold text-sm'>₹0.874 (CPM + CPC)</span>
             </div>
-            <div className='bg-slate-50/70 dark:bg-zinc-900/70 border border-border rounded-lg p-3 shadow-xs'>
-              <span className='text-muted-foreground block text-[10px] uppercase'>Gross Attributed Value</span>
-              <span className='text-emerald-600 dark:text-emerald-400 font-bold text-sm'>₹170.00 Gross / ₹93.50 Margin</span>
+            <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded p-3'>
+              <span className='text-[#8A8A8A] block text-[10px] uppercase'>Gross Attributed Value</span>
+              <span className='text-[#FFFFFF] font-bold text-sm'>₹170.00 Gross / ₹93.50 Margin</span>
             </div>
-            <div className='bg-slate-50/70 dark:bg-zinc-900/70 border border-border rounded-lg p-3 shadow-xs'>
-              <span className='text-muted-foreground block text-[10px] uppercase'>Attributed Lift Factor</span>
-              <span className='text-sky-700 dark:text-cyan-400 font-bold text-sm'>194.5x ROAS Yield</span>
+            <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded p-3'>
+              <span className='text-[#8A8A8A] block text-[10px] uppercase'>Attributed Lift Factor</span>
+              <span className='text-[#FFFFFF] font-bold text-sm'>194.5x ROAS Yield</span>
             </div>
           </div>
         </div>
@@ -1038,20 +1012,20 @@ export function FingerprintTrackerDemo() {
 
       {/* TAB CONTENT 3: RAW TELEMETRY JSON STREAM */}
       {activeTab === 'telemetry' && (
-        <div className='rounded-xl border border-border bg-card p-5 shadow-xs font-mono'>
-          <div className='flex items-center justify-between mb-4 border-b border-border pb-3'>
+        <div className='rounded border border-[#8A8A8A] bg-[#1A1A1A] p-5 font-mono'>
+          <div className='flex items-center justify-between mb-4 border-b border-[#8A8A8A]/40 pb-3'>
             <div className='flex items-center gap-2'>
-              <Icons.code className='size-4 text-sky-600 dark:text-cyan-400' />
-              <h3 className='text-xs font-bold text-foreground uppercase tracking-wider'>
+              <Icons.code className='size-4 text-[#FFFFFF]' />
+              <h3 className='text-xs font-bold text-[#FFFFFF] uppercase tracking-wider'>
                 Ingestion Telemetry Payload (DuckDB Ingest Buffer)
               </h3>
             </div>
-            <Badge variant='outline' className='border-emerald-200 dark:border-emerald-500/40 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 text-[10px] font-bold'>
-              HTTP 200 INGESTED
+            <Badge variant='outline' className='border border-[#8A8A8A] text-[#FFFFFF] bg-[#000000] text-[10px] font-bold'>
+              ● HTTP 200 INGESTED
             </Badge>
           </div>
 
-          <pre className='bg-slate-950 text-slate-100 border border-slate-800 rounded-lg p-4 text-xs overflow-x-auto leading-relaxed max-h-96 selection:bg-sky-500 selection:text-black'>
+          <pre className='bg-[#000000] text-[#FFFFFF] border border-[#8A8A8A]/40 rounded p-4 text-xs overflow-x-auto leading-relaxed max-h-96'>
             {JSON.stringify(currentStepData.eventPayload, null, 2)}
           </pre>
         </div>
@@ -1061,17 +1035,17 @@ export function FingerprintTrackerDemo() {
       {activeTab === 'code' && (
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs'>
           {/* Client SDK */}
-          <div className='rounded-xl border border-border bg-card p-4 shadow-xs'>
-            <div className='flex items-center justify-between mb-3 border-b border-border pb-2'>
-              <span className='font-bold text-foreground text-xs flex items-center gap-1.5'>
-                <Icons.code className='size-3.5 text-sky-600 dark:text-cyan-400' />
+          <div className='rounded border border-[#8A8A8A] bg-[#1A1A1A] p-4'>
+            <div className='flex items-center justify-between mb-3 border-b border-[#8A8A8A]/40 pb-2'>
+              <span className='font-bold text-[#FFFFFF] text-xs flex items-center gap-1.5'>
+                <Icons.code className='size-3.5 text-[#FFFFFF]' />
                 Client-Side Fingerprint Generator (`nexus-fp.js`)
               </span>
-              <Badge variant='outline' className='text-[10px] border-border text-muted-foreground bg-muted/40'>
+              <Badge variant='outline' className='text-[10px] border-[#8A8A8A] text-[#8A8A8A] bg-[#000000]'>
                 1.4 kB • Zero Cookies
               </Badge>
             </div>
-            <pre className='bg-slate-950 text-slate-100 p-3 rounded-md text-[11px] overflow-x-auto leading-relaxed border border-slate-800'>
+            <pre className='bg-[#000000] text-[#FFFFFF] p-3 rounded text-[11px] overflow-x-auto leading-relaxed border border-[#8A8A8A]/40'>
 {`// NEXUS Deterministic Hardware Fingerprint Engine
 async function computeNexusFingerprint() {
   const canvas = document.createElement('canvas');
@@ -1105,17 +1079,17 @@ async function computeNexusFingerprint() {
           </div>
 
           {/* DuckDB Cross-Channel Query */}
-          <div className='rounded-xl border border-border bg-card p-4 shadow-xs'>
-            <div className='flex items-center justify-between mb-3 border-b border-border pb-2'>
-              <span className='font-bold text-foreground text-xs flex items-center gap-1.5'>
-                <Icons.product className='size-3.5 text-indigo-600 dark:text-purple-400' />
+          <div className='rounded border border-[#8A8A8A] bg-[#1A1A1A] p-4'>
+            <div className='flex items-center justify-between mb-3 border-b border-[#8A8A8A]/40 pb-2'>
+              <span className='font-bold text-[#FFFFFF] text-xs flex items-center gap-1.5'>
+                <Icons.product className='size-3.5 text-[#FFFFFF]' />
                 DuckDB Cross-Platform Attribution Query
               </span>
-              <Badge variant='outline' className='text-[10px] border-border text-muted-foreground bg-muted/40'>
+              <Badge variant='outline' className='text-[10px] border-[#8A8A8A] text-[#8A8A8A] bg-[#000000]'>
                 SQL Query
               </Badge>
             </div>
-            <pre className='bg-slate-950 text-slate-100 p-3 rounded-md text-[11px] overflow-x-auto leading-relaxed border border-slate-800'>
+            <pre className='bg-[#000000] text-[#FFFFFF] p-3 rounded text-[11px] overflow-x-auto leading-relaxed border border-[#8A8A8A]/40'>
 {`-- Stitch YouTube impressions to Amazon checkout
 SELECT
   yt.fingerprint_id,

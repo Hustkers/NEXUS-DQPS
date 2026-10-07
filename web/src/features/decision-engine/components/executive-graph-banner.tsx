@@ -294,13 +294,12 @@ export function ExecutiveGraphBanner({
             }}
             onClick={() => setExpandedMetric(expandedMetric === card.id ? null : card.id)}
             className={cn(
-              'group relative rounded-2xl border border-border/80 bg-muted/20 p-1 transition-all cursor-pointer hover:border-border hover:shadow-md',
+              'group relative rounded-xl border border-border/80 bg-card p-4 transition-all cursor-pointer hover:border-border hover:shadow-md flex flex-col justify-between overflow-hidden',
               expandedMetric === card.id && 'ring-2 ring-emerald-500/50 border-emerald-500/60 shadow-sm'
             )}
           >
-            <div className='relative overflow-hidden rounded-xl bg-card p-4 flex flex-col justify-between h-full border border-border/40'>
-              {/* Card Header Content */}
-              <div className='relative z-10'>
+            {/* Card Header Content */}
+            <div className='relative z-10'>
                 <div className='flex items-center justify-between'>
                   <span className='font-mono text-[11px] uppercase tracking-wider text-muted-foreground'>
                     {card.title}
@@ -397,7 +396,6 @@ export function ExecutiveGraphBanner({
                   {card.footerValue}
                 </span>
               </div>
-            </div>
           </motion.div>
         ))}
       </div>

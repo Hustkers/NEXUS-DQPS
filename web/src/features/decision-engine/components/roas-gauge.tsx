@@ -3,7 +3,6 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Wrench, ArrowRight } from 'lucide-react';
 
 interface RoasGaugeProps {
   currentRoas: number;
@@ -18,7 +17,6 @@ interface RoasGaugeProps {
   className?: string;
   compact?: boolean;
   onAnalyze?: () => void;
-  onFix?: (e: React.MouseEvent) => void;
 }
 
 export function RoasGauge({
@@ -33,14 +31,13 @@ export function RoasGauge({
   inventory,
   className,
   compact = false,
-  onAnalyze,
-  onFix
+  onAnalyze
 }: RoasGaugeProps) {
   // Map ROAS (0 to 5.0) to angle on semicircular arc (180deg to 0deg)
   const maxRoas = 5.0;
   const clampedRoas = Math.min(Math.max(currentRoas, 0), maxRoas);
   const percentage = clampedRoas / maxRoas;
-
+  
   // Circumference for r=65: half circle length = PI * 65 = ~204
   const radius = compact ? 45 : 65;
   const strokeWidth = compact ? 6 : 10;
@@ -86,7 +83,7 @@ export function RoasGauge({
       onClick={onAnalyze}
       title={onAnalyze ? 'Click to inspect product telemetry' : undefined}
     >
-      {/* 1. Header with Product, Platform, Inv, & Health Score */}
+      {/* Header if campaign provided */}
       {campaignName && (
         <div className='flex w-full items-center justify-between gap-2 border-b border-[#8A8A8A]/40 pb-2 mb-2'>
           <div className='flex items-center gap-2 min-w-0'>
@@ -94,10 +91,6 @@ export function RoasGauge({
               <div className='relative size-7 rounded border border-[#8A8A8A] bg-[#000000] overflow-hidden shrink-0'>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={photoUrl} alt={productName || campaignName} className='size-full object-cover' />
-              </div>
-            ) : (
-              <div className='size-8 rounded-lg border border-border/80 bg-muted flex items-center justify-center shrink-0 font-mono text-[11px] font-bold text-foreground'>
-                {(productName || campaignName).slice(0, 2).toUpperCase()}
               </div>
             )}
             <div className='flex flex-col text-left min-w-0'>
@@ -122,8 +115,8 @@ export function RoasGauge({
         </div>
       )}
 
-      {/* 2. SVG Semicircle Gauge with Centered ROAS readout */}
-      <div className='relative flex items-center justify-center my-1.5'>
+      {/* SVG Semicircle Gauge */}
+      <div className='relative flex items-center justify-center my-1'>
         <svg
           width={radius * 2 + strokeWidth * 2}
           height={radius + strokeWidth + 8}
@@ -220,34 +213,6 @@ export function RoasGauge({
         <Badge variant='outline' className={cn('text-[9px] py-0 px-1 font-mono tracking-wider', badgeVariant)}>
           {statusBadge}
         </Badge>
-
-        {isStockout ? (
-          <button
-            type='button'
-            onClick={(e) => {
-              e.stopPropagation();
-              onFix?.(e);
-            }}
-            className='inline-flex items-center justify-center gap-1.5 px-3 py-1 text-xs font-mono font-bold text-white bg-rose-600 hover:bg-rose-700 active:scale-95 rounded-md shadow-xs transition-all cursor-pointer'
-            title='Fix stockout inventory issue'
-          >
-            <Wrench className='w-3 h-3' />
-            <span>Fix</span>
-          </button>
-        ) : (
-          <button
-            type='button'
-            onClick={(e) => {
-              e.stopPropagation();
-              onAnalyze?.();
-            }}
-            className='inline-flex items-center justify-center gap-1 px-2.5 py-1 text-[11px] font-mono font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 rounded-md transition-all cursor-pointer'
-            title='Inspect product telemetry'
-          >
-            <span>Inspect</span>
-            <ArrowRight className='w-3 h-3 opacity-60' />
-          </button>
-        )}
       </div>
     </div>
   );

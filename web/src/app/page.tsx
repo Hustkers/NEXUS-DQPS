@@ -8,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <LandingPageView />;
+  return (
+    <main className='min-h-screen bg-[#000000] text-[#FFFFFF]'>
+      <LandingPageView />
+    </main>
+  );
 }

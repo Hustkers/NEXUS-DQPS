@@ -4,12 +4,8 @@ import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
 import { RoasGauge } from '@/features/decision-engine/components/roas-gauge';
-import {
-  ProductAnalysisModal,
-  type ProductAnalysisTarget
-} from '@/features/decision-engine/components/product-analysis-modal';
+import { ProductAnalysisModal, type ProductAnalysisTarget } from '@/features/decision-engine/components/product-analysis-modal';
 import initialEngineState from '@/data/nexus-engine-state.json';
-import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 export default function GaugesPage() {
@@ -17,28 +13,9 @@ export default function GaugesPage() {
   const [analyzingProduct, setAnalyzingProduct] = useState<ProductAnalysisTarget | null>(null);
   const campaigns = initialEngineState.campaigns;
 
-  const stockoutCount = campaigns.filter(
-    (c: any) =>
-      (c.inventory !== undefined && c.inventory <= 0) || c.roasStatus === 'CRITICAL_STOCKOUT'
-  ).length;
-
-  const filtered = campaigns.filter((c: any) => {
-    if (activePlatform === 'all') return true;
-    if (activePlatform === 'stockout') {
-      return (
-        (c.inventory !== undefined && c.inventory <= 0) ||
-        c.roasStatus === 'CRITICAL_STOCKOUT'
-      );
-    }
-    return c.platform === activePlatform;
-  });
-
-  const handleFix = (c: any) => {
-    toast.error(`Fix Stockout: ${c.productName || c.campaign}`, {
-      description: `Circuit breaker active. Inventory is 0 on ${c.platform.toUpperCase()}. Ready for mitigation configuration.`,
-      duration: 4000
-    });
-  };
+  const filtered = campaigns.filter((c: any) =>
+    activePlatform === 'all' ? true : c.platform === activePlatform
+  );
 
   return (
     <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#000000] text-white min-h-screen'>
@@ -67,12 +44,7 @@ export default function GaugesPage() {
                   : 'text-[#8A8A8A] hover:text-white'
               )}
             >
-              <span>{plat === 'stockout' ? 'Stockouts' : plat}</span>
-              {plat === 'stockout' && (
-                <span className='px-1.5 py-0.2 rounded-full text-[10px] bg-rose-600 text-white font-mono'>
-                  {stockoutCount}
-                </span>
-              )}
+              {plat}
             </button>
           ))}
         </div>
@@ -91,7 +63,6 @@ export default function GaugesPage() {
             targetRoas={c.targetRoas}
             breakevenRoas={c.breakevenRoas}
             healthScore={c.healthScore}
-            onFix={() => handleFix(c)}
             onAnalyze={() => {
               setAnalyzingProduct({
                 productName: c.productName || c.campaign,

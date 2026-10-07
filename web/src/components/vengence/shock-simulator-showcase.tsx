@@ -161,7 +161,7 @@ export function ShockSimulatorShowcase() {
               <div className='text-[11px] text-[#8A8A8A] leading-snug'>
                 Simulated on 90-day multi-channel telemetry with 100% mathematical audit trail.
               </div>
-              <Link href={`/dashboard/simulator?scenario=${active.id}`} className='block'>
+              <Link href='/dashboard/simulator' className='block'>
                 <GlowButton size='sm' variant='default' className='w-full font-mono text-xs'>
                   Execute in Simulator →
                 </GlowButton>
