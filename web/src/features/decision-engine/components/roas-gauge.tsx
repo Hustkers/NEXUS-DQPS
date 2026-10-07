@@ -18,6 +18,7 @@ interface RoasGaugeProps {
   className?: string;
   compact?: boolean;
   onAnalyze?: () => void;
+  onFix?: () => void;
 }
 
 export function RoasGauge({
@@ -32,7 +33,8 @@ export function RoasGauge({
   inventory,
   className,
   compact = false,
-  onAnalyze
+  onAnalyze,
+  onFix
 }: RoasGaugeProps) {
   // Map ROAS (0 to 5.0) to angle on semicircular arc (180deg to 0deg)
   const maxRoas = 5.0;
@@ -216,6 +218,22 @@ export function RoasGauge({
           {statusBadge}
         </Badge>
       </div>
+
+      {/* Stockout Fix Button */}
+      {isStockout && (
+        <div className='mt-3 w-full pt-2 border-t border-[#8A8A8A]/30'>
+          <button
+            type='button'
+            onClick={(e) => {
+              e.stopPropagation();
+              onFix?.();
+            }}
+            className='w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded bg-[#FFFFFF] text-[#000000] font-mono text-xs font-bold uppercase tracking-wider hover:bg-[#8A8A8A] hover:text-[#FFFFFF] transition-all shadow-sm'
+          >
+            <span>Fix</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
