@@ -19,7 +19,7 @@ export const columns: ColumnDef<Product>[] = [
       const onAnalyze = (table.options.meta as any)?.onAnalyze;
       return (
         <div
-          className='relative size-12 overflow-hidden rounded-md border border-zinc-800 bg-zinc-900 cursor-pointer hover:border-cyan-500/80 transition-colors'
+          className='relative size-12 overflow-hidden rounded-md border border-border bg-muted/40 cursor-pointer hover:border-cyan-500/80 transition-colors'
           onClick={() => onAnalyze?.(row.original)}
           title='Click to inspect product telemetry'
         >
@@ -32,7 +32,7 @@ export const columns: ColumnDef<Product>[] = [
               className='object-cover'
             />
           ) : (
-            <div className='flex size-full items-center justify-center text-[10px] text-zinc-600'>
+            <div className='flex size-full items-center justify-center text-[10px] text-muted-foreground font-mono'>
               NIKE
             </div>
           )}
@@ -55,11 +55,11 @@ export const columns: ColumnDef<Product>[] = [
           onClick={() => onAnalyze?.(p)}
           title='Click to inspect product telemetry'
         >
-          <div className='font-medium text-zinc-100 truncate group-hover:text-cyan-400 transition-colors'>
+          <div className='font-semibold text-foreground truncate group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors'>
             {p.name}
           </div>
           {p.sku && (
-            <div className='text-[10px] font-mono text-zinc-500'>SKU: {p.sku}</div>
+            <div className='text-[10px] font-mono text-muted-foreground'>SKU: {p.sku}</div>
           )}
         </div>
       );
@@ -82,7 +82,7 @@ export const columns: ColumnDef<Product>[] = [
     cell: ({ cell }) => {
       const cat = cell.getValue<Product['category']>();
       return (
-        <Badge variant='outline' className='font-mono text-[10px] border-zinc-700 text-zinc-300'>
+        <Badge variant='outline' className='font-mono text-[10px] border-border text-foreground bg-muted/30'>
           {cat}
         </Badge>
       );
@@ -103,10 +103,10 @@ export const columns: ColumnDef<Product>[] = [
       const p = row.original;
       const inrPrice = p.sale_price_inr ?? Math.round(Number(p.price) * 83);
       return (
-        <div className='font-mono'>
-          <div className='text-zinc-900 dark:text-zinc-100 font-bold'>₹{inrPrice.toLocaleString()}</div>
+        <div className='font-mono whitespace-nowrap'>
+          <div className='text-foreground font-bold'>₹{inrPrice.toLocaleString()}</div>
           {p.listing_price_inr && (
-            <div className='text-[10px] text-zinc-500 line-through'>₹{p.listing_price_inr.toLocaleString()}</div>
+            <div className='text-[10px] text-muted-foreground line-through'>₹{p.listing_price_inr.toLocaleString()}</div>
           )}
         </div>
       );
@@ -121,11 +121,11 @@ export const columns: ColumnDef<Product>[] = [
       const stock = (p as any).inventory ?? 150;
       const isCritical = stock <= 0;
       return (
-        <div className='flex items-center gap-1.5 text-xs font-mono'>
-          <span className={cn('font-bold', isCritical ? 'text-rose-400' : 'text-emerald-400')}>
+        <div className='flex items-center gap-1.5 text-xs font-mono whitespace-nowrap'>
+          <span className={cn('font-bold', isCritical ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400')}>
             {stock} units
           </span>
-          <span className='text-zinc-500 text-[11px]'>
+          <span className='text-muted-foreground text-[11px]'>
             {isCritical ? '(Stockout)' : '(In Stock)'}
           </span>
         </div>
@@ -136,7 +136,7 @@ export const columns: ColumnDef<Product>[] = [
     accessorKey: 'description',
     header: 'Description',
     cell: ({ cell }) => (
-      <div className='max-w-[320px] truncate text-xs text-zinc-400'>
+      <div className='max-w-[320px] truncate text-xs text-muted-foreground' title={cell.getValue<string>()}>
         {cell.getValue<string>()}
       </div>
     )

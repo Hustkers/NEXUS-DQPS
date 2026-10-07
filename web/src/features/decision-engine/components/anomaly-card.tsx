@@ -70,16 +70,16 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, onViewReceipt, isM
           </div>
           <div className='flex items-center gap-1.5'>
             {isReallocated && (
-              <span className='font-mono font-bold text-[10px] px-1.5 py-0.5 rounded bg-[#FFFFFF] text-[#000000] border border-[#FFFFFF]'>
+              <span className='font-mono font-bold text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'>
                 [REALLOCATED]
               </span>
             )}
             <span
               className={cn(
-                'font-mono font-bold text-[10px] px-1.5 py-0.5 rounded',
+                'font-mono font-bold text-[10px] px-1.5 py-0.5 rounded border',
                 isCritical
-                  ? 'bg-[#FFFFFF] text-[#000000]'
-                  : 'bg-[#000000] text-[#FFFFFF]'
+                  ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30'
+                  : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30'
               )}
             >
               {isCritical ? '[CRITICAL] ' : '[WARN] '}Z {anomaly.zScore > 0 ? `+${anomaly.zScore}` : anomaly.zScore}

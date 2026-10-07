@@ -62,11 +62,11 @@ export function ScenarioController({
 
   return (
     <>
-      <div className={cn('rounded border border-[#8A8A8A] bg-[#1A1A1A] p-5 shadow-none text-[#FFFFFF]', className)}>
-        <div className='flex items-center justify-between border-b border-[#8A8A8A]/40 pb-3 mb-4'>
+      <div className={cn('rounded-xl border border-border bg-card p-5 shadow-xs text-card-foreground', className)}>
+        <div className='flex items-center justify-between border-b border-border/60 pb-3 mb-4'>
           <div className='flex items-center gap-2'>
-            <Icons.sparkles className='size-3.5 text-[#8A8A8A]' />
-            <h3 className='font-mono text-xs font-bold text-[#FFFFFF] uppercase tracking-wider'>
+            <Icons.sparkles className='size-3.5 text-muted-foreground' />
+            <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
               Scenario Shock Testing Sandbox
             </h3>
           </div>
@@ -75,9 +75,9 @@ export function ScenarioController({
             size='sm'
             variant='outline'
             onClick={handleReset}
-            className='h-8 text-xs font-mono text-[#FFFFFF] hover:bg-[#000000] hover:border-[#FFFFFF] border border-[#8A8A8A] bg-[#1A1A1A] px-2.5 active:scale-[0.98]'
+            className='h-8 text-xs font-mono text-foreground hover:bg-muted border border-border bg-card px-2.5 active:scale-[0.98]'
           >
-            <Icons.clock className='mr-1.5 size-3 text-[#8A8A8A]' />
+            <Icons.clock className='mr-1.5 size-3 text-muted-foreground' />
             Reset Baseline
           </Button>
         </div>
@@ -94,32 +94,32 @@ export function ScenarioController({
                 key={s.id}
                 onClick={() => handleTrigger(s)}
                 className={cn(
-                  'group flex flex-col justify-between text-left rounded border p-3.5 transition-all active:scale-[0.98] min-h-[140px] min-w-0',
+                  'group flex flex-col justify-between text-left rounded-lg border p-3.5 transition-all active:scale-[0.98] min-h-[140px] min-w-0',
                   isActive
-                    ? 'border-[#FFFFFF] bg-[#000000] ring-1 ring-[#FFFFFF]'
-                    : 'border-[#8A8A8A]/40 bg-[#000000] hover:border-[#FFFFFF] hover:bg-zinc-950/80'
+                    ? 'border-foreground bg-muted/80 ring-1 ring-foreground'
+                    : 'border-border bg-background hover:border-foreground/40 hover:bg-muted/30'
                 )}
               >
                 <div className='w-full'>
                   <div className='flex items-center justify-between w-full mb-1.5'>
-                    <span className='font-mono text-xs font-bold text-[#FFFFFF]'>
+                    <span className={cn('font-mono text-xs font-bold', isCritical ? 'text-rose-500' : 'text-foreground')}>
                       {isCritical ? '■' : '○'}
                     </span>
-                    <span className='text-[10px] font-mono text-[#FFFFFF] bg-[#1A1A1A] border border-[#8A8A8A] px-1.5 py-0.5 rounded font-bold'>
+                    <span className='text-[10px] font-mono text-foreground bg-muted/80 border border-border px-1.5 py-0.5 rounded font-bold'>
                       {s.expectedSavedWaste.split(' ')[0]} saved
                     </span>
                   </div>
-                  <div className='font-mono text-xs font-bold text-[#FFFFFF] line-clamp-1 group-hover:text-cyan-400 transition-colors'>
+                  <div className='font-mono text-xs font-bold text-foreground line-clamp-1 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors'>
                     {s.name}
                   </div>
-                  <div className='text-[11px] text-[#8A8A8A] font-mono mt-1 line-clamp-2 leading-relaxed'>
+                  <div className='text-[11px] text-muted-foreground font-mono mt-1 line-clamp-2 leading-relaxed'>
                     {s.injectedEvent}
                   </div>
                 </div>
 
-                <div className='w-full pt-2.5 mt-2 border-t border-[#8A8A8A]/20 flex items-center justify-between text-[10px] font-mono'>
-                  <span className='text-[#8A8A8A]'>Autonomous Response</span>
-                  <span className='font-bold text-[#FFFFFF] group-hover:translate-x-0.5 transition-transform flex items-center gap-1'>
+                <div className='w-full pt-2.5 mt-2 border-t border-border/50 flex items-center justify-between text-[10px] font-mono'>
+                  <span className='text-muted-foreground'>Autonomous Response</span>
+                  <span className='font-bold text-foreground group-hover:translate-x-0.5 transition-transform flex items-center gap-1'>
                     RUN SIMULATION →
                   </span>
                 </div>

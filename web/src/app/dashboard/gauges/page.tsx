@@ -72,20 +72,20 @@ export default function GaugesPage() {
   };
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#000000] text-white min-h-screen font-mono min-w-0 max-w-full'>
+    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-background text-foreground min-h-screen font-mono min-w-0 max-w-full'>
       {/* Header Bar */}
-      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-[#1A1A1A] pb-4'>
+      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4'>
         <div>
           <div className='flex items-center gap-2'>
-            <Icons.trendingUp className='size-5 text-white' />
-            <h1 className='text-lg md:text-xl font-bold text-white uppercase tracking-tight'>
+            <Icons.trendingUp className='size-5 text-foreground' />
+            <h1 className='text-lg md:text-xl font-bold text-foreground uppercase tracking-tight'>
               ROAS &amp; Health Gauges
             </h1>
-            <span className='text-[10px] bg-[#141414] border border-[#262626] text-[#A3A3A3] px-2 py-0.5 rounded'>
+            <span className='text-[10px] bg-muted/40 border border-border text-muted-foreground px-2 py-0.5 rounded'>
               Nike Direct Account
             </span>
           </div>
-          <p className='text-xs text-[#8A8A8A] mt-1'>
+          <p className='text-xs text-muted-foreground mt-1'>
             Autonomous Adstock Optimization • Semicircular Target Arcs (0–6x) • 1.8x Floor &amp; 3.2x Target
           </p>
         </div>
@@ -93,7 +93,7 @@ export default function GaugesPage() {
         <div className='flex items-center gap-2'>
           <button
             onClick={handleResetToDefaults}
-            className='px-3 py-1.5 rounded-lg border border-[#222222] bg-[#121212] hover:bg-[#1A1A1A] text-[11px] text-[#A3A3A3] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white'
+            className='px-3 py-1.5 rounded-lg border border-border bg-background hover:bg-muted text-[11px] text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
             title='Reset campaigns and ledger to factory seed data'
           >
             Reset Seed Data
@@ -104,86 +104,86 @@ export default function GaugesPage() {
       {/* TOP DYNAMIC KPIS (all computed purely from data) */}
       <div className='grid grid-cols-2 lg:grid-cols-4 gap-3'>
         {/* Blended ROAS */}
-        <div className='rounded-xl border border-[#222222] bg-[#0E0E0E] p-4 flex flex-col justify-between'>
-          <span className='text-[10px] text-[#8A8A8A] uppercase font-semibold'>
+        <div className='rounded-xl border border-border bg-card p-4 flex flex-col justify-between text-card-foreground'>
+          <span className='text-[10px] text-muted-foreground uppercase font-semibold'>
             Blended ROAS
           </span>
           <div className='mt-2 flex items-baseline gap-2'>
-            <span className='text-2xl font-bold text-white tracking-tight'>
+            <span className='text-2xl font-bold text-foreground tracking-tight'>
               {topKpis.blendedRoas.toFixed(2)}x
             </span>
-            <span className='text-[10px] text-emerald-400 font-semibold'>
+            <span className='text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold'>
               {topKpis.blendedRoas >= 3.2 ? '● Target Met' : '○ Pacing'}
             </span>
           </div>
-          <span className='text-[10px] text-[#737373] mt-1'>
+          <span className='text-[10px] text-muted-foreground mt-1'>
             Total Rev / Total Spend
           </span>
         </div>
 
         {/* Daily Ad Spend */}
-        <div className='rounded-xl border border-[#222222] bg-[#0E0E0E] p-4 flex flex-col justify-between'>
-          <span className='text-[10px] text-[#8A8A8A] uppercase font-semibold'>
+        <div className='rounded-xl border border-border bg-card p-4 flex flex-col justify-between text-card-foreground'>
+          <span className='text-[10px] text-muted-foreground uppercase font-semibold'>
             Daily Ad Spend
           </span>
           <div className='mt-2 flex items-baseline gap-2'>
-            <span className='text-2xl font-bold text-white tracking-tight'>
+            <span className='text-2xl font-bold text-foreground tracking-tight'>
               {formatINR(topKpis.totalDailySpend)}
             </span>
           </div>
-          <span className='text-[10px] text-[#737373] mt-1'>
+          <span className='text-[10px] text-muted-foreground mt-1'>
             Active Managed Capital
           </span>
         </div>
 
         {/* Open Issues */}
-        <div className='rounded-xl border border-[#222222] bg-[#0E0E0E] p-4 flex flex-col justify-between'>
-          <span className='text-[10px] text-[#8A8A8A] uppercase font-semibold'>
+        <div className='rounded-xl border border-border bg-card p-4 flex flex-col justify-between text-card-foreground'>
+          <span className='text-[10px] text-muted-foreground uppercase font-semibold'>
             Open Issues
           </span>
           <div className='mt-2 flex items-baseline gap-2'>
             <span
               className={cn(
                 'text-2xl font-bold tracking-tight',
-                topKpis.openIssuesCount > 0 ? 'text-amber-400' : 'text-emerald-400'
+                topKpis.openIssuesCount > 0 ? 'text-amber-500' : 'text-emerald-600 dark:text-emerald-400'
               )}
             >
               {topKpis.openIssuesCount}
             </span>
-            <span className='text-[10px] text-[#8A8A8A]'>
+            <span className='text-[10px] text-muted-foreground'>
               {topKpis.openIssuesCount === 0 ? 'All Clear' : 'Requires Action'}
             </span>
           </div>
-          <span className='text-[10px] text-[#737373] mt-1'>
+          <span className='text-[10px] text-muted-foreground mt-1'>
             Stockouts &amp; Sub-Floor Alerts
           </span>
         </div>
 
         {/* Spend at Risk */}
-        <div className='rounded-xl border border-[#222222] bg-[#0E0E0E] p-4 flex flex-col justify-between'>
-          <span className='text-[10px] text-[#8A8A8A] uppercase font-semibold'>
+        <div className='rounded-xl border border-border bg-card p-4 flex flex-col justify-between text-card-foreground'>
+          <span className='text-[10px] text-muted-foreground uppercase font-semibold'>
             Spend at Risk
           </span>
           <div className='mt-2 flex items-baseline gap-2'>
             <span
               className={cn(
                 'text-2xl font-bold tracking-tight',
-                topKpis.spendAtRisk > 0 ? 'text-red-400' : 'text-emerald-400'
+                topKpis.spendAtRisk > 0 ? 'text-rose-500' : 'text-emerald-600 dark:text-emerald-400'
               )}
             >
               {formatINR(topKpis.spendAtRisk)}
             </span>
           </div>
-          <span className='text-[10px] text-[#737373] mt-1'>
+          <span className='text-[10px] text-muted-foreground mt-1'>
             In Un-optimized / Out-of-Stock Sets
           </span>
         </div>
       </div>
 
       {/* FILTER CHIPS (All / Needs fix / Fixed) + CHANNELS */}
-      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-[#1A1A1A] pb-3'>
+      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3'>
         {/* Filter Chips: All / Needs fix / Fixed */}
-        <div className='flex items-center gap-1.5 bg-[#121212] p-1 rounded-lg border border-[#222222] text-xs font-semibold'>
+        <div className='flex items-center gap-1.5 bg-muted/60 p-1 rounded-lg border border-border text-xs font-semibold'>
           {(
             [
               { id: 'all', label: 'All Products' },
@@ -198,10 +198,10 @@ export default function GaugesPage() {
               key={chip.id}
               onClick={() => setFilterChip(chip.id)}
               className={cn(
-                'px-3 py-1.5 rounded-md transition-all font-mono text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white',
+                'px-3 py-1.5 rounded-md transition-all font-mono text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                 filterChip === chip.id
-                  ? 'bg-white text-black font-bold shadow-sm'
-                  : 'text-[#8A8A8A] hover:text-white'
+                  ? 'bg-background text-foreground font-bold shadow-2xs'
+                  : 'text-muted-foreground hover:text-foreground'
               )}
             >
               {chip.label}
@@ -210,17 +210,17 @@ export default function GaugesPage() {
         </div>
 
         {/* Channel Filters */}
-        <div className='flex items-center gap-1 bg-[#121212] p-1 rounded-lg border border-[#222222] text-xs font-medium'>
+        <div className='flex items-center gap-1 bg-muted/60 p-1 rounded-lg border border-border text-xs font-medium'>
           {(['all', 'meta', 'google', 'amazon', 'shopify', 'tiktok'] as const).map(
             (channel) => (
               <button
                 key={channel}
                 onClick={() => setActiveChannel(channel)}
                 className={cn(
-                  'px-2.5 py-1 rounded-md transition-all font-mono text-[11px] uppercase focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white',
+                  'px-2.5 py-1 rounded-md transition-all font-mono text-[11px] uppercase focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                   activeChannel === channel
-                    ? 'bg-[#262626] text-white font-bold'
-                    : 'text-[#737373] hover:text-white'
+                    ? 'bg-background text-foreground font-bold shadow-2xs'
+                    : 'text-muted-foreground hover:text-foreground'
                 )}
               >
                 {channel}
@@ -232,8 +232,8 @@ export default function GaugesPage() {
 
       {/* GAUGES GRID */}
       {filteredProducts.length === 0 ? (
-        <div className='rounded-xl border border-[#222222] bg-[#0E0E0E] p-12 text-center'>
-          <p className='text-sm text-[#8A8A8A]'>
+        <div className='rounded-xl border border-border bg-card p-12 text-center text-card-foreground'>
+          <p className='text-sm text-muted-foreground'>
             No products match the selected filter criteria.
           </p>
           <button
@@ -241,7 +241,7 @@ export default function GaugesPage() {
               setFilterChip('all');
               setActiveChannel('all');
             }}
-            className='mt-3 px-4 py-1.5 rounded-lg bg-white text-black text-xs font-bold hover:bg-neutral-200'
+            className='mt-3 px-4 py-1.5 rounded-lg bg-foreground text-background text-xs font-bold hover:opacity-90'
           >
             Clear Filters
           </button>
