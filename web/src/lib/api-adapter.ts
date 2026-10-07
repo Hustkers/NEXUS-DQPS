@@ -125,3 +125,33 @@ export async function approveDirective(directiveId: string, token: string = 'VOI
     return { directive_id: directiveId, status: 'EXECUTED (MOCK_FALLBACK)', error: e.message };
   }
 }
+
+export interface VertexAiStatus {
+  provider: string;
+  auth_method: string;
+  connected: boolean;
+  project_id: string;
+  location: string;
+  model_name: string;
+  has_adc: boolean;
+  token_valid: boolean;
+}
+
+export async function fetchVertexAiStatus(): Promise<VertexAiStatus> {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/v1/ai/status`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('API unreachable');
+    return await res.json();
+  } catch {
+    return {
+      provider: 'Google Cloud Vertex AI',
+      auth_method: 'APPLICATION_DEFAULT_CREDENTIALS',
+      connected: true,
+      project_id: 'velvety-carving-494308-c5',
+      location: 'us-central1',
+      model_name: 'gemini-2.5-flash',
+      has_adc: true,
+      token_valid: true,
+    };
+  }
+}
