@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "NEXUS D2C \u2014 Autonomous Decision Engine",
+    "title": "NEXUS D2C — Autonomous Decision Engine",
     "brand": "Nike Direct (D2C Footwear & Apparel)",
     "database": "PostgreSQL 16 (Docker) [nexus_d2c]",
     "systemVersion": "3.2.0-PROD",
@@ -25,8 +25,8 @@
     "totalManagedBudget": 145000,
     "activeAnomaliesCount": 8,
     "reallocationsCount": 6,
-    "reallocationCapitalMoved": 19850.0,
-    "projectedMarginUplift": 35200.0
+    "reallocationCapitalMoved": 19850,
+    "projectedMarginUplift": 35200
   },
   "platforms": [
     {
@@ -151,7 +151,7 @@
       "date": "Sep 04",
       "fullDate": "2026-09-04",
       "spend": 67129.6,
-      "revenue": 339942.0,
+      "revenue": 339942,
       "margin": 203599.99,
       "roas": 5.06,
       "amazonSpend": 21003.05,
@@ -372,7 +372,7 @@
       "roas": 6.6,
       "amazonSpend": 15459.55,
       "googleSpend": 11984.06,
-      "metaSpend": 11986.0,
+      "metaSpend": 11986,
       "shopifySpend": 11996.42
     },
     {
@@ -395,7 +395,7 @@
       "margin": 170303.46,
       "roas": 5.47,
       "amazonSpend": 16905.2,
-      "googleSpend": 12034.0,
+      "googleSpend": 12034,
       "metaSpend": 11346.65,
       "shopifySpend": 12427.05
     },
@@ -468,17 +468,17 @@
       "healthScore": 65,
       "inventory": 0,
       "price": 168.61,
-      "marginPct": 0.0,
+      "marginPct": 0,
       "pacingPct": 87,
       "sparkline": [
         9.28,
-        8.0,
+        8,
         9.96,
         7.59,
-        0.0,
-        0.0,
-        0.0,
-        0.0
+        0,
+        0,
+        0,
+        0
       ]
     },
     {
@@ -487,7 +487,7 @@
       "sku": "AQ2730-009",
       "productName": "Nike Joyride Run Flyknit",
       "photoUrl": "https://static.nike.com/a/images/t_PDP_1728_v1/i1-b714d0a4-53ed-4919-9761-1bddc5dff48f/joyride-run-flyknit-running-shoe-sqfqGQ.jpg",
-      "rating": 4.0,
+      "rating": 4,
       "reviews": 65,
       "category": "Running",
       "currentDailySpend": 2149.88,
@@ -523,26 +523,26 @@
       "reviews": 78,
       "category": "Lifestyle / Casual",
       "currentDailySpend": 2103.34,
-      "currentDailyRevenue": 0.0,
-      "currentDailyMargin": 0.0,
-      "roas": 0.0,
+      "currentDailyRevenue": 0,
+      "currentDailyMargin": 0,
+      "roas": 0,
       "targetRoas": 3.2,
       "breakevenRoas": 1.8,
       "roasStatus": "CRITICAL_STOCKOUT",
       "healthScore": 25,
       "inventory": 0,
       "price": 87.89,
-      "marginPct": 0.0,
+      "marginPct": 0,
       "pacingPct": 84,
       "sparkline": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
       ]
     },
     {
@@ -569,8 +569,8 @@
       "sparkline": [
         9.75,
         6.61,
-        0.0,
-        0.0,
+        0,
+        0,
         11.71,
         9.01,
         7.94,
@@ -596,7 +596,7 @@
       "healthScore": 95,
       "inventory": 1145,
       "price": 108.37,
-      "marginPct": 0.0,
+      "marginPct": 0,
       "pacingPct": 81,
       "sparkline": [
         4.24,
@@ -605,8 +605,8 @@
         4.88,
         4.9,
         2.54,
-        0.0,
-        0.0
+        0,
+        0
       ]
     },
     {
@@ -650,7 +650,7 @@
       "rating": 4.5,
       "reviews": 78,
       "category": "Lifestyle / Casual",
-      "currentDailySpend": 1925.65,
+      "currentDailySpend": 75.65,
       "currentDailyRevenue": 5075.65,
       "currentDailyMargin": 3108.86,
       "roas": 2.64,
@@ -682,7 +682,7 @@
       "rating": 2.9,
       "reviews": 71,
       "category": "Running",
-      "currentDailySpend": 1891.76,
+      "currentDailySpend": 3741.76,
       "currentDailyRevenue": 25196.83,
       "currentDailyMargin": 16945.36,
       "roas": 13.32,
@@ -700,7 +700,7 @@
         17.65,
         20.36,
         12.16,
-        0.0,
+        0,
         13.38,
         10.96
       ]
@@ -724,7 +724,7 @@
       "healthScore": 95,
       "inventory": 799,
       "price": 108.37,
-      "marginPct": 63.0,
+      "marginPct": 63,
       "pacingPct": 75,
       "sparkline": [
         5.91,
@@ -756,7 +756,7 @@
       "healthScore": 91,
       "inventory": 831,
       "price": 125.27,
-      "marginPct": 0.0,
+      "marginPct": 0,
       "pacingPct": 71,
       "sparkline": [
         3.86,
@@ -765,8 +765,8 @@
         3.09,
         4.81,
         1.47,
-        0.0,
-        0.0
+        0,
+        0
       ]
     },
     {
@@ -807,7 +807,7 @@
       "sku": "AQ2730-009",
       "productName": "Nike Joyride Run Flyknit",
       "photoUrl": "https://static.nike.com/a/images/t_PDP_1728_v1/i1-b714d0a4-53ed-4919-9761-1bddc5dff48f/joyride-run-flyknit-running-shoe-sqfqGQ.jpg",
-      "rating": 4.0,
+      "rating": 4,
       "reviews": 65,
       "category": "Running",
       "currentDailySpend": 1762.06,
@@ -824,9 +824,9 @@
       "pacingPct": 70,
       "sparkline": [
         1.89,
-        0.0,
-        0.0,
-        0.0,
+        0,
+        0,
+        0,
         5.42,
         7.72,
         5.96,
@@ -852,17 +852,17 @@
       "healthScore": 95,
       "inventory": 523,
       "price": 154.18,
-      "marginPct": 0.0,
+      "marginPct": 0,
       "pacingPct": 68,
       "sparkline": [
         14.11,
         13.35,
         4.02,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0
+        0,
+        0,
+        0,
+        0,
+        0
       ]
     },
     {
@@ -1034,7 +1034,7 @@
       "rating": 4.3,
       "reviews": 105,
       "category": "Running",
-      "currentDailySpend": 1363.0,
+      "currentDailySpend": 1363,
       "currentDailyRevenue": 6134.23,
       "currentDailyMargin": 3971.77,
       "roas": 4.5,
@@ -1076,7 +1076,7 @@
       "healthScore": 65,
       "inventory": 0,
       "price": 125.27,
-      "marginPct": 0.0,
+      "marginPct": 0,
       "pacingPct": 54,
       "sparkline": [
         6.91,
@@ -1086,7 +1086,7 @@
         5.04,
         5.92,
         0.77,
-        0.0
+        0
       ]
     },
     {
@@ -1143,9 +1143,9 @@
       "marginPct": 50.3,
       "pacingPct": 52,
       "sparkline": [
-        0.0,
-        0.0,
-        0.0,
+        0,
+        0,
+        0,
         8.06,
         8.41,
         7.83,
@@ -1175,10 +1175,10 @@
       "marginPct": 49.1,
       "pacingPct": 48,
       "sparkline": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
+        0,
+        0,
+        0,
+        0,
         17.34,
         18.02,
         10.88,
@@ -1277,7 +1277,7 @@
         7.52,
         6.91,
         0.19,
-        0.0,
+        0,
         6.83
       ]
     },
@@ -1351,7 +1351,7 @@
       "sku": "AQ2730-009",
       "productName": "Nike Joyride Run Flyknit",
       "photoUrl": "https://static.nike.com/a/images/t_PDP_1728_v1/i1-b714d0a4-53ed-4919-9761-1bddc5dff48f/joyride-run-flyknit-running-shoe-sqfqGQ.jpg",
-      "rating": 4.0,
+      "rating": 4,
       "reviews": 65,
       "category": "Running",
       "currentDailySpend": 1060.63,
@@ -1367,8 +1367,8 @@
       "marginPct": 51.1,
       "pacingPct": 42,
       "sparkline": [
-        0.0,
-        0.0,
+        0,
+        0,
         3.26,
         4.71,
         4.33,
@@ -1415,7 +1415,7 @@
       "sku": "AQ2730-009",
       "productName": "Nike Joyride Run Flyknit",
       "photoUrl": "https://static.nike.com/a/images/t_PDP_1728_v1/i1-b714d0a4-53ed-4919-9761-1bddc5dff48f/joyride-run-flyknit-running-shoe-sqfqGQ.jpg",
-      "rating": 4.0,
+      "rating": 4,
       "reviews": 65,
       "category": "Running",
       "currentDailySpend": 841.93,
@@ -1434,7 +1434,7 @@
         15.81,
         12.16,
         13.51,
-        0.0,
+        0,
         11.79,
         14.89,
         11.67,
@@ -1517,7 +1517,7 @@
       "currentDailySpend": 604.74,
       "currentDailyRevenue": 3022.14,
       "currentDailyMargin": 1926.23,
-      "roas": 5.0,
+      "roas": 5,
       "targetRoas": 3.2,
       "breakevenRoas": 1.8,
       "roasStatus": "ABOVE_TARGET",
@@ -1749,7 +1749,7 @@
         {
           "name": "Inventory Stockout",
           "deltaPct": -100,
-          "impactPts": -65.0,
+          "impactPts": -65,
           "badge": "ERP Inventory = 0",
           "color": "rose",
           "detail": "Ad spend active while Nike Air Force 1 '07 warehouse stock depleted to 0 units."
@@ -1762,7 +1762,10 @@
           "color": "amber",
           "detail": "Sudden competitive bidding surge in ad network auction."
         }
-      ]
+      ],
+      "isReallocated": true,
+      "reallocationId": "ledg-exec-1-1100",
+      "reallocatedAt": "2026-10-07 23:46:51"
     },
     {
       "id": "anom-2",
@@ -1782,7 +1785,7 @@
         {
           "name": "Efficiency Variance",
           "deltaPct": -46.7,
-          "impactPts": -12.0,
+          "impactPts": -12,
           "badge": "ROAS Drift",
           "color": "slate",
           "detail": "General performance fluctuation against 14-day rolling baseline."
@@ -1799,7 +1802,7 @@
       "date": "2026-09-28",
       "severity": "CRITICAL",
       "zScore": -2.3,
-      "roas": 0.0,
+      "roas": 0,
       "spend": 1422.83,
       "inventory": 0,
       "explanation": "Campaign shopify-BQ8928-011 (Nike Epic React Flyknit 2) on 2026-09-28 00:00:00: ROAS moved -100%. Primary causal drivers: SKU stocked out in Shopify (conversions collapsed).",
@@ -1807,7 +1810,7 @@
         {
           "name": "Inventory Stockout",
           "deltaPct": -100,
-          "impactPts": -65.0,
+          "impactPts": -65,
           "badge": "ERP Inventory = 0",
           "color": "rose",
           "detail": "Ad spend active while Nike Epic React Flyknit 2 warehouse stock depleted to 0 units."
@@ -1857,14 +1860,14 @@
       "date": "2026-09-28",
       "severity": "WARNING",
       "zScore": -1.94,
-      "roas": 0.0,
+      "roas": 0,
       "spend": 1941.32,
       "inventory": 831,
       "explanation": "Campaign amazon-BQ8928-011 (Nike Epic React Flyknit 2) on 2026-09-28 00:00:00: ROAS moved -100%. Primary causal drivers: minor stochastic variance.",
       "factors": [
         {
           "name": "Auction CPM Spike",
-          "deltaPct": 17.0,
+          "deltaPct": 17,
           "impactPts": -20.5,
           "badge": "CPM +17.0%",
           "color": "amber",
@@ -1890,7 +1893,7 @@
       "date": "2026-09-28",
       "severity": "CRITICAL",
       "zScore": -1.24,
-      "roas": 0.0,
+      "roas": 0,
       "spend": 2476.62,
       "inventory": 0,
       "explanation": "Campaign amazon-AH8050-100 (Nike Air Max 270) on 2026-09-28 00:00:00: ROAS moved -100%. Primary causal drivers: SKU stocked out in Shopify (conversions collapsed).",
@@ -1898,7 +1901,7 @@
         {
           "name": "Inventory Stockout",
           "deltaPct": -100,
-          "impactPts": -65.0,
+          "impactPts": -65,
           "badge": "ERP Inventory = 0",
           "color": "rose",
           "detail": "Ad spend active while Nike Air Max 270 warehouse stock depleted to 0 units."
@@ -1915,7 +1918,7 @@
       "date": "2026-09-28",
       "severity": "WARNING",
       "zScore": -1.06,
-      "roas": 0.0,
+      "roas": 0,
       "spend": 2406.16,
       "inventory": 1145,
       "explanation": "Campaign shopify-634835-108 (Nike Air Huarache) on 2026-09-28 00:00:00: ROAS moved -100%. Primary causal drivers: minor stochastic variance.",
@@ -1940,15 +1943,15 @@
       "date": "2026-09-28",
       "severity": "WARNING",
       "zScore": -1.03,
-      "roas": 0.0,
+      "roas": 0,
       "spend": 1275.14,
       "inventory": 523,
       "explanation": "Campaign shopify-AO2924-401 (Nike Air Max 720) on 2026-09-28 00:00:00: ROAS moved -100%. Primary causal drivers: minor stochastic variance.",
       "factors": [
         {
           "name": "Efficiency Variance",
-          "deltaPct": -100.0,
-          "impactPts": -12.0,
+          "deltaPct": -100,
+          "impactPts": -12,
           "badge": "ROAS Drift",
           "color": "slate",
           "detail": "General performance fluctuation against 14-day rolling baseline."
@@ -1958,6 +1961,22 @@
   ],
   "reallocations": [
     {
+      "id": "realloc-1",
+      "actionType": "EMERGENCY_THROTTLE",
+      "sourceCampaign": "amazon-315122-001",
+      "targetCampaign": "shopify-849559-004",
+      "targetProductName": "Nike Air Max 2017",
+      "currentSpend": 1891.76,
+      "recommendedSpend": 3741.76,
+      "deltaSpend": 1850,
+      "expectedDailyMargin": 12821,
+      "predictedRoas": 13.32,
+      "confidence": 0.94,
+      "reason": "Inventory Stockout Kill-Switch: Zero warehouse units remaining for Nike Air Force 1 '07. Spend throttled to eliminate non-converting ad burn and redirected to Nike Air Max 2017 (13.32x ROAS, 838 units available).",
+      "status": "EXECUTED_TO_AD_API",
+      "stockoutKill": true
+    },
+    {
       "id": "realloc-8",
       "actionType": "TRIM_BUDGET",
       "sourceCampaign": "shopify-BQ8928-011",
@@ -1966,7 +1985,7 @@
       "currentSpend": 2161.04,
       "recommendedSpend": 1620.78,
       "deltaSpend": -540.26,
-      "expectedDailyMargin": 2134.0,
+      "expectedDailyMargin": 2134,
       "predictedRoas": 2.63,
       "confidence": 0.67,
       "reason": "Diminishing Returns: Channel approaching saturation knee. Capital redirected to higher-yield footwear models.",
@@ -2056,10 +2075,22 @@
   ],
   "ledger": [
     {
+      "id": "ledg-exec-1-1100",
+      "timestamp": "2026-10-07 23:46:51",
+      "decision": "Shift ₹1,850/day from amazon-315122-001 (Inventory Stockout) -> shopify-849559-004 (Nike Air Max 2017)",
+      "expectedMargin": 12821,
+      "realizedMargin": 12308,
+      "variancePct": -4,
+      "accuracyPct": 96,
+      "confidence": 0.94,
+      "status": "executed",
+      "feedback": "Reinforced: Online convex optimization weights calibrated"
+    },
+    {
       "id": "ledg-1",
       "timestamp": "2026-10-06 14:32:10",
-      "decision": "Shift \u20b91,850/day from meta-315122-001 (Nike Air Force 1 stockout) -> google-CD4371-001 (React Infinity Flyknit)",
-      "expectedMargin": 3450.0,
+      "decision": "Shift ₹1,850/day from meta-315122-001 (Nike Air Force 1 stockout) -> google-CD4371-001 (React Infinity Flyknit)",
+      "expectedMargin": 3450,
       "realizedMargin": 3610.5,
       "variancePct": 4.7,
       "accuracyPct": 95.3,
@@ -2070,9 +2101,9 @@
     {
       "id": "ledg-2",
       "timestamp": "2026-10-05 09:15:00",
-      "decision": "Scale tiktok-AH8050-100 (Nike Air Max 270) budget +\u20b9920/day on viral footwear trend",
-      "expectedMargin": 6800.0,
-      "realizedMargin": 6590.0,
+      "decision": "Scale tiktok-AH8050-100 (Nike Air Max 270) budget +₹920/day on viral footwear trend",
+      "expectedMargin": 6800,
+      "realizedMargin": 6590,
       "variancePct": -3.1,
       "accuracyPct": 96.9,
       "confidence": 0.88,
@@ -2082,9 +2113,9 @@
     {
       "id": "ledg-3",
       "timestamp": "2026-10-04 18:45:22",
-      "decision": "Throttle amazon-849559-004 (Air Max 2017) spend -\u20b9650/day due to competitor footwear discount",
-      "expectedMargin": 1400.0,
-      "realizedMargin": 1375.0,
+      "decision": "Throttle amazon-849559-004 (Air Max 2017) spend -₹650/day due to competitor footwear discount",
+      "expectedMargin": 1400,
+      "realizedMargin": 1375,
       "variancePct": -1.8,
       "accuracyPct": 98.2,
       "confidence": 0.91,
@@ -2098,17 +2129,17 @@
       "name": "Hero Air Force 1 '07 Stockout Shock",
       "description": "Top-selling hero shoe (Nike Air Force 1 '07, 65% gross margin) runs out of warehouse inventory. Ad spend keeps driving traffic to an empty product page.",
       "injectedEvent": "ERP inventory reaches 0 on SKU 315122-001",
-      "autonomousResponse": "Stockout Kill-Switch activates in <15 mins. Spend throttled -\u20b92,200/day and diverted to Google Shopping React Infinity Flyknit (+3.6x ROAS).",
-      "expectedSavedWaste": "\u20b915,400 / week",
+      "autonomousResponse": "Stockout Kill-Switch activates in <15 mins. Spend throttled -₹2,200/day and diverted to Google Shopping React Infinity Flyknit (+3.6x ROAS).",
+      "expectedSavedWaste": "₹15,400 / week",
       "severity": "CRITICAL"
     },
     {
       "id": "scenario-cpm-spike",
       "name": "Meta Footwear Auction CPM Surge (+45%)",
-      "description": "Holiday sneaker flash sales drive Meta Advantage+ CPM from \u20b99.50 to \u20b914.20, compressing ROAS below the 1.8x break-even floor.",
+      "description": "Holiday sneaker flash sales drive Meta Advantage+ CPM from ₹9.50 to ₹14.20, compressing ROAS below the 1.8x break-even floor.",
       "injectedEvent": "Meta network sneaker auction inflation +45%",
-      "autonomousResponse": "ROAS drops below break-even. Engine pulls \u20b93,500/day from Meta and redistributes to Amazon Sponsored Products & Google PMax.",
-      "expectedSavedWaste": "\u20b99,200 / week",
+      "autonomousResponse": "ROAS drops below break-even. Engine pulls ₹3,500/day from Meta and redistributes to Amazon Sponsored Products & Google PMax.",
+      "expectedSavedWaste": "₹9,200 / week",
       "severity": "HIGH"
     },
     {
@@ -2117,7 +2148,7 @@
       "description": "Hero sneaker UGC video frequency exceeds 5.2. Hook rate collapses, CTR drops 60%, and customer acquisition cost (CAC) doubles.",
       "injectedEvent": "Creative fatigue wear-out on TikTok UGC batch #4",
       "autonomousResponse": "Auto-pauses exhausted ad set, triggers creative refresh alert to Nike design studio, and reroutes spend to high-vitality Meta Reels.",
-      "expectedSavedWaste": "\u20b95,200 / week",
+      "expectedSavedWaste": "₹5,200 / week",
       "severity": "MEDIUM"
     },
     {
@@ -2126,7 +2157,7 @@
       "description": "Rival footwear seller launches aggressive 25% price drop on Amazon, lowering Nike Zoom Fly conversion rate from 4.8% to 2.8%.",
       "injectedEvent": "Marketplace conversion rate drops -35%",
       "autonomousResponse": "Optimizer re-solves scipy convex problem: shifts capital to Nike Direct Brand Search where gross margins are preserved at 68%.",
-      "expectedSavedWaste": "\u20b96,800 / week",
+      "expectedSavedWaste": "₹6,800 / week",
       "severity": "MEDIUM"
     }
   ]

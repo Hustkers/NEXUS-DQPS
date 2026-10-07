@@ -99,4 +99,14 @@ export interface ReallocationExecutionDetails {
     timestamp: string;
     statusText: string;
   };
+  anomaly?: {
+    id: string;
+    campaign: string;
+    productName?: string;
+    severity: string;
+    zScore: number;
+    rootCause: string;
+    explanation: string;
+  };
+  recommendedAction?: string;
 }
