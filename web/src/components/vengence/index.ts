@@ -9,3 +9,5 @@ export * from './shock-simulator-showcase';
 export * from './isometric-telemetry-panel';
 export * from './landing-page-view';
 export * from './vgpu-canvas';
+export * from './shared-tooltip-avatars';
+export * from './animated-footer';
