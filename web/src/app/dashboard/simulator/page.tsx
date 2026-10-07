@@ -14,6 +14,7 @@ import {
 } from '@/features/decision-engine/lib/simulation-engine';
 import { ScenarioInputPanel } from '@/features/decision-engine/components/scenario-input-panel';
 import { StrategySelector } from '@/features/decision-engine/components/strategy-selector';
+import { SimulationVisualizer, SimulationStage } from '@/features/decision-engine/components/simulation-visualizer';
 import { SimulationResultsMatrix } from '@/features/decision-engine/components/simulation-results-matrix';
 import { SimulationFinancialImpact } from '@/features/decision-engine/components/simulation-financial-impact';
 import { SimulationStrategyComparison } from '@/features/decision-engine/components/simulation-strategy-comparison';
@@ -23,7 +24,7 @@ import { SimulationImpactChart } from '@/features/decision-engine/components/sim
 import { SimulationLossCurve } from '@/features/decision-engine/components/simulation-loss-curve';
 import { ScenarioController } from '@/features/decision-engine/components/scenario-controller';
 import initialEngineState from '@/data/nexus-engine-state.json';
-import type { ShockScenarioId, ScenarioInputParams, SimulationResult } from '@/features/decision-engine/types/simulation-types';
+import type { ShockScenarioId, ScenarioInputParams, SimulationResult, DailyLossPoint } from '@/features/decision-engine/types/simulation-types';
 
 interface SavedRun {
   id: string;
@@ -50,6 +51,8 @@ function SimulationLabContent() {
       setInputs(BASELINE_DEFAULTS[scenarioParam]);
       const rec = SCENARIO_STRATEGIES[scenarioParam].find((s) => s.isRecommended) || SCENARIO_STRATEGIES[scenarioParam][0];
       setSelectedStrategyId(rec.id);
+      setSimStage('ready');
+      setExecutedResult(null);
     }
   }, [scenarioParam]);
 
@@ -64,17 +67,21 @@ function SimulationLabContent() {
   const [selectedStrategyId, setSelectedStrategyId] = useState<string>(defaultStrategy.id);
 
   // Simulation execution lifecycle state
-  const [executionState, setExecutionState] = useState<
-    'idle' | 'initializing' | 'applying_shock' | 'calculating_impact' | 'testing_mitigation' | 'completed'
-  >('completed');
+  const [simStage, setSimStage] = useState<SimulationStage>('ready');
+  const [simProgress, setSimProgress] = useState<number>(0);
+  const [simulatedDay, setSimulatedDay] = useState<number>(0);
+  const [executedResult, setExecutedResult] = useState<SimulationResult | null>(null);
 
   // Saved scenario experiment comparisons
   const [savedRuns, setSavedRuns] = useState<SavedRun[]>([]);
 
-  // Simulation computation
-  const simulationResult: SimulationResult = useMemo(() => {
+  // Real-time calculated simulation (pure deterministic source of truth)
+  const computedResult: SimulationResult = useMemo(() => {
     return runDeterministicSimulation(selectedScenarioId, inputs, selectedStrategyId);
   }, [selectedScenarioId, inputs, selectedStrategyId]);
+
+  // Active result displayed (computedResult if executed, else null)
+  const activeResult = executedResult || (simStage === 'completed' ? computedResult : null);
 
   // Handle switching scenario
   const handleSelectScenario = (id: ShockScenarioId) => {
@@ -82,6 +89,10 @@ function SimulationLabContent() {
     setInputs(BASELINE_DEFAULTS[id]);
     const rec = SCENARIO_STRATEGIES[id].find((s) => s.isRecommended) || SCENARIO_STRATEGIES[id][0];
     setSelectedStrategyId(rec.id);
+    setSimStage('ready');
+    setExecutedResult(null);
+    setSimProgress(0);
+    setSimulatedDay(0);
   };
 
   // Reset inputs to default baseline
@@ -89,51 +100,266 @@ function SimulationLabContent() {
     setInputs(BASELINE_DEFAULTS[selectedScenarioId]);
     const rec = SCENARIO_STRATEGIES[selectedScenarioId].find((s) => s.isRecommended) || SCENARIO_STRATEGIES[selectedScenarioId][0];
     setSelectedStrategyId(rec.id);
+    setSimStage('ready');
+    setExecutedResult(null);
+    setSimProgress(0);
+    setSimulatedDay(0);
     toast.info('Restored Scenario Baseline', {
       description: 'Scenario parameters restored to deterministic 90-day simulator baseline.'
     });
   };
 
-  // Run simulation sequence
+  // Progressive deterministic simulation runner
   const handleRunSimulation = () => {
-    setExecutionState('initializing');
+    const horizon = inputs.horizonDays;
+    setSimStage('initializing');
+    setSimProgress(10);
+    setSimulatedDay(0);
 
+    // Stage 1: Baseline inspection (150ms)
     setTimeout(() => {
-      setExecutionState('applying_shock');
-    }, 150);
+      setSimStage('baseline');
+      setSimProgress(25);
+      setSimulatedDay(1);
+    }, 200);
 
+    // Stage 2: Shock injection (450ms)
     setTimeout(() => {
-      setExecutionState('calculating_impact');
-    }, 320);
+      setSimStage('shock');
+      setSimProgress(50);
+      setSimulatedDay(Math.max(1, Math.round(horizon * 0.35)));
+    }, 550);
 
+    // Stage 3: DAG Propagation (850ms)
     setTimeout(() => {
-      setExecutionState('testing_mitigation');
-    }, 500);
+      setSimStage('propagating');
+      setSimProgress(75);
+      setSimulatedDay(Math.max(2, Math.round(horizon * 0.7)));
+    }, 950);
 
+    // Stage 4: Autonomous Mitigation & Final Resolution (1300ms)
     setTimeout(() => {
-      setExecutionState('completed');
-      toast.success(`Simulation Completed: ${simulationResult.scenarioMeta.title}`, {
-        description: `Applied ${simulationResult.activeStrategyName}. Projected Loss Avoided: +₹${simulationResult.financialImpact.lossAvoided.toLocaleString('en-IN')}.`
+      setSimStage('mitigating');
+      setSimProgress(90);
+      setSimulatedDay(horizon);
+    }, 1300);
+
+    // Stage 5: Finalized (1700ms)
+    setTimeout(() => {
+      setSimStage('completed');
+      setSimProgress(100);
+      setSimulatedDay(horizon);
+      setExecutedResult(computedResult);
+      toast.success(`Simulation Completed: ${computedResult.scenarioMeta.title}`, {
+        description: `Applied ${computedResult.activeStrategyName}. Projected Loss Avoided: +₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}.`
       });
-    }, 700);
+    }, 1700);
   };
 
   // Save current simulation run to local comparison
   const handleSaveRun = () => {
+    if (!activeResult) return;
     const newRun: SavedRun = {
       id: `sim-${Date.now()}`,
       timestamp: new Date().toTimeString().split(' ')[0],
-      scenarioTitle: simulationResult.scenarioMeta.title,
-      strategyName: simulationResult.activeStrategyName,
-      lossAvoided: simulationResult.financialImpact.lossAvoided,
-      roas: simulationResult.mitigated.roas
+      scenarioTitle: activeResult.scenarioMeta.title,
+      strategyName: activeResult.activeStrategyName,
+      lossAvoided: activeResult.financialImpact.lossAvoided,
+      roas: activeResult.mitigated.roas
     };
     setSavedRuns((prev) => [newRun, ...prev.slice(0, 4)]);
     toast.success('Simulation Saved to Comparison Ledger');
   };
 
   const scenarioMeta = SCENARIO_METAS[selectedScenarioId];
-  const isExecuting = executionState !== 'idle' && executionState !== 'completed';
+  const isExecuting = simStage !== 'ready' && simStage !== 'completed';
+
+  // Sliced time-series up to current simulated day for live animation
+  const simulatedTimeSeries: DailyLossPoint[] = useMemo(() => {
+    const allSeries = computedResult.timeSeries;
+    if (simStage === 'ready') return [];
+    if (simStage === 'completed') return allSeries;
+    const targetCount = Math.max(1, Math.min(allSeries.length, simulatedDay));
+    return allSeries.slice(0, targetCount);
+  }, [computedResult.timeSeries, simStage, simulatedDay]);
+
+  // Compute live telemetry stats depending on simulation stage
+  const liveTelemetry = useMemo(() => {
+    const base = computedResult.baseline;
+    const shock = computedResult.shocked;
+    const mit = computedResult.mitigated;
+
+    if (selectedScenarioId === 'stockout') {
+      const invDisplay =
+        simStage === 'ready' || simStage === 'baseline'
+          ? `${inputs.inventoryUnits} units`
+          : simStage === 'shock'
+          ? `${inputs.inventoryShockUnits} units (Depleted)`
+          : simStage === 'propagating'
+          ? '0 units (Out of Stock)'
+          : `${inputs.inventoryShockUnits} units (Protected)`;
+
+      const spendDisplay =
+        simStage === 'ready' || simStage === 'baseline'
+          ? `₹${base.spend.toLocaleString('en-IN')}/day`
+          : simStage === 'shock' || simStage === 'propagating'
+          ? `₹${shock.spend.toLocaleString('en-IN')}/day (Burning)`
+          : `₹${mit.spend.toLocaleString('en-IN')}/day (Controlled)`;
+
+      const roasDisplay =
+        simStage === 'ready' || simStage === 'baseline'
+          ? `${base.roas.toFixed(2)}x`
+          : simStage === 'shock' || simStage === 'propagating'
+          ? `${shock.roas.toFixed(2)}x (Collapsed)`
+          : `${mit.roas.toFixed(2)}x (Recovered)`;
+
+      const protectedDisplay =
+        simStage === 'completed'
+          ? `+₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}`
+          : simStage === 'mitigating'
+          ? `+₹${Math.round(computedResult.financialImpact.lossAvoided * 0.85).toLocaleString('en-IN')}`
+          : '₹0';
+
+      return {
+        labelA: 'Physical Inventory',
+        valueA: invDisplay,
+        subA: 'Warehouse SKU: 315122-001',
+        labelB: 'Daily Ad Spend',
+        valueB: spendDisplay,
+        subB: 'Meta Advantage+ Campaign',
+        labelC: 'Effective ROAS',
+        valueC: roasDisplay,
+        subC: 'Conversion return on ad spend',
+        labelD: 'Capital Protected',
+        valueD: protectedDisplay,
+        subD: 'Loss avoided vs unmitigated'
+      };
+    }
+
+    if (selectedScenarioId === 'cpm-spike') {
+      const cpmDisplay =
+        simStage === 'ready' || simStage === 'baseline'
+          ? `₹${inputs.baselineCpm.toFixed(2)}`
+          : `₹${(inputs.baselineCpm * inputs.cpmMultiplier).toFixed(2)} (+${Math.round((inputs.cpmMultiplier - 1) * 100)}%)`;
+
+      const impDisplay =
+        simStage === 'ready' || simStage === 'baseline'
+          ? base.impressions.toLocaleString('en-IN')
+          : simStage === 'shock' || simStage === 'propagating'
+          ? `${shock.impressions.toLocaleString('en-IN')} (Compressed)`
+          : mit.impressions.toLocaleString('en-IN');
+
+      const roasDisplay =
+        simStage === 'ready' || simStage === 'baseline'
+          ? `${base.roas.toFixed(2)}x`
+          : simStage === 'shock'
+          ? `${shock.roas.toFixed(2)}x (< Break-even)`
+          : `${mit.roas.toFixed(2)}x (Rebalanced)`;
+
+      const lossDisplay =
+        simStage === 'completed'
+          ? `+₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}`
+          : '₹0';
+
+      return {
+        labelA: 'Auction CPM',
+        valueA: cpmDisplay,
+        subA: 'Meta footwear auction rate',
+        labelB: 'Daily Impressions',
+        valueB: impDisplay,
+        subB: 'Ad views delivered',
+        labelC: 'Operating ROAS',
+        valueC: roasDisplay,
+        subC: 'Threshold floor: 1.80x',
+        labelD: 'Loss Avoided',
+        valueD: lossDisplay,
+        subD: 'Shifted to Amazon/Google'
+      };
+    }
+
+    if (selectedScenarioId === 'creative-fatigue') {
+      const ctrDisplay =
+        simStage === 'ready' || simStage === 'baseline'
+          ? `${inputs.ctrPct.toFixed(2)}%`
+          : simStage === 'shock' || simStage === 'propagating'
+          ? `${(inputs.ctrPct * (1 - inputs.fatiguePct / 100)).toFixed(2)}% (-${inputs.fatiguePct}%)`
+          : `${(inputs.ctrPct * 0.95).toFixed(2)}% (Refreshed)`;
+
+      const convDisplay =
+        simStage === 'ready' || simStage === 'baseline'
+          ? `${base.conversions} orders`
+          : simStage === 'shock'
+          ? `${shock.conversions} orders (Decayed)`
+          : `${mit.conversions} orders (Restored)`;
+
+      const roasDisplay =
+        simStage === 'ready' || simStage === 'baseline'
+          ? `${base.roas.toFixed(2)}x`
+          : simStage === 'shock'
+          ? `${shock.roas.toFixed(2)}x`
+          : `${mit.roas.toFixed(2)}x`;
+
+      const lossDisplay =
+        simStage === 'completed'
+          ? `+₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}`
+          : '₹0';
+
+      return {
+        labelA: 'Ad Set CTR',
+        valueA: ctrDisplay,
+        subA: 'TikTok UGC hook & click rate',
+        labelB: 'Daily Orders',
+        valueB: convDisplay,
+        subB: 'Air Max 270 unit conversions',
+        labelC: 'Channel ROAS',
+        valueC: roasDisplay,
+        subC: 'Post-fatigue recovery rate',
+        labelD: 'Capital Protected',
+        valueD: lossDisplay,
+        subD: 'Rerouted to Meta Reels'
+      };
+    }
+
+    // price-undercut
+    const bbDisplay =
+      simStage === 'ready' || simStage === 'baseline'
+        ? `${inputs.buyBoxProbabilityPct}%`
+        : simStage === 'shock' || simStage === 'propagating'
+        ? '25% (Undercut by Rival)'
+        : '68% (Rebalanced Direct)';
+
+    const priceDisplay =
+      simStage === 'ready' || simStage === 'baseline'
+        ? `₹${inputs.ourPrice.toLocaleString('en-IN')}`
+        : `₹${inputs.competitorPrice.toLocaleString('en-IN')} (-${inputs.competitorUndercutPct}%)`;
+
+    const roasDisplay =
+      simStage === 'ready' || simStage === 'baseline'
+        ? `${base.roas.toFixed(2)}x`
+        : simStage === 'shock'
+        ? `${shock.roas.toFixed(2)}x`
+        : `${mit.roas.toFixed(2)}x`;
+
+    const lossDisplay =
+      simStage === 'completed'
+        ? `+₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}`
+        : '₹0';
+
+    return {
+      labelA: 'Buy Box Win Rate',
+      valueA: bbDisplay,
+      subA: 'Amazon buy box session share',
+      labelB: 'Competitor Price',
+      valueB: priceDisplay,
+      subB: 'Rival merchant price shock',
+      labelC: 'Blended ROAS',
+      valueC: roasDisplay,
+      subC: 'Scipy convex yield return',
+      labelD: 'Protected Capital',
+      valueD: lossDisplay,
+      subD: 'Shifted to Nike Direct'
+    };
+  }, [selectedScenarioId, simStage, inputs, computedResult]);
 
   return (
     <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen font-mono'>
@@ -169,7 +395,12 @@ function SimulationLabContent() {
             {isExecuting ? (
               <>
                 <Icons.spinner className='mr-1.5 size-3.5 animate-spin' />
-                {executionState.toUpperCase().replace('_', ' ')}
+                SIMULATING ({simProgress}%)
+              </>
+            ) : simStage === 'completed' ? (
+              <>
+                <Icons.refresh className='mr-1.5 size-3.5 text-emerald-500' />
+                Rerun Simulation
               </>
             ) : (
               <>
@@ -247,7 +478,13 @@ function SimulationLabContent() {
           <ScenarioInputPanel
             scenarioId={selectedScenarioId}
             inputs={inputs}
-            onChangeInputs={setInputs}
+            onChangeInputs={(newInputs) => {
+              setInputs(newInputs);
+              if (simStage === 'completed') {
+                setSimStage('ready');
+                setExecutedResult(null);
+              }
+            }}
             onResetBaseline={handleResetBaseline}
           />
 
@@ -255,9 +492,21 @@ function SimulationLabContent() {
           <StrategySelector
             strategies={strategies}
             selectedStrategyId={selectedStrategyId}
-            onSelectStrategy={setSelectedStrategyId}
+            onSelectStrategy={(newStratId) => {
+              setSelectedStrategyId(newStratId);
+              if (simStage === 'completed') {
+                setSimStage('ready');
+                setExecutedResult(null);
+              }
+            }}
             inputs={inputs}
-            onChangeInputs={setInputs}
+            onChangeInputs={(newInputs) => {
+              setInputs(newInputs);
+              if (simStage === 'completed') {
+                setSimStage('ready');
+                setExecutedResult(null);
+              }
+            }}
           />
 
           {/* Action Bar */}
@@ -267,11 +516,12 @@ function SimulationLabContent() {
               disabled={isExecuting}
               className='flex-1 h-10 text-xs font-bold uppercase bg-foreground text-background hover:bg-foreground/90'
             >
-              {isExecuting ? 'Simulating...' : 'Run Simulation'}
+              {isExecuting ? `Simulating (${simProgress}%)...` : simStage === 'completed' ? 'Rerun Simulation' : 'Run Simulation'}
             </Button>
             <Button
               variant='outline'
               onClick={handleSaveRun}
+              disabled={!activeResult}
               className='h-10 text-xs font-bold border-border'
               title='Save current experiment'
             >
@@ -314,31 +564,50 @@ function SimulationLabContent() {
           )}
         </div>
 
-        {/* RIGHT COLUMN: SIMULATION RESULTS & CHARTS (7 cols) */}
+        {/* RIGHT COLUMN: PROGRESSIVE SIMULATION VISUALIZER & DYNAMIC RESULTS (7 cols) */}
         <div className='lg:col-span-7 space-y-4'>
-          {/* Financial Impact Hero */}
-          <SimulationFinancialImpact result={simulationResult} />
-
-          {/* Recharts Visualizations */}
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <SimulationImpactChart result={simulationResult} />
-            <SimulationLossCurve result={simulationResult} />
-          </div>
-
-          {/* Full Metric Results Matrix */}
-          <SimulationResultsMatrix result={simulationResult} />
-
-          {/* Strategy Comparison Matrix */}
-          <SimulationStrategyComparison
-            result={simulationResult}
-            onSelectStrategy={setSelectedStrategyId}
+          {/* Always Visible: Interactive Runnable Simulation HUD */}
+          <SimulationVisualizer
+            scenarioId={selectedScenarioId}
+            stage={simStage}
+            progressPct={simProgress}
+            simulatedDay={simulatedDay}
+            totalDays={inputs.horizonDays}
+            timeSeriesSoFar={simulatedTimeSeries}
+            currentTelemetry={liveTelemetry}
+            onRun={handleRunSimulation}
+            onReset={handleResetBaseline}
+            result={computedResult}
           />
 
-          {/* Step-by-Step Causal Chain */}
-          <SimulationCausalChain nodes={simulationResult.causalChain} />
+          {/* DYNAMIC RESULTS: Revealed only when simulation has run */}
+          {activeResult && (
+            <div className='space-y-4 animate-in fade-in-50 duration-500'>
+              {/* Financial Impact Hero */}
+              <SimulationFinancialImpact result={activeResult} />
 
-          {/* Data Lineage & Audit Trail Seal */}
-          <SimulationDataLineage lineage={simulationResult.dataLineage} />
+              {/* Recharts Visualizations */}
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <SimulationImpactChart result={activeResult} />
+                <SimulationLossCurve result={activeResult} />
+              </div>
+
+              {/* Full Metric Results Matrix */}
+              <SimulationResultsMatrix result={activeResult} />
+
+              {/* Strategy Comparison Matrix */}
+              <SimulationStrategyComparison
+                result={activeResult}
+                onSelectStrategy={setSelectedStrategyId}
+              />
+
+              {/* Step-by-Step Causal Chain */}
+              <SimulationCausalChain nodes={activeResult.causalChain} />
+
+              {/* Data Lineage & Audit Trail Seal */}
+              <SimulationDataLineage lineage={activeResult.dataLineage} />
+            </div>
+          )}
         </div>
       </div>
 

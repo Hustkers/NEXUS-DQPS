@@ -52,7 +52,7 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, onViewReceipt, isM
   return (
     <div
       className={cn(
-        'group relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-4 text-card-foreground transition-all duration-200 hover:border-foreground/30 shadow-xs overflow-hidden before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/20 dark:before:via-white/10 before:to-transparent',
+        'group relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-4 text-card-foreground transition-all duration-200 hover:border-foreground/30 shadow-xs overflow-hidden min-w-0 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/20 dark:before:via-white/10 before:to-transparent',
         className
       )}
     >

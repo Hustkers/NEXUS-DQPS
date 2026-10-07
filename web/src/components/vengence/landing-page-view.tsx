@@ -353,12 +353,15 @@ export function LandingPageView() {
         </div>
       </section>
 
-      {/* CINEMATIC ASCII ANIMATED FOOTER (NEXUS ONLY) */}
+      {/* CINEMATIC ASCII ANIMATED FOOTER (CONFIGURED LIKE CONTEXT-HACKDEVENGERS) */}
       <AnimatedFooter
         headingLines={['NEXUS']}
+        brandLogo='NX'
+        brandTitle='nexusdqps'
+        tagline='Autonomous multi-channel ad capital optimization & causal anomaly diagnostic engine — halting stockout waste and maximizing net contribution margin in real time.'
+        copyright='© 2026 Jay Gopal · NEXUS · All rights reserved.'
         leftImage='/animated-footer/hand-left.jpg'
         rightImage='/animated-footer/hand-right.jpg'
-        className='h-[420px] sm:h-[520px] md:h-[620px] border-t border-border/80'
       />
     </div>
   );

@@ -490,11 +490,14 @@ export default function MatrixPage() {
                         </button>
 
                         {/* Floating Dropdown Menu Panel with Apple Glass Material & Origin Spring */}
-                        {isDropdownOpen && (
-                          <div
-                            className='absolute left-3 top-full mt-2 z-50 w-64 rounded-2xl border border-border/80 bg-popover/95 dark:bg-zinc-900/95 backdrop-blur-xl text-popover-foreground p-2 shadow-2xl origin-top-left animate-in fade-in-0 zoom-in-95'
-                            onClick={(e) => e.stopPropagation()}
-                          >
+{isDropdownOpen && (
+                            <div
+                              className='absolute left-3 top-full mt-2 z-50 w-64 rounded-2xl border border-border/80 bg-popover/95 dark:bg-zinc-900/95 backdrop-blur-xl text-popover-foreground p-2 shadow-2xl origin-top-left animate-in fade-in-0 zoom-in-95'
+                              onClick={(e) => e.stopPropagation()}
+                              onKeyDown={(e) => { if (e.key === 'Escape') setOpenDropdownSku(null); e.stopPropagation(); }}
+                              role='menu'
+                              tabIndex={0}
+                            >
                             <div className='px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground border-b border-border/60 mb-1.5'>
                               Select Marketplace: {p.productName}
                             </div>
@@ -697,7 +700,7 @@ export default function MatrixPage() {
                                       )}
                                     >
                                       {/* Marketplace Badge */}
-                                      <td className='py-2.5 px-3 font-semibold'>
+                                      <td className='py-2.5 px-3 font-semibold' aria-label={cfg.name}>
                                         <div className='flex items-center gap-2'>
                                           <span className={cn('size-2 rounded-full', cfg.dotColor)} />
                                           <span className={cn('px-2 py-0.5 rounded text-[10px] border font-bold', cfg.pillColor)}>

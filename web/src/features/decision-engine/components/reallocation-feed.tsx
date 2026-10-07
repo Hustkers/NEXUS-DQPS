@@ -39,7 +39,7 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
   return (
     <div
       className={cn(
-        'rounded-xl border border-border bg-card p-5 shadow-none text-card-foreground font-mono',
+        'rounded-xl border border-border bg-card p-5 shadow-none text-card-foreground font-mono min-w-0 max-w-full',
         className
       )}
     >
