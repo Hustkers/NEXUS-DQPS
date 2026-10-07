@@ -116,13 +116,13 @@ export function NotchNavbar({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Target style logo from Screenshot 1: [NX] nexusdqps (matching [CG] contextgc)
+  // Target style logo: [NX] nexusdqps with Vengence Orbitron display styling
   const defaultLogo = (
     <Link href="/" className="flex items-center gap-2 group shrink-0 mb-0.5">
-      <div className="bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 rounded-lg px-2 py-0.5 font-bold font-sans text-xs tracking-tight flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+      <div className="bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 rounded-lg px-2 py-0.5 font-black font-orbitron text-xs tracking-tight flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
         NX
       </div>
-      <span className="font-bold text-sm sm:text-base tracking-tight text-foreground font-sans">
+      <span className="font-bold text-sm sm:text-base tracking-tight text-foreground font-orbitron">
         nexusdqps
       </span>
     </Link>

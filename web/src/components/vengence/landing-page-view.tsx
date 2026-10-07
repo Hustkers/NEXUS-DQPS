@@ -11,6 +11,7 @@ import { CylinderCarousel, type CarouselImage } from './cylinder-carousel';
 import { PlotFigure, BranchesFigure, PhosphorFigure, RiffleFigure } from './hairline-figures';
 import { AnimatedFooter } from '@/components/ui/animated-footer';
 import { WhyUsBento } from './why-us-bento';
+import { HighlightGrid } from './highlight-grid';
 import { ArrowRight, Sparkles, TrendingUp, ShieldCheck, Zap } from 'lucide-react';
 
 const AGENCY_TICKER_ITEMS = [
@@ -171,7 +172,7 @@ export function LandingPageView() {
               <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75'></span>
               <span className='relative inline-flex rounded-full h-2 w-2 bg-emerald-500'></span>
             </span>
-            <span className='font-mono text-[11px] font-semibold tracking-wider uppercase text-foreground/90'>
+            <span className='font-orbitron text-[11px] font-bold tracking-widest uppercase text-foreground/90'>
               AUTONOMOUS AD AGENCY
             </span>
             <span className='h-3 w-px bg-border/80' />
@@ -181,7 +182,7 @@ export function LandingPageView() {
           </div>
 
           {/* Master Ad Agency Headline with Static Gradient Text Animations */}
-          <h1 className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-[-0.035em] text-foreground max-w-5xl leading-[1.08] mb-6 apple-display'>
+          <h1 className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-orbitron font-extrabold tracking-tight text-foreground max-w-5xl leading-[1.12] mb-6'>
             We Automate Winning Ad Creatives &{' '}
             <span className='relative inline-block'>
               <span className='bg-gradient-to-r from-blue-600 via-sky-400 to-indigo-600 dark:from-blue-400 dark:via-sky-300 dark:to-indigo-300 bg-clip-text text-transparent font-black'>
@@ -259,11 +260,11 @@ export function LandingPageView() {
                     <span className='font-mono text-[10px] text-muted-foreground uppercase tracking-wider'>
                       {stat.label}
                     </span>
-                    <span className='font-mono text-[9px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold'>
+                    <span className='font-orbitron text-[9px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold'>
                       {stat.tag}
                     </span>
                   </div>
-                  <div className='font-mono text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight mb-1'>
+                  <div className='font-orbitron text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight mb-1'>
                     {stat.value}
                   </div>
                   <div className='font-mono text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold truncate'>
@@ -283,7 +284,7 @@ export function LandingPageView() {
           <div className='font-mono text-xs font-bold text-primary uppercase tracking-widest mb-2'>
             CORE SYSTEM PILLARS
           </div>
-          <h2 className='text-3xl md:text-4xl font-extrabold tracking-[-0.025em] text-foreground mb-4 apple-title'>
+          <h2 className='text-3xl md:text-4xl font-orbitron font-extrabold tracking-tight text-foreground mb-4'>
             Engineered for Ground-Truth Profitability
           </h2>
           <p className='text-sm md:text-base text-muted-foreground leading-relaxed'>
@@ -301,7 +302,7 @@ export function LandingPageView() {
             description='Solves the Karush-Kuhn-Tucker (KKT) constrained optimization problem across channels. Reallocates capital to equalize marginal contribution profit under strict ±20% daily liquidity stability bounds to preserve ad platform algorithmic learning phases.'
             icon={<Icons.trendingUp className='size-5' />}
             badge={
-              <span className='font-mono text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold'>
+              <span className='font-orbitron text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold'>
                 KKT CONVEX SOLVER
               </span>
             }
@@ -336,7 +337,7 @@ export function LandingPageView() {
             description='Separates ad copy failures from external confounders. When ROAS drops, factor decomposition isolates website latency, buy-box undercutting, and ERP stockouts before touching creative spend.'
             icon={<Icons.checkCircle className='size-5' />}
             badge={
-              <span className='font-mono text-[10px] px-2 py-0.5 rounded bg-sky-500/10 text-sky-600 dark:text-sky-400 font-bold'>
+              <span className='font-orbitron text-[10px] px-2 py-0.5 rounded bg-sky-500/10 text-sky-600 dark:text-sky-400 font-bold'>
                 DAG CAUSALITY
               </span>
             }
@@ -364,7 +365,7 @@ export function LandingPageView() {
             description='99.8% deterministic hardware entropy fingerprinting stitches YouTube impressions, TikTok ads, and Amazon marketplace checkouts without 3rd-party cookies or UTM parameters.'
             icon={<Icons.lock className='size-5' />}
             badge={
-              <span className='font-mono text-[10px] px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold'>
+              <span className='font-orbitron text-[10px] px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold'>
                 ZERO COOKIES
               </span>
             }
@@ -393,7 +394,7 @@ export function LandingPageView() {
             description='Every single budget shift is committed to an immutable ledger with predicted vs realized contribution margin. Model weights and adstock decay curves automatically tune in DuckDB/PostgreSQL based on accuracy variances.'
             icon={<Icons.clipboardText className='size-5' />}
             badge={
-              <span className='font-mono text-[10px] px-2 py-0.5 rounded bg-primary/10 text-primary font-bold'>
+              <span className='font-orbitron text-[10px] px-2 py-0.5 rounded bg-primary/10 text-primary font-bold'>
                 DUCKDB + POSTGRES
               </span>
             }
@@ -439,7 +440,7 @@ export function LandingPageView() {
           <div className='font-mono text-xs font-bold text-primary uppercase tracking-widest mb-2'>
             CLOSED LOOP EXECUTION
           </div>
-          <h2 className='text-3xl md:text-4xl font-extrabold tracking-tight text-foreground mb-4'>
+          <h2 className='text-3xl md:text-4xl font-orbitron font-extrabold tracking-tight text-foreground mb-4'>
             From Ingestion to Closed-Loop Ledger
           </h2>
           <p className='text-sm md:text-base text-muted-foreground leading-relaxed'>
@@ -479,13 +480,13 @@ export function LandingPageView() {
               className='p-6 flex flex-col justify-between space-y-4 border-border/80'
             >
               <div>
-                <div className='font-mono text-2xl font-extrabold text-primary mb-2'>
+                <div className='font-orbitron text-2xl font-black text-primary mb-2'>
                   {phase.step}
                 </div>
-                <div className='font-mono text-[10px] px-2 py-0.5 rounded bg-muted text-muted-foreground uppercase font-bold inline-block mb-3'>
+                <div className='font-orbitron text-[10px] px-2 py-0.5 rounded bg-muted text-muted-foreground uppercase font-bold inline-block mb-3'>
                   {phase.badge}
                 </div>
-                <h3 className='font-bold text-base text-foreground mb-2'>
+                <h3 className='font-orbitron font-bold text-base text-foreground mb-2'>
                   {phase.title}
                 </h3>
                 <p className='text-xs text-muted-foreground leading-relaxed'>
@@ -497,6 +498,25 @@ export function LandingPageView() {
               </div>
             </CardSpotlight>
           ))}
+        </div>
+      </section>
+
+      {/* DETERMINISTIC ENGINE TECH STACK HIGHLIGHT GRID */}
+      <section className='py-12 sm:py-16 relative z-10 w-full'>
+        <div className='mx-auto max-w-7xl px-4 md:px-8 lg:px-12 flex flex-col gap-6 sm:gap-8'>
+          <div className='flex flex-col items-center text-center space-y-3 mb-2'>
+            <div className='inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-primary text-xs font-mono tracking-wider uppercase'>
+              <span>●</span> DETERMINISTIC ENGINE &amp; TECH STACK
+            </div>
+            <h2 className='text-2xl sm:text-3xl md:text-4xl font-orbitron font-extrabold tracking-tight text-foreground'>
+              Engineered with Modern Full-Stack Precision
+            </h2>
+            <p className='text-sm sm:text-base text-muted-foreground max-w-2xl'>
+              Glide across the real-time DuckDB columnar analytics, SciPy KKT solvers, Next.js 16 architecture, and multi-platform ad APIs powering NEXUS.
+            </p>
+          </div>
+
+          <HighlightGrid />
         </div>
       </section>
 

@@ -67,7 +67,7 @@ export function BentoGridItem({
           </div>
           {badge}
         </div>
-        <div className='font-sans font-bold text-foreground text-lg tracking-tight apple-title'>
+        <div className='font-orbitron font-bold text-foreground text-base sm:text-lg tracking-tight'>
           {title}
         </div>
         <div className='font-sans font-normal text-muted-foreground text-xs leading-relaxed'>
