@@ -19,7 +19,7 @@ export default function AnomaliesPage() {
 
   return (
     <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#000000] text-white min-h-screen'>
-      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-[#8A8A8A] pb-4'>
+      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-[#1A1A1A] pb-4'>
         <div>
           <div className='flex items-center gap-2'>
             <Icons.warning className='size-5 text-white' />
@@ -32,7 +32,7 @@ export default function AnomaliesPage() {
           </p>
         </div>
 
-        <div className='flex items-center gap-1.5 bg-[#1A1A1A] p-1 rounded border border-[#8A8A8A] text-xs font-mono'>
+        <div className='flex items-center gap-1.5 bg-[#1A1A1A] p-1 rounded border border-[#1A1A1A] text-xs font-mono'>
           {(['ALL', 'CRITICAL', 'HIGH', 'WARNING'] as const).map((sev) => (
             <button
               key={sev}
