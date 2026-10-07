@@ -517,7 +517,7 @@ export function MissionControlConsole() {
       </div>
 
       {/* 8. Closed-Loop Decision Ledger */}
-      <DecisionLedgerTable entries={state.ledger} />
+      <DecisionLedgerTable entries={state.ledger} showHeader />
 
       {/* 9. Analysing Phase Modal featuring 3D GitHub Globe */}
       <ProductAnalysisModal
