@@ -17,8 +17,10 @@ import {
   SidebarMenuItem
 } from '@/components/ui/sidebar';
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export function OrgSwitcher() {
+  const router = useRouter();
   const [activeBrand, setActiveBrand] = useState('Nike Direct');
   const brands = [
     { name: 'Nike Direct', category: 'Footwear & Performance', channels: 'Meta • Google • Amazon • Shopify', status: 'Live' },
@@ -102,7 +104,17 @@ export function OrgSwitcher() {
             ))}
 
             <DropdownMenuSeparator className='bg-border/60 my-1' />
-            <div className='px-2 py-1 text-[10px] text-muted-foreground font-mono flex items-center justify-between'>
+            <DropdownMenuItem
+              onClick={() => router.push('/')}
+              className='cursor-pointer rounded-lg p-2 hover:bg-muted/80 text-xs font-mono text-muted-foreground hover:text-foreground flex items-center justify-between'
+            >
+              <div className='flex items-center gap-2'>
+                <Icons.externalLink className='size-3.5 text-muted-foreground' />
+                <span>Return to Landing Page</span>
+              </div>
+              <span className='text-[10px] text-muted-foreground/60 font-mono'>/</span>
+            </DropdownMenuItem>
+            <div className='px-2 py-1 text-[10px] text-muted-foreground font-mono flex items-center justify-between border-t border-border/40 pt-1.5 mt-0.5'>
               <span>ENGINE: SCIPY CONVEX</span>
               <span className='text-emerald-600 dark:text-emerald-400 font-semibold'>ACTIVE (CYC-9482)</span>
             </div>
