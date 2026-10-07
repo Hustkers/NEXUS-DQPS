@@ -14,7 +14,10 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@designcodeio/threeui": ["./src/shaders/index.tsx"],
+      "@designcodeio/threeui/style.css": ["./src/shaders/threeui.css"],
+      "@designcodeio/threeui/*": ["./src/shaders/*"]
     },
     "incremental": true,
     "plugins": [

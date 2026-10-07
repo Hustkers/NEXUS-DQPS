@@ -21,6 +21,14 @@ export const navGroups: NavGroup[] = [
         items: []
       },
       {
+        title: 'AI Strategy Engine',
+        url: '/dashboard/strategy-engine',
+        icon: 'bot',
+        isActive: false,
+        shortcut: ['a', 'e'],
+        items: []
+      },
+      {
         title: '3D Global Intelligence',
         url: '/dashboard/globe',
         icon: 'globe',
@@ -58,6 +66,14 @@ export const navGroups: NavGroup[] = [
         icon: 'check',
         isActive: false,
         shortcut: ['d', 'l'],
+        items: []
+      },
+      {
+        title: 'Visitor Tracking & Attribution',
+        url: '/dashboard/tracking',
+        icon: 'search',
+        isActive: false,
+        shortcut: ['v', 't'],
         items: []
       }
     ]

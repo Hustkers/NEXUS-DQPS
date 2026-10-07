@@ -9,6 +9,7 @@ import type { Metadata, Viewport } from 'next';
 import { cookies } from 'next/headers';
 import NextTopLoader from 'nextjs-toploader';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import BackgroundShader from '@/components/layout/background-shader';
 import '../styles/globals.css';
 
 const META_THEME_COLORS = {
@@ -90,6 +91,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             enableColorScheme
           >
             <Providers activeThemeValue={themeToApply}>
+              <BackgroundShader />
               <Toaster />
               {children}
               <AppAiAssistant />
