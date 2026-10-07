@@ -7,7 +7,6 @@ import { GlowButton } from './glow-button';
 import { CardSpotlight } from './card-spotlight';
 import { BentoGrid, BentoGridItem } from './bento-grid';
 import { StatsMatrix, type StatItem } from './stats-matrix';
-import { ShockSimulatorShowcase } from './shock-simulator-showcase';
 import { NotchNavbar } from './notch-navbar';
 import { IsometricTelemetryPanel } from './isometric-telemetry-panel';
 import { PlotFigure, BranchesFigure, PhosphorFigure, RiffleFigure } from './hairline-figures';
@@ -127,27 +126,8 @@ export function LandingPageView() {
         </div>
       </section>
 
-      {/* 3. SHOCK SIMULATOR SHOWCASE (WORKFLOW & SCENARIOS) */}
-      <section id='workflow' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-16 relative'>
-        <span id='shocks' className='absolute -top-20' />
-        <div className='text-center max-w-3xl mx-auto mb-12'>
-          <div className='font-mono text-xs font-bold text-primary uppercase tracking-widest mb-2'>
-            STRESS TEST BENCHMARK
-          </div>
-          <h2 className='text-3xl md:text-4xl font-extrabold tracking-[-0.025em] text-foreground mb-4 apple-title'>
-            Four Real-World Crisis Scenarios
-          </h2>
-          <p className='text-sm md:text-base text-muted-foreground leading-relaxed'>
-            Standard marketers take 48–72 hours to diagnose inventory and auction anomalies.
-            NEXUS intervenes in sub-15 minutes with automated circuit breakers and Scipy convex reallocation.
-          </p>
-        </div>
-
-        <ShockSimulatorShowcase />
-      </section>
-
-      {/* 4. EXPANDABLE / AGENT BENTO GRID (FEATURES & ARCHITECTURE) */}
-      <section id='features' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-muted/20 border-y border-border/60 scroll-mt-16 relative'>
+      {/* 2. EXPANDABLE / AGENT BENTO GRID (FEATURES & ARCHITECTURE) */}
+      <section id='features' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-muted/20 border-b border-border/60 scroll-mt-16 relative'>
         <span id='bento' className='absolute -top-20' />
         <div className='text-center max-w-3xl mx-auto mb-14'>
           <div className='font-mono text-xs font-bold text-primary uppercase tracking-widest mb-2'>
