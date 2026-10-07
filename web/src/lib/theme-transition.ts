@@ -8,17 +8,22 @@ export function startThemeTransition(
   apply: () => void,
   origin?: { clientX: number; clientY: number }
 ) {
-  const root = document.documentElement;
-
-  if (!document.startViewTransition) {
+  if (typeof document === 'undefined' || !('startViewTransition' in document)) {
     apply();
     return;
   }
 
-  if (origin) {
-    root.style.setProperty('--x', `${origin.clientX}px`);
-    root.style.setProperty('--y', `${origin.clientY}px`);
-  }
+  try {
+    const root = document.documentElement;
+    if (origin) {
+      root.style.setProperty('--x', `${origin.clientX}px`);
+      root.style.setProperty('--y', `${origin.clientY}px`);
+    }
 
-  document.startViewTransition(apply);
+    document.startViewTransition(() => {
+      apply();
+    });
+  } catch {
+    apply();
+  }
 }
