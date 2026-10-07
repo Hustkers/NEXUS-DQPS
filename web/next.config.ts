@@ -1,4 +1,8 @@
 import type { NextConfig } from 'next';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+const rawLoader = require.resolve('raw-loader');
 
 const nextConfig: NextConfig = {
   output: process.env.BUILD_STANDALONE === 'true' ? 'standalone' : undefined,
@@ -17,7 +21,7 @@ const nextConfig: NextConfig = {
   turbopack: {
     rules: {
       '*.html': {
-        loaders: ['raw-loader'],
+        loaders: [rawLoader],
         as: '*.js',
       },
     },
