@@ -11,6 +11,7 @@ import { ShockSimulatorShowcase } from './shock-simulator-showcase';
 import { NotchNavbar } from './notch-navbar';
 import { IsometricTelemetryPanel } from './isometric-telemetry-panel';
 import { PlotFigure, BranchesFigure, PhosphorFigure, RiffleFigure } from './hairline-figures';
+import { AnimatedFooter } from '@/components/ui/animated-footer';
 
 const HERO_STATS = [
   {
@@ -62,7 +63,7 @@ export function LandingPageView() {
 
           {/* Proposed Solution Subtitle */}
           <p className='text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl font-normal leading-relaxed mb-8 apple-subhead'>
-            <span className='text-foreground font-semibold'>The NEXUS Solution:</span> An AI-native closed loop pairing causal diagnostics with Scipy convex optimization — halting stockout waste in &lt;15 minutes to guarantee positive net contribution profit.
+            <span className='text-foreground font-semibold'>The NEXUS:</span> An AI-native closed loop pairing causal diagnostics with Scipy convex optimization — halting stockout waste in &lt;15 minutes to guarantee positive net contribution profit.
           </p>
 
           {/* Primary Button Group with VengenceUI Button Forge Styling */}
