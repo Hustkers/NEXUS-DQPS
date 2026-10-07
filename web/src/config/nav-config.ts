@@ -90,6 +90,14 @@ export const navGroups: NavGroup[] = [
         items: []
       },
       {
+        title: 'AI Strategy Engine',
+        url: '/dashboard/strategy-engine',
+        icon: 'sparkles',
+        isActive: false,
+        shortcut: ['a', 'e'],
+        items: []
+      },
+      {
         title: 'Nike Footwear Catalog',
         url: '/dashboard/product',
         icon: 'kanban',
