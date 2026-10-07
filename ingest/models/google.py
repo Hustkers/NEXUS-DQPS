@@ -1,25 +1,20 @@
-"""Production-exact Google Ads API Pydantic v2 models.
-
-Mirroring Google Ads API SearchStream / Search response:
-GoogleAdsRow with campaign, segments, and metrics resources.
-"""
-
+"""Google Ads API Pydantic v2 Models mirroring GoogleAdsRow."""
 from __future__ import annotations
 
 from typing import Any, Optional
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
-class GoogleAdsCampaign(BaseModel):
-    """Google Ads Campaign resource representation."""
+class GoogleCampaign(BaseModel):
+    """Google Ads campaign resource."""
+    model_config = ConfigDict(extra="allow", populate_by_name=True)
 
-    model_config = ConfigDict(populate_by_name=True, extra="allow")
-
-    id: str = Field(..., description="Google Ads Campaign ID (numeric string or int)")
-    name: str = Field(..., description="Campaign name")
-    advertising_channel_type: str = Field(
+    id: str = Field(..., description="Unique Google Campaign ID")
+    name: str = Field(..., description="Campaign display name")
+    advertising_channel_type: Optional[str] = Field(
         default="SEARCH",
-        description="Channel type: SEARCH, PERFORMANCE_MAX, DISPLAY, SHOPPING, VIDEO",
+        alias="advertisingChannelType",
+        description="e.g., 'SEARCH', 'SHOPPING', 'PERFORMANCE_MAX', 'DISPLAY'"
     )
     status: Optional[str] = Field(default="ENABLED", description="Campaign status: ENABLED, PAUSED, REMOVED")
 
@@ -29,98 +24,109 @@ class GoogleAdsCampaign(BaseModel):
         return str(v)
 
 
-class GoogleAdsSegments(BaseModel):
-    """Google Ads Segments resource representation."""
+class GoogleSegments(BaseModel):
+    """Segmentation fields for Google Ads rows."""
+    model_config = ConfigDict(extra="allow", populate_by_name=True)
 
-    model_config = ConfigDict(populate_by_name=True, extra="allow")
-
-    date: str = Field(..., description="Date segment formatted as YYYY-MM-DD")
+    date: str = Field(..., description="Reporting date string (YYYY-MM-DD)")
     device: Optional[str] = Field(default=None, description="Device segment (DESKTOP, MOBILE, TABLET)")
     day_of_week: Optional[str] = Field(default=None, description="Day of week segment")
 
 
-class GoogleAdsMetrics(BaseModel):
-    """Google Ads Metrics resource representation with cost_micros."""
+class GoogleMetrics(BaseModel):
+    """Performance metrics in Google Ads response."""
+    model_config = ConfigDict(extra="allow", populate_by_name=True)
 
-    model_config = ConfigDict(populate_by_name=True, extra="allow")
-
-    impressions: int = Field(default=0, description="Count of impressions")
-    clicks: int = Field(default=0, description="Count of clicks")
+    impressions: int = Field(0, description="Count of impressions")
+    clicks: int = Field(0, description="Count of user clicks")
     cost_micros: int = Field(
-        default=0,
-        description="The sum of your cost-per-click (CPC) and cost-per-thousand impressions (CPM) in millionths of the currency",
+        0,
+        alias="costMicros",
+        description="Spend in micros (1 USD = 1,000,000 micros)"
     )
-    conversions: float = Field(default=0.0, description="The number of conversions")
+    conversions: float = Field(0.0, description="Attributed conversion count")
     conversions_value: float = Field(
-        default=0.0,
-        description="The total value of conversions (monetary sum)",
+        0.0,
+        alias="conversionsValue",
+        description="Monetary conversion value in account currency"
     )
     average_cpc: Optional[float] = Field(
-        default=None,
-        description="Average cost per click in micro currency or currency units",
+        None,
+        alias="averageCpc",
+        description="Average cost per click in micros"
     )
     ctr: Optional[float] = Field(default=None, description="Click-through rate")
 
-    @field_validator("cost_micros", "impressions", "clicks", mode="before")
+    @field_validator("impressions", "clicks", "cost_micros", mode="before")
     @classmethod
-    def parse_ints(cls, v: Any) -> int:
-        if v is None or v == "":
-            return 0
-        return int(float(v))
+    def parse_int(cls, v: Any) -> int:
+        return int(float(v)) if v is not None else 0
 
     @field_validator("conversions", "conversions_value", "average_cpc", "ctr", mode="before")
     @classmethod
-    def parse_floats(cls, v: Any) -> Optional[float]:
-        if v is None or v == "":
-            return None
-        return float(v)
+    def parse_float(cls, v: Any) -> Optional[float]:
+        return float(v) if v is not None else 0.0
 
     @property
     def cost(self) -> float:
-        """Ad spend in primary currency units (e.g. USD) converted from cost_micros."""
+        """Spend converted from micros to standard currency."""
         return self.cost_micros / 1_000_000.0
+
+    @property
+    def spend(self) -> float:
+        """Spend converted from micros to standard currency."""
+        return round(self.cost_micros / 1_000_000.0, 2)
 
 
 class GoogleAdsRow(BaseModel):
-    """Production-exact Google Ads API GoogleAdsRow.
+    """Canonical GoogleAdsRow returned from Search and SearchStream endpoints."""
+    model_config = ConfigDict(extra="allow", populate_by_name=True)
 
-    Represents a single row of GoogleAdsService.Search or SearchStream response.
-    """
-
-    model_config = ConfigDict(populate_by_name=True, extra="allow")
-
-    campaign: GoogleAdsCampaign = Field(..., description="Campaign details")
-    segments: GoogleAdsSegments = Field(..., description="Segments including date")
-    metrics: GoogleAdsMetrics = Field(..., description="Performance metrics")
+    campaign: GoogleCampaign = Field(..., description="Campaign resource details")
+    segments: GoogleSegments = Field(..., description="Date segments")
+    metrics: GoogleMetrics = Field(..., description="Performance metric payload")
     customer_id: Optional[str] = Field(default=None, description="Google Ads Customer ID (XXX-XXX-XXXX)")
 
     @property
     def spend(self) -> float:
-        """Ad spend in USD / standard currency units."""
+        return self.metrics.cost
+
+    @property
+    def cost(self) -> float:
         return self.metrics.cost
 
     @property
     def revenue(self) -> float:
-        """Conversion value revenue."""
         return self.metrics.conversions_value
 
     @property
     def roas(self) -> float:
-        """Return on Ad Spend = conversions_value / spend."""
         if self.spend <= 0:
             return 0.0
         return self.revenue / self.spend
 
     @property
+    def date(self) -> str:
+        return self.segments.date
+
+    @property
+    def campaign_name(self) -> str:
+        return self.campaign.name
+
+    @property
     def ctr(self) -> float:
-        """Click-through rate."""
         if self.metrics.impressions <= 0:
             return 0.0
         return self.metrics.clicks / self.metrics.impressions
 
     @property
     def cvr(self) -> float:
-        """Conversion rate = conversions / clicks."""
         if self.metrics.clicks <= 0:
             return 0.0
         return self.metrics.conversions / self.metrics.clicks
+
+
+# Aliases for backward compatibility
+GoogleAdsCampaign = GoogleCampaign
+GoogleAdsSegments = GoogleSegments
+GoogleAdsMetrics = GoogleMetrics

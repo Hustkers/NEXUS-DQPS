@@ -13,11 +13,16 @@ export const columns: ColumnDef<Product>[] = [
   {
     accessorKey: 'photo_url',
     header: 'IMAGE',
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       const url = row.getValue('photo_url') as string;
       const name = row.getValue('name') as string;
+      const onAnalyze = (table.options.meta as any)?.onAnalyze;
       return (
-        <div className='relative size-12 overflow-hidden rounded-md border border-zinc-800 bg-zinc-900'>
+        <div
+          className='relative size-12 overflow-hidden rounded-md border border-zinc-800 bg-zinc-900 cursor-pointer hover:border-cyan-500/80 transition-colors'
+          onClick={() => onAnalyze?.(row.original)}
+          title='Click to inspect product telemetry'
+        >
           {url ? (
             <Image
               src={url}
@@ -41,11 +46,18 @@ export const columns: ColumnDef<Product>[] = [
     header: ({ column }: { column: Column<Product, unknown> }) => (
       <DataTableColumnHeader column={column} title='Shoe Model' />
     ),
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       const p = row.original;
+      const onAnalyze = (table.options.meta as any)?.onAnalyze;
       return (
-        <div className='max-w-[260px]'>
-          <div className='font-medium text-zinc-100 truncate'>{p.name}</div>
+        <div
+          className='max-w-[260px] cursor-pointer group'
+          onClick={() => onAnalyze?.(p)}
+          title='Click to inspect product telemetry'
+        >
+          <div className='font-medium text-zinc-100 truncate group-hover:text-cyan-400 transition-colors'>
+            {p.name}
+          </div>
           {p.sku && (
             <div className='text-[10px] font-mono text-zinc-500'>SKU: {p.sku}</div>
           )}
@@ -89,11 +101,12 @@ export const columns: ColumnDef<Product>[] = [
     ),
     cell: ({ row }) => {
       const p = row.original;
+      const inrPrice = p.sale_price_inr ?? Math.round(Number(p.price) * 83);
       return (
         <div className='font-mono'>
-          <div className='text-zinc-200 font-bold'>${Number(p.price).toFixed(2)}</div>
-          {p.sale_price_inr && (
-            <div className='text-[10px] text-zinc-500'>₹{p.sale_price_inr.toLocaleString()}</div>
+          <div className='text-zinc-900 dark:text-zinc-100 font-bold'>₹{inrPrice.toLocaleString()}</div>
+          {p.listing_price_inr && (
+            <div className='text-[10px] text-zinc-500 line-through'>₹{p.listing_price_inr.toLocaleString()}</div>
           )}
         </div>
       );
@@ -130,6 +143,11 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     id: 'actions',
-    cell: ({ row }) => <CellAction data={row.original} />
+    cell: ({ row, table }) => (
+      <CellAction
+        data={row.original}
+        onAnalyze={(table.options.meta as any)?.onAnalyze}
+      />
+    )
   }
 ];

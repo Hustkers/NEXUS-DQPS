@@ -1,6 +1,10 @@
 # DataQuest 3.0 — DQPS Plan
 ## Next-Generation Autonomous D2C Advertising Intelligence & Decision Engine
 
+> 🚀 **Live Production Console:** [https://nexus-dqps.vercel.app/dashboard/overview](https://nexus-dqps.vercel.app/dashboard/overview)  
+> 🔗 **Live Deployment:** [https://nexus-dqps.vercel.app](https://nexus-dqps.vercel.app)  
+> 📦 **GitHub Repository:** [https://github.com/Hustkers/NEXUS-DQPS](https://github.com/Hustkers/NEXUS-DQPS)
+
 ---
 
 ## 1. One-Line Pitch

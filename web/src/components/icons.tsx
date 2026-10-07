@@ -28,6 +28,7 @@ import {
   IconCode,
   IconCommand,
   IconCreditCard,
+  IconTerminal,
   IconDeviceLaptop,
   IconDots,
   IconDotsVertical,
@@ -86,6 +87,7 @@ import {
   IconUserX,
   IconUsers,
   IconVideo,
+  IconWorld,
   IconCrown,
   IconFingerprint,
   IconBrandYoutube,
@@ -94,7 +96,6 @@ import {
   IconPlayerPlay,
   IconShoppingCart,
   IconShieldCheck,
-  IconTerminal,
   IconGitBranch,
   IconChartBar,
   IconVolume2,
@@ -126,6 +127,7 @@ export const Icons = {
   search: IconSearch,
   settings: IconSettings,
   trash: IconTrash,
+  terminal: IconTerminal,
 
   // Navigation / Chevrons
   chevronDown: IconChevronDown,
@@ -141,6 +143,7 @@ export const Icons = {
   dashboard: IconLayoutDashboard,
   kanban: IconLayoutKanban,
   panelLeft: IconLayoutSidebar,
+  globe: IconWorld,
 
   // User
   user: IconUser,
@@ -153,6 +156,10 @@ export const Icons = {
 
   // Brand
   github: IconBrandGithub,
+  brandGithub: IconBrandGithub,
+  checkCircle: IconCircleCheck,
+  clipboardText: IconClipboardText,
+  shield: IconShieldCheck,
   twitter: IconBrandTwitter,
   logo: IconCommand,
 
@@ -244,7 +251,6 @@ export const Icons = {
   play: IconPlayerPlay,
   cart: IconShoppingCart,
   shieldCheck: IconShieldCheck,
-  terminal: IconTerminal,
   gitBranch: IconGitBranch,
   barChart: IconChartBar,
   sliders: IconAdjustmentsHorizontal,

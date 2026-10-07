@@ -48,22 +48,22 @@ export function ScenarioController({
   };
 
   return (
-    <div className={cn('rounded-xl border border-zinc-800/60 bg-zinc-950/40 p-5 shadow-none', className)}>
-      <div className='flex items-center justify-between border-b border-zinc-800/60 pb-3 mb-4'>
+    <div className={cn('rounded-xl border border-border/80 bg-card p-5 shadow-xs', className)}>
+      <div className='flex items-center justify-between border-b border-border/80 pb-3 mb-4'>
         <div className='flex items-center gap-2'>
-          <Icons.sparkles className='size-3.5 text-zinc-400' />
-          <h3 className='font-mono text-xs font-bold text-zinc-200 uppercase tracking-wider'>
+          <Icons.sparkles className='size-3.5 text-muted-foreground' />
+          <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
             Scenario Shock Testing Sandbox
           </h3>
         </div>
 
         <Button
           size='sm'
-          variant='ghost'
+          variant='outline'
           onClick={handleReset}
-          className='h-7 text-xs font-mono text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900/80 px-2.5 active:scale-[0.98]'
+          className='h-8 text-xs font-mono text-muted-foreground hover:text-foreground hover:bg-accent border border-border bg-card px-2.5 shadow-2xs active:scale-[0.98]'
         >
-          <Icons.clock className='mr-1.5 size-3 text-zinc-500' />
+          <Icons.clock className='mr-1.5 size-3 text-muted-foreground' />
           Reset Baseline
         </Button>
       </div>
@@ -79,27 +79,27 @@ export function ScenarioController({
               key={s.id}
               onClick={() => handleTrigger(s)}
               className={cn(
-                'group flex flex-col items-start text-left rounded-lg border p-3.5 transition-all active:scale-[0.98]',
+                'group flex flex-col items-start text-left rounded-xl border p-3.5 transition-all active:scale-[0.98]',
                 isActive
-                  ? 'border-zinc-400 bg-zinc-900/80 shadow-none'
-                  : 'border-zinc-800/60 bg-zinc-950/30 hover:border-zinc-700/80 hover:bg-zinc-900/40'
+                  ? 'border-foreground bg-accent/80 shadow-xs ring-1 ring-foreground/20'
+                  : 'border-border/80 bg-slate-50/50 dark:bg-zinc-950/30 hover:border-border hover:bg-slate-100/60 dark:hover:bg-zinc-900/40 shadow-2xs'
               )}
             >
               <div className='flex items-center justify-between w-full mb-1.5'>
                 <span
                   className={cn(
                     'size-1.5 rounded-full',
-                    isCritical ? 'bg-rose-400' : 'bg-amber-400'
+                    isCritical ? 'bg-rose-500' : 'bg-amber-500'
                   )}
                 />
-                <span className='text-[10px] font-mono text-emerald-400/90 font-medium'>
+                <span className='text-[10px] font-mono text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-500/30 px-1 py-0.2 rounded font-bold'>
                   {s.expectedSavedWaste.split(' ')[0]} saved
                 </span>
               </div>
-              <div className='font-mono text-xs font-semibold text-zinc-200 group-hover:text-zinc-100 line-clamp-1'>
+              <div className='font-mono text-xs font-bold text-foreground group-hover:text-foreground line-clamp-1'>
                 {s.name}
               </div>
-              <div className='text-[11px] text-zinc-500 font-mono mt-1 line-clamp-1'>
+              <div className='text-[11px] text-muted-foreground font-mono mt-1 line-clamp-1'>
                 {s.injectedEvent}
               </div>
             </button>

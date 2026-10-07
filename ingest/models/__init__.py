@@ -1,26 +1,36 @@
-"""Pydantic v2 data models for multi-platform ad telemetry and canonical records."""
+"""Canonical Pydantic v2 Ingestion Models for Multi-Channel Ad & ERP Data."""
+from __future__ import annotations
 
-from ingest.models.amazon import AmazonSponsoredProductsRecord
-from ingest.models.canonical import UnifiedCommerceRecord
-from ingest.models.google import (
-    GoogleAdsCampaign,
-    GoogleAdsMetrics,
+from .meta import MetaAdInsights, MetaAction, MetaActionValue, MetaInsightsRecord
+from .google import (
     GoogleAdsRow,
+    GoogleCampaign,
+    GoogleSegments,
+    GoogleMetrics,
+    GoogleAdsCampaign,
     GoogleAdsSegments,
+    GoogleAdsMetrics,
 )
-from ingest.models.meta import MetaAction, MetaInsightsRecord
-from ingest.models.shopify import ShopifyInventoryLevel, ShopifyLineItem, ShopifyOrder
+from .amazon import AmazonSponsoredProductsRow, AmazonSponsoredProductsRecord
+from .shopify import ShopifyOrder, ShopifyLineItem, ShopifyInventoryLevel
+from .canonical import UnifiedCommerceRecord
 
 __all__ = [
-    "MetaAction",
+    "MetaAdInsights",
     "MetaInsightsRecord",
+    "MetaAction",
+    "MetaActionValue",
+    "GoogleAdsRow",
+    "GoogleCampaign",
+    "GoogleSegments",
+    "GoogleMetrics",
     "GoogleAdsCampaign",
     "GoogleAdsSegments",
     "GoogleAdsMetrics",
-    "GoogleAdsRow",
+    "AmazonSponsoredProductsRow",
     "AmazonSponsoredProductsRecord",
-    "ShopifyLineItem",
     "ShopifyOrder",
+    "ShopifyLineItem",
     "ShopifyInventoryLevel",
     "UnifiedCommerceRecord",
 ]

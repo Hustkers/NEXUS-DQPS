@@ -66,7 +66,7 @@ def simulate_cross_channel_user_journey():
     print(f"  [LOGGED] {imp_event['timestamp']} | {imp_event['platform']}")
     print(f"  Fingerprint:  {imp_event['fingerprint_id']}")
     print(f"  Creative:     {imp_event['creative']}")
-    print(f"  Cost:         ${imp_event['cost_cpm_usd']:.3f}")
+    print(f"  Cost:         ₹{imp_event['cost_cpm_usd']:.3f}")
 
     # 3. Stage 2: User Clicks the Ad on YouTube
     print("\n" + "-" * 80)
@@ -87,7 +87,7 @@ def simulate_cross_channel_user_journey():
     print(f"  [LOGGED] {click_event['timestamp']} | {click_event['platform']}")
     print(f"  Fingerprint:  {click_event['fingerprint_id']}")
     print(f"  Action:       User clicked 'Shop Now', viewed page for 14.2s, closed tab without buying.")
-    print(f"  Total Ad Cost: ${imp_event['cost_cpm_usd'] + click_event['cost_cpc_usd']:.3f}")
+    print(f"  Total Ad Cost: ₹{imp_event['cost_cpm_usd'] + click_event['cost_cpc_usd']:.3f}")
 
     # 4. Stage 3: Independent Amazon Visit (Walled Garden Gap)
     print("\n" + "-" * 80)
@@ -137,7 +137,7 @@ def simulate_cross_channel_user_journey():
     journey_events.append(amz_buy_event)
     print(f"  [LOGGED] {amz_buy_event['timestamp']} | Order: {amz_buy_event['order_id']}")
     print(f"  Fingerprint:  {amz_buy_event['fingerprint_id']}")
-    print(f"  Revenue:      ${amz_buy_event['order_total_usd']:.2f}")
+    print(f"  Revenue:      ₹{amz_buy_event['order_total_usd']:.2f}")
 
     # 6. Stage 5: Attribution Resolution
     print("\n" + "=" * 80)
@@ -148,14 +148,14 @@ def simulate_cross_channel_user_journey():
     assisted_roas = revenue / total_cost
 
     print("\n  [STANDARD SILOED ATTRIBUTION (WITHOUT FINGERPRINT)]:")
-    print("    - YouTube Ad Platform:  $0.874 spend, $0 revenue -> 0.00x ROAS (Flagged as Waste!)")
-    print("    - Amazon Analytics:     $170.00 revenue -> 100% credited to 'Organic Direct Search'")
+    print("    - YouTube Ad Platform:  ₹0.874 spend, ₹0 revenue -> 0.00x ROAS (Flagged as Waste!)")
+    print("    - Amazon Analytics:     ₹170.00 revenue -> 100% credited to 'Organic Direct Search'")
     print("    --> Marketer Action:    WRONGLY cuts YouTube ad budget!")
 
     print(f"\n  [NEXUS STITCHED ATTRIBUTION (WITH SINGLE FINGERPRINT {fp_id})]:")
     print(f"    - Causal Link:          YouTube Ad (10:14 AM) -> Amazon Buy (04:35 PM)")
-    print(f"    - Ad Spend Invested:    ${total_cost:.3f}")
-    print(f"    - Realized Revenue:     ${revenue:.2f}")
+    print(f"    - Ad Spend Invested:    ₹{total_cost:.3f}")
+    print(f"    - Realized Revenue:     ₹{revenue:.2f}")
     print(f"    - Assisted ROAS:        \033[1;32m{assisted_roas:.1f}x\033[0m")
     print(f"    --> Autonomous Action:  SCALE YouTube budget by +25% (protects high-yield funnel)")
 

@@ -21,7 +21,7 @@ export const CHANNELS: Record<AdChannel, ChannelInfo> = {
     fullName: 'Blended Omnichannel (D2C)',
     subtitle: 'Amazon • Google • Meta • Shopify',
     badge: 'Blended',
-    accentColor: 'text-emerald-400 border-emerald-500/30 bg-emerald-950/20'
+    accentColor: 'text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-950/20'
   },
   amazon: {
     id: 'amazon',
@@ -29,7 +29,7 @@ export const CHANNELS: Record<AdChannel, ChannelInfo> = {
     fullName: 'Amazon Advertising',
     subtitle: 'Sponsored Products & Buy Box',
     badge: 'Buy Box',
-    accentColor: 'text-amber-400 border-amber-500/30 bg-amber-950/20'
+    accentColor: 'text-amber-800 dark:text-amber-400 border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-950/20'
   },
   google: {
     id: 'google',
@@ -37,7 +37,7 @@ export const CHANNELS: Record<AdChannel, ChannelInfo> = {
     fullName: 'Google Performance Max',
     subtitle: 'Shopping & Search Intent',
     badge: 'P-Max',
-    accentColor: 'text-blue-400 border-blue-500/30 bg-blue-950/20'
+    accentColor: 'text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-500/30 bg-blue-50 dark:bg-blue-950/20'
   },
   meta: {
     id: 'meta',
@@ -45,7 +45,7 @@ export const CHANNELS: Record<AdChannel, ChannelInfo> = {
     fullName: 'Meta Advantage+',
     subtitle: 'Instagram, Reels & Feed',
     badge: 'Advantage+',
-    accentColor: 'text-sky-400 border-sky-500/30 bg-sky-950/20'
+    accentColor: 'text-indigo-700 dark:text-sky-400 border-indigo-200 dark:border-sky-500/30 bg-indigo-50 dark:bg-sky-950/20'
   },
   shopify: {
     id: 'shopify',
@@ -53,7 +53,7 @@ export const CHANNELS: Record<AdChannel, ChannelInfo> = {
     fullName: 'Shopify D2C Storefront',
     subtitle: 'Direct Checkout & Retention',
     badge: 'Storefront',
-    accentColor: 'text-lime-400 border-lime-500/30 bg-lime-950/20'
+    accentColor: 'text-lime-700 dark:text-lime-400 border-lime-200 dark:border-lime-500/30 bg-lime-50 dark:bg-lime-950/20'
   }
 };
 
