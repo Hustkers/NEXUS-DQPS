@@ -54,7 +54,7 @@ export function PlatformBreakdownChart({
   return (
     <div className={cn('grid grid-cols-1 lg:grid-cols-3 gap-4', className)}>
       {/* 30-Day Performance Trends (Clean Utilitarian Area Chart) */}
-      <div className='relative overflow-hidden lg:col-span-2 rounded border border-[#8A8A8A] bg-[#1A1A1A] p-5 shadow-none flex flex-col justify-between'>
+      <div className='relative overflow-hidden lg:col-span-2 rounded border border-[#1A1A1A] bg-[#1A1A1A] p-5 shadow-none flex flex-col justify-between'>
         <div className='relative z-10'>
           <div className='flex items-center justify-between border-b border-[#000000] pb-3 mb-4'>
             <div>
@@ -102,7 +102,7 @@ export function PlatformBreakdownChart({
                   content={({ active, payload, label }) => {
                     if (active && payload && payload.length) {
                       return (
-                        <div className='rounded border border-[#8A8A8A] bg-[#000000] p-3 shadow-none text-xs font-mono space-y-1.5'>
+                        <div className='rounded border border-[#1A1A1A] bg-[#000000] p-3 shadow-none text-xs font-mono space-y-1.5'>
                           <p className='font-bold text-white border-b border-[#1A1A1A] pb-1'>{label}</p>
                           <div className='flex justify-between gap-4 text-white font-medium'>
                             <span>Revenue:</span>
@@ -169,7 +169,7 @@ export function PlatformBreakdownChart({
       </div>
 
       {/* Cross-Platform Attribution & Share */}
-      <div className='rounded border border-[#8A8A8A] bg-[#1A1A1A] p-5 shadow-none flex flex-col justify-between'>
+      <div className='rounded border border-[#1A1A1A] bg-[#1A1A1A] p-5 shadow-none flex flex-col justify-between'>
         <div>
           <div className='border-b border-[#000000] pb-3 mb-4'>
             <h3 className='font-mono text-xs font-bold text-white uppercase tracking-wider'>
@@ -191,7 +191,7 @@ export function PlatformBreakdownChart({
                     </div>
                     <div className='flex items-center gap-2'>
                       <span className='text-[#8A8A8A] font-medium'>₹{p.spend.toLocaleString()}</span>
-                      <Badge variant='outline' className='text-[10px] font-mono py-0 px-1 border-[#8A8A8A] text-white bg-[#000000] font-semibold'>
+                      <Badge variant='outline' className='text-[10px] font-mono py-0 px-1.5 border-none text-white bg-[#000000] font-semibold'>
                         {p.roas.toFixed(2)}x ROAS
                       </Badge>
                     </div>
@@ -215,10 +215,10 @@ export function PlatformBreakdownChart({
           </div>
         </div>
 
-        <div className='mt-4 rounded bg-[#000000] p-3.5 border border-[#8A8A8A] text-[11px] font-mono text-[#8A8A8A] space-y-1.5'>
+        <div className='mt-4 rounded bg-[#000000] p-3.5 border border-[#1A1A1A] text-[11px] font-mono text-[#8A8A8A] space-y-1.5'>
           <div className='flex justify-between items-center'>
             <span className='font-medium text-white'>Optimal Channel Shift:</span>
-            <span className='text-black bg-white border border-white px-1.5 py-0.5 rounded text-[10px] font-bold inline-flex items-center gap-1.5'>
+            <span className='text-black bg-white px-1.5 py-0.5 rounded text-[10px] font-bold inline-flex items-center gap-1.5'>
               <MetaLogo size={12} className='shrink-0' />
               <span>Meta</span>
               <span>→</span>

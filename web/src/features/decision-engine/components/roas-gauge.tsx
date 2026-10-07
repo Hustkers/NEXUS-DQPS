@@ -53,7 +53,7 @@ export function RoasGauge({
   const isWarning = !isCritical && currentRoas < targetRoas;
 
   let statusBadge = '● TARGET MET';
-  let badgeVariant = 'border border-[#1A1A1A] text-[#FFFFFF] bg-[#1A1A1A] font-bold';
+  let badgeVariant = 'border-none text-[#FFFFFF] bg-[#000000] font-bold';
 
   if (isStockout) {
     statusBadge = '[CRITICAL] STOCKOUT';
@@ -63,15 +63,15 @@ export function RoasGauge({
     badgeVariant = 'border-none text-[#000000] bg-[#FFFFFF] font-bold';
   } else if (isWarning) {
     statusBadge = '○ [WARN] PROFITABLE';
-    badgeVariant = 'border border-[#8A8A8A] text-[#FFFFFF] bg-[#1A1A1A] font-normal';
+    badgeVariant = 'border-none text-[#8A8A8A] bg-[#000000] font-normal';
   }
 
   // Health score monochrome tag
   const healthBadgeStyle =
     healthScore >= 75
-      ? 'text-[#FFFFFF] border border-[#1A1A1A] bg-[#1A1A1A] font-bold'
+      ? 'text-[#FFFFFF] bg-[#000000] font-bold'
       : healthScore >= 50
-      ? 'text-[#FFFFFF] border border-[#8A8A8A] bg-[#1A1A1A] font-medium'
+      ? 'text-[#8A8A8A] bg-[#000000] font-medium'
       : 'text-[#000000] border-none bg-[#FFFFFF] font-bold';
 
   const arcStrokeColor = isCritical ? '#FFFFFF' : isWarning ? '#8A8A8A' : '#FFFFFF';
@@ -79,7 +79,7 @@ export function RoasGauge({
   return (
     <div
       className={cn(
-        'relative flex flex-col items-center justify-between rounded border border-[#8A8A8A] bg-[#1A1A1A] p-4 transition-all hover:border-[#FFFFFF] hover:bg-[#000000]',
+        'relative flex flex-col items-center justify-between rounded border border-[#1A1A1A] bg-[#1A1A1A] p-4 transition-all hover:border-[#8A8A8A] hover:bg-[#000000]',
         onAnalyze && 'cursor-pointer',
         className
       )}
@@ -88,10 +88,10 @@ export function RoasGauge({
     >
       {/* Header if campaign provided */}
       {campaignName && (
-        <div className='flex w-full items-center justify-between gap-2 border-b border-[#8A8A8A]/40 pb-2 mb-2'>
+        <div className='flex w-full items-center justify-between gap-2 border-b border-[#000000] pb-2 mb-2'>
           <div className='flex items-center gap-2 min-w-0'>
             {photoUrl && (
-              <div className='relative size-7 rounded border border-[#8A8A8A] bg-[#000000] overflow-hidden shrink-0'>
+              <div className='relative size-7 rounded bg-[#000000] overflow-hidden shrink-0'>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={photoUrl} alt={productName || campaignName} className='size-full object-cover' />
               </div>
@@ -221,7 +221,7 @@ export function RoasGauge({
 
       {/* Stockout Fix Button */}
       {isStockout && (
-        <div className='mt-3 w-full pt-2 border-t border-[#8A8A8A]/30'>
+        <div className='mt-3 w-full pt-2 border-t border-[#000000]'>
           <button
             type='button'
             onClick={(e) => {

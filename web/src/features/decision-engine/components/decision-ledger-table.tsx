@@ -25,8 +25,8 @@ interface DecisionLedgerTableProps {
 
 export function DecisionLedgerTable({ entries, className }: DecisionLedgerTableProps) {
   return (
-    <div className={cn('rounded border border-[#8A8A8A] bg-[#1A1A1A] p-5 shadow-none text-[#FFFFFF]', className)}>
-      <div className='flex items-center justify-between border-b border-[#8A8A8A]/40 pb-3 mb-4'>
+    <div className={cn('rounded border border-[#1A1A1A] bg-[#1A1A1A] p-5 shadow-none text-[#FFFFFF]', className)}>
+      <div className='flex items-center justify-between border-b border-[#000000] pb-3 mb-4'>
         <div className='flex items-center gap-2'>
           <Icons.check className='size-3.5 text-[#FFFFFF]' />
           <h3 className='font-mono text-xs font-bold text-[#FFFFFF] uppercase tracking-wider'>
@@ -39,10 +39,10 @@ export function DecisionLedgerTable({ entries, className }: DecisionLedgerTableP
       </div>
 
       {/* Table */}
-      <div className='overflow-x-auto rounded border border-[#8A8A8A]/40'>
+      <div className='overflow-x-auto rounded border border-[#1A1A1A]'>
         <table className='w-full text-left text-xs font-mono'>
           <thead>
-            <tr className='border-b border-[#8A8A8A] bg-[#000000] text-[11px] text-[#8A8A8A] uppercase tracking-wider'>
+            <tr className='border-b border-[#1A1A1A] bg-[#000000] text-[11px] text-[#8A8A8A] uppercase tracking-wider'>
               <th className='py-2.5 px-3 font-semibold'>Timestamp</th>
               <th className='py-2.5 px-3 font-semibold'>Allocation Action</th>
               <th className='py-2.5 px-3 text-right font-semibold'>Exp. Margin</th>

@@ -4,7 +4,7 @@ Configured with:
 - Google Cloud Application Default Credentials (ADC) with automatic token refresh
 - Dynamic project resolution (auto-detects project from ADC or GOOGLE_CLOUD_PROJECT)
 - Multi-region routing (defaults to us-central1)
-- Vertex AI Gemini publisher model endpoint (gemini-2.5-flash / gemini-2.5-pro)
+- Vertex AI Gemini publisher model endpoint (gemini-3.8-flash with dynamic failover)
 - Connection pooling & persistent sessions
 - Exponential backoff with jitter for transient errors (429, 503)
 - Quota-aware token bucket rate limiter
@@ -85,7 +85,7 @@ class GoogleCloudClient:
             model_name
             or os.getenv("VERTEX_AI_MODEL")
             or os.getenv("GOOGLE_CLOUD_MODEL")
-            or "gemini-2.5-flash"
+            or "gemini-3.8-flash"
         )
         self.location = (
             location

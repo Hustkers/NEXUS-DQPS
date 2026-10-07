@@ -76,9 +76,9 @@ export function ReallocationFeed({
   };
 
   return (
-    <div className={cn('rounded border border-[#8A8A8A] bg-[#1A1A1A] p-5 shadow-none text-[#FFFFFF]', className)}>
+    <div className={cn('rounded border border-[#1A1A1A] bg-[#1A1A1A] p-5 shadow-none text-[#FFFFFF]', className)}>
       {/* Header */}
-      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-[#8A8A8A]/40 pb-3 mb-4'>
+      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-[#000000] pb-3 mb-4'>
         <div className='flex items-center gap-2'>
           <Icons.adjustments className='size-3.5 text-[#8A8A8A]' />
           <h3 className='font-mono text-xs font-bold text-[#FFFFFF] uppercase tracking-wider'>
@@ -95,7 +95,7 @@ export function ReallocationFeed({
             <Switch
               checked={autoPilot}
               onCheckedChange={setAutoPilot}
-              className='data-[state=checked]:bg-[#FFFFFF] data-[state=unchecked]:bg-[#000000] border border-[#8A8A8A]'
+              className='data-[state=checked]:bg-[#FFFFFF] data-[state=unchecked]:bg-[#000000] border border-[#1A1A1A]'
             />
           </div>
 
@@ -132,7 +132,7 @@ export function ReallocationFeed({
                   ? 'border-[#1A1A1A] bg-[#000000] opacity-50'
                   : isKill
                   ? 'border-2 border-[#FFFFFF] bg-[#000000]'
-                  : 'border border-[#8A8A8A]/40 bg-[#000000] hover:border-[#8A8A8A]'
+                  : 'border border-[#1A1A1A] bg-[#000000] hover:border-[#8A8A8A]'
               )}
             >
               {/* Route & Flow */}
@@ -144,8 +144,8 @@ export function ReallocationFeed({
                       isKill
                         ? 'bg-[#FFFFFF] text-[#000000]'
                         : item.deltaSpend > 0
-                        ? 'bg-[#1A1A1A] text-[#FFFFFF] border border-[#8A8A8A]'
-                        : 'bg-[#1A1A1A] text-[#8A8A8A] border border-[#8A8A8A]'
+                        ? 'bg-[#1A1A1A] text-[#FFFFFF]'
+                        : 'bg-[#1A1A1A] text-[#8A8A8A]'
                     )}
                   >
                     {isKill ? '[CRITICAL] ' : ''}{item.actionType.replace('_', ' ')}
@@ -196,7 +196,7 @@ export function ReallocationFeed({
                     variant='outline'
                     disabled={executingId === item.id}
                     onClick={() => handleExecute(item)}
-                    className='h-7.5 text-xs font-mono border border-[#8A8A8A] bg-[#1A1A1A] hover:bg-[#000000] hover:border-[#FFFFFF] text-[#FFFFFF] font-semibold active:scale-[0.98]'
+                    className='h-7.5 text-xs font-mono border border-[#1A1A1A] bg-[#000000] hover:bg-[#1A1A1A] hover:border-[#FFFFFF] text-[#FFFFFF] font-semibold active:scale-[0.98]'
                   >
                     {executingId === item.id ? (
                       <Icons.spinner className='size-3 animate-spin text-[#FFFFFF]' />

@@ -33,7 +33,7 @@ export default function OverViewPage() {
           </div>
         </div>
         <Tabs defaultValue='overview' className='space-y-4'>
-          <TabsList className='bg-[#1A1A1A] border border-[#8A8A8A]'>
+          <TabsList className='bg-[#1A1A1A] border border-[#1A1A1A]'>
             <TabsTrigger value='overview' className='data-[state=active]:bg-white data-[state=active]:text-black'>Overview</TabsTrigger>
             <TabsTrigger value='analytics' disabled className='text-[#8A8A8A]'>
               Analytics
@@ -41,14 +41,14 @@ export default function OverViewPage() {
           </TabsList>
           <TabsContent value='overview' className='space-y-4'>
             <div className='grid grid-cols-1 gap-4 px-4 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4'>
-              <Card className='@container/card bg-[#1A1A1A] border-[#8A8A8A] shadow-none'>
+              <Card className='@container/card bg-[#1A1A1A] border-[#1A1A1A] shadow-none'>
                 <CardHeader>
                   <CardDescription className='text-[#8A8A8A] font-mono'>Total Revenue</CardDescription>
                   <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl text-white font-mono'>
                     ₹1,250.00
                   </CardTitle>
                   <CardAction>
-                    <Badge variant='outline' className='border-[#8A8A8A] text-white bg-transparent font-mono'>
+                    <Badge variant='outline' className='border-none text-white bg-[#000000] font-mono'>
                       <Icons.trendingUp className='text-white' />
                       +12.5%
                     </Badge>
@@ -61,14 +61,14 @@ export default function OverViewPage() {
                   <div className='text-[#8A8A8A] text-xs font-mono'>Visitors for the last 6 months</div>
                 </CardFooter>
               </Card>
-              <Card className='@container/card bg-[#1A1A1A] border-[#8A8A8A] shadow-none'>
+              <Card className='@container/card bg-[#1A1A1A] border-[#1A1A1A] shadow-none'>
                 <CardHeader>
                   <CardDescription className='text-[#8A8A8A] font-mono'>New Customers</CardDescription>
                   <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl text-white font-mono'>
                     1,234
                   </CardTitle>
                   <CardAction>
-                    <Badge variant='outline' className='border-[#8A8A8A] text-white bg-transparent font-mono'>
+                    <Badge variant='outline' className='border-none text-white bg-[#000000] font-mono'>
                       <Icons.trendingDown className='text-[#8A8A8A]' />
                       -20%
                     </Badge>
@@ -81,14 +81,14 @@ export default function OverViewPage() {
                   <div className='text-[#8A8A8A] text-xs font-mono'>Acquisition needs attention</div>
                 </CardFooter>
               </Card>
-              <Card className='@container/card bg-[#1A1A1A] border-[#8A8A8A] shadow-none'>
+              <Card className='@container/card bg-[#1A1A1A] border-[#1A1A1A] shadow-none'>
                 <CardHeader>
                   <CardDescription className='text-[#8A8A8A] font-mono'>Active Accounts</CardDescription>
                   <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl text-white font-mono'>
                     45,678
                   </CardTitle>
                   <CardAction>
-                    <Badge variant='outline' className='border-[#8A8A8A] text-white bg-transparent font-mono'>
+                    <Badge variant='outline' className='border-none text-white bg-[#000000] font-mono'>
                       <Icons.trendingUp className='text-white' />
                       +12.5%
                     </Badge>
@@ -101,14 +101,14 @@ export default function OverViewPage() {
                   <div className='text-[#8A8A8A] text-xs font-mono'>Engagement exceed targets</div>
                 </CardFooter>
               </Card>
-              <Card className='@container/card bg-[#1A1A1A] border-[#8A8A8A] shadow-none'>
+              <Card className='@container/card bg-[#1A1A1A] border-[#1A1A1A] shadow-none'>
                 <CardHeader>
                   <CardDescription className='text-[#8A8A8A] font-mono'>Growth Rate</CardDescription>
                   <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl text-white font-mono'>
                     4.5%
                   </CardTitle>
                   <CardAction>
-                    <Badge variant='outline' className='border-[#8A8A8A] text-white bg-transparent font-mono'>
+                    <Badge variant='outline' className='border-none text-white bg-[#000000] font-mono'>
                       <Icons.trendingUp className='text-white' />
                       +4.5%
                     </Badge>
@@ -126,7 +126,7 @@ export default function OverViewPage() {
               <div className='col-span-4'>
                 <BarGraph />
               </div>
-              <Card className='col-span-4 md:col-span-3 bg-[#1A1A1A] border-[#8A8A8A] shadow-none'>
+              <Card className='col-span-4 md:col-span-3 bg-[#1A1A1A] border-[#1A1A1A] shadow-none'>
                 <RecentSales />
               </Card>
               <div className='col-span-4'>

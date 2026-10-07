@@ -48,8 +48,8 @@ export function ScenarioController({
   };
 
   return (
-    <div className={cn('rounded border border-[#8A8A8A] bg-[#1A1A1A] p-5 shadow-none text-[#FFFFFF]', className)}>
-      <div className='flex items-center justify-between border-b border-[#8A8A8A]/40 pb-3 mb-4'>
+    <div className={cn('rounded border border-[#1A1A1A] bg-[#1A1A1A] p-5 shadow-none text-[#FFFFFF]', className)}>
+      <div className='flex items-center justify-between border-b border-[#000000] pb-3 mb-4'>
         <div className='flex items-center gap-2'>
           <Icons.sparkles className='size-3.5 text-[#8A8A8A]' />
           <h3 className='font-mono text-xs font-bold text-[#FFFFFF] uppercase tracking-wider'>
@@ -61,7 +61,7 @@ export function ScenarioController({
           size='sm'
           variant='outline'
           onClick={handleReset}
-          className='h-8 text-xs font-mono text-[#FFFFFF] hover:bg-[#000000] hover:border-[#FFFFFF] border border-[#8A8A8A] bg-[#1A1A1A] px-2.5 active:scale-[0.98]'
+          className='h-8 text-xs font-mono text-[#FFFFFF] hover:bg-[#000000] hover:border-[#FFFFFF] border border-[#1A1A1A] bg-[#000000] px-2.5 active:scale-[0.98]'
         >
           <Icons.clock className='mr-1.5 size-3 text-[#8A8A8A]' />
           Reset Baseline
@@ -79,17 +79,17 @@ export function ScenarioController({
               key={s.id}
               onClick={() => handleTrigger(s)}
               className={cn(
-                'group flex flex-col items-start text-left rounded border p-3.5 transition-all active:scale-[0.98]',
+                'group flex flex-col items-start text-left rounded p-3.5 transition-all active:scale-[0.98]',
                 isActive
-                  ? 'border-[#FFFFFF] bg-[#000000] ring-1 ring-[#FFFFFF]'
-                  : 'border-[#8A8A8A]/40 bg-[#000000] hover:border-[#8A8A8A]'
+                  ? 'border border-[#FFFFFF] bg-[#000000] ring-1 ring-[#FFFFFF]'
+                  : 'border border-[#1A1A1A] bg-[#000000] hover:border-[#8A8A8A]'
               )}
             >
               <div className='flex items-center justify-between w-full mb-1.5'>
                 <span className='font-mono text-xs font-bold text-[#FFFFFF]'>
                   {isCritical ? '■' : '○'}
                 </span>
-                <span className='text-[10px] font-mono text-[#FFFFFF] bg-[#1A1A1A] border border-[#8A8A8A] px-1 py-0.5 rounded font-bold'>
+                <span className='text-[10px] font-mono text-[#FFFFFF] bg-[#1A1A1A] px-1.5 py-0.5 rounded font-semibold'>
                   {s.expectedSavedWaste.split(' ')[0]} saved
                 </span>
               </div>

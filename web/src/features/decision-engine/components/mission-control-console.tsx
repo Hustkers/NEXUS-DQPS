@@ -130,24 +130,7 @@ export function MissionControlConsole() {
 
   return (
     <div className='relative flex flex-1 flex-col gap-8 p-5 md:p-8 bg-[#000000] text-white min-h-screen selection:bg-[#1A1A1A] selection:text-white'>
-      {/* 1. Header & Live Telemetry (Utilitarian Minimalist) */}
-      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#8A8A8A] pb-5'>
-        <div>
-          <div className='flex items-center gap-2.5'>
-            <span className='size-2 rounded-full bg-white' />
-            <h1 className='text-xl font-bold font-mono tracking-tight text-white'>
-              NEXUS D2C
-            </h1>
-            <span className='text-[#8A8A8A] font-mono text-sm'>/</span>
-            <span className='text-sm font-mono text-[#8A8A8A] font-medium'>
-              Nike Direct Decision Engine
-            </span>
-          </div>
-          <p className='text-xs text-[#8A8A8A] font-mono mt-1'>
-            DuckDB &amp; PostgreSQL 16 • Columnar Store • Analytical SLSQP Optimizer • Dual-Knapsack Bandits • Floor ROAS 1.80x
-          </p>
-        </div>
-      </div>
+
 
       {/* 2. Executive Overview KPI Banner & Trajectory Graphs */}
       <ExecutiveGraphBanner
@@ -164,7 +147,7 @@ export function MissionControlConsole() {
       />
 
       {/* 3.5. Live 3D Global Telemetry & Heatmap Command Center */}
-      <div className='rounded border border-[#8A8A8A] bg-[#1A1A1A] p-5 shadow-none flex flex-col lg:flex-row items-center justify-between gap-6 overflow-hidden'>
+      <div className='rounded border border-[#1A1A1A] bg-[#1A1A1A] p-5 shadow-none flex flex-col lg:flex-row items-center justify-between gap-6 overflow-hidden'>
         <div className='flex-1 space-y-3.5 w-full'>
           <div className='flex flex-wrap items-center justify-between gap-2 border-b border-[#000000] pb-2.5'>
             <div className='flex items-center gap-2'>
@@ -175,7 +158,7 @@ export function MissionControlConsole() {
             </div>
             <div className='flex items-center gap-2'>
               {/* Globe Switcher */}
-              <div className='flex items-center bg-[#000000] rounded border border-[#8A8A8A] p-0.5 text-xs font-mono'>
+              <div className='flex items-center bg-[#000000] rounded border border-[#1A1A1A] p-0.5 text-xs font-mono'>
                 <button
                   onClick={() => setConsoleGlobeMode('pulse')}
                   className={cn(
@@ -202,7 +185,7 @@ export function MissionControlConsole() {
 
               <Link
                 href='/dashboard/globe'
-                className='px-2.5 py-1 rounded bg-[#000000] border border-[#8A8A8A] text-xs font-mono text-white hover:bg-white hover:text-black transition-colors flex items-center gap-1.5'
+                className='px-2.5 py-1 rounded bg-[#000000] border border-[#1A1A1A] text-xs font-mono text-white hover:bg-white hover:text-black transition-colors flex items-center gap-1.5'
               >
                 <span>Full Globe Hub</span>
                 <Icons.arrowRight className='size-3' />
@@ -217,19 +200,19 @@ export function MissionControlConsole() {
           </p>
 
           <div className='grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 font-mono text-xs'>
-            <div className='p-2.5 rounded bg-[#000000] border border-[#8A8A8A]'>
+            <div className='p-2.5 rounded bg-[#000000]'>
               <div className='text-[10px] text-[#8A8A8A]'>US-EAST / WEST</div>
               <div className='text-white font-bold'>High Sales (78%)</div>
             </div>
-            <div className='p-2.5 rounded bg-[#000000] border border-[#8A8A8A]'>
+            <div className='p-2.5 rounded bg-[#000000]'>
               <div className='text-[10px] text-[#8A8A8A]'>WESTERN EUROPE</div>
               <div className='text-white font-bold'>Strong (56%)</div>
             </div>
-            <div className='p-2.5 rounded bg-[#000000] border border-[#8A8A8A]'>
+            <div className='p-2.5 rounded bg-[#000000]'>
               <div className='text-[10px] text-[#8A8A8A]'>ASIA-PACIFIC</div>
               <div className='text-[#8A8A8A] font-bold'>Moderate (44%)</div>
             </div>
-            <div className='p-2.5 rounded bg-[#000000] border border-[#8A8A8A]'>
+            <div className='p-2.5 rounded bg-[#000000]'>
               <div className='text-[10px] text-[#8A8A8A]'>LATAM &amp; SEA</div>
               <div className='text-white font-bold'>RL Suppressed</div>
             </div>
@@ -253,7 +236,7 @@ export function MissionControlConsole() {
                     severity: c.inventory === 0 ? 'CRITICAL' : 'HEALTHY'
                   });
                 }}
-                className='px-2.5 py-1 rounded bg-[#000000] border border-[#8A8A8A] hover:border-white text-xs font-mono text-white transition-colors flex items-center gap-1.5'
+                className='px-2.5 py-1 rounded bg-[#000000] border border-[#1A1A1A] hover:border-white text-xs font-mono text-white transition-colors flex items-center gap-1.5'
               >
                 <PlatformLogo platform={c.platform} size={12} className='shrink-0' />
                 <span>{c.productName || c.sku}</span>
@@ -375,7 +358,7 @@ export function MissionControlConsole() {
       />
 
       {/* 10. ROAS Gauges & Health Scoring Matrix */}
-      <div className='space-y-4 rounded border border-[#8A8A8A] bg-[#1A1A1A] p-5 shadow-none'>
+      <div className='space-y-4 rounded border border-[#1A1A1A] bg-[#1A1A1A]/40 p-5 shadow-none'>
         <div className='flex flex-wrap items-center justify-between gap-3 border-b border-[#000000] pb-3'>
           <div className='flex items-center gap-2'>
             <Icons.trendingUp className='size-3.5 text-white' />
@@ -388,7 +371,7 @@ export function MissionControlConsole() {
           </div>
 
           {/* Platform Tab Filters */}
-          <div className='flex items-center gap-1 bg-[#000000] p-1 rounded border border-[#8A8A8A] text-xs font-mono'>
+          <div className='flex items-center gap-1 bg-[#000000] p-1 rounded border border-[#1A1A1A] text-xs font-mono'>
             {(['all', 'amazon', 'google', 'meta'] as const).map((tab) => (
               <button
                 key={tab}
