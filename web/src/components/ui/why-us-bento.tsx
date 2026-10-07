@@ -31,7 +31,7 @@ export const DEFAULT_BENTO_TEAM_MEMBERS: BentoAvatarMember[] = [
     image: "https://github.com/shi-ivam.png",
   },
   {
-    name: "Abhisekh",
+    name: "Abhishek",
     image: "https://github.com/Abhishek-singh06.png",
   },
   {
@@ -254,7 +254,7 @@ export function WhyUsBento({
                 Built by Systems Engineers
               </h3>
               <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
-                Architected by full-stack systems & quant engineers: Jay Gopal Tripathy, Shivam Kumar, Abhisekh, Pragyan Jain, Anushree Tiwari, and Garv Gupta.
+                Architected by full-stack systems & quant engineers: Jay Gopal Tripathy, Shivam Kumar, Abhishek, Pragyan Jain, Anushree Tiwari, and Garv Gupta.
               </p>
             </div>
             <div className="absolute -right-3 -bottom-8 text-[6rem] sm:text-[8rem] font-orbitron font-black text-muted/30 pointer-events-none group-hover:scale-105 transition-transform duration-700 leading-none select-none">

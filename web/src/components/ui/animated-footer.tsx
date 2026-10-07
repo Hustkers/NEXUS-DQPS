@@ -19,8 +19,8 @@ export const DEFAULT_TEAM_MEMBERS: AvatarItem[] = [
     image: "https://github.com/shi-ivam.png",
   },
   {
-    id: "abhisekh",
-    name: "Abhisekh",
+    id: "abhishek",
+    name: "Abhishek",
     image: "https://github.com/Abhishek-singh06.png",
   },
   {
