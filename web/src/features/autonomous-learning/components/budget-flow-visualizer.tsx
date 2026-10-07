@@ -37,9 +37,9 @@ export function BudgetFlowVisualizer({ channels, className }: BudgetFlowVisualiz
       </div>
 
       {/* 3-Column Visual Flow: Current Allocation -> Autonomous Engine -> New Allocation */}
-      <div className='grid grid-cols-1 md:grid-cols-11 gap-4 items-center'>
+      <div className='grid grid-cols-1 xl:grid-cols-11 gap-4 items-center'>
         {/* Column 1: Current Allocation (4 cols) */}
-        <div className='md:col-span-4 space-y-2.5'>
+        <div className='xl:col-span-4 space-y-2.5'>
           <div className='text-[10px] uppercase font-bold text-muted-foreground flex items-center justify-between'>
             <span>Current Allocation</span>
             <span>Historical</span>
@@ -65,7 +65,7 @@ export function BudgetFlowVisualizer({ channels, className }: BudgetFlowVisualiz
         </div>
 
         {/* Column 2: Autonomous Reallocation Shift Directives (3 cols) */}
-        <div className='md:col-span-3 space-y-2.5 flex flex-col justify-center'>
+        <div className='xl:col-span-3 space-y-2.5 flex flex-col justify-center'>
           <div className='text-[10px] uppercase font-bold text-primary text-center flex items-center justify-center gap-1.5'>
             <Icons.sparkles className='size-3' />
             AI Recommended Shift
@@ -101,7 +101,7 @@ export function BudgetFlowVisualizer({ channels, className }: BudgetFlowVisualiz
         </div>
 
         {/* Column 3: Recommended Final Allocation (4 cols) */}
-        <div className='md:col-span-4 space-y-2.5'>
+        <div className='xl:col-span-4 space-y-2.5'>
           <div className='text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400 flex items-center justify-between'>
             <span>Recommended Allocation</span>
             <span>Optimized</span>

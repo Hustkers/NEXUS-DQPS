@@ -280,7 +280,7 @@ export function ExecutiveGraphBanner({
       </div>
 
       {/* 2. Five Bento Sparkline Graph Cards with Mission Control Blueprint Grid */}
-      <div className='grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5'>
+      <div className='grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-5'>
         {cardsConfig.map((card, idx) => (
           <motion.div
             key={card.id}

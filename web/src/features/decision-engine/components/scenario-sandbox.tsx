@@ -642,13 +642,13 @@ export function ScenarioSandbox({
       {/* ============================================================ */}
       {/* PHASE 5: BEFORE VS SCENARIO COMPARISON MATRIX */}
       {/* ============================================================ */}
-      <div className='mb-5 rounded-xl border border-border overflow-hidden'>
-        <div className='bg-muted/40 px-3.5 py-2 border-b border-border flex items-center justify-between text-xs font-bold uppercase tracking-wider text-muted-foreground'>
+      <div className='mb-5 rounded-xl border border-border overflow-x-auto'>
+        <div className='bg-muted/40 px-3.5 py-2 border-b border-border flex items-center justify-between text-xs font-bold uppercase tracking-wider text-muted-foreground min-w-[560px]'>
           <span>Baseline Steady-State vs What-If Scenario Matrix</span>
           <span className='text-[10px] text-muted-foreground font-normal'>Real-time Hill Saturation Deltas</span>
         </div>
 
-        <div className='divide-y divide-border/60 text-xs'>
+        <div className='divide-y divide-border/60 text-xs min-w-[560px]'>
           {/* Row 1: Total Budget */}
           <div className='grid grid-cols-4 p-2.5 items-center hover:bg-muted/20 transition-colors'>
             <span className='text-muted-foreground font-medium'>Total Daily Budget</span>

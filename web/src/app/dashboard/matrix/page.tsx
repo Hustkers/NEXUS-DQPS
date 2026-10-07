@@ -447,8 +447,8 @@ export default function SkuChannelMatrixPage() {
   };
 
   return (
-    <div className='relative flex flex-1 flex-col w-full min-w-0 min-h-screen bg-[#FBFBFA] dark:bg-[#0C0D0E] text-[#111111] dark:text-[#EEEEEE] font-sans p-4 sm:p-6 md:p-8 space-y-6'>
-      
+    <div className='relative flex flex-1 flex-col w-full min-w-0 max-w-full overflow-hidden min-h-screen bg-[#FBFBFA] dark:bg-[#0C0D0E] text-[#111111] dark:text-[#EEEEEE] font-sans p-4 sm:p-6 md:p-8 space-y-6'>
+
       {/* 1. FAUX-OS WINDOW CHROME & METADATA BAR (Technical Document Header) */}
       <div className='w-full border border-[#EAEAEA] dark:border-[#262626] bg-[#FFFFFF] dark:bg-[#141517] rounded-[8px] p-4 flex flex-col md:flex-row md:items-center justify-between gap-4'>
         <div className='flex items-center gap-3'>
@@ -680,7 +680,7 @@ export default function SkuChannelMatrixPage() {
           </div>
         ) : (
           <div className='overflow-x-auto w-full'>
-            <table className='w-full min-w-full text-left text-xs font-mono'>
+            <table className='w-full min-w-[960px] text-left text-xs font-mono'>
               <thead>
                 <tr className='border-b border-[#EAEAEA] dark:border-[#262626] text-[11px] text-[#787774] uppercase tracking-wider bg-[#FBFBFA] dark:bg-[#111214]'>
                   <th className='py-3.5 px-4'>Shoe &amp; SKU</th>

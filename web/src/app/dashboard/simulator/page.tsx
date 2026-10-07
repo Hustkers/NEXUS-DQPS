@@ -362,7 +362,7 @@ function SimulationLabContent() {
   }, [selectedScenarioId, simStage, inputs, computedResult]);
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen font-mono'>
+    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen font-mono min-w-0 max-w-full overflow-hidden'>
       {/* Header Banner */}
       <div className='flex flex-wrap items-center justify-between gap-4 border-b border-border/80 pb-4'>
         <div>
@@ -413,7 +413,7 @@ function SimulationLabContent() {
       </div>
 
       {/* Scenario Selector Navigation Tabs */}
-      <div className='grid grid-cols-2 md:grid-cols-4 gap-2'>
+      <div className='grid grid-cols-2 lg:grid-cols-4 gap-2'>
         {(Object.keys(SCENARIO_METAS) as ShockScenarioId[]).map((id) => {
           const s = SCENARIO_METAS[id];
           const isSelected = selectedScenarioId === id;

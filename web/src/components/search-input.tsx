@@ -11,7 +11,7 @@ export default function SearchInput() {
     <div className='shrink-0'>
       <Button
         variant='outline'
-        className='bg-background/80 text-muted-foreground hover:text-foreground hover:bg-muted/60 relative h-9 w-9 p-0 md:px-3 md:py-2 md:w-36 lg:w-44 xl:w-56 justify-center md:justify-start rounded-[0.5rem] text-xs font-mono shadow-none border-border/80 transition-colors'
+        className='bg-background/80 text-muted-foreground hover:text-foreground hover:bg-muted/60 relative h-9 w-9 p-0 md:px-3 md:py-2 md:w-32 lg:w-40 xl:w-48 justify-center md:justify-start rounded-[0.5rem] text-xs font-mono shadow-none border-border/80 transition-colors'
         onClick={() => query?.toggle()}
         title='Search (⌘K)'
       >
