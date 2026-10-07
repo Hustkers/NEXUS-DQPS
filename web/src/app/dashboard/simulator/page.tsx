@@ -21,9 +21,6 @@ import { SimulationStrategyComparison } from '@/features/decision-engine/compone
 import { SimulationCausalChain } from '@/features/decision-engine/components/simulation-causal-chain';
 import { SimulationDataLineage } from '@/features/decision-engine/components/simulation-data-lineage';
 import { SimulationImpactChart } from '@/features/decision-engine/components/simulation-impact-chart';
-import { SimulationLossCurve } from '@/features/decision-engine/components/simulation-loss-curve';
-import { ScenarioController } from '@/features/decision-engine/components/scenario-controller';
-import initialEngineState from '@/data/nexus-engine-state.json';
 import type { ShockScenarioId, ScenarioInputParams, SimulationResult, DailyLossPoint } from '@/features/decision-engine/types/simulation-types';
 
 interface SavedRun {
@@ -54,7 +51,7 @@ function SimulationLabContent() {
       setSimStage('ready');
       setExecutedResult(null);
     }
-  }, [scenarioParam]);
+  }, [scenarioParam, selectedScenarioId]);
 
   // Inputs state for active scenario
   const [inputs, setInputs] = useState<ScenarioInputParams>(
@@ -75,12 +72,16 @@ function SimulationLabContent() {
   // Saved scenario experiment comparisons
   const [savedRuns, setSavedRuns] = useState<SavedRun[]>([]);
 
+  // Progressive Disclosure View Tabs (reduces visual overload)
+  const [configTab, setConfigTab] = useState<'inputs' | 'strategy'>('inputs');
+  const [analysisTab, setAnalysisTab] = useState<'impact' | 'policy' | 'causal'>('impact');
+  const [isMechanicsExpanded, setIsMechanicsExpanded] = useState<boolean>(false);
+
   // Real-time calculated simulation (pure deterministic source of truth)
   const computedResult: SimulationResult = useMemo(() => {
     return runDeterministicSimulation(selectedScenarioId, inputs, selectedStrategyId);
   }, [selectedScenarioId, inputs, selectedStrategyId]);
 
-  // Active result displayed (computedResult is the single deterministic source of truth)
   const activeResult = computedResult;
 
   // Handle switching scenario
@@ -116,28 +117,28 @@ function SimulationLabContent() {
     setSimProgress(10);
     setSimulatedDay(0);
 
-    // Stage 1: Baseline inspection (150ms)
+    // Stage 1: Baseline inspection (200ms)
     setTimeout(() => {
       setSimStage('baseline');
       setSimProgress(25);
       setSimulatedDay(1);
     }, 200);
 
-    // Stage 2: Shock injection (450ms)
+    // Stage 2: Shock injection (550ms)
     setTimeout(() => {
       setSimStage('shock');
       setSimProgress(50);
       setSimulatedDay(Math.max(1, Math.round(horizon * 0.35)));
     }, 550);
 
-    // Stage 3: DAG Propagation (850ms)
+    // Stage 3: DAG Propagation (950ms)
     setTimeout(() => {
       setSimStage('propagating');
       setSimProgress(75);
       setSimulatedDay(Math.max(2, Math.round(horizon * 0.7)));
     }, 950);
 
-    // Stage 4: Autonomous Mitigation & Final Resolution (1300ms)
+    // Stage 4: Autonomous Mitigation (1300ms)
     setTimeout(() => {
       setSimStage('mitigating');
       setSimProgress(90);
@@ -156,7 +157,7 @@ function SimulationLabContent() {
     }, 1700);
   };
 
-  // Save current simulation run to local comparison
+  // Save current simulation run to local comparison ledger
   const handleSaveRun = () => {
     if (!activeResult) return;
     const newRun: SavedRun = {
@@ -171,7 +172,6 @@ function SimulationLabContent() {
     toast.success('Simulation Saved to Comparison Ledger');
   };
 
-  const scenarioMeta = SCENARIO_METAS[selectedScenarioId];
   const isExecuting = simStage !== 'ready' && simStage !== 'completed';
 
   // Sliced time-series up to current simulated day for live animation
@@ -361,23 +361,24 @@ function SimulationLabContent() {
   }, [selectedScenarioId, simStage, inputs, computedResult]);
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen font-mono min-w-0 max-w-full'>
-      {/* Header Banner */}
-      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-border/80 pb-4'>
+    <div className='flex flex-1 flex-col gap-5 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen font-mono min-w-0 max-w-full'>
+      {/* Streamlined Header Banner */}
+      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-3.5'>
         <div>
           <div className='flex items-center gap-2'>
             <Icons.sparkles className='size-5 text-indigo-600 dark:text-purple-400' />
-            <h1 className='text-xl font-bold uppercase tracking-tight text-foreground'>
+            <h1 className='text-lg sm:text-xl font-bold uppercase tracking-tight text-foreground'>
               Scenario Simulation Lab &amp; Decision Sandbox
             </h1>
           </div>
-          <p className='text-xs text-muted-foreground mt-1'>
+          <p className='text-xs text-muted-foreground mt-0.5'>
             Autonomous Crisis Stress-Testing • Parameterized What-If Modeling • Scipy Response Curve Calibration
           </p>
         </div>
 
-        <div className='flex items-center gap-3'>
-          <div className='flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-card text-xs'>
+        <div className='flex items-center gap-2.5'>
+          {/* Status Badge */}
+          <div className='flex items-center gap-2 px-2.5 py-1 rounded-lg border border-border bg-card text-xs'>
             <span
               className={cn(
                 'size-2 rounded-full',
@@ -389,25 +390,38 @@ function SimulationLabContent() {
               )}
             />
             <span className='text-muted-foreground'>Status:</span>
-            <span className='font-bold text-foreground'>
+            <span className='font-bold text-foreground text-[11px]'>
               {isExecuting
                 ? `SIMULATING (${simProgress}%)`
                 : simStage === 'completed'
-                ? 'SIMULATION COMPLETE'
-                : 'LIVE PREVIEW'}
+                ? 'COMPLETED'
+                : 'READY TO SIMULATE'}
             </span>
           </div>
 
+          {/* Reset Baseline */}
+          <Button
+            size='sm'
+            variant='outline'
+            onClick={handleResetBaseline}
+            className='h-8 px-2.5 text-xs text-muted-foreground hover:text-foreground border-border'
+            title='Reset inputs to default steady-state baseline'
+          >
+            <Icons.clock className='mr-1 size-3' />
+            Reset
+          </Button>
+
+          {/* Single Primary Run Action */}
           <Button
             size='sm'
             onClick={handleRunSimulation}
             disabled={isExecuting}
-            className='h-9 px-4 text-xs font-bold uppercase bg-foreground text-background hover:bg-foreground/90 shadow-sm active:scale-[0.98]'
+            className='h-8 px-4 text-xs font-bold uppercase bg-foreground text-background hover:bg-foreground/90 shadow-sm active:scale-[0.98]'
           >
             {isExecuting ? (
               <>
                 <Icons.spinner className='mr-1.5 size-3.5 animate-spin' />
-                SIMULATING ({simProgress}%)
+                Simulating ({simProgress}%)
               </>
             ) : simStage === 'completed' ? (
               <>
@@ -416,7 +430,7 @@ function SimulationLabContent() {
               </>
             ) : (
               <>
-                <Icons.play className='mr-1.5 size-3.5 text-emerald-500' />
+                <Icons.play className='mr-1.5 size-3.5 fill-current text-emerald-500' />
                 Run Simulation
               </>
             )}
@@ -424,7 +438,7 @@ function SimulationLabContent() {
         </div>
       </div>
 
-      {/* Scenario Selector Navigation Tabs */}
+      {/* Scenario Selector Tabs (Direct Selection with No Duplicate Target Card) */}
       <div className='grid grid-cols-2 lg:grid-cols-4 gap-2'>
         {(Object.keys(SCENARIO_METAS) as ShockScenarioId[]).map((id) => {
           const s = SCENARIO_METAS[id];
@@ -435,10 +449,10 @@ function SimulationLabContent() {
               key={s.id}
               onClick={() => handleSelectScenario(s.id)}
               className={cn(
-                'text-left p-3 rounded-xl border transition-all text-xs flex flex-col justify-between gap-1.5',
+                'text-left p-3 rounded-xl border transition-all text-xs flex flex-col justify-between gap-1.5 cursor-pointer',
                 isSelected
                   ? 'border-foreground bg-card shadow-sm ring-1 ring-foreground/20'
-                  : 'border-border/80 bg-muted/40 text-muted-foreground hover:bg-card hover:border-border hover:text-foreground'
+                  : 'border-border/70 bg-muted/30 text-muted-foreground hover:bg-card hover:border-border hover:text-foreground'
               )}
             >
               <div className='flex items-center justify-between w-full'>
@@ -465,118 +479,128 @@ function SimulationLabContent() {
       </div>
 
       {/* Main Simulation Workspace Grid */}
-      <div className='grid grid-cols-1 lg:grid-cols-12 gap-5'>
-        {/* LEFT COLUMN: SCENARIO INPUTS & STRATEGY SELECTION (5 cols) */}
-        <div className='lg:col-span-5 space-y-4'>
-          {/* Active Scenario Overview Badge */}
-          <div className='rounded-xl border border-border/80 bg-card p-4 space-y-2 text-xs'>
-            <div className='flex items-center justify-between'>
-              <span className='text-[10px] uppercase font-bold text-muted-foreground'>
-                Selected Crisis Target
-              </span>
-              <span className='text-[10px] text-muted-foreground'>
-                Response Latency: <strong className='text-foreground'>{scenarioMeta.responseSpeed}</strong>
-              </span>
-            </div>
-            <h3 className='text-sm font-bold text-foreground'>
-              {scenarioMeta.title}
-            </h3>
-            <p className='text-[11px] text-muted-foreground leading-relaxed'>
-              {scenarioMeta.eventDescription}
-            </p>
+      <div className='grid grid-cols-1 lg:grid-cols-12 gap-5 items-start'>
+        {/* LEFT COLUMN: CRISIS SETUP & POLICY (5 cols) */}
+        <div className='lg:col-span-5 space-y-3'>
+          {/* Segmented Switcher for Left Deck */}
+          <div className='flex items-center gap-1 p-1 bg-card border border-border/80 rounded-xl text-xs'>
+            <button
+              type='button'
+              onClick={() => setConfigTab('inputs')}
+              className={cn(
+                'flex-1 py-1.5 px-3 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer',
+                configTab === 'inputs'
+                  ? 'bg-foreground text-background shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              <Icons.adjustments className='size-3.5' />
+              <span>1. Shock Parameters</span>
+            </button>
+
+            <button
+              type='button'
+              onClick={() => setConfigTab('strategy')}
+              className={cn(
+                'flex-1 py-1.5 px-3 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer',
+                configTab === 'strategy'
+                  ? 'bg-foreground text-background shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              <Icons.check className='size-3.5' />
+              <span>2. Mitigation Policy</span>
+            </button>
           </div>
 
-          {/* Scenario Input Parameter Panel */}
-          <ScenarioInputPanel
-            scenarioId={selectedScenarioId}
-            inputs={inputs}
-            onChangeInputs={(newInputs) => {
-              setInputs(newInputs);
-              if (simStage === 'completed') {
-                setSimStage('ready');
-                setExecutedResult(null);
-              }
-            }}
-            onResetBaseline={handleResetBaseline}
-          />
+          {/* Active Tab View */}
+          {configTab === 'inputs' ? (
+            <ScenarioInputPanel
+              scenarioId={selectedScenarioId}
+              inputs={inputs}
+              onChangeInputs={(newInputs) => {
+                setInputs(newInputs);
+                if (simStage === 'completed') {
+                  setSimStage('ready');
+                  setExecutedResult(null);
+                }
+              }}
+              onResetBaseline={handleResetBaseline}
+            />
+          ) : (
+            <StrategySelector
+              strategies={strategies}
+              selectedStrategyId={selectedStrategyId}
+              onSelectStrategy={(newStratId) => {
+                setSelectedStrategyId(newStratId);
+                if (simStage === 'completed') {
+                  setSimStage('ready');
+                  setExecutedResult(null);
+                }
+              }}
+              inputs={inputs}
+              onChangeInputs={(newInputs) => {
+                setInputs(newInputs);
+                if (simStage === 'completed') {
+                  setSimStage('ready');
+                  setExecutedResult(null);
+                }
+              }}
+            />
+          )}
 
-          {/* Mitigation Strategy Selector */}
-          <StrategySelector
-            strategies={strategies}
-            selectedStrategyId={selectedStrategyId}
-            onSelectStrategy={(newStratId) => {
-              setSelectedStrategyId(newStratId);
-              if (simStage === 'completed') {
-                setSimStage('ready');
-                setExecutedResult(null);
-              }
-            }}
-            inputs={inputs}
-            onChangeInputs={(newInputs) => {
-              setInputs(newInputs);
-              if (simStage === 'completed') {
-                setSimStage('ready');
-                setExecutedResult(null);
-              }
-            }}
-          />
-
-          {/* Action Bar */}
-          <div className='flex items-center gap-2'>
-            <Button
-              onClick={handleRunSimulation}
-              disabled={isExecuting}
-              className='flex-1 h-10 text-xs font-bold uppercase bg-foreground text-background hover:bg-foreground/90'
-            >
-              {isExecuting ? `Simulating (${simProgress}%)...` : simStage === 'completed' ? 'Rerun Simulation' : 'Run Simulation'}
-            </Button>
-            <Button
-              variant='outline'
-              onClick={handleSaveRun}
-              disabled={!activeResult}
-              className='h-10 text-xs font-bold border-border'
-              title='Save current experiment'
-            >
-              <Icons.clipboardText className='size-3.5' />
-            </Button>
-          </div>
-
-          {/* Saved Experiments Ledger */}
-          {savedRuns.length > 0 && (
-            <div className='rounded-xl border border-border/80 bg-card p-3.5 space-y-2 text-xs'>
-              <div className='text-[10px] uppercase font-bold text-muted-foreground flex items-center justify-between'>
-                <span>Saved Comparisons ({savedRuns.length})</span>
+          {/* Compact Saved Comparisons Action Strip */}
+          <div className='flex items-center justify-between p-2.5 rounded-xl border border-border/70 bg-card/60 text-xs'>
+            <span className='text-[11px] text-muted-foreground'>
+              Ledger: <strong className='text-foreground'>{savedRuns.length}</strong> saved run{savedRuns.length === 1 ? '' : 's'}
+            </span>
+            <div className='flex items-center gap-1.5'>
+              <Button
+                size='sm'
+                variant='outline'
+                onClick={handleSaveRun}
+                className='h-7 px-2.5 text-[11px] font-mono border-border text-foreground hover:bg-accent'
+              >
+                <Icons.clipboardText className='mr-1 size-3' />
+                Save Run
+              </Button>
+              {savedRuns.length > 0 && (
                 <button
+                  type='button'
                   onClick={() => setSavedRuns([])}
-                  className='text-[9px] text-muted-foreground hover:text-foreground'
+                  className='text-[10px] text-muted-foreground hover:text-foreground px-1.5 py-0.5'
                 >
                   Clear
                 </button>
-              </div>
-              <div className='space-y-1.5'>
-                {savedRuns.map((run) => (
-                  <div
-                    key={run.id}
-                    className='rounded border border-border/60 p-2 flex items-center justify-between text-[11px] bg-muted/20'
-                  >
-                    <div className='truncate max-w-[170px]'>
-                      <span className='font-bold block text-foreground truncate'>{run.strategyName}</span>
-                      <span className='text-[10px] text-muted-foreground'>{run.timestamp}</span>
-                    </div>
-                    <div className='text-right'>
-                      <span className='text-emerald-600 dark:text-emerald-400 font-bold block'>
-                        +₹{run.lossAvoided.toLocaleString('en-IN')}
-                      </span>
-                      <span className='text-[10px] text-muted-foreground'>{run.roas.toFixed(2)}x ROAS</span>
-                    </div>
+              )}
+            </div>
+          </div>
+
+          {/* Saved Runs Detail List (if any) */}
+          {savedRuns.length > 0 && (
+            <div className='rounded-xl border border-border/80 bg-card p-3 space-y-1.5 text-xs animate-in fade-in-50 duration-200'>
+              {savedRuns.map((run) => (
+                <div
+                  key={run.id}
+                  className='rounded border border-border/60 p-2 flex items-center justify-between text-[11px] bg-muted/20'
+                >
+                  <div className='truncate max-w-[170px]'>
+                    <span className='font-bold block text-foreground truncate'>{run.strategyName}</span>
+                    <span className='text-[10px] text-muted-foreground'>{run.timestamp}</span>
                   </div>
-                ))}
-              </div>
+                  <div className='text-right'>
+                    <span className='text-emerald-600 dark:text-emerald-400 font-bold block'>
+                      +₹{run.lossAvoided.toLocaleString('en-IN')}
+                    </span>
+                    <span className='text-[10px] text-muted-foreground'>{run.roas.toFixed(2)}x ROAS</span>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
 
-        {/* RIGHT COLUMN: PROGRESSIVE SIMULATION VISUALIZER & DYNAMIC RESULTS (7 cols) */}
+        {/* RIGHT COLUMN: SIMULATION VISUALIZER & PROGRESSIVE ANALYSIS DECK (7 cols) */}
         <div className='lg:col-span-7 space-y-4'>
           {/* Always Visible: Interactive Runnable Simulation HUD */}
           <SimulationVisualizer
@@ -592,94 +616,135 @@ function SimulationLabContent() {
             result={computedResult}
           />
 
-          {/* DYNAMIC RESULTS: Revealed only when simulation has run */}
-          {activeResult && (
-            <div className='space-y-4 animate-in fade-in-50 duration-500'>
-              {/* Financial Impact Hero */}
-              <SimulationFinancialImpact result={activeResult} />
+          {/* Progressive Analysis Deck: Clean Tabs eliminate wall-of-content overload */}
+          <div className='space-y-3 pt-1'>
+            {/* Analysis Navigation Tabs */}
+            <div className='flex items-center gap-1.5 p-1 bg-card border border-border/80 rounded-xl text-xs'>
+              <button
+                type='button'
+                onClick={() => setAnalysisTab('impact')}
+                className={cn(
+                  'flex-1 py-1.5 px-3 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer truncate',
+                  analysisTab === 'impact'
+                    ? 'bg-foreground text-background shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                <Icons.lineChart className='size-3.5 shrink-0' />
+                <span className='truncate'>Impact &amp; Trajectory</span>
+              </button>
 
-              {/* Recharts Visualizations */}
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <SimulationImpactChart result={activeResult} />
-                <SimulationLossCurve result={activeResult} />
-              </div>
+              <button
+                type='button'
+                onClick={() => setAnalysisTab('policy')}
+                className={cn(
+                  'flex-1 py-1.5 px-3 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer truncate',
+                  analysisTab === 'policy'
+                    ? 'bg-foreground text-background shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                <Icons.adjustments className='size-3.5 shrink-0' />
+                <span className='truncate'>Policy &amp; Trade-offs</span>
+              </button>
 
-              {/* Full Metric Results Matrix */}
-              <SimulationResultsMatrix result={activeResult} />
-
-              {/* Strategy Comparison Matrix */}
-              <SimulationStrategyComparison
-                result={activeResult}
-                onSelectStrategy={setSelectedStrategyId}
-              />
-
-              {/* Step-by-Step Causal Chain */}
-              <SimulationCausalChain nodes={activeResult.causalChain} />
-
-              {/* Data Lineage & Audit Trail Seal */}
-              <SimulationDataLineage lineage={activeResult.dataLineage} />
+              <button
+                type='button'
+                onClick={() => setAnalysisTab('causal')}
+                className={cn(
+                  'flex-1 py-1.5 px-3 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer truncate',
+                  analysisTab === 'causal'
+                    ? 'bg-foreground text-background shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                <Icons.gitBranch className='size-3.5 shrink-0' />
+                <span className='truncate'>Causal Lineage</span>
+              </button>
             </div>
-          )}
+
+            {/* TAB 1: EXECUTIVE IMPACT & CHARTS */}
+            {analysisTab === 'impact' && (
+              <div className='space-y-4 animate-in fade-in-50 duration-200'>
+                <SimulationFinancialImpact result={activeResult} />
+                <SimulationImpactChart result={activeResult} />
+              </div>
+            )}
+
+            {/* TAB 2: POLICY COMPARISON & MATRIX */}
+            {analysisTab === 'policy' && (
+              <div className='space-y-4 animate-in fade-in-50 duration-200'>
+                <SimulationStrategyComparison
+                  result={activeResult}
+                  onSelectStrategy={setSelectedStrategyId}
+                />
+                <SimulationResultsMatrix result={activeResult} />
+              </div>
+            )}
+
+            {/* TAB 3: CAUSAL CHAIN & DATA AUDIT SEAL */}
+            {analysisTab === 'causal' && (
+              <div className='space-y-4 animate-in fade-in-50 duration-200'>
+                <SimulationCausalChain nodes={activeResult.causalChain} />
+                <SimulationDataLineage lineage={activeResult.dataLineage} />
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Preserve Existing Scenario Controller & Educational Deep-Dive */}
-      <div className='pt-6 border-t border-border/80 space-y-4'>
-        <div className='flex items-center gap-2'>
-          <Icons.terminal className='size-4 text-muted-foreground' />
-          <h3 className='text-xs font-bold uppercase tracking-wider text-muted-foreground'>
-            Integrated Scenario Controller &amp; Ground-Truth Engine
-          </h3>
-        </div>
-
-        <ScenarioController
-          scenarios={initialEngineState.scenarios}
-          onTriggerScenario={(s) => {
-            const mappedId: ShockScenarioId =
-              s.id === 'scenario-stockout'
-                ? 'stockout'
-                : s.id === 'scenario-cpm-spike'
-                ? 'cpm-spike'
-                : s.id === 'scenario-creative-fatigue'
-                ? 'creative-fatigue'
-                : 'price-undercut';
-            handleSelectScenario(mappedId);
-          }}
-          onResetBaseline={handleResetBaseline}
-        />
-
-        {/* Simulator Mechanics Deep-Dive */}
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-4 pt-2'>
-          <div className='rounded-xl border border-border bg-card p-5 shadow-xs'>
-            <h4 className='text-sm font-bold text-foreground mb-2 flex items-center gap-2'>
-              <Icons.adjustments className='size-4 text-emerald-600 dark:text-emerald-400' />
-              1. Adstock &amp; Saturation
-            </h4>
-            <p className='text-xs text-muted-foreground leading-relaxed font-sans'>
-              Simulates non-linear Hill response curves: <code className='text-emerald-700 dark:text-emerald-400 font-mono bg-emerald-50 dark:bg-emerald-950/40 px-1 py-0.5 rounded border border-emerald-200 dark:border-emerald-800/50'>r(s) = a * s^b / (c + s^b)</code>. Models diminishing returns on over-scaled channels to calibrate optimizer bounds.
-            </p>
+      {/* Engine Mechanics & Mathematical Foundations (Collapsible Accordion to avoid clutter) */}
+      <div className='pt-2 border-t border-border/80'>
+        <button
+          type='button'
+          onClick={() => setIsMechanicsExpanded(!isMechanicsExpanded)}
+          className='w-full flex items-center justify-between p-3 rounded-xl border border-border/70 bg-card/60 hover:bg-card text-xs text-muted-foreground hover:text-foreground transition-all cursor-pointer'
+        >
+          <div className='flex items-center gap-2'>
+            <Icons.info className='size-4 text-primary' />
+            <span className='font-bold uppercase tracking-wider'>
+              Engine Mathematical Foundations &amp; Scipy Calibration
+            </span>
           </div>
+          <span className='text-[10px] text-muted-foreground flex items-center gap-1'>
+            {isMechanicsExpanded ? 'Collapse' : 'Expand Details'}
+            {isMechanicsExpanded ? <Icons.chevronUp className='size-3.5' /> : <Icons.chevronDown className='size-3.5' />}
+          </span>
+        </button>
 
-          <div className='rounded-xl border border-border bg-card p-5 shadow-xs'>
-            <h4 className='text-sm font-bold text-foreground mb-2 flex items-center gap-2'>
-              <Icons.product className='size-4 text-sky-600 dark:text-cyan-400' />
-              2. ERP Inventory Coupling
-            </h4>
-            <p className='text-xs text-muted-foreground leading-relaxed font-sans'>
-              Couples live warehouse inventory with ad network spend. When units hit 0, conversions collapse while ad spend continues unless the autonomous stockout kill-switch triggers.
-            </p>
-          </div>
+        {isMechanicsExpanded && (
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-3 pt-3 animate-in fade-in-50 duration-200'>
+            <div className='rounded-xl border border-border bg-card p-4 shadow-xs'>
+              <h4 className='text-xs font-bold text-foreground mb-1.5 flex items-center gap-2'>
+                <Icons.adjustments className='size-3.5 text-emerald-600 dark:text-emerald-400' />
+                1. Adstock &amp; Saturation
+              </h4>
+              <p className='text-[11px] text-muted-foreground leading-relaxed font-sans'>
+                Simulates non-linear Hill response curves: <code className='text-emerald-700 dark:text-emerald-400 font-mono bg-emerald-50 dark:bg-emerald-950/40 px-1 py-0.5 rounded border border-emerald-200 dark:border-emerald-800/50'>r(s) = a * s^b / (c + s^b)</code>. Models diminishing returns on over-scaled channels to calibrate optimizer bounds.
+              </p>
+            </div>
 
-          <div className='rounded-xl border border-border bg-card p-5 shadow-xs'>
-            <h4 className='text-sm font-bold text-foreground mb-2 flex items-center gap-2'>
-              <Icons.check className='size-4 text-indigo-600 dark:text-purple-400' />
-              3. Ground-Truth Scoring
-            </h4>
-            <p className='text-xs text-muted-foreground leading-relaxed font-sans'>
-              Every injected anomaly holds a deterministic ground-truth label. The RCA agent explanation is evaluated against exact injected drivers (e.g. stockout vs CPM spike).
-            </p>
+            <div className='rounded-xl border border-border bg-card p-4 shadow-xs'>
+              <h4 className='text-xs font-bold text-foreground mb-1.5 flex items-center gap-2'>
+                <Icons.product className='size-3.5 text-sky-600 dark:text-cyan-400' />
+                2. ERP Inventory Coupling
+              </h4>
+              <p className='text-[11px] text-muted-foreground leading-relaxed font-sans'>
+                Couples live warehouse inventory with ad network spend. When units hit 0, conversions collapse while ad spend continues unless the autonomous stockout kill-switch triggers.
+              </p>
+            </div>
+
+            <div className='rounded-xl border border-border bg-card p-4 shadow-xs'>
+              <h4 className='text-xs font-bold text-foreground mb-1.5 flex items-center gap-2'>
+                <Icons.check className='size-3.5 text-indigo-600 dark:text-purple-400' />
+                3. Ground-Truth Scoring
+              </h4>
+              <p className='text-[11px] text-muted-foreground leading-relaxed font-sans'>
+                Every injected anomaly holds a deterministic ground-truth label. The RCA agent explanation is evaluated against exact injected drivers (e.g. stockout vs CPM spike).
+              </p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

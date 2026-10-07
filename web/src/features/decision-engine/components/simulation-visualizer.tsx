@@ -306,13 +306,13 @@ export function SimulationVisualizer({
         </div>
       </div>
 
-      {/* LIVE PROGRESSIVE LOSS CHART (BUILDS DAY BY DAY DURING RUN) */}
-      {(isRunning || (isDone && timeSeriesSoFar.length > 0)) && (
+      {/* PROGRESSIVE LOSS CHART (ALIGNED TO HORIZON) */}
+      {timeSeriesSoFar.length > 0 && (
         <div className='rounded-lg border border-border/70 bg-muted/20 p-3 space-y-2'>
           <div className='flex items-center justify-between text-[10px] uppercase font-bold'>
             <span className='flex items-center gap-1.5 text-foreground'>
               <Icons.lineChart className='size-3 text-emerald-500' />
-              Live Simulation Curve (Cumulative Loss Bleed)
+              {isReady ? 'Cumulative Loss Bleed Trajectory' : 'Live Simulation Curve (Cumulative Loss Bleed)'}
             </span>
             <div className='flex items-center gap-3'>
               <span className='text-rose-500'>● Unmitigated Bleed</span>
@@ -362,21 +362,6 @@ export function SimulationVisualizer({
               </AreaChart>
             </ResponsiveContainer>
           </div>
-        </div>
-      )}
-
-      {/* READY-STATE CALL TO ACTION (WHEN NOT YET RUN) */}
-      {isReady && (
-        <div className='rounded-lg border border-dashed border-border p-4 bg-muted/20 text-center space-y-2'>
-          <div className='size-8 rounded-full bg-primary/10 text-primary mx-auto flex items-center justify-center'>
-            <Icons.sparkles className='size-4' />
-          </div>
-          <div className='text-xs font-bold uppercase tracking-wider text-foreground'>
-            Simulator Standing By
-          </div>
-          <p className='text-[11px] text-muted-foreground max-w-md mx-auto leading-relaxed'>
-            Review or adjust the crisis parameters and chosen strategy on the left panel. Click <strong>"Run Simulation"</strong> to execute the deterministic calculation engine and inspect real-time causal telemetry.
-          </p>
         </div>
       )}
     </div>
