@@ -273,17 +273,17 @@ export function ProductAnalysisModal({
                 </div>
 
                 {/* The Globe: Switch between GitHub Globe and GlobePulse */}
-                <div className='w-full h-[340px] flex items-center justify-center'>
+                <div className='w-full min-h-[340px] flex items-center justify-center overflow-x-auto'>
                   {analysisStage === 'analysing' ? (
                     <GithubGlobe
-                      className='w-full h-full'
+                      size={320}
                       activeSku={product.sku}
                       activePlatform={product.platform}
                       accentColor={isCritical ? [0.95, 0.35, 0.45] : [0.2, 0.85, 0.6]}
                     />
                   ) : (
-                    <div className='w-full h-full max-w-[340px] flex items-center justify-center'>
-                      <GlobePulse className='w-full h-full' speed={0.0035} />
+                    <div className='flex items-center justify-center'>
+                      <GlobePulse size={320} speed={0.0035} />
                     </div>
                   )}
                 </div>

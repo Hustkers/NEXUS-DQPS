@@ -12,6 +12,8 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { createProductMutation, updateProductMutation } from '../api/mutations';
 import type { Product } from '../api/types';
+import Link from 'next/link';
+import { Icons } from '@/components/icons';
 
 export default function ProductForm({
   initialData,
@@ -79,7 +81,20 @@ export default function ProductForm({
       <CardHeader>
         <CardTitle className='text-left text-2xl font-bold'>{pageTitle}</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className='space-y-6'>
+        {pageTitle === 'Create New Product' && (
+          <div className='flex items-center justify-between p-3.5 bg-[#39FF14]/10 border border-[#39FF14]/30 rounded-lg text-xs font-mono text-white'>
+            <div className='flex items-center gap-2'>
+              <Icons.bot className='h-4 w-4 text-[#39FF14]' />
+              <span>Looking for the <strong>AI Ad Campaign Optimization Engine</strong>?</span>
+            </div>
+            <Link href='/dashboard/strategy-engine'>
+              <Button size='sm' className='h-7 text-xs bg-[#39FF14] text-black hover:bg-[#32e012] font-semibold'>
+                Launch Engine &rarr;
+              </Button>
+            </Link>
+          </div>
+        )}
         <form
           className='space-y-8'
           onSubmit={(e) => {
