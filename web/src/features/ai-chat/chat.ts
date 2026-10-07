@@ -41,7 +41,7 @@ export const demoChat = createChat<unknown, Record<string, never>, Tools>()
         topDriver: 'returning customers'
       });
     writer.text(
-      'Last month you brought in $1,250 — up 12.5% from the month before, so revenue is clearly trending up. '
+      'Last month you brought in ₹1,250 — up 12.5% from the month before, so revenue is clearly trending up. '
     );
     writer.text('Most of that growth came from returning customers.');
   })

@@ -1,12 +1,17 @@
 # Deployment
 
-The starter deploys to Vercel out of the box, or anywhere Docker runs. `next.config.ts` sets `output: 'standalone'`, so production builds are optimized for self-hosting.
+> 🚀 **Live Production Deployment:** [https://nexus-dqps.vercel.app](https://nexus-dqps.vercel.app)  
+> 📊 **Interactive Decision Console:** [https://nexus-dqps.vercel.app/dashboard/overview](https://nexus-dqps.vercel.app/dashboard/overview)
 
-## Vercel (Recommended)
+The NEXUS-D2C platform is deployed to Vercel in production (`web/` root directory) or can be deployed anywhere Docker runs. `next.config.ts` sets `output: 'standalone'`, so production builds are optimized for self-hosting.
 
-1. Connect the repository to Vercel
-2. Add environment variables in the dashboard
-3. Deploy
+## Vercel (Production)
+
+The live project is hosted on Vercel:
+- **Production URL**: [https://nexus-dqps.vercel.app](https://nexus-dqps.vercel.app)
+- **Root Directory**: `web`
+- **Framework Preset**: Next.js
+- **Build Command**: `next build` (using Bun or npm)
 
 For other platforms, see the [Next.js deployment docs](https://nextjs.org/docs/app/getting-started/deploying).
 

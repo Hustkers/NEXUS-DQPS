@@ -1,13 +1,16 @@
 # NEXUS-DQPS — Project Overview
 **DataQuest 3.0 | Next-Generation Autonomous D2C Advertising Intelligence & Decision Engine**
 
+> 🌐 **Live Production Deployment:** [https://nexus-dqps.vercel.app](https://nexus-dqps.vercel.app)  
+> 📊 **Interactive Decision Console:** [https://nexus-dqps.vercel.app/dashboard/overview](https://nexus-dqps.vercel.app/dashboard/overview)
+
 ---
 
 ## 1. The Problem Space (from DQPS)
 D2C brands run fragmented operations across Meta, Google, Amazon, TikTok, programmatic —
 with siloed spend, sales, margin, inventory, and creative data. Existing tools only
 *visualize* history. Brand managers are left guessing which campaign to adjust, why
-performance moved, and where the next dollar earns the most profit.
+performance moved, and where the next rupee earns the most profit.
 
 ## 2. Questions We Are Solving
 1. **What is happening?** — Unify ad spend, eCommerce sales, GA events, ERP inventory, and
@@ -24,7 +27,7 @@ performance moved, and where the next dollar earns the most profit.
 |---|---|
 | ROAS dropped 30% on Meta — why? | Factor decomposition + LLM RCA card names the true driver (stockout −18pts, CPM +9pts…) |
 | Which campaign do we cut? | Optimizer flags stockout-bleeding and fatigue campaigns for throttle/kill |
-| Where should the next $ go? | Saturation-curve optimizer maximizes expected margin under budget + ±40% stability bounds + inventory constraints |
+| Where should the next ₹ go? | Saturation-curve optimizer maximizes expected margin under budget + ±40% stability bounds + inventory constraints |
 | How do we trust the AI? | Ground-truth event labels in the simulator; ledger shows realized ≈ expected for every decision |
 | How is this different from a dashboard? | It *decides and learns*: a closed loop, not a chart |
 

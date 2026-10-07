@@ -25,35 +25,35 @@ export default function ReallocationsPage() {
   }, []);
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#07090e] text-zinc-100 min-h-screen'>
-      <div className='flex flex-wrap items-center justify-between gap-4'>
+    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen'>
+      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-border/80 pb-4'>
         <div>
-          <h1 className='text-xl font-mono font-bold text-zinc-100 uppercase tracking-tight flex items-center gap-2'>
-            <IconCpu className='size-5 text-cyan-400' />
+          <h1 className='text-xl font-mono font-bold text-foreground uppercase tracking-tight flex items-center gap-2'>
+            <IconCpu className='size-5 text-cyan-500 dark:text-cyan-400' />
             Autonomous Budget Reallocation Feed &amp; RL Policy
           </h1>
-          <p className='text-xs font-mono text-zinc-500 mt-1'>
+          <p className='text-xs font-mono text-muted-foreground mt-1'>
             Reinforcement Learning Contextual Bandit • SLSQP Convex Solver • Stockout Suppression Kill-Switches
           </p>
         </div>
 
         {/* View Switcher */}
-        <div className='flex items-center bg-zinc-900 rounded-lg border border-zinc-800 p-1 text-xs font-mono'>
+        <div className='flex items-center bg-muted/60 dark:bg-zinc-900 rounded-lg border border-border p-1 text-xs font-mono'>
           <button
             onClick={() => setActiveView('both')}
             className={cn(
               'px-3 py-1.5 rounded transition-all font-semibold flex items-center gap-1.5',
-              activeView === 'both' ? 'bg-zinc-800 text-zinc-100 shadow-sm' : 'text-zinc-500 hover:text-zinc-300'
+              activeView === 'both' ? 'bg-background text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'
             )}
           >
-            <IconSparkles className='size-3.5 text-cyan-400' />
+            <IconSparkles className='size-3.5 text-cyan-500' />
             Unified View
           </button>
           <button
             onClick={() => setActiveView('rl_analytics')}
             className={cn(
               'px-3 py-1.5 rounded transition-all font-semibold flex items-center gap-1.5',
-              activeView === 'rl_analytics' ? 'bg-zinc-800 text-emerald-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-300'
+              activeView === 'rl_analytics' ? 'bg-background text-emerald-600 dark:text-emerald-400 shadow-xs' : 'text-muted-foreground hover:text-foreground'
             )}
           >
             <IconCpu className='size-3.5' />
@@ -63,13 +63,12 @@ export default function ReallocationsPage() {
             onClick={() => setActiveView('feed')}
             className={cn(
               'px-3 py-1.5 rounded transition-all font-semibold',
-              activeView === 'feed' ? 'bg-zinc-800 text-zinc-100 shadow-sm' : 'text-zinc-500 hover:text-zinc-300'
+              activeView === 'feed' ? 'bg-background text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'
             )}
           >
             Reallocation Directives
           </button>
         </div>
-      </div>
 
       {/* RL Analytics Suite */}
       {(activeView === 'both' || activeView === 'rl_analytics') && (

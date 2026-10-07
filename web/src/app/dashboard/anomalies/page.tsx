@@ -18,29 +18,29 @@ export default function AnomaliesPage() {
   );
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#07090e] text-zinc-100 min-h-screen'>
-      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-zinc-800 pb-4'>
+    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen'>
+      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-border/80 pb-4'>
         <div>
           <div className='flex items-center gap-2'>
-            <Icons.warning className='size-5 text-rose-400' />
-            <h1 className='text-xl font-mono font-bold text-zinc-100 uppercase tracking-tight'>
+            <Icons.warning className='size-5 text-rose-500' />
+            <h1 className='text-xl font-mono font-bold text-foreground uppercase tracking-tight'>
               Diagnostic Root-Cause Analysis (RCA) &amp; Anomalies
             </h1>
           </div>
-          <p className='text-xs font-mono text-zinc-500 mt-1'>
+          <p className='text-xs font-mono text-muted-foreground mt-1'>
             modery68 4-Week Rolling Baselines • IsolationForest &amp; Z-Score Attribution (|Z| &gt; 2.2)
           </p>
         </div>
 
-        <div className='flex items-center gap-1.5 bg-zinc-900 p-1 rounded-lg border border-zinc-800 text-xs font-mono'>
+        <div className='flex items-center gap-1.5 bg-slate-100 dark:bg-zinc-900 p-1 rounded-lg border border-border text-xs font-mono'>
           {(['ALL', 'CRITICAL', 'HIGH', 'WARNING'] as const).map((sev) => (
             <button
               key={sev}
               onClick={() => setFilterSeverity(sev)}
               className={`px-3 py-1 rounded-md transition-all font-semibold ${
                 filterSeverity === sev
-                  ? 'bg-zinc-800 text-zinc-100 shadow-xs'
-                  : 'text-zinc-500 hover:text-zinc-300'
+                  ? 'bg-card text-foreground font-bold shadow-2xs border border-border/60'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {sev}

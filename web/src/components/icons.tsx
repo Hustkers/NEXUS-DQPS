@@ -89,6 +89,14 @@ import {
   IconVideo,
   IconWorld,
   IconCrown,
+  IconFingerprint,
+  IconBrandYoutube,
+  IconBrandAmazon,
+  IconTopologyComplex,
+  IconPlayerPlay,
+  IconShoppingCart,
+  IconShieldCheck,
+  IconTerminal,
   IconX
 } from '@tabler/icons-react';
 
@@ -155,6 +163,7 @@ export const Icons = {
   paperclip: IconPaperclip,
 
   // Files
+  file: IconFile,
   page: IconFile,
   post: IconFileText,
   fileTypePdf: IconFileTypePdf,
@@ -223,5 +232,15 @@ export const Icons = {
   slash: IconSlash,
   calendar: IconCalendar,
   galleryVerticalEnd: IconStack2,
-  moreHorizontal: IconDots
+  moreHorizontal: IconDots,
+
+  // Identity & Tracking
+  fingerprint: IconFingerprint,
+  youtube: IconBrandYoutube,
+  amazon: IconBrandAmazon,
+  topology: IconTopologyComplex,
+  play: IconPlayerPlay,
+  cart: IconShoppingCart,
+  shieldCheck: IconShieldCheck,
+  terminal: IconTerminal
 };

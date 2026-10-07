@@ -2,9 +2,29 @@
 
 **Next-Generation Autonomous D2C Advertising Intelligence & Decision Engine**
 
+[![Live on Vercel](https://img.shields.io/badge/Live_Deployment-nexus--dqps.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://nexus-dqps.vercel.app/dashboard/overview)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
+[![DataQuest 3.0](https://img.shields.io/badge/Hackathon-DataQuest_3.0-06b6d4?style=for-the-badge)](https://github.com/Hustkers/NEXUS-DQPS)
+
 NEXUS D2C turns passive ad dashboards into an AI-native, closed-loop decision engine:
 it unifies fragmented data, diagnoses *why* performance moved, decides the best
 budget reallocation, executes it, and learns from measured outcomes.
+
+---
+
+## 🌐 Live Production Deployment
+
+The autonomous mission control console is deployed and live on Vercel:
+
+| Resource | Production Link |
+| :--- | :--- |
+| **🚀 Production Console** | **[https://nexus-dqps.vercel.app](https://nexus-dqps.vercel.app)** |
+| **📊 Mission Control Dashboard** | **[https://nexus-dqps.vercel.app/dashboard/overview](https://nexus-dqps.vercel.app/dashboard/overview)** |
+| **🔍 Anomaly & RCA Feed** | **[https://nexus-dqps.vercel.app/dashboard/anomalies](https://nexus-dqps.vercel.app/dashboard/anomalies)** |
+| **🎯 ROAS & Health Matrix** | **[https://nexus-dqps.vercel.app/dashboard/gauges](https://nexus-dqps.vercel.app/dashboard/gauges)** |
+| **⚡ Budget Reallocation Engine** | **[https://nexus-dqps.vercel.app/dashboard/reallocations](https://nexus-dqps.vercel.app/dashboard/reallocations)** |
+| **📜 Closed-Loop Decision Ledger** | **[https://nexus-dqps.vercel.app/dashboard/ledger](https://nexus-dqps.vercel.app/dashboard/ledger)** |
+| **🎮 Scenario Shock Sandbox** | **[https://nexus-dqps.vercel.app/dashboard/simulator](https://nexus-dqps.vercel.app/dashboard/simulator)** |
 
 ---
 
@@ -24,22 +44,35 @@ The web console is built using **Next.js 16**, **shadcn/ui** (forked from `next-
 
 ## 🚀 Quickstart
 
-### 1. Launch Next.js Autonomous Web Console
+### 1. View Live Cloud Console
+Open **[https://nexus-dqps.vercel.app/dashboard/overview](https://nexus-dqps.vercel.app/dashboard/overview)** in any browser.
+
+### 2. Local Development (Optional)
 ```bash
 # From repository root:
 pnpm dev
-# Or cd web && pnpm dev / pnpm next start -p 3000
+# Or cd web && pnpm dev
 
 # Open in browser:
 http://localhost:3000/dashboard/overview
 ```
 
-### 2. Run Offline Python Decision Pipeline
+### 3. Run Offline Python Decision Pipeline
 ```bash
 pip install -r requirements.txt
 python scripts/run_demo.py                                # end-to-end simulation & optimizer run
 python scripts/export_engine_state.py                     # updates web/src/data/nexus-engine-state.json
 uvicorn execute.mock_ads_api:app --port 8000              # mock ad executor API
+```
+
+### 4. Sync Live Ad Channels (Shopify, Meta, Google, Amazon)
+Configure your API credentials in `.env` (see `.env.example`), then run:
+```bash
+# 1. Audit API credentials and connectivity
+python scripts/sync_live_ads.py --check-only
+
+# 2. Pull live telemetry, reconcile with Shopify inventory & margins, and update console
+python scripts/sync_live_ads.py --days 30
 ```
 
 ---
@@ -66,4 +99,4 @@ uvicorn execute.mock_ads_api:app --port 8000              # mock ad executor API
 - [x] Automated root cause diagnosis (Stockout, CPM spike, Creative wearout, Competitor price change)
 - [x] Constrained optimization under inventory availability and ROAS floors
 - [x] Closed-loop execution and decision ledger verification
-
+- [x] Production deployment on Vercel: [https://nexus-dqps.vercel.app](https://nexus-dqps.vercel.app)

@@ -16,35 +16,33 @@ const META_THEME_COLORS = {
 };
 
 export const metadata: Metadata = {
-  ...(process.env.NEXT_PUBLIC_APP_URL
-    ? { metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL) }
-    : {}),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://nexus-dqps.vercel.app'),
   title: {
-    default: 'Shadcn Dashboard - Next.js Admin Dashboard Template',
-    template: '%s | Shadcn Dashboard'
+    default: 'NEXUS-D2C | Autonomous Advertising Decision Engine',
+    template: '%s | NEXUS-D2C'
   },
   description:
-    'Free, open source admin dashboard starter built with Next.js 16, shadcn/ui, Tailwind CSS, and TypeScript.',
+    'Next-Generation Autonomous D2C Advertising Intelligence & Decision Engine (DataQuest 3.0)',
   openGraph: {
-    title: 'Shadcn Dashboard - Next.js Admin Dashboard Template',
+    title: 'NEXUS-D2C | Autonomous Advertising Decision Engine',
     description:
-      'Free, open source admin dashboard starter built with Next.js 16, shadcn/ui, Tailwind CSS, and TypeScript.',
-    siteName: 'Shadcn Dashboard',
+      'Next-Generation Autonomous D2C Advertising Intelligence & Decision Engine (DataQuest 3.0)',
+    siteName: 'NEXUS-D2C',
     type: 'website',
     images: [
       {
         url: '/shadcn-dashboard.png',
         width: 3200,
         height: 1600,
-        alt: 'Shadcn Dashboard overview page'
+        alt: 'NEXUS-D2C Mission Control Console'
       }
     ]
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Shadcn Dashboard - Next.js Admin Dashboard Template',
+    title: 'NEXUS-D2C | Autonomous Advertising Decision Engine',
     description:
-      'Free, open source admin dashboard starter built with Next.js 16, shadcn/ui, Tailwind CSS, and TypeScript.',
+      'Next-Generation Autonomous D2C Advertising Intelligence & Decision Engine (DataQuest 3.0)',
     images: ['/shadcn-dashboard.png']
   }
 };
@@ -85,8 +83,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <NuqsAdapter>
           <ThemeProvider
             attribute='class'
-            defaultTheme='dark'
-            enableSystem
+            defaultTheme='light'
+            enableSystem={false}
             disableTransitionOnChange
             enableColorScheme
           >
