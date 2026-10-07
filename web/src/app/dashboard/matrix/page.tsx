@@ -99,7 +99,7 @@ export default function MatrixPage() {
                     </span>
                   </td>
                   <td className='py-3 px-3 text-muted-foreground text-[11px]'>{c.category || 'Sportswear'}</td>
-                  <td className='py-3 px-3 text-right text-foreground font-bold tabular-nums'>${c.price.toFixed(2)}</td>
+                  <td className='py-3 px-3 text-right text-foreground font-bold tabular-nums'>₹{c.price.toFixed(2)}</td>
                   <td className='py-3 px-3 text-right text-emerald-600 dark:text-emerald-400 font-bold tabular-nums'>{c.marginPct.toFixed(1)}%</td>
                   <td className='py-3 px-3 text-right font-bold tabular-nums'>
                     {isStockout ? (
@@ -110,7 +110,7 @@ export default function MatrixPage() {
                       <span className='text-foreground'>{c.inventory.toLocaleString()} units</span>
                     )}
                   </td>
-                  <td className='py-3 px-3 text-right text-foreground tabular-nums'>${c.currentDailySpend.toFixed(0)}</td>
+                  <td className='py-3 px-3 text-right text-foreground tabular-nums'>₹{c.currentDailySpend.toFixed(0)}</td>
                   <td className='py-3 px-3 text-right font-bold tabular-nums'>
                     <span
                       className={cn(

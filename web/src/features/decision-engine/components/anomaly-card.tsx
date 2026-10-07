@@ -99,7 +99,7 @@ export function AnomalyCard({ anomaly, onMitigate, className }: AnomalyCardProps
               )}
             </div>
             <div className='flex items-center gap-2 text-[11px] font-mono text-muted-foreground mt-0.5'>
-              <span>${anomaly.spend.toLocaleString()}/d</span>
+              <span>₹{anomaly.spend.toLocaleString()}/d</span>
               <span className='text-muted-foreground/40'>•</span>
               <span className={cn('font-semibold', anomaly.roas < 1.8 ? 'text-rose-600 dark:text-rose-400' : 'text-amber-600 dark:text-amber-400')}>
                 {anomaly.roas.toFixed(2)}x ROAS

@@ -110,7 +110,7 @@ export function FingerprintTrackerDemo() {
       details: [
         `Client hardware & canvas entropy evaluated on YouTube page via NEXUS cookieless pixel.`,
         `Deterministic device fingerprint generated: ${selectedDevice.fingerprintId}`,
-        `Impression logged: Campaign "YT_Brand_AirMaxDn_Q4", Cost CPM $0.024`,
+        `Impression logged: Campaign "YT_Brand_AirMaxDn_Q4", Cost CPM ₹0.024`,
         `Zero reliance on 3rd-party tracking cookies (bypasses browser cookie blocking & Safari ITP).`
       ],
       eventPayload: {
@@ -141,7 +141,7 @@ export function FingerprintTrackerDemo() {
       timestamp: 'Today, 10:14:18 AM',
       details: [
         `Click event registered with matching Fingerprint ID: ${selectedDevice.fingerprintId}`,
-        `Ad interaction logged: Cost CPC $0.85`,
+        `Ad interaction logged: Cost CPC ₹0.85`,
         `User lands on campaign landing page, explores colorways, but leaves without converting.`,
         `Standard ad networks now consider this user "lost / bounced" unless cross-channel retargeting exists.`
       ],
@@ -192,10 +192,10 @@ export function FingerprintTrackerDemo() {
       title: 'Amazon Checkout: Complete Purchase Conversion',
       platform: 'amazon',
       badgeLabel: 'STAGE 4: PURCHASE CONVERSION',
-      summary: 'User selects Size 10.5 and completes 1-Click Buy on Amazon for $170.00.',
+      summary: 'User selects Size 10.5 and completes 1-Click Buy on Amazon for ₹170.00.',
       timestamp: 'Today, 04:35:10 PM',
       details: [
-        `Order confirmed: Order #AMZ-9482-DN77 for $170.00.`,
+        `Order confirmed: Order #AMZ-9482-DN77 for ₹170.00.`,
         `Conversion telemetry sent to NEXUS Ingestion Engine with Fingerprint ID: ${selectedDevice.fingerprintId}`,
         `Amazon internal analytics attributes this as: "Direct Amazon Organic Search / Unpaid Traffic".`,
         `NEXUS Identity Graph unlocks the full truth: YouTube Ad generated the demand!`
@@ -221,10 +221,10 @@ export function FingerprintTrackerDemo() {
       summary: 'The single Fingerprint ID connects the siloed platforms. YouTube ROAS jumps from 0.00x to 194.5x, preventing budget cuts!',
       timestamp: 'Real-Time Sync • Just Now',
       details: [
-        `Without Fingerprint: Marketer sees $0.87 YouTube ad spend with $0 revenue -> Cuts YouTube budget!`,
+        `Without Fingerprint: Marketer sees ₹0.87 YouTube ad spend with ₹0 revenue -> Cuts YouTube budget!`,
         `With NEXUS Fingerprint: Full cross-channel journey proven (YouTube View -> YouTube Click -> Amazon Buy).`,
-        `Assisted ROAS calculated: $170.00 revenue / $0.874 total ad spend = 194.5x ROAS!`,
-        `NEXUS SLSQP Optimizer Recommendation: Scale YouTube campaign budget by +25% ($4,500/day shift).`
+        `Assisted ROAS calculated: ₹170.00 revenue / ₹0.874 total ad spend = 194.5x ROAS!`,
+        `NEXUS SLSQP Optimizer Recommendation: Scale YouTube campaign budget by +25% (₹4,500/day shift).`
       ],
       eventPayload: {
         identity_graph_match: {
@@ -739,7 +739,7 @@ export function FingerprintTrackerDemo() {
                             Nike Men's Air Max Dn Running &amp; Street Shoes (Triple Black)
                           </h4>
                           <div className='text-xs font-mono text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-2'>
-                            <span className='text-lg font-bold text-foreground'>$170.00</span>
+                            <span className='text-lg font-bold text-foreground'>₹170.00</span>
                             <Badge variant='outline' className='border-emerald-200 dark:border-emerald-500/40 text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/30 text-[10px] font-bold'>
                               In Stock (Prime 1-Day)
                             </Badge>
@@ -764,7 +764,7 @@ export function FingerprintTrackerDemo() {
                               className='bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold font-sans text-xs h-8 px-4 flex-1 shadow-xs'
                             >
                               <Icons.cart className='size-3.5 mr-1.5' />
-                              Buy Now (1-Click Checkout $170.00)
+                              Buy Now (1-Click Checkout ₹170.00)
                             </Button>
                           ) : (
                             <div className='rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-500/40 p-2.5 w-full flex items-center justify-between text-xs font-mono text-emerald-700 dark:text-emerald-300'>
@@ -772,7 +772,7 @@ export function FingerprintTrackerDemo() {
                                 <Icons.circleCheck className='size-4 text-emerald-600 dark:text-emerald-400' />
                                 <span className='font-bold'>Order Confirmed: #AMZ-9482-DN77</span>
                               </div>
-                              <span className='text-foreground font-bold'>$170.00</span>
+                              <span className='text-foreground font-bold'>₹170.00</span>
                             </div>
                           )}
                         </div>
@@ -811,8 +811,8 @@ export function FingerprintTrackerDemo() {
                         <div className='bg-card border border-rose-200 dark:border-zinc-800 rounded-lg p-3 shadow-xs'>
                           <span className='text-rose-700 dark:text-red-400 font-bold block mb-1'>❌ Without Single Fingerprint:</span>
                           <ul className='text-muted-foreground space-y-1 text-[11px]'>
-                            <li>• YouTube Spend: $0.874</li>
-                            <li>• YouTube Revenue: $0.00 (0.0x ROAS)</li>
+                            <li>• YouTube Spend: ₹0.874</li>
+                            <li>• YouTube Revenue: ₹0.00 (0.0x ROAS)</li>
                             <li>• Amazon Sale: 100% "Organic Direct"</li>
                             <li className='text-rose-700 dark:text-red-300 font-semibold'>• Result: Marketer cancels YouTube ad!</li>
                           </ul>
@@ -821,8 +821,8 @@ export function FingerprintTrackerDemo() {
                         <div className='bg-card border border-emerald-200 dark:border-cyan-800/80 rounded-lg p-3 shadow-xs'>
                           <span className='text-emerald-700 dark:text-emerald-400 font-bold block mb-1'>✅ With NEXUS Single Fingerprint:</span>
                           <ul className='text-foreground space-y-1 text-[11px]'>
-                            <li>• YouTube Spend: $0.874</li>
-                            <li>• Attributed Amazon Sale: $170.00</li>
+                            <li>• YouTube Spend: ₹0.874</li>
+                            <li>• Attributed Amazon Sale: ₹170.00</li>
                             <li>• Realized ROAS: <strong className='text-emerald-600 dark:text-emerald-300'>194.5x</strong></li>
                             <li className='text-sky-700 dark:text-cyan-300 font-semibold'>• Result: AI scales YouTube budget +25%!</li>
                           </ul>
@@ -835,7 +835,7 @@ export function FingerprintTrackerDemo() {
                       <div>
                         <span className='text-indigo-700 dark:text-purple-400 font-bold'>Autonomous Decision Engine Action: </span>
                         scipy SLSQP optimizer ingested this graph event. Convex response curve shifts 
-                        <strong className='text-foreground'> $4,500/day</strong> into YouTube top-of-funnel campaigns to feed downstream Amazon conversion loops.
+                        <strong className='text-foreground'> ₹4,500/day</strong> into YouTube top-of-funnel campaigns to feed downstream Amazon conversion loops.
                       </div>
                     </div>
                   </div>
@@ -958,7 +958,7 @@ export function FingerprintTrackerDemo() {
               </div>
               <span className='text-[10px] text-rose-700 dark:text-red-400 font-bold uppercase tracking-wider block'>Node 02</span>
               <h4 className='text-xs font-bold text-foreground mt-1'>YouTube Ad Click</h4>
-              <p className='text-[11px] text-muted-foreground mt-1'>CPC Cost: $0.85</p>
+              <p className='text-[11px] text-muted-foreground mt-1'>CPC Cost: ₹0.85</p>
               <div className='mt-2 pt-2 border-t border-border text-[10px] text-muted-foreground'>
                 Dwell Time: 14.2s (Bounced)
               </div>
@@ -1000,7 +1000,7 @@ export function FingerprintTrackerDemo() {
               </div>
               <span className='text-[10px] text-emerald-700 dark:text-emerald-400 font-bold uppercase tracking-wider block'>Node 04</span>
               <h4 className='text-xs font-bold text-foreground mt-1'>Amazon Purchase</h4>
-              <p className='text-[11px] text-muted-foreground mt-1'>Order $170.00 Confirmed</p>
+              <p className='text-[11px] text-muted-foreground mt-1'>Order ₹170.00 Confirmed</p>
               <div className='mt-2 pt-2 border-t border-border text-[10px] text-emerald-600 dark:text-emerald-400 font-bold'>
                 Revenue Attributed!
               </div>
@@ -1015,11 +1015,11 @@ export function FingerprintTrackerDemo() {
             </div>
             <div className='bg-slate-50/70 dark:bg-zinc-900/70 border border-border rounded-lg p-3 shadow-xs'>
               <span className='text-muted-foreground block text-[10px] uppercase'>Total Incurred Ad Cost</span>
-              <span className='text-rose-600 dark:text-red-400 font-bold text-sm'>$0.874 (CPM + CPC)</span>
+              <span className='text-rose-600 dark:text-red-400 font-bold text-sm'>₹0.874 (CPM + CPC)</span>
             </div>
             <div className='bg-slate-50/70 dark:bg-zinc-900/70 border border-border rounded-lg p-3 shadow-xs'>
               <span className='text-muted-foreground block text-[10px] uppercase'>Gross Attributed Value</span>
-              <span className='text-emerald-600 dark:text-emerald-400 font-bold text-sm'>$170.00 Gross / $93.50 Margin</span>
+              <span className='text-emerald-600 dark:text-emerald-400 font-bold text-sm'>₹170.00 Gross / ₹93.50 Margin</span>
             </div>
             <div className='bg-slate-50/70 dark:bg-zinc-900/70 border border-border rounded-lg p-3 shadow-xs'>
               <span className='text-muted-foreground block text-[10px] uppercase'>Attributed Lift Factor</span>

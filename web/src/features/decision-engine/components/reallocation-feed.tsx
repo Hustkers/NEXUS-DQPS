@@ -49,7 +49,7 @@ export function ReallocationFeed({
       );
       setExecutingId(null);
       toast.success(`Executed Reallocation on ${item.targetProductName || item.targetCampaign}`, {
-        description: `Shifted $${Math.abs(item.deltaSpend).toLocaleString()}/day. Expected Margin Lift: +$${item.expectedDailyMargin.toLocaleString()}/day.`
+        description: `Shifted ₹${Math.abs(item.deltaSpend).toLocaleString()}/day. Expected Margin Lift: +₹${item.expectedDailyMargin.toLocaleString()}/day.`
       });
       onExecuteReallocation?.(item);
     }, 500);
@@ -162,14 +162,14 @@ export function ReallocationFeed({
                 {/* Plain Numbers inline */}
                 <div className='flex items-center gap-3 text-xs font-mono text-muted-foreground flex-wrap'>
                   <span>
-                    Spend: <span className='text-foreground font-medium'>${item.currentSpend.toFixed(0)}</span> →{' '}
+                    Spend: <span className='text-foreground font-medium'>₹{item.currentSpend.toFixed(0)}</span> →{' '}
                     <span className={cn('font-bold', item.deltaSpend > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400')}>
-                      ${item.recommendedSpend.toFixed(0)}/d ({item.deltaSpend > 0 ? '+' : ''}${item.deltaSpend.toFixed(0)})
+                      ₹{item.recommendedSpend.toFixed(0)}/d ({item.deltaSpend > 0 ? '+' : ''}₹{item.deltaSpend.toFixed(0)})
                     </span>
                   </span>
                   <span className='text-muted-foreground/30'>•</span>
                   <span>
-                    Lift: <span className='text-emerald-600 dark:text-emerald-400 font-bold'>+${item.expectedDailyMargin.toFixed(0)}/d</span>
+                    Lift: <span className='text-emerald-600 dark:text-emerald-400 font-bold'>+₹{item.expectedDailyMargin.toFixed(0)}/d</span>
                   </span>
                   <span className='text-muted-foreground/30'>•</span>
                   <span>

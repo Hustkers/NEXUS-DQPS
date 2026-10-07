@@ -21,7 +21,7 @@ Judges see a **live, interactive demo**, not slides. Every click must tell part 
 | Platform mix | bar/area chart of spend & margin by platform | hover |
 | Anomaly feed | red/amber cards: campaign, metric, z-score, date | click to inspect |
 | RCA card | LLM/template explanation + top-3 factor bars | click from feed |
-| Recommendations | table: campaign, current $, recommended $, expected Δmargin, stockout-kill flag | select + Approve button |
+| Recommendations | table: campaign, current ₹, recommended ₹, expected Δmargin, stockout-kill flag | select + Approve button |
 | Decision Ledger | decision, expected vs realized margin (bar), confidence, status | none |
 | Event timeline | injected scenario events (from `data/events.json`) | scrubber optional |
 

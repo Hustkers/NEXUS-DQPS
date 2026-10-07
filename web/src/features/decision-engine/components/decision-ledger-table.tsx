@@ -63,11 +63,11 @@ export function DecisionLedgerTable({ entries, className }: DecisionLedgerTableP
                     {item.decision}
                   </td>
                   <td className='py-2.5 px-3 text-right text-muted-foreground whitespace-nowrap'>
-                    ${item.expectedMargin.toLocaleString()}
+                    ₹{item.expectedMargin.toLocaleString()}
                   </td>
                   <td className='py-2.5 px-3 text-right whitespace-nowrap'>
                     <span className={cn('font-bold', isPositiveLift ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400')}>
-                      ${item.realizedMargin.toLocaleString()}
+                      ₹{item.realizedMargin.toLocaleString()}
                     </span>
                   </td>
                   <td className='py-2.5 px-3 text-right whitespace-nowrap'>

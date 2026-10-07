@@ -166,10 +166,10 @@ export function MissionControlConsole() {
           </div>
           <div className='mt-2.5 flex items-baseline justify-between'>
             <span className='text-2xl font-bold font-mono tracking-tight text-foreground'>
-              ${(state.telemetry.totalSpend30d / 1000).toFixed(1)}k
+              ₹{(state.telemetry.totalSpend30d / 1000).toFixed(1)}k
             </span>
             <span className='text-xs font-mono text-muted-foreground'>
-              Budget: ${(state.telemetry.totalManagedBudget / 1000).toFixed(0)}k
+              Budget: ₹{(state.telemetry.totalManagedBudget / 1000).toFixed(0)}k
             </span>
           </div>
           <div className='mt-3 h-1 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden'>
@@ -185,10 +185,10 @@ export function MissionControlConsole() {
           </div>
           <div className='mt-2.5 flex items-baseline justify-between'>
             <span className='text-2xl font-bold font-mono tracking-tight text-foreground'>
-              ${(state.telemetry.totalMargin30d / 1000).toFixed(1)}k
+              ₹{(state.telemetry.totalMargin30d / 1000).toFixed(1)}k
             </span>
             <span className='text-xs font-mono text-muted-foreground'>
-              Rev: ${(state.telemetry.totalRevenue30d / 1000).toFixed(1)}k
+              Rev: ₹{(state.telemetry.totalRevenue30d / 1000).toFixed(1)}k
             </span>
           </div>
           <div className='mt-3 h-1 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden'>
@@ -204,10 +204,10 @@ export function MissionControlConsole() {
           </div>
           <div className='mt-2.5 flex items-baseline justify-between'>
             <span className='text-2xl font-bold font-mono tracking-tight text-emerald-600 dark:text-emerald-400'>
-              +${(state.telemetry.projectedMarginUplift / 1000).toFixed(1)}k
+              +₹{(state.telemetry.projectedMarginUplift / 1000).toFixed(1)}k
             </span>
             <span className='text-xs font-mono text-muted-foreground'>
-              Reallocated: ${(state.telemetry.reallocationCapitalMoved / 1000).toFixed(1)}k
+              Reallocated: ₹{(state.telemetry.reallocationCapitalMoved / 1000).toFixed(1)}k
             </span>
           </div>
           <div className='mt-3 h-1 w-full bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden'>
@@ -263,7 +263,7 @@ export function MissionControlConsole() {
             const newLedgerItem = {
               id: `ledg-live-${Date.now()}`,
               timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
-              decision: `Set ${item.targetCampaign} spend -> $${item.recommendedSpend.toFixed(0)}/day (shifted $${Math.abs(item.deltaSpend).toFixed(0)} from ${item.sourceCampaign})`,
+              decision: `Set ${item.targetCampaign} spend -> ₹${item.recommendedSpend.toFixed(0)}/day (shifted ₹${Math.abs(item.deltaSpend).toFixed(0)} from ${item.sourceCampaign})`,
               expectedMargin: item.expectedDailyMargin,
               realizedMargin: item.expectedDailyMargin * 0.94,
               variancePct: -6.0,
