@@ -23,18 +23,17 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useChannel, AdChannel } from '@/context/channel-context';
+import { ActionDrawer } from './action-drawer';
 import { useDecisionEngine } from '@/context/decision-engine-store';
-import { FixProtocolModal } from './fix-protocol-modal';
-import { computeFixPlan, type DerivedProduct, type FixPlanSummary } from '@/lib/gauges-engine';
+import type { DerivedProduct } from '@/lib/gauges-engine';
 
 export function MissionControlConsole() {
   const [state, setState] = useState(initialEngineState);
-  const { products, ledger, executeFix } = useDecisionEngine();
+  const { products, ledger } = useDecisionEngine();
   const [analyzingProduct, setAnalyzingProduct] = useState<ProductAnalysisTarget | null>(null);
-  const [fixingProduct, setFixingProduct] = useState<DerivedProduct | null>(null);
-  const [fixingPlan, setFixingPlan] = useState<FixPlanSummary | null>(null);
-  const [isFixModalOpen, setIsFixModalOpen] = useState(false);
-  const [isSummaryOnly, setIsSummaryOnly] = useState(false);
+  const [fixingActionId, setFixingActionId] = useState<string | null>(null);
+  const [fixingInitialState, setFixingInitialState] = useState<'review' | 'done'>('review');
+  const [isFixDrawerOpen, setIsFixDrawerOpen] = useState(false);
   const [consoleGlobeMode, setConsoleGlobeMode] = useState<'arcs' | 'pulse'>('pulse');
   const [selectedGlobeMarker, setSelectedGlobeMarker] = useState<PulseMarker | null>(null);
   const { channel, setChannel } = useChannel();
@@ -469,9 +468,9 @@ export function MissionControlConsole() {
         {/* Gauges Grid */}
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'>
           {products
-            .filter((p) => (activeTab === 'all' ? true : p.channel.toLowerCase() === activeTab.toLowerCase()))
+            .filter((p: DerivedProduct) => (activeTab === 'all' ? true : p.channel.toLowerCase() === activeTab.toLowerCase()))
             .slice(0, 8)
-            .map((p) => (
+            .map((p: DerivedProduct) => (
               <RoasGauge
                 key={p.id}
                 productName={p.name}
@@ -492,18 +491,14 @@ export function MissionControlConsole() {
                 photoUrl={p.photoUrl}
                 compact
                 onFix={() => {
-                  const plan = computeFixPlan(p, products);
-                  setFixingProduct(p);
-                  setFixingPlan(plan);
-                  setIsSummaryOnly(false);
-                  setIsFixModalOpen(true);
+                  setFixingActionId(`fix-${p.id}`);
+                  setFixingInitialState('review');
+                  setIsFixDrawerOpen(true);
                 }}
                 onViewFix={() => {
-                  const plan = p.appliedPlan || computeFixPlan(p, products);
-                  setFixingProduct(p);
-                  setFixingPlan(plan);
-                  setIsSummaryOnly(true);
-                  setIsFixModalOpen(true);
+                  setFixingActionId(`fix-${p.id}`);
+                  setFixingInitialState('done');
+                  setIsFixDrawerOpen(true);
                 }}
                 onAnalyze={() => {
                   setAnalyzingProduct({
@@ -540,18 +535,12 @@ export function MissionControlConsole() {
         }}
       />
 
-      {/* Fix Protocol Modal for Overview Gauges */}
-      <FixProtocolModal
-        product={fixingProduct}
-        plan={fixingPlan}
-        isOpen={isFixModalOpen}
-        isSummaryOnly={isSummaryOnly}
-        onClose={() => setIsFixModalOpen(false)}
-        onExecute={(plan) => {
-          if (fixingProduct) {
-            executeFix(fixingProduct.id, plan);
-          }
-        }}
+      {/* Action Drawer for Overview Gauges */}
+      <ActionDrawer
+        actionId={fixingActionId}
+        isOpen={isFixDrawerOpen}
+        initialState={fixingInitialState}
+        onClose={() => setIsFixDrawerOpen(false)}
       />
     </div>
   );

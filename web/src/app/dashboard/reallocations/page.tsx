@@ -10,28 +10,6 @@ import { cn } from '@/lib/utils';
 
 export default function ReallocationsPage() {
   const [activeView, setActiveView] = useState<'feed' | 'rl_analytics' | 'both'>('both');
-  const [items, setItems] = useState<ReallocationItem[]>(initialEngineState.reallocations as unknown as ReallocationItem[]);
-
-  useEffect(() => {
-    let isMounted = true;
-    async function loadReallocations() {
-      try {
-        const res = await fetch('/api/reallocations');
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && Array.isArray(data.reallocations) && isMounted) {
-            setItems(data.reallocations);
-          }
-        }
-      } catch {
-        // Fallback to initialEngineState
-      }
-    }
-    loadReallocations();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   // Compute portfolio-level RL ad allocation
   const rlData = React.useMemo(() => {
@@ -102,10 +80,7 @@ export default function ReallocationsPage() {
 
       {/* Reallocation Feed Directives */}
       {(activeView === 'both' || activeView === 'feed') && (
-        <ReallocationFeed
-          initialItems={items}
-          campaigns={initialEngineState.campaigns}
-        />
+        <ReallocationFeed />
       )}
     </div>
   );

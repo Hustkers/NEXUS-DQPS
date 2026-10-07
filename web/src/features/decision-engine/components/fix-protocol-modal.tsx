@@ -364,7 +364,7 @@ export function FixProtocolModal({
                 Projected Impact Summary
               </span>
               <div className='grid grid-cols-1 sm:grid-cols-3 gap-2.5'>
-                {currentPlan.resultTiles.map((tile, idx) => (
+                {currentPlan.resultTiles?.map((tile, idx) => (
                   <div
                     key={idx}
                     className='rounded-lg border border-[#262626] bg-[#141414] p-3 flex flex-col justify-between'
