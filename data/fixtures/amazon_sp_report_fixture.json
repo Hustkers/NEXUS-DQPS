@@ -1,0 +1,44 @@
+[
+  {
+    "campaignId": "amzn-sp-camp-00",
+    "campaignName": "Amazon-SP-310805-137",
+    "adGroupId": "ag-990",
+    "asin": "B08N5WRW00",
+    "sku": "310805-137",
+    "date": "2026-10-07",
+    "impressions": 38000,
+    "clicks": 1100,
+    "cost": 377.0,
+    "attributedSales14d": 3890.5,
+    "attributedUnitsOrdered14d": 32,
+    "currency": "USD"
+  },
+  {
+    "campaignId": "amzn-sp-camp-01",
+    "campaignName": "Amazon-SP-554724-066",
+    "adGroupId": "ag-991",
+    "asin": "B08N5WRW11",
+    "sku": "554724-066",
+    "date": "2026-10-07",
+    "impressions": 42000,
+    "clicks": 1280,
+    "cost": 540.0,
+    "attributedSales14d": 4937.22,
+    "attributedUnitsOrdered14d": 41,
+    "currency": "USD"
+  },
+  {
+    "campaignId": "amzn-sp-camp-02",
+    "campaignName": "Amazon-SP-849559-004",
+    "adGroupId": "ag-992",
+    "asin": "B08N5WRW22",
+    "sku": "849559-004",
+    "date": "2026-10-07",
+    "impressions": 51000,
+    "clicks": 1650,
+    "cost": 720.0,
+    "attributedSales14d": 7480.0,
+    "attributedUnitsOrdered14d": 60,
+    "currency": "USD"
+  }
+]

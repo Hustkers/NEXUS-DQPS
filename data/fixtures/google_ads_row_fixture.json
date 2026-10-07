@@ -1,0 +1,56 @@
+[
+  {
+    "campaign": {
+      "id": "8192039101",
+      "name": "Google-Search-310805-137",
+      "advertisingChannelType": "SEARCH"
+    },
+    "segments": {
+      "date": "2026-10-07"
+    },
+    "metrics": {
+      "impressions": 45000,
+      "clicks": 1600,
+      "costMicros": 527000000,
+      "conversions": 35.0,
+      "conversionsValue": 6500.0,
+      "averageCpc": 329375
+    }
+  },
+  {
+    "campaign": {
+      "id": "8192039102",
+      "name": "Google-Shopping-AH8050-100",
+      "advertisingChannelType": "SHOPPING"
+    },
+    "segments": {
+      "date": "2026-10-07"
+    },
+    "metrics": {
+      "impressions": 58000,
+      "clicks": 1950,
+      "costMicros": 780000000,
+      "conversions": 42.0,
+      "conversionsValue": 7081.62,
+      "averageCpc": 400000
+    }
+  },
+  {
+    "campaign": {
+      "id": "8192039103",
+      "name": "Google-PMax-CD4371-001",
+      "advertisingChannelType": "PERFORMANCE_MAX"
+    },
+    "segments": {
+      "date": "2026-10-07"
+    },
+    "metrics": {
+      "impressions": 64000,
+      "clicks": 2100,
+      "costMicros": 950000000,
+      "conversions": 54.0,
+      "conversionsValue": 9104.94,
+      "averageCpc": 452380
+    }
+  }
+]
