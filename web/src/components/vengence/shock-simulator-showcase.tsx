@@ -77,22 +77,22 @@ export function ShockSimulatorShowcase() {
               key={s.id}
               onClick={() => setSelectedId(s.id)}
               className={cn(
-                'text-left p-3 rounded-[6px] border transition-colors duration-150 cursor-pointer font-mono shadow-none',
+                'text-left p-3 rounded-xl border transition-all duration-200 cursor-pointer font-mono',
                 isSelected
-                  ? 'bg-card border-foreground text-foreground shadow-sm'
-                  : 'bg-muted/30 border-border hover:border-foreground/60 text-muted-foreground hover:text-foreground'
+                  ? 'bg-card border-primary/60 shadow-sm ring-1 ring-primary/40'
+                  : 'bg-muted/40 border-border/80 hover:bg-card hover:border-border text-muted-foreground'
               )}
             >
               <div className='flex items-center justify-between mb-1'>
-                <span className='text-[10px] uppercase font-medium tracking-wider text-muted-foreground'>
+                <span className='text-[10px] uppercase font-bold tracking-wider'>
                   {s.tag}
                 </span>
                 <span
                   className={cn(
-                    'text-[9px] px-1.5 py-0.5 rounded-[2px] font-bold uppercase font-mono',
-                    s.severity === 'CRITICAL' && 'bg-primary text-primary-foreground',
-                    s.severity === 'HIGH' && 'bg-card border border-border text-foreground',
-                    s.severity === 'MEDIUM' && 'bg-muted border border-border/60 text-muted-foreground'
+                    'text-[9px] px-1.5 py-0.2 rounded font-bold uppercase',
+                    s.severity === 'CRITICAL' && 'bg-destructive/15 text-destructive',
+                    s.severity === 'HIGH' && 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
+                    s.severity === 'MEDIUM' && 'bg-sky-500/15 text-sky-600 dark:text-sky-400'
                   )}
                 >
                   {s.severity}
@@ -107,13 +107,13 @@ export function ShockSimulatorShowcase() {
       </div>
 
       {/* Main Active Scenario Visualizer */}
-      <CardSpotlight className='p-6 md:p-8 bg-card border border-border rounded-[6px] text-card-foreground'>
+      <CardSpotlight className='p-6 md:p-8 bg-card border-border/90'>
         <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 items-center'>
           {/* Left Details */}
           <div className='lg:col-span-2 space-y-4'>
             <div className='flex items-center gap-2'>
-              <span className='font-mono text-[10px] px-2 py-0.5 rounded-[2px] bg-muted border border-border text-foreground font-bold'>
-                SHOCK RESPONSE BENCHMARK
+              <span className='font-mono text-xs px-2 py-0.5 rounded bg-primary/10 text-primary font-bold'>
+                SHOCK RESPONSE DEMO
               </span>
               <span className='text-xs text-muted-foreground font-mono'>
                 Response Latency: {active.speed}
@@ -125,16 +125,16 @@ export function ShockSimulatorShowcase() {
             </h3>
 
             <div className='space-y-3 pt-1'>
-              <div className='p-3.5 rounded-[6px] border border-border bg-muted/20 text-xs text-foreground'>
-                <div className='font-mono font-bold text-foreground uppercase tracking-wider mb-1 flex items-center gap-1.5'>
-                  <Icons.alertCircle className='size-3.5 text-amber-500' /> Injected Crisis Event
+              <div className='p-3.5 rounded-xl border border-destructive/20 bg-destructive/5 text-xs text-foreground'>
+                <div className='font-mono font-bold text-destructive uppercase tracking-wider mb-1 flex items-center gap-1.5'>
+                  <Icons.alertCircle className='size-3.5' /> Injected Crisis Event
                 </div>
                 <p className='leading-relaxed text-muted-foreground'>{active.event}</p>
               </div>
 
-              <div className='p-3.5 rounded-[6px] border border-emerald-500/40 bg-emerald-500/5 text-xs text-foreground'>
+              <div className='p-3.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-xs text-foreground'>
                 <div className='font-mono font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1 flex items-center gap-1.5'>
-                  <Icons.checkCircle className='size-3.5 text-emerald-500' /> NEXUS Autonomous Action
+                  <Icons.checkCircle className='size-3.5' /> NEXUS Autonomous Action
                 </div>
                 <p className='leading-relaxed text-foreground font-medium'>
                   {active.autonomousAction}
@@ -144,12 +144,12 @@ export function ShockSimulatorShowcase() {
           </div>
 
           {/* Right Metrics Card */}
-          <div className='rounded-[6px] border border-border bg-muted/10 p-5 flex flex-col justify-between space-y-5 text-center lg:text-left'>
+          <div className='rounded-xl border border-border/80 bg-muted/30 p-5 flex flex-col justify-between space-y-5 text-center lg:text-left'>
             <div>
-              <div className='font-mono text-[11px] uppercase tracking-wider text-muted-foreground font-medium'>
+              <div className='font-mono text-[11px] uppercase tracking-wider text-muted-foreground font-semibold'>
                 Protected Waste Capital
               </div>
-              <div className='font-mono text-3xl font-extrabold text-foreground tracking-tight mt-1'>
+              <div className='font-mono text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight mt-1'>
                 {active.savedWaste}
               </div>
               <div className='text-xs text-muted-foreground font-mono mt-1'>
@@ -157,11 +157,11 @@ export function ShockSimulatorShowcase() {
               </div>
             </div>
 
-            <div className='pt-3 border-t border-border/50 space-y-2'>
+            <div className='pt-3 border-t border-border/80 space-y-2'>
               <div className='text-[11px] text-muted-foreground leading-snug'>
                 Simulated on 90-day multi-channel telemetry with 100% mathematical audit trail.
               </div>
-              <Link href='/dashboard/simulator' className='block'>
+              <Link href={`/dashboard/simulator?scenario=${active.id}`} className='block'>
                 <GlowButton size='sm' variant='default' className='w-full font-mono text-xs'>
                   Execute in Simulator →
                 </GlowButton>

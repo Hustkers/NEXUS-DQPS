@@ -3,15 +3,17 @@
 import { useTheme } from 'next-themes';
 import { ConstellationField } from '@designcodeio/threeui';
 import '@designcodeio/threeui/style.css';
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
+
+const emptySubscribe = () => () => {};
 
 export function BackgroundShader() {
   const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
 
   const isDark = !mounted || resolvedTheme === 'dark';
 
