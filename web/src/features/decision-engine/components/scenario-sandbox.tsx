@@ -37,8 +37,8 @@ export function ScenarioSandbox({ onApplyReallocation }: { onApplyReallocation?:
   };
 
   return (
-    <Card className="p-5 border border-border bg-card shadow-none rounded text-card-foreground">
-      <div className="flex items-center justify-between mb-4 border-b border-border pb-3">
+    <Card className="p-5 border border-border bg-card shadow-none rounded text-card-foreground min-w-0 max-w-full overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4 border-b border-border pb-3">
         <div>
           <h3 className="text-sm font-semibold text-foreground tracking-tight flex items-center gap-2 font-mono">
             <IconAdjustmentsHorizontal className="h-4 w-4 text-foreground" />

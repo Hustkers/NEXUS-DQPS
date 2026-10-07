@@ -83,7 +83,7 @@ export function ScenarioController({
         </div>
 
         {/* Enhanced interactive shock tiles */}
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3'>
           {scenarios.map((s) => {
             const isActive = activeScenarioId === s.id;
             const isCritical = s.severity === 'CRITICAL';
@@ -94,7 +94,7 @@ export function ScenarioController({
                 key={s.id}
                 onClick={() => handleTrigger(s)}
                 className={cn(
-                  'group flex flex-col justify-between text-left rounded border p-3.5 transition-all active:scale-[0.98] min-h-[140px]',
+                  'group flex flex-col justify-between text-left rounded border p-3.5 transition-all active:scale-[0.98] min-h-[140px] min-w-0',
                   isActive
                     ? 'border-[#FFFFFF] bg-[#000000] ring-1 ring-[#FFFFFF]'
                     : 'border-[#8A8A8A]/40 bg-[#000000] hover:border-[#FFFFFF] hover:bg-zinc-950/80'

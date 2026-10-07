@@ -53,8 +53,8 @@ export function RcaWaterfallChart({ items, totalLoss = 3008.25 }: RcaWaterfallCh
   const breakdown = items || defaultItems;
 
   return (
-    <Card className="p-5 border border-border bg-card shadow-none rounded text-card-foreground">
-      <div className="flex items-center justify-between mb-4 border-b border-border pb-3">
+    <Card className="p-5 border border-border bg-card shadow-none rounded text-card-foreground min-w-0 max-w-full overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4 border-b border-border pb-3">
         <div>
           <h3 className="text-sm font-semibold text-foreground tracking-tight flex items-center gap-2 font-mono">
             <IconChartBar className="h-4 w-4 text-foreground" />
@@ -67,7 +67,7 @@ export function RcaWaterfallChart({ items, totalLoss = 3008.25 }: RcaWaterfallCh
         <div className="text-right">
           <span className="text-xs text-muted-foreground block font-mono">Observed Margin Loss</span>
           <span className="text-sm font-mono font-bold bg-foreground text-background px-1.5 py-0.5 rounded inline-block mt-0.5">
-            -${totalLoss.toLocaleString()}
+            -₹{totalLoss.toLocaleString()}
           </span>
         </div>
       </div>

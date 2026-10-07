@@ -37,9 +37,9 @@ export function PlatformBreakdownChart({
   className
 }: PlatformBreakdownChartProps) {
   return (
-    <div className={cn('grid grid-cols-1 lg:grid-cols-3 gap-4', className)}>
+    <div className={cn('grid grid-cols-1 xl:grid-cols-3 gap-4 min-w-0 max-w-full', className)}>
       {/* 30-Day Performance Trends (Clean Utilitarian Area Chart) */}
-      <div className='relative overflow-hidden lg:col-span-2 rounded border border-border bg-card p-5 shadow-none text-card-foreground flex flex-col justify-between'>
+      <div className='relative overflow-hidden xl:col-span-2 rounded border border-border bg-card p-5 shadow-none text-card-foreground flex flex-col justify-between min-w-0'>
         <div className='relative z-10'>
           <div className='flex items-center justify-between border-b border-border pb-3 mb-4'>
             <div>
@@ -57,7 +57,7 @@ export function PlatformBreakdownChart({
             </div>
           </div>
 
-          <div className='h-[250px] w-full pt-2'>
+          <div className='h-[250px] w-full min-w-0 pt-2'>
             <ResponsiveContainer width='100%' height='100%'>
               <AreaChart data={dailyTrend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid
@@ -157,7 +157,7 @@ export function PlatformBreakdownChart({
       </div>
 
       {/* Cross-Platform Attribution & Share */}
-      <div className='rounded border border-border bg-card p-5 shadow-none text-card-foreground flex flex-col justify-between'>
+      <div className='rounded border border-border bg-card p-5 shadow-none text-card-foreground flex flex-col justify-between min-w-0'>
         <div>
           <div className='border-b border-border pb-3 mb-4'>
             <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
