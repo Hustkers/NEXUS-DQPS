@@ -25,20 +25,20 @@ export default function MatrixPage() {
           </p>
         </div>
         <div className='flex items-center gap-2'>
-          <Badge variant='outline' className='font-mono text-xs border-[#8A8A8A] text-white bg-[#1A1A1A] py-1 px-2.5 shadow-none'>
+          <Badge variant='outline' className='font-mono text-xs border-[#1A1A1A] text-white bg-[#1A1A1A] py-1 px-2.5 shadow-none'>
             <span className='size-1.5 rounded-full bg-white mr-2' />
             POSTGRESQL 16 CONNECTED
           </Badge>
-          <Badge variant='outline' className='font-mono text-xs border-[#8A8A8A] text-[#8A8A8A] bg-[#000000] py-1 px-2.5'>
+          <Badge variant='outline' className='font-mono text-xs border-[#1A1A1A] text-[#8A8A8A] bg-[#000000] py-1 px-2.5'>
             {campaigns.length} ACTIVE CAMPAIGNS
           </Badge>
         </div>
       </div>
 
-      <div className='rounded border border-[#8A8A8A] bg-[#1A1A1A] p-5 shadow-none overflow-x-auto'>
+      <div className='rounded border border-[#1A1A1A] bg-[#1A1A1A] p-5 shadow-none overflow-x-auto'>
         <table className='w-full text-left text-xs font-mono'>
           <thead>
-            <tr className='border-b border-[#8A8A8A] text-[11px] text-[#8A8A8A] uppercase tracking-wider bg-[#000000]'>
+            <tr className='border-b border-[#1A1A1A] text-[11px] text-[#8A8A8A] uppercase tracking-wider bg-[#000000]'>
               <th className='py-3 px-3'>Shoe / Model</th>
               <th className='py-3 px-3'>Campaign</th>
               <th className='py-3 px-3'>Platform</th>
@@ -61,7 +61,7 @@ export default function MatrixPage() {
                   <td className='py-3 px-3 font-medium text-white'>
                     <div className='flex items-center gap-2.5'>
                       {c.photoUrl ? (
-                        <div className='relative size-8 rounded border border-[#8A8A8A] bg-[#000000] overflow-hidden shrink-0'>
+                        <div className='relative size-8 rounded border border-[#1A1A1A] bg-[#000000] overflow-hidden shrink-0'>
                           <Image
                             src={c.photoUrl}
                             alt={c.productName || c.sku}
@@ -71,7 +71,7 @@ export default function MatrixPage() {
                           />
                         </div>
                       ) : (
-                        <div className='size-8 rounded border border-[#8A8A8A] bg-[#000000] flex items-center justify-center text-[9px] text-[#8A8A8A] font-bold shrink-0'>
+                        <div className='size-8 rounded border border-[#1A1A1A] bg-[#000000] flex items-center justify-center text-[9px] text-[#8A8A8A] font-bold shrink-0'>
                           NIKE
                         </div>
                       )}
@@ -84,7 +84,7 @@ export default function MatrixPage() {
                   <td className='py-3 px-3 font-mono text-[#8A8A8A]'>{c.campaign}</td>
                   <td className='py-3 px-3 capitalize'>
                     <span
-                      className='px-2 py-0.5 rounded text-[10px] font-semibold border border-[#8A8A8A] text-white bg-[#000000]'
+                      className='px-2 py-0.5 rounded text-[10px] font-semibold border border-[#1A1A1A] text-white bg-[#000000]'
                     >
                       {c.platform}
                     </span>
@@ -113,7 +113,7 @@ export default function MatrixPage() {
                     </span>
                   </td>
                   <td className='py-3 px-3 text-center'>
-                    <Badge variant='outline' className='text-[10px] py-0 px-1.5 border-[#8A8A8A] text-white font-mono bg-[#000000]'>
+                    <Badge variant='outline' className='text-[10px] py-0 px-1.5 border-none text-white font-mono bg-[#000000]'>
                       {c.healthScore}/100
                     </Badge>
                   </td>
@@ -121,12 +121,12 @@ export default function MatrixPage() {
                     <Badge
                       variant='outline'
                       className={cn(
-                        'text-[10px] font-mono py-0 px-1.5',
+                        'text-[10px] font-mono py-0 px-1.5 border-none',
                         isStockout
-                          ? 'border-white text-black bg-white font-bold'
+                          ? 'text-black bg-white font-bold'
                           : c.roasStatus === 'ABOVE_TARGET'
-                          ? 'border-[#8A8A8A] text-white bg-[#1A1A1A]'
-                          : 'border-[#8A8A8A] text-[#8A8A8A] bg-[#000000]'
+                          ? 'text-white bg-[#1A1A1A]'
+                          : 'text-[#8A8A8A] bg-[#000000]'
                       )}
                     >
                       {c.roasStatus}
