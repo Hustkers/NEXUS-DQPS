@@ -28,6 +28,7 @@
   html {
     @apply bg-background text-foreground;
     overflow-y: auto;
+    scroll-behavior: smooth;
   }
   body {
     @apply bg-background text-foreground;
