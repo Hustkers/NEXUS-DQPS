@@ -72,6 +72,11 @@ export function GaugesDecisionLedgerTable({
                         className='shrink-0'
                       />
                       <span>{item.product}</span>
+                      {item.isAuto && (
+                        <span className='text-[9px] font-mono px-1 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-800/50 uppercase font-bold'>
+                          Auto
+                        </span>
+                      )}
                     </div>
                   </td>
 

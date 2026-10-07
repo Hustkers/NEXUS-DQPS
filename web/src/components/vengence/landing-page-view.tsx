@@ -6,43 +6,11 @@ import { VGPUCanvas } from './vgpu-canvas';
 import { GlowButton } from './glow-button';
 import { CardSpotlight } from './card-spotlight';
 import { BentoGrid, BentoGridItem } from './bento-grid';
-import { StatsMatrix } from './stats-matrix';
 import { ShockSimulatorShowcase } from './shock-simulator-showcase';
 import { NotchNavbar } from './notch-navbar';
 import { IsometricTelemetryPanel } from './isometric-telemetry-panel';
 import { PlotFigure, BranchesFigure, PhosphorFigure, RiffleFigure } from './hairline-figures';
 import { AnimatedFooter } from '@/components/ui/animated-footer';
-
-const HERO_STATS = [
-  {
-    label: 'Protected Capital',
-    value: '₹15,400/wk',
-    sublabel: 'Stockout kill-switch waste cut',
-    trend: 'live' as const,
-    badge: 'CIRCUIT BREAKER'
-  },
-  {
-    label: 'Hardware Attribution',
-    value: '99.8%',
-    sublabel: 'Deterministic entropy match',
-    trend: 'up' as const,
-    change: '+3.2x ROAS'
-  },
-  {
-    label: 'Circuit SLA',
-    value: '< 15 mins',
-    sublabel: 'Out-of-stock throttling speed',
-    trend: 'up' as const,
-    change: 'REAL-TIME'
-  },
-  {
-    label: 'Optimization Stability',
-    value: '±20%',
-    sublabel: 'Bounded KKT convex budget shift',
-    trend: 'neutral' as const,
-    change: 'SCIPY / PULP'
-  }
-];
 
 export function LandingPageView() {
   return (
@@ -67,7 +35,7 @@ export function LandingPageView() {
           </p>
 
           {/* Primary Button Group with VengenceUI Button Forge Styling */}
-          <div className='flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-16'>
+          <div className='flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-16'>
             <GlowButton
               href='/dashboard/overview'
               size='lg'
@@ -85,11 +53,6 @@ export function LandingPageView() {
             >
               Hardware Fingerprint Demo
             </GlowButton>
-          </div>
-
-          {/* Clean No-Counter Stats Matrix */}
-          <div className='w-full max-w-5xl mb-12 sm:mb-16'>
-            <StatsMatrix stats={HERO_STATS} />
           </div>
 
           {/* Hairline Isometric Telemetry Mission Console */}

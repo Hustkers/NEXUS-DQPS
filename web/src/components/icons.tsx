@@ -78,6 +78,7 @@ import {
   IconSearch,
   IconSelector,
   IconTerminal,
+  IconTable,
   IconSend,
   IconSettings,
   IconShare,
@@ -160,6 +161,7 @@ export const Icons = {
   kanban: IconLayoutKanban,
   panelLeft: IconLayoutSidebar,
   globe: IconWorld,
+  table: IconTable,
 
   // User
   user: IconUser,
