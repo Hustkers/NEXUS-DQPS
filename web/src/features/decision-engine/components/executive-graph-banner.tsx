@@ -233,7 +233,7 @@ export function ExecutiveGraphBanner({
   return (
     <div className='flex flex-col gap-4'>
       {/* 1. Header Bar with Time Range Selector & Comparative Detail Toggle */}
-      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-3'>
+      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-[#1A1A1A] pb-3'>
         <div className='flex items-center gap-2.5'>
           <h2 className='font-mono text-xs font-bold uppercase tracking-wider text-foreground'>
             Executive Financial &amp; Efficiency Trajectories
@@ -246,7 +246,7 @@ export function ExecutiveGraphBanner({
 
         <div className='flex items-center gap-2'>
           {/* Timeframe pill selector */}
-          <div className='flex items-center rounded-lg border border-border bg-card p-0.5 text-[11px] font-mono shadow-2xs'>
+          <div className='flex items-center rounded-lg border border-[#1A1A1A] bg-card p-0.5 text-[11px] font-mono shadow-2xs'>
             {(['7d', '14d', '30d'] as const).map((r) => (
               <button
                 key={r}
@@ -269,8 +269,8 @@ export function ExecutiveGraphBanner({
             className={cn(
               'flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-mono transition-all active:scale-[0.98]',
               expandedMetric
-                ? 'bg-muted text-foreground border-border font-bold'
-                : 'bg-card border-border text-muted-foreground hover:text-foreground hover:bg-muted/40'
+                ? 'bg-muted text-foreground border-[#1A1A1A] font-bold'
+                : 'bg-card border-[#1A1A1A] text-muted-foreground hover:text-foreground hover:bg-muted/40'
             )}
             title='Toggle multi-axis comparative trajectory chart'
           >
@@ -294,8 +294,8 @@ export function ExecutiveGraphBanner({
             }}
             onClick={() => setExpandedMetric(expandedMetric === card.id ? null : card.id)}
             className={cn(
-              'group relative rounded-xl border border-border/80 bg-card p-4 transition-all cursor-pointer hover:border-border hover:shadow-md flex flex-col justify-between overflow-hidden',
-              expandedMetric === card.id && 'ring-2 ring-emerald-500/50 border-emerald-500/60 shadow-sm'
+              'group relative rounded-xl border-none bg-card p-4 transition-all cursor-pointer hover:shadow-md flex flex-col justify-between overflow-hidden',
+              expandedMetric === card.id && 'ring-2 ring-emerald-500/50 shadow-sm'
             )}
           >
             {/* Card Header Content */}
@@ -381,7 +381,7 @@ export function ExecutiveGraphBanner({
               </div>
 
               {/* Card Footer Status */}
-              <div className='relative z-10 mt-1 flex items-center justify-between border-t border-border/60 pt-1.5 font-mono text-[10px] text-muted-foreground'>
+              <div className='relative z-10 mt-1 flex items-center justify-between border-none pt-1.5 font-mono text-[10px] text-muted-foreground'>
                 <span>{card.footerLabel}</span>
                 <span
                   className={cn(
@@ -408,9 +408,9 @@ export function ExecutiveGraphBanner({
             animate={{ opacity: 1, height: 'auto', y: 0 }}
             exit={{ opacity: 0, height: 0, y: -10 }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className='relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm'
+            className='relative overflow-hidden rounded-2xl border border-[#1A1A1A] bg-card p-5 shadow-sm'
           >
-            <div className='relative z-10 flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-3 mb-4'>
+            <div className='relative z-10 flex flex-wrap items-center justify-between gap-3 border-b border-[#1A1A1A] pb-3 mb-4'>
               <div>
                 <div className='flex items-center gap-2'>
                   <h3 className='font-mono text-xs font-bold uppercase tracking-wider text-foreground'>
@@ -434,7 +434,7 @@ export function ExecutiveGraphBanner({
 
               <div className='flex items-center gap-2'>
                 {/* Metric Quick Switcher */}
-                <div className='flex items-center rounded-lg border border-border bg-muted/40 p-0.5 text-[11px] font-mono shadow-2xs'>
+                <div className='flex items-center rounded-lg border border-[#1A1A1A] bg-muted/40 p-0.5 text-[11px] font-mono shadow-2xs'>
                   {(
                     [
                       { key: 'roas', label: 'ROAS' },
@@ -450,7 +450,7 @@ export function ExecutiveGraphBanner({
                       className={cn(
                         'px-2.5 py-1 rounded-md transition-all font-semibold uppercase',
                         expandedMetric === key
-                          ? 'bg-card text-foreground font-bold shadow-2xs border border-border'
+                          ? 'bg-card text-foreground font-bold shadow-2xs border border-[#1A1A1A]'
                           : 'text-muted-foreground hover:text-foreground'
                       )}
                     >
@@ -461,7 +461,7 @@ export function ExecutiveGraphBanner({
 
                 <button
                   onClick={() => setExpandedMetric(null)}
-                  className='px-2.5 py-1 rounded-md bg-muted/30 border border-border hover:bg-muted text-muted-foreground hover:text-foreground font-mono text-xs transition-colors'
+                  className='px-2.5 py-1 rounded-md bg-muted/30 border border-[#1A1A1A] hover:bg-muted text-muted-foreground hover:text-foreground font-mono text-xs transition-colors'
                   title='Close studio overlay'
                 >
                   Close
