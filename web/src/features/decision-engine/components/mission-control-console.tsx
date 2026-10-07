@@ -394,11 +394,12 @@ export function MissionControlConsole() {
       {/* 5. Autonomous Budget Reallocation Stream */}
       <ReallocationFeed
         initialItems={state.reallocations}
-        onExecuteReallocation={(item) => {
+        campaigns={state.campaigns}
+        onExecuteReallocation={(item, details) => {
           setState((prev) => {
             const newLedgerItem = {
-              id: `ledg-live-${Date.now()}`,
-              timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+              id: details?.ledgerRecord?.id || `ledg-live-${Date.now()}`,
+              timestamp: details?.ledgerRecord?.timestamp || new Date().toISOString().replace('T', ' ').substring(0, 19),
               decision: `Set ${item.targetCampaign} spend -> ₹${item.recommendedSpend.toFixed(0)}/day (shifted ₹${Math.abs(item.deltaSpend).toFixed(0)} from ${item.sourceCampaign})`,
               expectedMargin: item.expectedDailyMargin,
               realizedMargin: item.expectedDailyMargin * 0.94,
@@ -408,8 +409,36 @@ export function MissionControlConsole() {
               status: 'executed',
               feedback: 'Reinforced: Model weights updated'
             };
+
+            // Update cumulative capital moved and projected uplift in telemetry
+            const updatedTelemetry = {
+              ...prev.telemetry,
+              reallocationCapitalMoved: +(prev.telemetry.reallocationCapitalMoved + Math.abs(item.deltaSpend)).toFixed(2),
+              projectedMarginUplift: +(prev.telemetry.projectedMarginUplift + item.expectedDailyMargin).toFixed(2)
+            };
+
+            // Mutate campaigns safely so ROAS gauges reflect the newly executed allocation
+            const updatedCampaigns = prev.campaigns.map((c: any) => {
+              if (c.campaign === item.targetCampaign) {
+                return {
+                  ...c,
+                  currentDailySpend: Math.round(item.recommendedSpend),
+                  roas: item.predictedRoas
+                };
+              }
+              if (c.campaign === item.sourceCampaign) {
+                return {
+                  ...c,
+                  currentDailySpend: Math.max(0, Math.round(c.currentDailySpend - Math.abs(item.deltaSpend)))
+                };
+              }
+              return c;
+            });
+
             return {
               ...prev,
+              campaigns: updatedCampaigns,
+              telemetry: updatedTelemetry,
               ledger: [newLedgerItem, ...prev.ledger]
             };
           });
@@ -493,7 +522,7 @@ export function MissionControlConsole() {
       </div>
 
       {/* 8. Closed-Loop Decision Ledger */}
-      <DecisionLedgerTable entries={state.ledger} />
+      <DecisionLedgerTable entries={state.ledger} showHeader />
 
       {/* 9. Analysing Phase Modal featuring 3D GitHub Globe */}
       <ProductAnalysisModal
