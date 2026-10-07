@@ -33,17 +33,17 @@ export default function SimulatorPage() {
 
       {/* Simulator Mechanics Deep-Dive */}
       <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-        <div className='rounded border border-[#8A8A8A] bg-[#1A1A1A] p-5 shadow-none'>
+        <div className='rounded border border-[#1A1A1A] bg-[#1A1A1A] p-5 shadow-none'>
           <h4 className='font-mono text-sm font-bold text-white mb-2 flex items-center gap-2'>
             <Icons.adjustments className='size-4 text-white' />
             1. Adstock &amp; Saturation
           </h4>
           <p className='text-xs text-[#8A8A8A] leading-relaxed font-sans'>
-            Simulates non-linear Hill response curves: <code className='text-white font-mono bg-[#000000] px-1 py-0.5 rounded border border-[#8A8A8A]'>r(s) = a * s^b / (c + s^b)</code>. Models diminishing returns on over-scaled channels to calibrate optimizer bounds.
+            Simulates non-linear Hill response curves: <code className='text-white font-mono bg-[#000000] px-1 py-0.5 rounded'>r(s) = a * s^b / (c + s^b)</code>. Models diminishing returns on over-scaled channels to calibrate optimizer bounds.
           </p>
         </div>
 
-        <div className='rounded border border-[#8A8A8A] bg-[#1A1A1A] p-5 shadow-none'>
+        <div className='rounded border border-[#1A1A1A] bg-[#1A1A1A] p-5 shadow-none'>
           <h4 className='font-mono text-sm font-bold text-white mb-2 flex items-center gap-2'>
             <Icons.product className='size-4 text-white' />
             2. ERP Inventory Coupling
@@ -53,7 +53,7 @@ export default function SimulatorPage() {
           </p>
         </div>
 
-        <div className='rounded border border-[#8A8A8A] bg-[#1A1A1A] p-5 shadow-none'>
+        <div className='rounded border border-[#1A1A1A] bg-[#1A1A1A] p-5 shadow-none'>
           <h4 className='font-mono text-sm font-bold text-white mb-2 flex items-center gap-2'>
             <Icons.check className='size-4 text-white' />
             3. Ground-Truth Scoring
