@@ -9,10 +9,7 @@ import {
   IconBuildingStore,
   IconCheck,
   IconCopy,
-  IconRefresh,
   IconDatabase,
-  IconArrowRight,
-  IconAlertTriangle,
   IconCpu,
   IconFileCode,
   IconSparkles,
@@ -20,7 +17,9 @@ import {
   IconRocket,
   IconCurrencyDollar,
   IconPackage,
-  IconShieldCheck
+  IconShieldCheck,
+  IconChartBar,
+  IconEye
 } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
@@ -39,10 +38,18 @@ import {
   normalizeGoogleAdsRow,
   normalizeAmazonSponsoredProducts,
   normalizeShopifyOrder,
+  getCrossChannelOverview,
   UnifiedCommerceRecord
 } from '../normalization-engine';
 
+import { NormalizationKpiRibbon } from './normalization-kpi-ribbon';
+import { NormalizationGraphs } from './normalization-graphs';
+import { NormalizationPipelineTracker } from './normalization-pipeline-tracker';
+import { NormalizationFieldMapper } from './normalization-field-mapper';
+import { OmnichannelMatrixView } from './omnichannel-matrix-view';
+
 type PlatformKey = 'meta' | 'google' | 'amazon' | 'shopify';
+type MainViewMode = 'analytics' | 'split-inspector' | 'omnichannel' | 'mapper';
 
 interface PlatformSpec {
   id: PlatformKey;
@@ -52,10 +59,10 @@ interface PlatformSpec {
   color: string;
   accentBg: string;
   icon: React.ComponentType<{ className?: string }>;
-  rawSample: any[];
+  rawSample: Record<string, unknown>[];
   problemDescription: string;
   solutionDescription: string;
-  keyMismatches: { from: string; to: string; note: string }[];
+  keyFeatureBadge: string;
 }
 
 const PLATFORM_SPECS: PlatformSpec[] = [
@@ -70,13 +77,7 @@ const PLATFORM_SPECS: PlatformSpec[] = [
     rawSample: rawMetaPartials,
     problemDescription: 'Meta buries purchase and revenue values 4 levels deep in heterogeneous "actions" arrays with creative frequency decay.',
     solutionDescription: 'NEXUS unrolls the actions array, extracts omni_purchase count and monetary value, and computes creative hook & fatigue rates.',
-    keyMismatches: [
-      { from: 'actions[action_type="omni_purchase"].value', to: 'conversions', note: 'Nested actions array unwrapped to verified order count' },
-      { from: 'action_values[omni_purchase].value', to: 'attributed_revenue', note: 'Monetary conversion value extracted & currency-normalized' },
-      { from: 'frequency & reach', to: 'wearout_decay_curve', note: 'Monitors ad fatigue to trigger creative refresh before performance dips' },
-      { from: 'video_3_sec_watched / impressions', to: 'video_hook_rate_pct', note: 'Measures video hook retention (first 3 seconds)' },
-      { from: 'learning_phase_status', to: 'guardrail_status', note: 'Guards budget scaling to prevent algorithm reset' }
-    ]
+    keyFeatureBadge: 'Video Hook & Wearout Telemetry'
   },
   {
     id: 'google',
@@ -89,13 +90,7 @@ const PLATFORM_SPECS: PlatformSpec[] = [
     rawSample: rawGooglePartials,
     problemDescription: 'Google reports spend in micro-cents (1,000,000 micros = $1) and conceals impression share lost to budget constraints.',
     solutionDescription: 'NEXUS divides costMicros by 10^6, calculates Lost IS to uncover budget headroom, and matches SERP quality scores.',
-    keyMismatches: [
-      { from: 'metrics.costMicros', to: 'spend', note: '1,000,000 micros divided to clean decimal currency float' },
-      { from: 'metrics.searchBudgetLostImpressionShare', to: 'budget_lost_is_pct', note: 'Lost Impression Share detects when budget is capping growth' },
-      { from: 'metrics.searchRankLostImpressionShare', to: 'rank_lost_is_pct', note: 'Lost IS (Rank) diagnoses bid floor vs ad copy quality' },
-      { from: 'ad_group_criterion.qualityInfo.qualityScore', to: 'quality_score (1-10)', note: 'SERP keyword relevance score for bid arbitration' },
-      { from: 'campaign.biddingStrategyType', to: 'target_roas_drift', note: 'Detects divergence between target ROAS and actual return' }
-    ]
+    keyFeatureBadge: 'Auction Lost IS (Budget Headroom)'
   },
   {
     id: 'amazon',
@@ -108,12 +103,7 @@ const PLATFORM_SPECS: PlatformSpec[] = [
     rawSample: rawAmazonPartials,
     problemDescription: 'Amazon blends 14-day attribution windows with catalog halo effects and Buy Box win percentages that can waste budget.',
     solutionDescription: 'NEXUS reconciles 14-day lag, detects cross-SKU halo sales, and triggers Buy Box kill-switches if third-party sellers win the box.',
-    keyMismatches: [
-      { from: 'buyBoxWinPercentage', to: 'buy_box_kill_switch', note: 'Instantly stops ads if Buy Box is lost to 3rd-party counterfeiters' },
-      { from: 'attributedSalesOtherSku14d', to: 'halo_attributed_revenue', note: 'Captures sales of related shoes triggered by this ad' },
-      { from: 'fbaFeesEstimate & referralFeeRate', to: 'fba_unit_deductions', note: 'Deducts Amazon FBA handling fees for true net profit' },
-      { from: 'cost & attributedSales14d', to: 'spend & attributed_revenue', note: '14-day window reconciled with 1st-party orders' }
-    ]
+    keyFeatureBadge: 'Buy Box Circuit & Halo Sales'
   },
   {
     id: 'shopify',
@@ -126,13 +116,7 @@ const PLATFORM_SPECS: PlatformSpec[] = [
     rawSample: rawShopifyOrders,
     problemDescription: 'Storefront webhooks stream raw order and inventory json without ad attribution or payment gateway fee deductions.',
     solutionDescription: 'NEXUS maps customer order histories to calculate new vs returning customer LTV, deducts payment fees, and matches ERP inventory.',
-    keyMismatches: [
-      { from: 'customer.orders_count == 1', to: 'customer_acquisition_type', note: 'Identifies new customer acquisition (nCAC) vs returning buyer LTV' },
-      { from: 'processing_fee (2.9% + $0.30)', to: 'payment_gateway_fee', note: 'Deducts gateway friction for true Contribution Margin 3 (CM3)' },
-      { from: 'total_price - COGS - fees - taxes', to: 'net_contribution_margin', note: 'Calculates true profit after all unit costs' },
-      { from: 'line_items[0].sku', to: 'sku_id', note: 'Joins Shopify variant barcode to canonical Nike SKU' },
-      { from: 'inventory_item.available', to: 'inventory_runway', note: 'Automatically stops ads if warehouse stock reaches 0' }
-    ]
+    keyFeatureBadge: 'True CM3 & Gateway Deductions'
   }
 ];
 
@@ -144,6 +128,13 @@ const PLATFORMS_SPECS_MAP: Record<PlatformKey, PlatformSpec> = PLATFORM_SPECS.re
   {} as Record<PlatformKey, PlatformSpec>
 );
 
+function copyToClipboard(text: string, setCopied: (v: boolean) => void, label: string) {
+  navigator.clipboard.writeText(text);
+  setCopied(true);
+  toast.success(`${label} Copied to Clipboard`);
+  setTimeout(() => setCopied(false), 2000);
+}
+
 export function NormalizationShowcase() {
   const [selectedPlatform, setSelectedPlatform] = useState<PlatformKey>('meta');
   const [selectedSampleIndex, setSelectedSampleIndex] = useState<number>(0);
@@ -152,7 +143,8 @@ export function NormalizationShowcase() {
   const [copiedRaw, setCopiedRaw] = useState<boolean>(false);
   const [copiedUnified, setCopiedUnified] = useState<boolean>(false);
   const [rightViewMode, setRightViewMode] = useState<'visual' | 'json'>('visual');
-  const [showGuide, setShowGuide] = useState<boolean>(true);
+  const [mainViewMode, setMainViewMode] = useState<MainViewMode>('analytics');
+  const [showGuide, setShowGuide] = useState<boolean>(false);
 
   // Build warehouse inventory map
   const inventoryMap = useMemo(() => {
@@ -202,12 +194,10 @@ export function NormalizationShowcase() {
     }
   }, [currentRawItem, selectedPlatform, inventoryMap]);
 
-  const copyToClipboard = (text: string, setCopied: (v: boolean) => void, label: string) => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    toast.success(`${label} Copied to Clipboard`);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  // Omnichannel comparison data
+  const omnichannelData = useMemo(() => {
+    return getCrossChannelOverview(inventoryMap);
+  }, [inventoryMap]);
 
   const loadPresetSample = (idx: number) => {
     setIsCustomMode(false);
@@ -224,20 +214,23 @@ export function NormalizationShowcase() {
   };
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen min-w-0 max-w-full font-sans'>
+    <div className='flex flex-1 flex-col gap-5 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen min-w-0 max-w-full font-sans'>
       
-      {/* 1. Header Banner & Business Explanation */}
-      <div className='flex flex-col gap-3 border-b border-border/80 pb-5'>
+      {/* 1. Top Header Banner with Live Integrity Status */}
+      <div className='flex flex-col gap-3 border-b border-border/80 pb-4'>
         <div className='flex flex-wrap items-center justify-between gap-3'>
           <div className='flex items-center gap-2 flex-wrap'>
-            <Badge variant='outline' className='bg-cyan-500/10 text-cyan-500 border-cyan-500/30 font-mono text-[11px]'>
-              Data Ingestion Layer
+            <Badge variant='outline' className='bg-cyan-500/10 text-cyan-400 border-cyan-500/30 font-mono text-[11px]'>
+              Ingestion Layer
             </Badge>
-            <Badge variant='outline' className='bg-emerald-500/10 text-emerald-500 border-emerald-500/30 font-mono text-[11px]'>
+            <Badge variant='outline' className='bg-emerald-500/10 text-emerald-400 border-emerald-500/30 font-mono text-[11px]'>
               Real-Time Transformation
             </Badge>
             <Badge variant='outline' className='bg-indigo-500/10 text-indigo-400 border-indigo-500/30 font-mono text-[11px]'>
-              Cross-Platform SKU Harmonization
+              Multi-Channel SKU Harmonization
+            </Badge>
+            <Badge variant='outline' className='bg-purple-500/10 text-purple-400 border-purple-500/30 font-mono text-[11px]'>
+              Zero Data Drift
             </Badge>
           </div>
 
@@ -249,33 +242,33 @@ export function NormalizationShowcase() {
               className='text-xs font-mono h-8 flex items-center gap-1.5'
             >
               <IconInfoCircle className='size-3.5 text-cyan-500' />
-              <span>{showGuide ? 'Hide Feature Guide' : 'How This Feature Works'}</span>
+              <span>{showGuide ? 'Hide Feature Guide' : 'How This Works'}</span>
             </Button>
           </div>
         </div>
 
         <div>
-          <h1 className='text-xl sm:text-2xl font-mono font-bold text-foreground uppercase tracking-tight flex items-center gap-2.5 mt-1'>
-            <IconArrowsSplit2 className='size-6 text-cyan-500 shrink-0' />
+          <h1 className='text-xl sm:text-2xl font-mono font-bold text-foreground uppercase tracking-tight flex items-center gap-2.5 mt-0.5'>
+            <IconArrowsSplit2 className='size-6 text-cyan-400 shrink-0' />
             Live Ad API Normalizer &amp; Schema Harmonizer
           </h1>
-          <p className='text-xs sm:text-sm text-muted-foreground mt-1 max-w-4xl leading-relaxed'>
-            Every ad network reports metrics differently (Google in micro-cents, Meta in nested arrays, Amazon in halo windows, Shopify in raw webhooks).
-            NEXUS automatically translates and unifies these raw payloads in real-time so autonomous decision engines can optimize spend across all channels without calculation errors.
+          <p className='text-xs sm:text-sm text-muted-foreground mt-1 max-w-4xl leading-relaxed font-sans'>
+            Every ad network reports metrics differently (Google in micro-cents, Meta in nested arrays, Amazon in 14-day halo windows, Shopify in raw webhooks).
+            NEXUS automatically harmonizes these heterogeneous payloads into clean, canonical unit economics so autonomous decision engines can optimize spend across all channels without calculation errors.
           </p>
         </div>
 
-        {/* 2. User-Friendly Interactive Guide / Walkthrough Card */}
+        {/* Dismissable Interactive Guide */}
         {showGuide && (
           <div className='rounded-xl border border-cyan-500/30 bg-cyan-950/20 p-4 space-y-3 font-mono text-xs animate-in fade-in duration-200'>
             <div className='flex items-center justify-between'>
               <span className='font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5 text-[11px]'>
                 <IconSparkles className='size-3.5 text-cyan-400' />
-                Interactive 3-Step Walkthrough Guide
+                Interactive Normalization Architecture
               </span>
               <button
                 onClick={() => setShowGuide(false)}
-                className='text-[10px] text-muted-foreground hover:text-foreground'
+                className='text-[10px] text-muted-foreground hover:text-foreground cursor-pointer'
               >
                 Dismiss ✕
               </button>
@@ -287,10 +280,10 @@ export function NormalizationShowcase() {
                   <span className='size-5 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-[11px] font-bold'>
                     1
                   </span>
-                  Choose Ad Platform
+                  Choose Network &amp; Payload
                 </div>
                 <p className='text-muted-foreground text-[11px] leading-relaxed'>
-                  Click any of the 4 platform cards below (Meta, Google, Amazon, Shopify) to inspect its exact live API schema.
+                  Select Meta, Google, Amazon, or Shopify. Toggle preset payloads or edit custom JSON live.
                 </p>
               </div>
 
@@ -299,10 +292,10 @@ export function NormalizationShowcase() {
                   <span className='size-5 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-[11px] font-bold'>
                     2
                   </span>
-                  Inspect or Edit Raw JSON
+                  Interactive Graphs &amp; Telemetry
                 </div>
                 <p className='text-muted-foreground text-[11px] leading-relaxed'>
-                  Toggle between preset payloads (#1, #2, #3) or click <strong>&quot;Edit Raw JSON&quot;</strong> to test your own custom ad payload.
+                  Explore the Unit Economics Waterfall, Creative Video Funnels, Auction Lost Impression Share, and Buy Box win dials.
                 </p>
               </div>
 
@@ -311,10 +304,10 @@ export function NormalizationShowcase() {
                   <span className='size-5 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-[11px] font-bold'>
                     3
                   </span>
-                  Live Normalization Output
+                  RL Decision Dispatch
                 </div>
                 <p className='text-muted-foreground text-[11px] leading-relaxed'>
-                  Watch the right panel instantly calculate unified Spend, Revenue, True ROAS, and inventory checks in real-time.
+                  Deploy clean, validated state tensors directly into the reinforcement learning optimizer cache with 1 click.
                 </p>
               </div>
             </div>
@@ -322,10 +315,11 @@ export function NormalizationShowcase() {
         )}
       </div>
 
-      {/* 3. Source Platform Selector Tabs */}
+      {/* 2. Step 1: Network Selection Bar */}
       <div>
-        <div className='text-xs font-mono font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5'>
+        <div className='text-xs font-mono font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center justify-between'>
           <span>Step 1: Select Ad Network API to Normalize</span>
+          <span className='text-[10px] text-cyan-400'>Harmonizing 4 Channels</span>
         </div>
         <div className='grid grid-cols-2 lg:grid-cols-4 gap-3'>
           {PLATFORM_SPECS.map((spec) => {
@@ -342,7 +336,7 @@ export function NormalizationShowcase() {
                   toast.info(`Switched to ${spec.name}`);
                 }}
                 className={cn(
-                  'flex flex-col text-left p-3.5 rounded-xl border transition-all relative overflow-hidden cursor-pointer',
+                  'flex flex-col text-left p-3.5 rounded-xl border transition-all relative overflow-hidden cursor-pointer font-mono',
                   isSelected
                     ? 'border-cyan-500/80 bg-card shadow-md ring-2 ring-cyan-500/30'
                     : 'border-border/70 bg-card hover:bg-muted/40 hover:border-border'
@@ -357,18 +351,18 @@ export function NormalizationShowcase() {
                       <IconComponent className='size-5' />
                     </div>
                     <div>
-                      <div className='text-xs font-mono font-bold text-foreground'>{spec.name}</div>
-                      <div className='text-[10px] font-mono text-muted-foreground'>{spec.sourceApi}</div>
+                      <div className='text-xs font-bold text-foreground'>{spec.name}</div>
+                      <div className='text-[10px] text-muted-foreground'>{spec.sourceApi}</div>
                     </div>
                   </div>
                   {isSelected && (
-                    <Badge className='bg-cyan-500 text-black text-[9px] font-mono font-bold px-1.5 py-0.5 shrink-0'>
+                    <Badge className='bg-cyan-500 text-black text-[9px] font-bold px-1.5 py-0.5 shrink-0'>
                       ACTIVE
                     </Badge>
                   )}
                 </div>
-                <div className='mt-2.5 pt-2 border-t border-border/50 text-[10px] font-mono text-muted-foreground truncate'>
-                  {spec.endpoint}
+                <div className='mt-2.5 pt-2 border-t border-border/50 text-[10px] text-cyan-400/90 truncate flex items-center justify-between'>
+                  <span className='truncate'>{spec.keyFeatureBadge}</span>
                 </div>
               </button>
             );
@@ -376,8 +370,8 @@ export function NormalizationShowcase() {
         </div>
       </div>
 
-      {/* 4. Sample Payload Presets & Mode Switcher Bar */}
-      <div className='flex flex-wrap items-center justify-between gap-3 bg-muted/40 dark:bg-zinc-900/60 p-3 rounded-lg border border-border/70 text-xs font-mono'>
+      {/* 3. Step 2: Payload Presets & Mode Switcher Bar */}
+      <div className='flex flex-wrap items-center justify-between gap-3 bg-card/60 p-3 rounded-xl border border-border/70 text-xs font-mono shadow-xs'>
         <div className='flex items-center gap-2 flex-wrap'>
           <span className='text-muted-foreground font-semibold'>Step 2: Choose Payload:</span>
           {activeSpec.rawSample.map((_, idx) => (
@@ -398,6 +392,7 @@ export function NormalizationShowcase() {
             onClick={() => {
               setIsCustomMode(true);
               setCustomJsonInput(JSON.stringify(activeSpec.rawSample[selectedSampleIndex], null, 2));
+              setMainViewMode('split-inspector');
               toast.info('Custom JSON Edit Mode Activated');
             }}
             className={cn(
@@ -420,386 +415,458 @@ export function NormalizationShowcase() {
         </div>
       </div>
 
-      {/* 5. Main Split-Screen Showcase: Raw Payload (Left) -> Unified Record (Right) */}
-      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-        
-        {/* LEFT COLUMN: Raw Platform Partial */}
-        <div className='flex flex-col rounded-xl border border-border/80 bg-card overflow-hidden shadow-xs'>
-          <div className='flex items-center justify-between p-3.5 bg-muted/60 dark:bg-zinc-900 border-b border-border'>
-            <div className='flex items-center gap-2'>
-              <div
-                className='size-6 rounded flex items-center justify-center shrink-0'
-                style={{ backgroundColor: activeSpec.accentBg, color: activeSpec.color }}
-              >
-                <activeSpec.icon className='size-4' />
-              </div>
-              <div>
-                <span className='text-xs font-mono font-bold text-foreground uppercase'>
-                  1. Raw {activeSpec.name} Payload
-                </span>
-                <span className='text-[10px] font-mono text-muted-foreground ml-2 hidden sm:inline'>
-                  (Before Normalization)
-                </span>
-              </div>
-            </div>
-
-            <div className='flex items-center gap-1.5'>
-              <Button
-                size='sm'
-                variant='outline'
-                onClick={() =>
-                  copyToClipboard(
-                    isCustomMode ? customJsonInput : JSON.stringify(currentRawItem, null, 2),
-                    setCopiedRaw,
-                    'Raw JSON'
-                  )
-                }
-                className='h-7 text-[11px] font-mono px-2 flex items-center gap-1'
-                title='Copy Raw JSON'
-              >
-                {copiedRaw ? <IconCheck className='size-3.5 text-emerald-500' /> : <IconCopy className='size-3.5' />}
-                <span>{copiedRaw ? 'Copied' : 'Copy'}</span>
-              </Button>
-            </div>
-          </div>
-
-          {/* JSON Display / Live Editor */}
-          <div className='p-4 bg-slate-950 font-mono text-xs flex-1 min-h-[380px] max-h-[460px] overflow-auto text-slate-200'>
-            {isCustomMode ? (
-              <div className='flex flex-col h-full space-y-2'>
-                <div className='flex items-center justify-between text-[11px] text-purple-400 border-b border-purple-500/30 pb-1'>
-                  <span>✏️ Live JSON Editor (Edits normalize in real-time)</span>
-                  <button
-                    onClick={() => {
-                      setIsCustomMode(false);
-                      setCustomJsonInput('');
-                    }}
-                    className='text-[10px] text-muted-foreground hover:text-white'
-                  >
-                    Cancel / Reset
-                  </button>
-                </div>
-                <textarea
-                  value={customJsonInput}
-                  onChange={(e) => setCustomJsonInput(e.target.value)}
-                  className='w-full h-full min-h-[340px] bg-transparent text-emerald-400 font-mono text-xs resize-none outline-hidden border-none'
-                  placeholder='Paste or edit raw JSON here...'
-                />
-              </div>
-            ) : (
-              <pre className='whitespace-pre-wrap leading-relaxed'>
-                {currentRawItem ? JSON.stringify(currentRawItem, null, 2) : '// No valid JSON payload'}
-              </pre>
+      {/* 4. Main Navigation View Mode Switcher */}
+      <div className='flex flex-wrap items-center justify-between gap-3 bg-muted/40 p-1.5 rounded-xl border border-border/70 font-mono text-xs'>
+        <div className='flex items-center gap-1 flex-wrap'>
+          <button
+            onClick={() => setMainViewMode('analytics')}
+            className={cn(
+              'px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 font-bold cursor-pointer',
+              mainViewMode === 'analytics'
+                ? 'bg-cyan-500 text-black shadow-xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-card/50'
             )}
-          </div>
+          >
+            <IconChartBar className='size-4' />
+            <span>Visual Analytics &amp; Graphs</span>
+          </button>
 
-          {/* Field-by-Field Mapping Inspector */}
-          <div className='p-3.5 bg-muted/30 border-t border-border/70 text-[11px] font-mono'>
-            <div className='font-bold text-muted-foreground uppercase text-[10px] mb-2 flex items-center gap-1.5'>
-              <IconCpu className='size-3.5 text-cyan-500' />
-              Automatic Transformation Rules Applied to This Payload
-            </div>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
-              {activeSpec.keyMismatches.map((m, idx) => (
-                <div key={idx} className='p-2 rounded bg-card/60 border border-border/60 space-y-0.5'>
-                  <div className='text-amber-500 font-semibold truncate text-[10px]'>{m.from}</div>
-                  <div className='text-emerald-500 font-bold flex items-center gap-1 text-[11px]'>
-                    &rarr; {m.to}
-                  </div>
-                  <div className='text-[10px] text-muted-foreground'>{m.note}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <button
+            onClick={() => setMainViewMode('split-inspector')}
+            className={cn(
+              'px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 font-bold cursor-pointer',
+              mainViewMode === 'split-inspector'
+                ? 'bg-cyan-500 text-black shadow-xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-card/50'
+            )}
+          >
+            <IconEye className='size-4' />
+            <span>Side-by-Side Payload Inspector</span>
+          </button>
+
+          <button
+            onClick={() => setMainViewMode('omnichannel')}
+            className={cn(
+              'px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 font-bold cursor-pointer',
+              mainViewMode === 'omnichannel'
+                ? 'bg-cyan-500 text-black shadow-xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-card/50'
+            )}
+          >
+            <IconArrowsSplit2 className='size-4' />
+            <span>Cross-Platform Matrix</span>
+          </button>
+
+          <button
+            onClick={() => setMainViewMode('mapper')}
+            className={cn(
+              'px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 font-bold cursor-pointer',
+              mainViewMode === 'mapper'
+                ? 'bg-cyan-500 text-black shadow-xs'
+                : 'text-muted-foreground hover:text-foreground hover:bg-card/50'
+            )}
+          >
+            <IconCpu className='size-4' />
+            <span>Transformation Rules</span>
+          </button>
         </div>
 
-        {/* RIGHT COLUMN: Canonical UnifiedCommerceRecord */}
-        <div className='flex flex-col rounded-xl border border-cyan-500/40 bg-card overflow-hidden shadow-xs'>
-          <div className='flex items-center justify-between p-3.5 bg-cyan-950/30 border-b border-cyan-500/30'>
-            <div className='flex items-center gap-2'>
-              <div className='size-6 rounded bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0'>
-                <IconDatabase className='size-4' />
-              </div>
-              <div>
-                <span className='text-xs font-mono font-bold text-cyan-400 uppercase'>
-                  2. Canonical Unified Commerce Record
-                </span>
-                <span className='text-[10px] font-mono text-muted-foreground ml-2 hidden sm:inline'>
-                  (Clean Optimizer Output)
-                </span>
-              </div>
-            </div>
-
-            <div className='flex items-center gap-2'>
-              {/* Toggle View: Visual vs JSON */}
-              <div className='flex items-center bg-muted/60 p-0.5 rounded border border-border/60 text-[10px] font-mono'>
-                <button
-                  onClick={() => setRightViewMode('visual')}
-                  className={cn(
-                    'px-2 py-0.5 rounded font-medium transition-all',
-                    rightViewMode === 'visual' ? 'bg-cyan-500 text-black font-bold' : 'text-muted-foreground hover:text-foreground'
-                  )}
-                >
-                  Visual
-                </button>
-                <button
-                  onClick={() => setRightViewMode('json')}
-                  className={cn(
-                    'px-2 py-0.5 rounded font-medium transition-all',
-                    rightViewMode === 'json' ? 'bg-cyan-500 text-black font-bold' : 'text-muted-foreground hover:text-foreground'
-                  )}
-                >
-                  JSON
-                </button>
-              </div>
-
-              <Button
-                size='sm'
-                variant='outline'
-                onClick={() =>
-                  copyToClipboard(
-                    JSON.stringify(unifiedRecord, null, 2),
-                    setCopiedUnified,
-                    'Unified Record'
-                  )
-                }
-                className='h-7 text-[11px] font-mono px-2 flex items-center gap-1'
-                title='Copy Unified JSON'
-              >
-                {copiedUnified ? <IconCheck className='size-3.5 text-emerald-500' /> : <IconCopy className='size-3.5' />}
-                <span>{copiedUnified ? 'Copied' : 'Copy'}</span>
-              </Button>
-            </div>
-          </div>
-
-          {/* Unified Normalized Metrics Grid */}
-          {unifiedRecord ? (
-            <div className='p-4 flex flex-col gap-4 flex-1'>
-              
-              {/* Product Identity Banner */}
-              <div className='p-3.5 rounded-lg bg-muted/40 dark:bg-zinc-900 border border-border flex flex-col gap-2 font-mono text-xs'>
-                <div className='flex items-center justify-between'>
-                  <span className='text-muted-foreground'>Canonical Master SKU:</span>
-                  <span className='font-bold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/30'>
-                    {unifiedRecord.sku_id}
-                  </span>
-                </div>
-                <div className='flex items-center justify-between'>
-                  <span className='text-muted-foreground'>Matched Footwear:</span>
-                  <span className='font-bold text-foreground'>{unifiedRecord.sku_name}</span>
-                </div>
-                <div className='flex items-center justify-between'>
-                  <span className='text-muted-foreground'>Cross-Channel ID Match:</span>
-                  <span className='text-muted-foreground text-[11px]'>
-                    ASIN: {unifiedRecord.asin || 'N/A'} • Shopify: {unifiedRecord.variant_id ? unifiedRecord.variant_id.slice(-8) : 'N/A'}
-                  </span>
-                </div>
-                <div className='flex items-center justify-between'>
-                  <span className='text-muted-foreground'>Standard UTC Timestamp:</span>
-                  <span className='text-muted-foreground text-[11px]'>{unifiedRecord.timestamp}</span>
-                </div>
-              </div>
-
-              {rightViewMode === 'visual' ? (
-                <>
-                  {/* Key Financial KPIs */}
-                  <div className='grid grid-cols-2 sm:grid-cols-4 gap-2.5 font-mono'>
-                    <div className='p-2.5 rounded bg-card border border-border/70 flex flex-col'>
-                      <span className='text-[10px] text-muted-foreground uppercase'>Clean Spend</span>
-                      <span className='text-base font-bold text-foreground mt-0.5'>
-                        ${unifiedRecord.spend.toFixed(2)}
-                      </span>
-                      <span className='text-[9px] text-muted-foreground'>Normalized currency</span>
-                    </div>
-
-                    <div className='p-2.5 rounded bg-card border border-border/70 flex flex-col'>
-                      <span className='text-[10px] text-muted-foreground uppercase'>Attributed Rev</span>
-                      <span className='text-base font-bold text-emerald-500 mt-0.5'>
-                        ${unifiedRecord.attributed_revenue.toFixed(2)}
-                      </span>
-                      <span className='text-[9px] text-emerald-600'>Verified purchases</span>
-                    </div>
-
-                    <div className='p-2.5 rounded bg-card border border-border/70 flex flex-col'>
-                      <span className='text-[10px] text-muted-foreground uppercase'>Gross Margin</span>
-                      <span className='text-base font-bold text-cyan-400 mt-0.5'>
-                        ${unifiedRecord.gross_margin.toFixed(2)}
-                      </span>
-                      <span className='text-[9px] text-cyan-500'>{unifiedRecord.gross_margin_pct}% COGS margin</span>
-                    </div>
-
-                    <div className='p-2.5 rounded bg-card border border-border/70 flex flex-col'>
-                      <span className='text-[10px] text-muted-foreground uppercase'>Attributed ROAS</span>
-                      <span className='text-base font-bold text-indigo-400 mt-0.5'>
-                        {unifiedRecord.roas.toFixed(2)}x
-                      </span>
-                      <span className='text-[9px] text-indigo-500'>True return</span>
-                    </div>
-                  </div>
-
-                  {/* Secondary Metrics */}
-                  <div className='grid grid-cols-3 sm:grid-cols-6 gap-2 text-center font-mono text-[11px]'>
-                    <div className='p-2 rounded bg-muted/30 border border-border/50'>
-                      <div className='text-muted-foreground text-[9px]'>IMPR</div>
-                      <div className='font-bold mt-0.5'>{unifiedRecord.impressions.toLocaleString()}</div>
-                    </div>
-                    <div className='p-2 rounded bg-muted/30 border border-border/50'>
-                      <div className='text-muted-foreground text-[9px]'>CLICKS</div>
-                      <div className='font-bold mt-0.5'>{unifiedRecord.clicks.toLocaleString()}</div>
-                    </div>
-                    <div className='p-2 rounded bg-muted/30 border border-border/50'>
-                      <div className='text-muted-foreground text-[9px]'>CTR</div>
-                      <div className='font-bold mt-0.5'>{unifiedRecord.ctr}%</div>
-                    </div>
-                    <div className='p-2 rounded bg-muted/30 border border-border/50'>
-                      <div className='text-muted-foreground text-[9px]'>CPC</div>
-                      <div className='font-bold mt-0.5'>${unifiedRecord.cpc}</div>
-                    </div>
-                    <div className='p-2 rounded bg-muted/30 border border-border/50'>
-                      <div className='text-muted-foreground text-[9px]'>CPM</div>
-                      <div className='font-bold mt-0.5'>${unifiedRecord.cpm}</div>
-                    </div>
-                    <div className='p-2 rounded bg-muted/30 border border-border/50'>
-                      <div className='text-muted-foreground text-[9px]'>STOCK UNITS</div>
-                      <div className={cn('font-bold mt-0.5', unifiedRecord.inventory_on_hand === 0 ? 'text-red-500' : 'text-emerald-500')}>
-                        {unifiedRecord.inventory_on_hand === 0 ? '0 (STOCKOUT)' : unifiedRecord.inventory_on_hand}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Channel-Specific Features */}
-                  <div className='p-3 rounded-lg bg-cyan-950/20 border border-cyan-500/30 flex flex-col gap-2 font-mono text-[11px]'>
-                    <div className='flex items-center justify-between text-cyan-400 font-bold uppercase text-[10px]'>
-                      <span className='flex items-center gap-1.5'>
-                        <IconSparkles className='size-3.5 text-cyan-400' />
-                        {activeSpec.name} Telemetry Attributes
-                      </span>
-                      <Badge variant='outline' className='bg-cyan-500/10 text-cyan-300 border-cyan-500/30 text-[9px]'>
-                        AI Ready
-                      </Badge>
-                    </div>
-
-                    <div className='grid grid-cols-2 sm:grid-cols-3 gap-2 text-[10px]'>
-                      {unifiedRecord.channel === 'meta' && (
-                        <>
-                          <div className='p-1.5 rounded bg-background/50 border border-border/40'>
-                            <span className='text-muted-foreground block text-[9px]'>AD FREQUENCY / WEAROUT</span>
-                            <span className='font-bold text-foreground'>{unifiedRecord.frequency ?? 1.0}x</span>
-                          </div>
-                          <div className='p-1.5 rounded bg-background/50 border border-border/40'>
-                            <span className='text-muted-foreground block text-[9px]'>VIDEO 3S HOOK RATE</span>
-                            <span className='font-bold text-indigo-400'>{unifiedRecord.video_hook_rate_pct ? `${unifiedRecord.video_hook_rate_pct}%` : 'N/A (Still)'}</span>
-                          </div>
-                          <div className='p-1.5 rounded bg-background/50 border border-border/40'>
-                            <span className='text-muted-foreground block text-[9px]'>LEARNING STATUS</span>
-                            <span className='font-bold text-emerald-400'>{unifiedRecord.learning_phase_status ?? 'SUCCESS'}</span>
-                          </div>
-                        </>
-                      )}
-
-                      {unifiedRecord.channel === 'google' && (
-                        <>
-                          <div className='p-1.5 rounded bg-background/50 border border-border/40'>
-                            <span className='text-muted-foreground block text-[9px]'>LOST IS (BUDGET)</span>
-                            <span className='font-bold text-amber-400'>{unifiedRecord.search_budget_lost_is_pct}%</span>
-                          </div>
-                          <div className='p-1.5 rounded bg-background/50 border border-border/40'>
-                            <span className='text-muted-foreground block text-[9px]'>LOST IS (RANK)</span>
-                            <span className='font-bold text-rose-400'>{unifiedRecord.search_rank_lost_is_pct}%</span>
-                          </div>
-                          <div className='p-1.5 rounded bg-background/50 border border-border/40'>
-                            <span className='text-muted-foreground block text-[9px]'>QUALITY SCORE</span>
-                            <span className='font-bold text-emerald-400'>{unifiedRecord.quality_score ?? 9} / 10</span>
-                          </div>
-                        </>
-                      )}
-
-                      {unifiedRecord.channel === 'amazon' && (
-                        <>
-                          <div className='p-1.5 rounded bg-background/50 border border-border/40'>
-                            <span className='text-muted-foreground block text-[9px]'>BUY BOX WIN %</span>
-                            <span className={cn('font-bold', (unifiedRecord.buy_box_win_pct ?? 100) < 80 ? 'text-rose-400' : 'text-emerald-400')}>
-                              {unifiedRecord.buy_box_win_pct}%
-                            </span>
-                          </div>
-                          <div className='p-1.5 rounded bg-background/50 border border-border/40'>
-                            <span className='text-muted-foreground block text-[9px]'>CATALOG HALO REV</span>
-                            <span className='font-bold text-cyan-400'>${unifiedRecord.halo_attributed_revenue?.toFixed(2) ?? '0.00'}</span>
-                          </div>
-                          <div className='p-1.5 rounded bg-background/50 border border-border/40'>
-                            <span className='text-muted-foreground block text-[9px]'>FBA DEDUCTIONS</span>
-                            <span className='font-bold text-amber-400'>${unifiedRecord.fba_fees?.toFixed(2) ?? '0.00'}</span>
-                          </div>
-                        </>
-                      )}
-
-                      {unifiedRecord.channel === 'shopify' && (
-                        <>
-                          <div className='p-1.5 rounded bg-background/50 border border-border/40'>
-                            <span className='text-muted-foreground block text-[9px]'>ACQUISITION TYPE</span>
-                            <span className='font-bold text-purple-400'>{unifiedRecord.customer_acquisition_type}</span>
-                          </div>
-                          <div className='p-1.5 rounded bg-background/50 border border-border/40'>
-                            <span className='text-muted-foreground block text-[9px]'>GATEWAY FEE</span>
-                            <span className='font-bold text-amber-400'>${unifiedRecord.payment_gateway_fee?.toFixed(2)}</span>
-                          </div>
-                          <div className='p-1.5 rounded bg-background/50 border border-border/40'>
-                            <span className='text-muted-foreground block text-[9px]'>TRUE CM3 MARGIN</span>
-                            <span className='font-bold text-emerald-400'>${unifiedRecord.net_contribution_margin?.toFixed(2)}</span>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </>
-              ) : (
-                /* JSON Tensor View */
-                <div className='rounded bg-slate-950 p-3 font-mono text-xs text-cyan-300 overflow-auto max-h-[300px] border border-cyan-500/20'>
-                  <pre className='whitespace-pre-wrap leading-tight'>
-                    {JSON.stringify(unifiedRecord, null, 2)}
-                  </pre>
-                </div>
-              )}
-
-              {/* Action: Send to Decision Engine */}
-              <div className='pt-2 border-t border-border/60 flex items-center justify-between'>
-                <span className='text-[10px] text-muted-foreground font-mono'>
-                  Ready for real-time budget optimization
-                </span>
-                <Button
-                  size='sm'
-                  onClick={handleSendToDecisionEngine}
-                  className='bg-cyan-500 hover:bg-cyan-400 text-black font-mono font-bold text-xs h-8 px-3 flex items-center gap-1.5 cursor-pointer'
-                >
-                  <IconRocket className='size-3.5' />
-                  <span>Send to RL Decision Engine</span>
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className='p-8 text-center text-muted-foreground font-mono text-xs'>
-              Invalid payload or unable to normalize.
-            </div>
-          )}
+        <div className='flex items-center gap-2 pr-1'>
+          <Button
+            size='sm'
+            onClick={handleSendToDecisionEngine}
+            className='bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs h-7 px-3 flex items-center gap-1.5 cursor-pointer font-mono'
+          >
+            <IconRocket className='size-3.5' />
+            <span>Dispatch to RL Engine</span>
+          </Button>
         </div>
       </div>
 
-      {/* 6. Section Feature Guide: What Each Normalization Component Provides */}
+      {/* 5. Pipeline Stage Tracker */}
+      <NormalizationPipelineTracker record={unifiedRecord} platformName={activeSpec.name} />
+
+      {/* 6. Executive KPI Ribbon */}
+      <NormalizationKpiRibbon record={unifiedRecord} platformColor={activeSpec.color} />
+
+      {/* 7. VIEW MODE 1: VISUAL ANALYTICS & GRAPHS (PRIMARY UPGRADE) */}
+      {mainViewMode === 'analytics' && (
+        <div className='flex flex-col gap-5'>
+          {/* Main Graph Suite */}
+          <NormalizationGraphs
+            record={unifiedRecord}
+            omnichannelData={omnichannelData}
+            selectedPlatform={selectedPlatform}
+          />
+
+          {/* Compact Quick-Look Ingestion Inspector */}
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
+            {/* Left: Raw Payload Snippet */}
+            <div className='rounded-xl border border-border/80 bg-card overflow-hidden shadow-xs flex flex-col font-mono text-xs'>
+              <div className='flex items-center justify-between p-3 bg-muted/60 border-b border-border'>
+                <span className='font-bold text-foreground text-xs flex items-center gap-1.5 uppercase'>
+                  <activeSpec.icon className='size-4 text-cyan-400' />
+                  Raw {activeSpec.name} Payload
+                </span>
+                <Button
+                  size='sm'
+                  variant='outline'
+                  onClick={() =>
+                    copyToClipboard(
+                      JSON.stringify(currentRawItem, null, 2),
+                      setCopiedRaw,
+                      'Raw JSON'
+                    )
+                  }
+                  className='h-6 text-[10px] px-2 flex items-center gap-1'
+                >
+                  {copiedRaw ? <IconCheck className='size-3 text-emerald-400' /> : <IconCopy className='size-3' />}
+                  <span>Copy</span>
+                </Button>
+              </div>
+              <div className='p-3 bg-slate-950 text-slate-200 overflow-auto max-h-[220px] text-[11px]'>
+                <pre className='whitespace-pre-wrap leading-relaxed'>
+                  {currentRawItem ? JSON.stringify(currentRawItem, null, 2) : '// No data'}
+                </pre>
+              </div>
+              <div className='p-2 bg-muted/30 border-t border-border/60 text-[10px] text-muted-foreground flex items-center justify-between'>
+                <span>API Endpoint: {activeSpec.endpoint}</span>
+                <button
+                  onClick={() => setMainViewMode('split-inspector')}
+                  className='text-cyan-400 hover:underline font-semibold cursor-pointer'
+                >
+                  Full Editor &rarr;
+                </button>
+              </div>
+            </div>
+
+            {/* Right: Canonical Record Preview */}
+            <div className='rounded-xl border border-cyan-500/40 bg-card overflow-hidden shadow-xs flex flex-col font-mono text-xs'>
+              <div className='flex items-center justify-between p-3 bg-cyan-950/20 border-b border-cyan-500/30'>
+                <span className='font-bold text-cyan-400 text-xs flex items-center gap-1.5 uppercase'>
+                  <IconDatabase className='size-4' />
+                  Canonical Unified Commerce Record
+                </span>
+                <Button
+                  size='sm'
+                  variant='outline'
+                  onClick={() =>
+                    copyToClipboard(
+                      JSON.stringify(unifiedRecord, null, 2),
+                      setCopiedUnified,
+                      'Unified Tensor'
+                    )
+                  }
+                  className='h-6 text-[10px] px-2 flex items-center gap-1 border-cyan-500/40 text-cyan-300'
+                >
+                  {copiedUnified ? <IconCheck className='size-3 text-emerald-400' /> : <IconCopy className='size-3' />}
+                  <span>Copy</span>
+                </Button>
+              </div>
+
+              <div className='p-3 bg-slate-950 text-cyan-300 overflow-auto max-h-[220px] text-[11px] border-b border-cyan-500/20'>
+                <pre className='whitespace-pre-wrap leading-relaxed'>
+                  {unifiedRecord ? JSON.stringify(unifiedRecord, null, 2) : '// No record'}
+                </pre>
+              </div>
+
+              <div className='p-2 bg-cyan-950/30 text-[10px] text-cyan-400 flex items-center justify-between'>
+                <span>Status: Ingestion Tensor Ready</span>
+                <button
+                  onClick={handleSendToDecisionEngine}
+                  className='text-cyan-300 hover:text-white font-bold flex items-center gap-1 cursor-pointer'
+                >
+                  <IconRocket className='size-3' />
+                  <span>Send to RL Engine</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 8. VIEW MODE 2: SPLIT-SCREEN INGESTION INSPECTOR */}
+      {mainViewMode === 'split-inspector' && (
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-5'>
+          {/* LEFT: Raw Platform Partial */}
+          <div className='flex flex-col rounded-xl border border-border/80 bg-card overflow-hidden shadow-xs'>
+            <div className='flex items-center justify-between p-3.5 bg-muted/60 dark:bg-zinc-900 border-b border-border'>
+              <div className='flex items-center gap-2'>
+                <div
+                  className='size-6 rounded flex items-center justify-center shrink-0'
+                  style={{ backgroundColor: activeSpec.accentBg, color: activeSpec.color }}
+                >
+                  <activeSpec.icon className='size-4' />
+                </div>
+                <div>
+                  <span className='text-xs font-mono font-bold text-foreground uppercase'>
+                    1. Raw {activeSpec.name} Payload
+                  </span>
+                  <span className='text-[10px] font-mono text-muted-foreground ml-2 hidden sm:inline'>
+                    (Before Normalization)
+                  </span>
+                </div>
+              </div>
+
+              <div className='flex items-center gap-1.5'>
+                <Button
+                  size='sm'
+                  variant='outline'
+                  onClick={() =>
+                    copyToClipboard(
+                      isCustomMode ? customJsonInput : JSON.stringify(currentRawItem, null, 2),
+                      setCopiedRaw,
+                      'Raw JSON'
+                    )
+                  }
+                  className='h-7 text-[11px] font-mono px-2 flex items-center gap-1'
+                  title='Copy Raw JSON'
+                >
+                  {copiedRaw ? <IconCheck className='size-3.5 text-emerald-500' /> : <IconCopy className='size-3.5' />}
+                  <span>{copiedRaw ? 'Copied' : 'Copy'}</span>
+                </Button>
+              </div>
+            </div>
+
+            {/* JSON Display / Live Editor */}
+            <div className='p-4 bg-slate-950 font-mono text-xs flex-1 min-h-[400px] max-h-[500px] overflow-auto text-slate-200'>
+              {isCustomMode ? (
+                <div className='flex flex-col h-full space-y-2'>
+                  <div className='flex items-center justify-between text-[11px] text-purple-400 border-b border-purple-500/30 pb-1'>
+                    <span>✏️ Live JSON Editor (Edits normalize in real-time)</span>
+                    <button
+                      onClick={() => {
+                        setIsCustomMode(false);
+                        setCustomJsonInput('');
+                      }}
+                      className='text-[10px] text-muted-foreground hover:text-white cursor-pointer'
+                    >
+                      Cancel / Reset
+                    </button>
+                  </div>
+                  <textarea
+                    value={customJsonInput}
+                    onChange={(e) => setCustomJsonInput(e.target.value)}
+                    className='w-full h-full min-h-[360px] bg-transparent text-emerald-400 font-mono text-xs resize-none outline-hidden border-none'
+                    placeholder='Paste or edit raw JSON here...'
+                  />
+                </div>
+              ) : (
+                <pre className='whitespace-pre-wrap leading-relaxed'>
+                  {currentRawItem ? JSON.stringify(currentRawItem, null, 2) : '// No valid JSON payload'}
+                </pre>
+              )}
+            </div>
+
+            <div className='p-3 bg-muted/30 border-t border-border/70 text-[11px] font-mono text-muted-foreground flex items-center justify-between'>
+              <span>Endpoint: {activeSpec.endpoint}</span>
+              <span className='text-cyan-400 font-semibold'>Source: {activeSpec.sourceApi}</span>
+            </div>
+          </div>
+
+          {/* RIGHT: Canonical Unified Commerce Record */}
+          <div className='flex flex-col rounded-xl border border-cyan-500/40 bg-card overflow-hidden shadow-xs'>
+            <div className='flex items-center justify-between p-3.5 bg-cyan-950/30 border-b border-cyan-500/30'>
+              <div className='flex items-center gap-2'>
+                <div className='size-6 rounded bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0'>
+                  <IconDatabase className='size-4' />
+                </div>
+                <div>
+                  <span className='text-xs font-mono font-bold text-cyan-400 uppercase'>
+                    2. Canonical Unified Record
+                  </span>
+                  <span className='text-[10px] font-mono text-muted-foreground ml-2 hidden sm:inline'>
+                    (Clean Optimizer Output)
+                  </span>
+                </div>
+              </div>
+
+              <div className='flex items-center gap-2'>
+                <div className='flex items-center bg-muted/60 p-0.5 rounded border border-border/60 text-[10px] font-mono'>
+                  <button
+                    onClick={() => setRightViewMode('visual')}
+                    className={cn(
+                      'px-2 py-0.5 rounded font-medium transition-all cursor-pointer',
+                      rightViewMode === 'visual' ? 'bg-cyan-500 text-black font-bold' : 'text-muted-foreground hover:text-foreground'
+                    )}
+                  >
+                    Visual
+                  </button>
+                  <button
+                    onClick={() => setRightViewMode('json')}
+                    className={cn(
+                      'px-2 py-0.5 rounded font-medium transition-all cursor-pointer',
+                      rightViewMode === 'json' ? 'bg-cyan-500 text-black font-bold' : 'text-muted-foreground hover:text-foreground'
+                    )}
+                  >
+                    JSON
+                  </button>
+                </div>
+
+                <Button
+                  size='sm'
+                  variant='outline'
+                  onClick={() =>
+                    copyToClipboard(
+                      JSON.stringify(unifiedRecord, null, 2),
+                      setCopiedUnified,
+                      'Unified Record'
+                    )
+                  }
+                  className='h-7 text-[11px] font-mono px-2 flex items-center gap-1'
+                  title='Copy Unified JSON'
+                >
+                  {copiedUnified ? <IconCheck className='size-3.5 text-emerald-500' /> : <IconCopy className='size-3.5' />}
+                  <span>{copiedUnified ? 'Copied' : 'Copy'}</span>
+                </Button>
+              </div>
+            </div>
+
+            {unifiedRecord ? (
+              <div className='p-4 flex flex-col gap-4 flex-1'>
+                {/* Product Identity Banner */}
+                <div className='p-3 rounded-lg bg-muted/40 border border-border flex flex-col gap-2 font-mono text-xs'>
+                  <div className='flex items-center justify-between'>
+                    <span className='text-muted-foreground'>Canonical Master SKU:</span>
+                    <span className='font-bold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/30'>
+                      {unifiedRecord.sku_id}
+                    </span>
+                  </div>
+                  <div className='flex items-center justify-between'>
+                    <span className='text-muted-foreground'>Matched Footwear:</span>
+                    <span className='font-bold text-foreground'>{unifiedRecord.sku_name}</span>
+                  </div>
+                  <div className='flex items-center justify-between'>
+                    <span className='text-muted-foreground'>Cross-Channel ID Match:</span>
+                    <span className='text-muted-foreground text-[11px]'>
+                      ASIN: {unifiedRecord.asin || 'N/A'} • Shopify: {unifiedRecord.variant_id ? unifiedRecord.variant_id.slice(-8) : 'N/A'}
+                    </span>
+                  </div>
+                  <div className='flex items-center justify-between'>
+                    <span className='text-muted-foreground'>Standard UTC Timestamp:</span>
+                    <span className='text-muted-foreground text-[11px]'>{unifiedRecord.timestamp}</span>
+                  </div>
+                </div>
+
+                {rightViewMode === 'visual' ? (
+                  <>
+                    <div className='grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono'>
+                      <div className='p-2 rounded bg-card border border-border/70 flex flex-col'>
+                        <span className='text-[10px] text-muted-foreground uppercase'>Clean Spend</span>
+                        <span className='text-base font-bold text-foreground mt-0.5'>${unifiedRecord.spend.toFixed(2)}</span>
+                        <span className='text-[9px] text-muted-foreground'>Normalized float</span>
+                      </div>
+                      <div className='p-2 rounded bg-card border border-border/70 flex flex-col'>
+                        <span className='text-[10px] text-muted-foreground uppercase'>Attributed Rev</span>
+                        <span className='text-base font-bold text-emerald-400 mt-0.5'>${unifiedRecord.attributed_revenue.toFixed(2)}</span>
+                        <span className='text-[9px] text-emerald-500'>{unifiedRecord.conversions} orders</span>
+                      </div>
+                      <div className='p-2 rounded bg-card border border-border/70 flex flex-col'>
+                        <span className='text-[10px] text-muted-foreground uppercase'>Gross Margin</span>
+                        <span className='text-base font-bold text-indigo-400 mt-0.5'>${unifiedRecord.gross_margin.toFixed(2)}</span>
+                        <span className='text-[9px] text-indigo-500'>{unifiedRecord.gross_margin_pct}% COGS</span>
+                      </div>
+                      <div className='p-2 rounded bg-card border border-border/70 flex flex-col'>
+                        <span className='text-[10px] text-muted-foreground uppercase'>Attributed ROAS</span>
+                        <span className='text-base font-bold text-purple-400 mt-0.5'>{unifiedRecord.roas.toFixed(2)}x</span>
+                        <span className='text-[9px] text-purple-500'>True return</span>
+                      </div>
+                    </div>
+
+                    <div className='grid grid-cols-3 sm:grid-cols-6 gap-2 text-center font-mono text-[11px]'>
+                      <div className='p-1.5 rounded bg-muted/30 border border-border/50'>
+                        <div className='text-muted-foreground text-[9px]'>IMPR</div>
+                        <div className='font-bold mt-0.5'>{unifiedRecord.impressions.toLocaleString()}</div>
+                      </div>
+                      <div className='p-1.5 rounded bg-muted/30 border border-border/50'>
+                        <div className='text-muted-foreground text-[9px]'>CLICKS</div>
+                        <div className='font-bold mt-0.5'>{unifiedRecord.clicks.toLocaleString()}</div>
+                      </div>
+                      <div className='p-1.5 rounded bg-muted/30 border border-border/50'>
+                        <div className='text-muted-foreground text-[9px]'>CTR</div>
+                        <div className='font-bold mt-0.5'>{unifiedRecord.ctr}%</div>
+                      </div>
+                      <div className='p-1.5 rounded bg-muted/30 border border-border/50'>
+                        <div className='text-muted-foreground text-[9px]'>CPC</div>
+                        <div className='font-bold mt-0.5'>${unifiedRecord.cpc}</div>
+                      </div>
+                      <div className='p-1.5 rounded bg-muted/30 border border-border/50'>
+                        <div className='text-muted-foreground text-[9px]'>CPM</div>
+                        <div className='font-bold mt-0.5'>${unifiedRecord.cpm}</div>
+                      </div>
+                      <div className='p-1.5 rounded bg-muted/30 border border-border/50'>
+                        <div className='text-muted-foreground text-[9px]'>STOCK UNITS</div>
+                        <div className={cn('font-bold mt-0.5', unifiedRecord.inventory_on_hand === 0 ? 'text-red-500' : 'text-emerald-500')}>
+                          {unifiedRecord.inventory_on_hand === 0 ? '0 (STOCKOUT)' : unifiedRecord.inventory_on_hand}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className='rounded bg-slate-950 p-3 font-mono text-xs text-cyan-300 overflow-auto max-h-[300px] border border-cyan-500/20'>
+                    <pre className='whitespace-pre-wrap leading-tight'>
+                      {JSON.stringify(unifiedRecord, null, 2)}
+                    </pre>
+                  </div>
+                )}
+
+                <div className='pt-2 border-t border-border/60 flex items-center justify-between'>
+                  <span className='text-[10px] text-muted-foreground font-mono'>
+                    Ready for real-time budget optimization
+                  </span>
+                  <Button
+                    size='sm'
+                    onClick={handleSendToDecisionEngine}
+                    className='bg-cyan-500 hover:bg-cyan-400 text-black font-mono font-bold text-xs h-8 px-3 flex items-center gap-1.5 cursor-pointer'
+                  >
+                    <IconRocket className='size-3.5' />
+                    <span>Send to RL Decision Engine</span>
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className='p-8 text-center text-muted-foreground font-mono text-xs'>
+                Invalid payload or unable to normalize.
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 9. VIEW MODE 3: OMNICHANNEL MATRIX */}
+      {mainViewMode === 'omnichannel' && (
+        <OmnichannelMatrixView
+          items={omnichannelData}
+          onSelectPlatform={(p) => {
+            setSelectedPlatform(p);
+            setSelectedSampleIndex(0);
+            setIsCustomMode(false);
+          }}
+          selectedPlatform={selectedPlatform}
+        />
+      )}
+
+      {/* 10. VIEW MODE 4: TRANSFORMATION RULES */}
+      {mainViewMode === 'mapper' && (
+        <NormalizationFieldMapper platform={selectedPlatform} record={unifiedRecord} />
+      )}
+
+      {/* 11. Core Normalization Features & Business Guarantees */}
       <div className='rounded-xl border border-border/80 bg-card p-5 space-y-4'>
         <div>
           <h3 className='text-sm font-mono font-bold text-foreground uppercase tracking-tight flex items-center gap-2'>
             <IconShieldCheck className='size-4 text-emerald-500' />
-            What Each Section &amp; Normalization Feature Provides
+            Enterprise Normalization Guarantees &amp; Autonomous Safety
           </h3>
           <p className='text-xs font-mono text-muted-foreground mt-0.5'>
-            Understanding the real-world value of cross-channel schema harmonization in NEXUS-DQPS:
+            How NEXUS-DQPS protects marketing capital across heterogeneous ad networks:
           </p>
         </div>
 
         <div className='grid grid-cols-1 md:grid-cols-4 gap-4 font-mono text-xs'>
           <div className='p-3.5 rounded-lg bg-muted/40 border border-border flex flex-col justify-between'>
             <div>
-              <div className='flex items-center gap-1.5 font-bold text-cyan-500 mb-1.5'>
+              <div className='flex items-center gap-1.5 font-bold text-cyan-400 mb-1.5'>
                 <IconCurrencyDollar className='size-4' />
                 <span>1. Micro-Currency Engine</span>
               </div>
@@ -807,14 +874,14 @@ export function NormalizationShowcase() {
                 Google Ads outputs spend in micros ($1 = 1,000,000). NEXUS translates this into standard floats and handles daily FX rates so financial totals never glitch.
               </p>
             </div>
-            <div className='mt-2 pt-2 border-t border-border/50 text-[10px] text-cyan-500 font-semibold'>
+            <div className='mt-2 pt-2 border-t border-border/50 text-[10px] text-cyan-400 font-semibold'>
               Prevents $1M budget accounting errors
             </div>
           </div>
 
           <div className='p-3.5 rounded-lg bg-muted/40 border border-border flex flex-col justify-between'>
             <div>
-              <div className='flex items-center gap-1.5 font-bold text-emerald-500 mb-1.5'>
+              <div className='flex items-center gap-1.5 font-bold text-emerald-400 mb-1.5'>
                 <IconArrowsSplit2 className='size-4' />
                 <span>2. Action Array Unrolling</span>
               </div>
@@ -822,14 +889,14 @@ export function NormalizationShowcase() {
                 Meta buries revenue inside nested arrays. NEXUS extracts verified purchases, video 3-second hook rates, and creative fatigue curves automatically.
               </p>
             </div>
-            <div className='mt-2 pt-2 border-t border-border/50 text-[10px] text-emerald-500 font-semibold'>
+            <div className='mt-2 pt-2 border-t border-border/50 text-[10px] text-emerald-400 font-semibold'>
               Detects ad fatigue before ROAS drops
             </div>
           </div>
 
           <div className='p-3.5 rounded-lg bg-muted/40 border border-border flex flex-col justify-between'>
             <div>
-              <div className='flex items-center gap-1.5 font-bold text-amber-500 mb-1.5'>
+              <div className='flex items-center gap-1.5 font-bold text-amber-400 mb-1.5'>
                 <IconPackage className='size-4' />
                 <span>3. Omnichannel SKU Stitching</span>
               </div>
@@ -837,7 +904,7 @@ export function NormalizationShowcase() {
                 Connects Amazon ASINs (B07Q8Z9101), Shopify barcodes, and Meta ad tags to the central Nike catalog SKU (e.g. CD4371-001) for unified analysis.
               </p>
             </div>
-            <div className='mt-2 pt-2 border-t border-border/50 text-[10px] text-amber-500 font-semibold'>
+            <div className='mt-2 pt-2 border-t border-border/50 text-[10px] text-amber-400 font-semibold'>
               Single source of truth across all stores
             </div>
           </div>

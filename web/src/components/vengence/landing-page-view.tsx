@@ -13,6 +13,7 @@ import { PlotFigure, BranchesFigure, PhosphorFigure, RiffleFigure } from './hair
 import { AnimatedFooter } from '@/components/ui/animated-footer';
 import { WhyUsBento } from './why-us-bento';
 import { HighlightGrid } from './highlight-grid';
+import { LocomotiveHeroVideo } from './locomotive-hero-video';
 import { ArrowRight, Sparkles, TrendingUp, ShieldCheck, Zap } from 'lucide-react';
 
 const AGENCY_TICKER_ITEMS = [
@@ -156,6 +157,9 @@ export function LandingPageView() {
     <div className='relative min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-foreground'>
       {/* LANDING PAGE TOP BAR (NotchNavbar with balanced optical symmetry) */}
       <NotchNavbar />
+
+      {/* 0. CINEMATIC FULLSCREEN VIDEO HERO (LOCOMOTIVE AGENCY REEL) */}
+      <LocomotiveHeroVideo />
 
       {/* 1. AD AGENCY HERO SECTION WITH 3D CYLINDER CAROUSEL */}
       <section id='overview' className='relative pt-24 pb-20 md:pt-28 md:pb-32 overflow-hidden border-b border-border/60 scroll-mt-16'>

@@ -7,7 +7,6 @@ import { PlatformLogo } from '@/components/icons/platform-logos';
 import {
   formatINR,
   getChannelMeta,
-  getProductFooterSummary,
   type ProductStatus,
 } from '@/lib/gauges-engine';
 import { useTheme } from 'next-themes';
@@ -51,14 +50,12 @@ export function RoasGauge({
   maxRoas: maxRoasProp = 6.0,
   healthScore = 75,
   status,
-  footerSummary,
   isFixed = false,
   paused = false,
   restockUnitsOrdered,
   photoUrl,
   campaignName,
   className,
-  compact = false,
   onAnalyze,
   onFix,
   onViewFix,
@@ -84,19 +81,6 @@ export function RoasGauge({
     }
   }
 
-  // Derive footer summary if not explicitly provided
-  const effectiveFooterSummary =
-    footerSummary ||
-    getProductFooterSummary(
-      effectiveStatus,
-      dailySpend,
-      effectiveCoverDays,
-      currentRoas,
-      isFixed,
-      paused,
-      restockUnitsOrdered
-    );
-
   // Gauge scale 0–6x, clamped
   const maxRoas = maxRoasProp || 6.0;
   const clampedRoas = Math.min(Math.max(currentRoas, 0), maxRoas);
@@ -105,64 +89,72 @@ export function RoasGauge({
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme !== 'light';
 
-  // Semicircle dimensions
-  const radius = compact ? 45 : 62;
-  const strokeWidth = compact ? 6 : 9;
+  // Compact Semicircle Dimensions (~45% smaller than original)
+  const radius = 36;
+  const strokeWidth = 6;
   const circumference = Math.PI * radius;
   const strokeDashoffset = circumference * (1 - percentage);
 
-  // Status mapping & Color styling (theme-adaptive for healthy, amber = warning, red = critical, green = fixed)
+  // Status mapping & Color styling
   let arcStrokeColor = isDark ? '#FFFFFF' : '#18181b';
+  let statusBadgeClasses = 'bg-muted/60 text-muted-foreground border-border';
   let statusLabel = 'TARGET MET';
-  let badgeClasses = 'bg-muted text-foreground border-border font-medium';
+  let isProblematic = false;
 
   if (isFixed) {
-    arcStrokeColor = '#10B981'; // Green
+    arcStrokeColor = '#10B981';
     statusLabel = 'FIXED';
-    badgeClasses = 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 font-bold';
+    statusBadgeClasses = 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 font-bold';
   } else if (effectiveStatus === 'stockout') {
-    arcStrokeColor = '#EF4444'; // Red
+    arcStrokeColor = '#EF4444';
     statusLabel = 'STOCKOUT';
-    badgeClasses = 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30 font-bold';
+    statusBadgeClasses = 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30 font-bold';
+    isProblematic = true;
   } else if (effectiveStatus === 'below floor') {
-    arcStrokeColor = '#EF4444'; // Red
+    arcStrokeColor = '#EF4444';
     statusLabel = 'BELOW FLOOR';
-    badgeClasses = 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30 font-bold';
+    statusBadgeClasses = 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30 font-bold';
+    isProblematic = true;
   } else if (effectiveStatus === 'low stock') {
-    arcStrokeColor = '#F59E0B'; // Amber
+    arcStrokeColor = '#F59E0B';
     statusLabel = 'LOW STOCK';
-    badgeClasses = 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 font-semibold';
+    statusBadgeClasses = 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 font-semibold';
+    isProblematic = true;
   } else if (effectiveStatus === 'below target') {
-    arcStrokeColor = '#F59E0B'; // Amber
+    arcStrokeColor = '#F59E0B';
     statusLabel = 'BELOW TARGET';
-    badgeClasses = 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 font-semibold';
+    statusBadgeClasses = 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 font-semibold';
+    isProblematic = true;
   } else {
-    arcStrokeColor = isDark ? '#FFFFFF' : '#18181b';
+    arcStrokeColor = isDark ? '#10B981' : '#059669';
     statusLabel = 'TARGET MET';
-    badgeClasses = 'bg-muted text-foreground border-border font-medium';
+    statusBadgeClasses = 'bg-emerald-500/5 text-emerald-700 dark:text-emerald-400 border-emerald-500/20 font-semibold';
   }
 
   // Health score badge styling
   const healthBadgeStyle = isFixed
-    ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 font-bold'
-    : healthScore >= 75
-    ? 'text-foreground bg-muted border border-border font-bold'
-    : healthScore >= 50
-    ? 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/30 font-medium'
-    : 'text-rose-600 dark:text-rose-400 bg-rose-500/10 border border-rose-500/30 font-bold';
+    ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/30'
+    : healthScore >= 90
+    ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/30'
+    : healthScore >= 60
+    ? 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/30'
+    : 'text-rose-600 dark:text-rose-400 bg-rose-500/10 border-rose-500/30';
 
   return (
     <div
+      onClick={onAnalyze}
       className={cn(
-        'relative flex flex-col justify-between rounded-xl border border-border bg-card p-4 transition-all duration-200 hover:border-foreground/30 font-mono shadow-xs min-h-[380px] min-w-0 text-card-foreground',
+        'group relative flex flex-col justify-between rounded-xl border border-border/80 bg-card p-3.5 transition-all duration-200 hover:border-foreground/40 hover:shadow-md font-mono text-card-foreground cursor-pointer select-none',
+        isProblematic && !isFixed && 'border-rose-500/30 bg-rose-500/[0.015] hover:border-rose-500/60',
+        isFixed && 'border-emerald-500/30 bg-emerald-500/[0.015]',
         className
       )}
     >
-      {/* 1. PRODUCT + CHANNEL + STOCK & 2. HEALTH SCORE */}
-      <div className='flex w-full items-start justify-between gap-2 border-b border-border pb-3 mb-1'>
-        <div className='flex items-start gap-2.5 min-w-0'>
+      {/* 1. COMPACT HEADER: Product Name + Platform + Stock & Health Score */}
+      <div className='flex items-start justify-between gap-2 border-b border-border/50 pb-2.5'>
+        <div className='flex items-start gap-2 min-w-0'>
           {photoUrl ? (
-            <div className='relative size-8 rounded bg-muted/40 overflow-hidden shrink-0 border border-border mt-0.5'>
+            <div className='relative size-7 rounded bg-muted/40 overflow-hidden shrink-0 border border-border mt-0.5'>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={photoUrl}
@@ -171,35 +163,30 @@ export function RoasGauge({
               />
             </div>
           ) : null}
-          <div className='flex flex-col text-left min-w-0'>
-            <button
-              type='button'
-              onClick={onAnalyze}
-              className={cn(
-                'text-xs font-semibold text-foreground line-clamp-2 leading-snug min-h-[2rem] text-left',
-                onAnalyze && 'cursor-pointer hover:underline'
-              )}
+          <div className='flex flex-col min-w-0'>
+            <span
+              className='text-xs font-bold text-foreground truncate max-w-[170px] sm:max-w-[190px] leading-tight group-hover:text-primary transition-colors'
               title={displayName}
             >
               {displayName}
-            </button>
-            <div className='flex items-center gap-1.5 mt-1 text-[10px] text-muted-foreground flex-wrap'>
-              <span className={cn('inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[10px] font-semibold', channelMeta.badgeBg, channelMeta.badgeBorder, channelMeta.badgeText)}>
-                <PlatformLogo platform={channelMeta.name.toLowerCase()} size={11} className='shrink-0' />
-                <span>{channelMeta.name}</span>
+            </span>
+            <div className='flex items-center gap-1.5 mt-0.5 text-[10px] text-muted-foreground'>
+              <span className='inline-flex items-center gap-1 font-semibold text-foreground/80'>
+                <PlatformLogo platform={channelMeta.name.toLowerCase()} size={10} className='shrink-0' />
+                <span className='uppercase'>{channelMeta.name}</span>
               </span>
               <span>•</span>
-              <span className={cn('whitespace-nowrap font-medium', inventory <= 0 ? 'text-rose-500 font-bold' : 'text-foreground')}>
-                {inventory <= 0 ? '0 in stock' : `${inventory} in stock`}
+              <span className={cn('font-medium', inventory <= 0 ? 'text-rose-500 font-bold' : 'text-muted-foreground')}>
+                {inventory <= 0 ? '0 stock' : `${inventory} stock`}
               </span>
             </div>
           </div>
         </div>
 
-        {/* 2. Health Score */}
+        {/* Health Score Pill */}
         <div
           className={cn(
-            'flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] shrink-0 font-bold',
+            'flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] shrink-0 font-bold border',
             healthBadgeStyle
           )}
           title={`Health Score: ${healthScore}/100`}
@@ -209,11 +196,11 @@ export function RoasGauge({
         </div>
       </div>
 
-      {/* 3. SEMICIRCLE SVG GAUGE (white = healthy, amber = warning, red = critical, green = fixed) */}
-      <div className='relative flex flex-col items-center justify-center my-2'>
+      {/* 2. COMPACT SEMICIRCLE SVG GAUGE (Center) */}
+      <div className='relative flex flex-col items-center justify-center my-1.5'>
         <svg
           width={radius * 2 + strokeWidth * 2}
-          height={radius + strokeWidth + 6}
+          height={radius + strokeWidth + 4}
           className='overflow-visible'
         >
           {/* Background Track */}
@@ -223,7 +210,7 @@ export function RoasGauge({
             } ${radius + strokeWidth}`}
             fill='none'
             stroke='currentColor'
-            className='text-muted/60 dark:text-muted/80'
+            className='text-muted/40 dark:text-muted/60'
             strokeWidth={strokeWidth}
             strokeLinecap='round'
           />
@@ -245,8 +232,8 @@ export function RoasGauge({
                 x2={x2}
                 y2={y2}
                 stroke='#737373'
-                strokeWidth='1.2'
-                strokeDasharray='2 2'
+                strokeWidth='1'
+                strokeDasharray='1.5 1.5'
               />
             );
           })()}
@@ -268,8 +255,8 @@ export function RoasGauge({
                 x2={x2}
                 y2={y2}
                 stroke='#A3A3A3'
-                strokeWidth='1.5'
-                strokeDasharray='3 3'
+                strokeWidth='1.2'
+                strokeDasharray='2 2'
               />
             );
           })()}
@@ -289,94 +276,75 @@ export function RoasGauge({
           />
         </svg>
 
-        {/* Center Readout: Paused or ROAS */}
+        {/* Center Readout: ROAS or Paused */}
         <div className='absolute bottom-0 flex flex-col items-center justify-center text-center'>
           {paused ? (
-            <div className='flex flex-col items-center -mb-1'>
-              <span className='font-bold text-foreground tracking-wider text-base uppercase font-mono'>
+            <div className='flex flex-col items-center'>
+              <span className='font-bold text-foreground text-sm uppercase font-mono tracking-wider'>
                 Paused
               </span>
-              <span className='text-[10px] text-emerald-400 font-mono mt-0.5 truncate max-w-[140px]'>
-                Restock: {restockUnitsOrdered ?? 0} units ordered
+              <span className='text-[9px] text-emerald-500 font-mono'>
+                +{restockUnitsOrdered ?? 0} ordered
               </span>
             </div>
           ) : (
-            <div className='flex flex-col items-center -mb-0.5'>
-              <span className='font-bold tracking-tight text-foreground text-xl font-mono'>
+            <div className='flex flex-col items-center'>
+              <span className='font-extrabold tracking-tight text-foreground text-base sm:text-lg font-mono'>
                 {currentRoas.toFixed(2)}x
-              </span>
-              <span className='text-[10px] text-muted-foreground font-mono -mt-0.5'>
-                ROAS (0–6x)
               </span>
             </div>
           )}
         </div>
       </div>
 
-      {/* 4. SPEND/DAY + DAYS OF COVER */}
-      <div className='mt-3 flex w-full items-center justify-between text-xs text-muted-foreground font-mono px-0.5'>
+      {/* 3. METRICS ROW: Spend & Cover Days */}
+      <div className='flex w-full items-center justify-between text-[11px] text-muted-foreground font-mono pt-1'>
         <span className='text-foreground font-medium'>
-          {formatINR(dailySpend)}
+          {formatINR(dailySpend)}/d
         </span>
-        <span className={cn(effectiveCoverDays < 7 ? 'text-amber-500 font-semibold' : 'text-muted-foreground')}>
+        <span className={cn('font-semibold', effectiveCoverDays < 7 ? 'text-amber-500' : 'text-muted-foreground')}>
           {inventory <= 0 ? '0d cover' : `${effectiveCoverDays.toFixed(1)}d cover`}
         </span>
       </div>
 
-      {/* 5. "1.8x floor · 3.2x target" */}
-      <div className='mt-1 flex w-full items-center justify-center text-[10px] font-mono text-muted-foreground'>
-        <span>1.8x floor · 3.2x target</span>
-      </div>
-
-      {/* 6. STATUS BADGE */}
-      <div className='mt-2 flex w-full items-center justify-center'>
+      {/* 4. COMPACT STATUS & ACTION ROW */}
+      <div className='mt-2.5 flex w-full items-center justify-between gap-2 pt-2 border-t border-border/50'>
+        {/* Status indicator on the left */}
         <Badge
           variant='outline'
           className={cn(
-            'text-[10px] py-0.5 px-2.5 uppercase font-mono tracking-wider border rounded-md',
-            badgeClasses
+            'text-[9px] py-0.5 px-1.5 uppercase font-mono tracking-wider border rounded shrink-0',
+            statusBadgeClasses
           )}
         >
           {statusLabel}
         </Badge>
-      </div>
 
-      {/* Real One-Line Data-Driven Footer Summary */}
-      <div className='mt-2 w-full text-center px-1'>
-        <p className='text-[11px] text-muted-foreground truncate font-mono' title={effectiveFooterSummary}>
-          {effectiveFooterSummary}
-        </p>
-      </div>
-
-      {/* 7. FIX BUTTON / VIEW FIX BUTTON */}
-      <div className='mt-2.5 w-full pt-2 border-t border-border'>
-        {isFixed ? (
-          <button
-            type='button'
-            onClick={(e) => {
-              e.stopPropagation();
-              onViewFix?.();
-            }}
-            className='w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg border border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono text-xs font-semibold uppercase tracking-wider hover:bg-emerald-500/20 active:scale-[0.97] transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400'
-          >
-            <span>View fix</span>
-          </button>
-        ) : effectiveStatus !== 'target met' ? (
-          <button
-            type='button'
-            onClick={(e) => {
-              e.stopPropagation();
-              onFix?.();
-            }}
-            className='w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-primary text-primary-foreground font-mono text-xs font-bold uppercase tracking-wider shadow-xs hover:brightness-110 active:brightness-95 active:scale-[0.97] transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
-          >
-            <span>Fix</span>
-          </button>
-        ) : (
-          <div className='w-full flex items-center justify-center py-1.5 text-[11px] text-emerald-400/80 font-mono'>
-            <span>● Healthy Pacing</span>
-          </div>
-        )}
+        {/* Action on the right: only prominent if problematic */}
+        <div className='shrink-0' onClick={(e) => e.stopPropagation()}>
+          {isFixed ? (
+            <button
+              type='button'
+              onClick={onViewFix}
+              className='px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 active:scale-[0.96] transition-all cursor-pointer'
+            >
+              View fix
+            </button>
+          ) : isProblematic ? (
+            <button
+              type='button'
+              onClick={onFix}
+              className='px-3 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-wider bg-foreground text-background hover:bg-foreground/90 active:scale-[0.96] transition-all shadow-xs cursor-pointer'
+            >
+              Fix →
+            </button>
+          ) : (
+            <span className='text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1'>
+              <span className='size-1.5 rounded-full bg-emerald-500' />
+              Healthy
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
