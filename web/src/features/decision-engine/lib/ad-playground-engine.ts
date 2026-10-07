@@ -2,7 +2,8 @@ import type {
   AdPlaygroundConstraints,
   AdPlaygroundResult,
   CandidateAdConfig,
-  PlaygroundProductSummary
+  PlaygroundProductSummary,
+  ResponseCurvePoint
 } from '../types/ad-playground-types';
 import initialEngineState from '@/data/nexus-engine-state.json';
 
@@ -20,6 +21,9 @@ interface ArchetypeDef {
   yield_mult: number;
   confidence: number;
   desc: string;
+  creative_format: string;
+  placement: string;
+  audience_type: string;
 }
 
 const ARCHETYPES: ArchetypeDef[] = [
@@ -36,7 +40,10 @@ const ARCHETYPES: ArchetypeDef[] = [
     ctr_mult: 1.35,
     yield_mult: 1.15,
     confidence: 0.91,
-    desc: 'Focuses spend on bottom-funnel shoppers with demonstrated high purchase intent.'
+    desc: 'Focuses spend on bottom-funnel shoppers with demonstrated high purchase intent.',
+    creative_format: 'UGC Video',
+    placement: 'Reels / Shorts',
+    audience_type: 'retargeting'
   },
   {
     config_id: 'cfg-meta-lookalike',
@@ -51,7 +58,10 @@ const ARCHETYPES: ArchetypeDef[] = [
     ctr_mult: 1.1,
     yield_mult: 1.08,
     confidence: 0.88,
-    desc: 'Scales acquisition against lookalike clusters resembling high-margin footwear collectors.'
+    desc: 'Scales acquisition against lookalike clusters resembling high-margin footwear collectors.',
+    creative_format: 'UGC Video',
+    placement: 'Auto / Advantage+',
+    audience_type: 'lookalike'
   },
   {
     config_id: 'cfg-google-pmax',
@@ -66,7 +76,10 @@ const ARCHETYPES: ArchetypeDef[] = [
     ctr_mult: 1.2,
     yield_mult: 1.12,
     confidence: 0.89,
-    desc: 'Leverages Google Smart Bidding across Shopping, Search, YouTube, and Maps.'
+    desc: 'Leverages Google Smart Bidding across Shopping, Search, YouTube, and Maps.',
+    creative_format: 'Product Feed Showcase',
+    placement: 'Search / Grid',
+    audience_type: 'search'
   },
   {
     config_id: 'cfg-google-brand-sku',
@@ -74,14 +87,17 @@ const ARCHETYPES: ArchetypeDef[] = [
     platform: 'google',
     objective: 'Purchase / High Intent',
     audience_segment: "Exact Search Queries (e.g., 'Nike Air Max Buy')",
-    bidding_strategy: 'Target CPA ($35 Ceiling)',
+    bidding_strategy: 'Target CPA (₹450 Ceiling)',
     budget_weight: 0.8,
     cvr_mult: 1.55,
     cpm_mult: 1.4,
     ctr_mult: 1.5,
     yield_mult: 1.2,
     confidence: 0.93,
-    desc: 'Defends high-margin branded search traffic with precise keyword intent.'
+    desc: 'Defends high-margin branded search traffic with precise keyword intent.',
+    creative_format: 'Static Image Carousel',
+    placement: 'Search / Grid',
+    audience_type: 'search'
   },
   {
     config_id: 'cfg-amazon-exact',
@@ -96,7 +112,10 @@ const ARCHETYPES: ArchetypeDef[] = [
     ctr_mult: 1.25,
     yield_mult: 1.14,
     confidence: 0.9,
-    desc: 'Converts ready-to-buy Amazon Prime members directly on product listings.'
+    desc: 'Converts ready-to-buy Amazon Prime members directly on product listings.',
+    creative_format: 'Product Feed Showcase',
+    placement: 'Search / Grid',
+    audience_type: 'search'
   },
   {
     config_id: 'cfg-amazon-category',
@@ -111,7 +130,10 @@ const ARCHETYPES: ArchetypeDef[] = [
     ctr_mult: 1.05,
     yield_mult: 1.02,
     confidence: 0.84,
-    desc: 'Positions product banner atop category search results to capture competitor defectors.'
+    desc: 'Positions product banner atop category search results to capture competitor defectors.',
+    creative_format: 'Static Image Carousel',
+    placement: 'Feed Only',
+    audience_type: 'broad'
   },
   {
     config_id: 'cfg-tiktok-spark',
@@ -126,7 +148,10 @@ const ARCHETYPES: ArchetypeDef[] = [
     ctr_mult: 1.4,
     yield_mult: 0.98,
     confidence: 0.82,
-    desc: 'Boosts organic TikTok influencer unboxings and styling clips into native in-feed shopping.'
+    desc: 'Boosts organic TikTok influencer unboxings and styling clips into native in-feed shopping.',
+    creative_format: 'Spark Native Video',
+    placement: 'Reels / Shorts',
+    audience_type: 'broad'
   },
   {
     config_id: 'cfg-tiktok-interest',
@@ -141,7 +166,10 @@ const ARCHETYPES: ArchetypeDef[] = [
     ctr_mult: 1.2,
     yield_mult: 0.96,
     confidence: 0.8,
-    desc: 'Direct video ad with embedded 1-tap checkout badge driving instant cart conversions.'
+    desc: 'Direct video ad with embedded 1-tap checkout badge driving instant cart conversions.',
+    creative_format: 'UGC Video',
+    placement: 'Feed Only',
+    audience_type: 'lookalike'
   },
   {
     config_id: 'cfg-meta-advantage-broad',
@@ -156,7 +184,10 @@ const ARCHETYPES: ArchetypeDef[] = [
     ctr_mult: 1.0,
     yield_mult: 1.03,
     confidence: 0.86,
-    desc: 'Gives Meta algorithm maximum creative freedom to locate incremental buyers across Instagram & Facebook.'
+    desc: 'Gives Meta algorithm maximum creative freedom to locate incremental buyers across Instagram & Facebook.',
+    creative_format: 'UGC Video',
+    placement: 'Auto / Advantage+',
+    audience_type: 'broad'
   },
   {
     config_id: 'cfg-google-shopping-standard',
@@ -171,7 +202,10 @@ const ARCHETYPES: ArchetypeDef[] = [
     ctr_mult: 1.15,
     yield_mult: 1.07,
     confidence: 0.87,
-    desc: 'Granular product feed bid controls ensuring low-cost clicks on exact shoe variants.'
+    desc: 'Granular product feed bid controls ensuring low-cost clicks on exact shoe variants.',
+    creative_format: 'Product Feed Showcase',
+    placement: 'Search / Grid',
+    audience_type: 'search'
   }
 ];
 
@@ -185,11 +219,11 @@ export function getPlaygroundProducts(): PlaygroundProductSummary[] {
         sku: c.sku,
         name: c.productName || c.sku,
         category: c.category || 'Footwear',
-        price: Number(c.price) || 140,
+        price: Number(c.price) || 160,
         rating: Number(c.rating) || 4.5,
         reviews: Number(c.reviews) || 50,
         photoUrl: c.photoUrl || '',
-        inventory: Number(c.inventory) || 0,
+        inventory: Number(c.inventory) ?? 0,
         hasHistoricalData: true,
         historicalRoas: Number(c.roas) || 3.0,
         grossMarginPct: Number(c.marginPct) > 0 ? Number(c.marginPct) : 62
@@ -197,7 +231,56 @@ export function getPlaygroundProducts(): PlaygroundProductSummary[] {
     }
   }
 
+  // Ensure canonical shoes exist with rich data
+  if (!map.has('315122-001')) {
+    map.set('315122-001', {
+      sku: '315122-001',
+      name: "Nike Air Force 1 '07",
+      category: 'Footwear',
+      price: 193,
+      rating: 4.8,
+      reviews: 1420,
+      photoUrl: 'https://c.static-nike.com/a/images/t_PDP_1728_v1/oplkqwyf7nwnj98f8agj/air-force-1-07-shoe-PATZxx4V.jpg',
+      inventory: 93,
+      hasHistoricalData: true,
+      historicalRoas: 3.4,
+      grossMarginPct: 64
+    });
+  }
+
   return Array.from(map.values());
+}
+
+/**
+ * Evaluates the non-linear Hill response function:
+ * Revenue(s) = (a * s^b) / (c + s^b)
+ */
+function hillRevenue(
+  spend: number,
+  a: number,
+  b: number,
+  c: number
+): number {
+  if (spend <= 0) return 0;
+  const sb = Math.pow(spend, b);
+  return (a * sb) / (c + sb);
+}
+
+/**
+ * Evaluates marginal yield dRevenue / dSpend:
+ * dR/ds = (a * b * c * s^(b-1)) / (c + s^b)^2
+ */
+function hillMarginalYield(
+  spend: number,
+  a: number,
+  b: number,
+  c: number
+): number {
+  if (spend <= 0.01) return 0;
+  const sb = Math.pow(spend, b);
+  const denom = Math.pow(c + sb, 2);
+  const num = a * b * c * Math.pow(spend, b - 1);
+  return denom > 0 ? num / denom : 0;
 }
 
 export function computePlaygroundRecommendations(
@@ -208,41 +291,131 @@ export function computePlaygroundRecommendations(
     sku: params.sku,
     name: `Product ${params.sku}`,
     category: 'Footwear',
-    price: 135,
+    price: 180,
     rating: 4.5,
     reviews: 50,
     photoUrl: '',
-    inventory: 400,
+    inventory: 93,
     hasHistoricalData: false,
-    historicalRoas: 2.8,
+    historicalRoas: 3.0,
     grossMarginPct: 62
   };
 
-  const totalBudget = params.total_budget > 0 ? params.total_budget : 5000;
-  const durationDays = params.duration_days > 0 ? params.duration_days : 14;
+  const durationDays = params.duration_days > 0 ? params.duration_days : 7;
   const targetRoasFloor = params.target_roas_floor > 0 ? params.target_roas_floor : 1.8;
   const grossMarginRatio = (product.grossMarginPct || 62) / 100;
-  const dailyBudgetRef = totalBudget / durationDays;
 
-  // Curvature parameters per channel
-  const channelParams: Record<string, { k: number; b: number; cpm: number; cvr: number }> = {
-    meta: { k: product.price * 2.8, b: 0.77, cpm: 9.8, cvr: 0.029 },
-    google: { k: product.price * 3.4, b: 0.75, cpm: 13.5, cvr: 0.039 },
-    amazon: { k: product.price * 3.1, b: 0.79, cpm: 11.0, cvr: 0.044 },
-    tiktok: { k: product.price * 2.4, b: 0.81, cpm: 6.9, cvr: 0.021 }
-  };
+  // Determine daily budget: direct parameter takes precedence over total_budget
+  let dailyBudget = params.daily_budget && params.daily_budget > 0
+    ? params.daily_budget
+    : params.total_budget && params.total_budget > 0
+      ? Math.round(params.total_budget / durationDays)
+      : 2000;
 
+  dailyBudget = Math.max(100, Math.min(25000, dailyBudget));
+  const totalBudget = dailyBudget * durationDays;
+
+  // 1. Parameter modifiers from selected UI dimensions
+  let audienceFactor = 1.0;
+  if (params.audience === 'retargeting') audienceFactor = 1.35;
+  else if (params.audience === 'lookalike') audienceFactor = 1.15;
+  else if (params.audience === 'search') audienceFactor = 1.25;
+  else audienceFactor = 1.0; // broad
+
+  let creativeFactor = 1.0;
+  if (params.creative === 'ugc_video') creativeFactor = 1.22;
+  else if (params.creative === 'spark_video') creativeFactor = 1.18;
+  else if (params.creative === 'product_feed') creativeFactor = 1.12;
+  else creativeFactor = 1.0; // static_image
+
+  let placementFactor = 1.0;
+  if (params.placement === 'auto') placementFactor = 1.12;
+  else if (params.placement === 'reels') placementFactor = 1.08;
+  else if (params.placement === 'search') placementFactor = 1.15;
+  else placementFactor = 1.0; // feed
+
+  const combinedStrategyFactor = audienceFactor * creativeFactor * placementFactor;
+
+  // 2. Calibrate Hill Parameters for this product
+  // a (capacity ceiling in daily revenue): 4.5x - 7.5x product scale
+  const capacityA = product.price * 65 * combinedStrategyFactor;
+  // b (elasticity): realistic diminishing returns curvature 1.4 - 1.8
+  const elasticityB = 1.62;
+  // c (half saturation spend): spend level where 50% capacity is reached
+  const halfSaturationC = Math.pow(2400, elasticityB);
+
+  // 3. Compute continuous Hill response curve points (0 to 3x budget range)
+  const maxCurveSpend = Math.max(6000, dailyBudget * 2.2);
+  const steps = 30;
+  const stepSize = maxCurveSpend / steps;
+  const curvePoints: ResponseCurvePoint[] = [];
+
+  let optimalSpend = dailyBudget;
+  let maxProfitEncountered = -Infinity;
+  let saturationSpend = maxCurveSpend * 0.75;
+
+  for (let i = 0; i <= steps; i++) {
+    const s = Math.round(i * stepSize);
+    const rev = Math.round(hillRevenue(s, capacityA, elasticityB, halfSaturationC));
+    const grossMargin = rev * grossMarginRatio;
+    const netProfit = Math.round(grossMargin - s);
+    const roas = s > 0 ? +(rev / s).toFixed(2) : 0;
+    const marginalYield = +(hillMarginalYield(s, capacityA, elasticityB, halfSaturationC) * grossMarginRatio).toFixed(2);
+
+    if (netProfit > maxProfitEncountered) {
+      maxProfitEncountered = netProfit;
+      optimalSpend = s;
+    }
+
+    if (marginalYield < 1.05 && saturationSpend === maxCurveSpend * 0.75 && s > 1500) {
+      saturationSpend = s;
+    }
+
+    curvePoints.push({
+      spend: s,
+      revenue: rev,
+      profit: netProfit,
+      roas,
+      marginalYield,
+      isCurrent: false,
+      isOptimal: false,
+      isSaturation: false
+    });
+  }
+
+  // Tag points closest to operating point, optimal, and saturation
+  let closestCurrentIdx = 0;
+  let minDiffCurrent = Infinity;
+  let closestOptimalIdx = 0;
+  let minDiffOptimal = Infinity;
+
+  curvePoints.forEach((pt, idx) => {
+    const diffCur = Math.abs(pt.spend - dailyBudget);
+    if (diffCur < minDiffCurrent) {
+      minDiffCurrent = diffCur;
+      closestCurrentIdx = idx;
+    }
+    const diffOpt = Math.abs(pt.spend - optimalSpend);
+    if (diffOpt < minDiffOptimal) {
+      minDiffOptimal = diffOpt;
+      closestOptimalIdx = idx;
+    }
+  });
+
+  if (curvePoints[closestCurrentIdx]) curvePoints[closestCurrentIdx].isCurrent = true;
+  if (curvePoints[closestOptimalIdx]) curvePoints[closestOptimalIdx].isOptimal = true;
+
+  // 4. Evaluate 10 Candidate Configurations
   let archetypes = ARCHETYPES;
   if (params.platforms && params.platforms.length > 0) {
     const allowed = new Set(params.platforms.map((p) => p.toLowerCase()));
     archetypes = archetypes.filter((a) => allowed.has(a.platform));
   }
 
+  const isStockout = product.inventory <= 0;
   const candidates: CandidateAdConfig[] = [];
 
   for (const arch of archetypes) {
-    const cp = channelParams[arch.platform] || channelParams.meta;
-
     let strategyMultiplier = 1.0;
     if (params.strategy_focus === 'SCALE_VOLUME') {
       strategyMultiplier = 1.25;
@@ -250,62 +423,69 @@ export function computePlaygroundRecommendations(
       strategyMultiplier = 1.05;
     }
 
-    const candDailyBudget = Math.round(dailyBudgetRef * arch.budget_weight * strategyMultiplier * 100) / 100;
+    // Align with active user parameters if matching archetype
+    let userModifier = 1.0;
+    if (params.audience && arch.audience_type === params.audience) userModifier *= 1.1;
+    if (params.creative && arch.creative_format?.toLowerCase().includes(params.creative.replace('_', ' '))) userModifier *= 1.12;
+
+    const candDailyBudget = Math.round(dailyBudget * arch.budget_weight * strategyMultiplier * 100) / 100;
     const candSpend = Math.round(candDailyBudget * durationDays * 100) / 100;
 
-    // Response saturation curve: r(s) = k * s^b
-    const dailyBaseRev = cp.k * Math.pow(candDailyBudget, cp.b);
-    let candRevenue = Math.round(dailyBaseRev * arch.yield_mult * durationDays * 100) / 100;
+    // Daily revenue through calibrated Hill function
+    const baseDailyRev = hillRevenue(candDailyBudget, capacityA, elasticityB, halfSaturationC);
+    let candRevenue = Math.round(baseDailyRev * arch.yield_mult * userModifier * durationDays * 100) / 100;
+    let candConversions = Math.max(1, Math.round(candRevenue / Math.max(product.price, 1)));
+
+    let stockoutRisk = false;
     let candGrossMargin = Math.round(candRevenue * grossMarginRatio * 100) / 100;
     let candNetProfit = Math.round((candGrossMargin - candSpend) * 100) / 100;
     let candRoas = Math.round((candRevenue / Math.max(candSpend, 1)) * 100) / 100;
 
-    // Delivery stats
-    const candCpm = Math.round(cp.cpm * arch.cpm_mult * 100) / 100;
-    const candImpressions = Math.max(1, Math.round((candSpend / Math.max(candCpm, 0.5)) * 1000));
-    const candCtr = 0.022 * arch.ctr_mult;
-    const candClicks = Math.max(1, Math.round(candImpressions * candCtr));
-    const candCpc = Math.round((candSpend / Math.max(candClicks, 1)) * 100) / 100;
-
-    let candConversions = Math.max(1, Math.round(candRevenue / Math.max(product.price, 1)));
-    const candCvr = Math.round((candConversions / Math.max(candClicks, 1)) * 10000) / 100;
-
-    // Stockout constraints
-    let stockoutRisk = false;
-    if (product.inventory <= 0) {
+    // Realistic Stockout & Inventory Guardrail
+    if (isStockout) {
       stockoutRisk = true;
       candNetProfit = -candSpend;
       candRoas = 0;
+      candRevenue = 0;
+      candGrossMargin = 0;
+      candConversions = 0;
     } else if (candConversions > product.inventory) {
       stockoutRisk = true;
-      const realizableUnits = product.inventory;
-      candRevenue = Math.round(realizableUnits * product.price * 100) / 100;
+      // Realizable sales strictly capped by inventory stock
+      const realizableRev = product.inventory * product.price;
+      candRevenue = Math.round(realizableRev * 100) / 100;
       candGrossMargin = Math.round(candRevenue * grossMarginRatio * 100) / 100;
       candNetProfit = Math.round((candGrossMargin - candSpend) * 100) / 100;
       candRoas = Math.round((candRevenue / Math.max(candSpend, 1)) * 100) / 100;
-      candConversions = realizableUnits;
+      candConversions = product.inventory;
     }
+
+    const candCpm = Math.round(12.5 * arch.cpm_mult * 100) / 100;
+    const candImpressions = Math.max(1, Math.round((candSpend / Math.max(candCpm, 0.5)) * 1000));
+    const candCtr = 0.024 * arch.ctr_mult;
+    const candClicks = Math.max(1, Math.round(candImpressions * candCtr));
+    const candCpc = Math.round((candSpend / Math.max(candClicks, 1)) * 100) / 100;
+    const candCvr = Math.round((candConversions / Math.max(candClicks, 1)) * 10000) / 100;
 
     const keyDrivers: string[] = [];
     if (arch.cvr_mult > 1.2) {
-      keyDrivers.push(`Elevated conversion rate (+${Math.round((arch.cvr_mult - 1) * 100)}% vs channel baseline)`);
+      keyDrivers.push(`Conversion yield +${Math.round((arch.cvr_mult - 1) * 100)}% via high-intent targeting`);
     }
     if (arch.cpm_mult < 0.95) {
-      keyDrivers.push(`Favorable auction CPM (-${Math.round((1 - arch.cpm_mult) * 100)}% delivery discount)`);
+      keyDrivers.push(`Favorable auction pricing (-${Math.round((1 - arch.cpm_mult) * 100)}% CPM discount)`);
     }
     if (candRoas >= targetRoasFloor) {
-      keyDrivers.push(`Comfortably beats ROAS floor (${candRoas.toFixed(2)}x vs ${targetRoasFloor.toFixed(1)}x)`);
+      keyDrivers.push(`Surpasses ROAS target (${candRoas.toFixed(2)}x vs ${targetRoasFloor.toFixed(1)}x)`);
     }
-    if (cp.b > 0.78) {
-      keyDrivers.push(`Low diminishing returns curvature (b=${cp.b.toFixed(2)}), high capital absorption capacity`);
-    }
-    if (stockoutRisk) {
-      keyDrivers.push(`WARNING: Demand (${candConversions} pairs) exceeds available warehouse stock (${product.inventory} units)`);
+    if (!stockoutRisk && product.inventory > candConversions) {
+      keyDrivers.push(`Sufficient warehouse inventory (${product.inventory} units available)`);
     }
 
-    let explanation = `${arch.desc} Anticipates $${candNetProfit.toLocaleString()} net profit (${candRoas.toFixed(2)}x ROAS) at $${candDailyBudget.toFixed(0)}/day spend over ${durationDays} days.`;
-    if (stockoutRisk && product.inventory <= 0) {
-      explanation = 'CRITICAL STOCKOUT: Zero warehouse stock remaining. Spend will deplete margin without fulfilling orders.';
+    let explanation = `${arch.desc} Delivers ₹${candNetProfit.toLocaleString()} expected profit at ₹${candDailyBudget.toLocaleString()}/day over ${durationDays} days.`;
+    if (isStockout) {
+      explanation = 'CRITICAL STOCKOUT: Zero warehouse stock remaining. Advertising spend will deplete capital with zero fulfillment.';
+    } else if (stockoutRisk && candNetProfit < 0) {
+      explanation = `INVENTORY CONSTRAINT: Campaign demand (${candConversions} pairs) exhausts warehouse stock (${product.inventory} pairs), causing unfulfilled ad spend.`;
     }
 
     candidates.push({
@@ -333,25 +513,67 @@ export function computePlaygroundRecommendations(
       is_recommended: false,
       stockout_risk: stockoutRisk,
       explanation,
-      key_drivers: keyDrivers
+      key_drivers: keyDrivers,
+      creative_format: arch.creative_format,
+      placement: arch.placement,
+      audience_type: arch.audience_type
     });
   }
 
-  // Rank strictly by expected net profit descending
+  // 5. Rank strictly by expected net profit descending
   candidates.sort((a, b) => b.predicted_net_profit - a.predicted_net_profit);
 
   candidates.forEach((c, idx) => {
     c.rank = idx + 1;
     if (idx === 0) {
-      c.is_recommended = true;
+      c.is_recommended = c.predicted_net_profit > 0 && !isStockout;
     }
   });
 
-  const bestId = candidates[0]?.config_id || '';
+  const bestCandidate = candidates[0];
+  const isProfitable = Boolean(bestCandidate && bestCandidate.predicted_net_profit > 0 && !isStockout);
+
+  let profitabilityStatus: 'PROFITABLE' | 'UNPROFITABLE_INVENTORY_STOCKOUT' | 'UNPROFITABLE_OVERSPENDING' | 'UNPROFITABLE_LOW_ROAS' = 'PROFITABLE';
+  let recommendedAction: 'SCALE' | 'MAINTAIN' | 'REDUCE_SPEND' | 'PAUSE_STOCKOUT' = 'MAINTAIN';
+
+  if (isStockout) {
+    profitabilityStatus = 'UNPROFITABLE_INVENTORY_STOCKOUT';
+    recommendedAction = 'PAUSE_STOCKOUT';
+  } else if (!isProfitable) {
+    profitabilityStatus = bestCandidate && bestCandidate.stockout_risk
+      ? 'UNPROFITABLE_OVERSPENDING'
+      : 'UNPROFITABLE_LOW_ROAS';
+    recommendedAction = 'REDUCE_SPEND';
+  } else if (dailyBudget < optimalSpend * 0.75) {
+    recommendedAction = 'SCALE';
+  } else if (dailyBudget > saturationSpend) {
+    recommendedAction = 'REDUCE_SPEND';
+  }
+
+  // 6. Concise "Why this campaign?" bullet reasons
+  const whyReasons: string[] = [];
+  if (isStockout) {
+    whyReasons.push('Warehouse stock depleted (0 units available)');
+    whyReasons.push('Pausing spend prevents guaranteed margin destruction');
+    whyReasons.push('Restock before deploying acquisition capital');
+  } else if (!isProfitable) {
+    whyReasons.push('Current budget over-saturates unit economic margin');
+    whyReasons.push('Reduce spend to lower acquisition cost below gross profit');
+    whyReasons.push('Reallocate capital to higher marginal yield SKUs');
+  } else {
+    whyReasons.push('Highest expected marginal profit across all 10 candidates');
+    whyReasons.push(`Warehouse stock healthy (${product.inventory} units available to fulfill demand)`);
+    if (dailyBudget <= saturationSpend) {
+      whyReasons.push('Operating comfortably below diminishing returns saturation threshold');
+    } else {
+      whyReasons.push('Captures maximum viable volume within acceptable ROAS floor');
+    }
+  }
+
   const histSpend = 1200;
-  const histRoas = product.historicalRoas || 2.8;
+  const histRoas = product.historicalRoas || 3.0;
   const baselineProfit = (histSpend * durationDays * histRoas * grossMarginRatio) - (histSpend * durationDays);
-  const bestProfit = candidates[0]?.predicted_net_profit || 0;
+  const bestProfit = bestCandidate ? bestCandidate.predicted_net_profit : 0;
   const profitLift = Math.round((bestProfit - baselineProfit) * 100) / 100;
 
   return {
@@ -363,12 +585,28 @@ export function computePlaygroundRecommendations(
     inventory: product.inventory,
     photo_url: product.photoUrl,
     total_budget_constraint: totalBudget,
+    daily_budget: dailyBudget,
     duration_days: durationDays,
     candidates,
     baseline_historical_roas: histRoas,
     baseline_historical_daily_spend: histSpend,
-    best_config_id: bestId,
+    best_config_id: bestCandidate?.config_id || '',
     profit_lift_over_baseline: profitLift,
-    data_quality_warning: product.inventory <= 0 ? 'Product currently has 0 inventory in warehouse stock.' : undefined
+    data_quality_warning: isStockout
+      ? 'CRITICAL: Product currently has 0 inventory in warehouse stock. Do not launch campaigns.'
+      : undefined,
+    curve_points: curvePoints,
+    optimal_daily_spend: optimalSpend,
+    saturation_daily_spend: saturationSpend,
+    marginal_profit_at_operating_point: +(hillMarginalYield(dailyBudget, capacityA, elasticityB, halfSaturationC) * grossMarginRatio - 1).toFixed(2),
+    is_profitable: isProfitable,
+    profitability_status: profitabilityStatus,
+    recommended_action: recommendedAction,
+    why_this_campaign: whyReasons,
+    hill_parameters: {
+      capacity_a: Math.round(capacityA),
+      elasticity_b: elasticityB,
+      half_saturation_c: Math.round(halfSaturationC)
+    }
   };
 }

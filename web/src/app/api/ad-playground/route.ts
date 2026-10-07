@@ -16,18 +16,26 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ products });
     }
 
-    const total_budget = searchParams.get('total_budget') ? Number(searchParams.get('total_budget')) : 5000;
-    const duration_days = searchParams.get('duration_days') ? Number(searchParams.get('duration_days')) : 14;
+    const total_budget = searchParams.get('total_budget') ? Number(searchParams.get('total_budget')) : undefined;
+    const daily_budget = searchParams.get('daily_budget') ? Number(searchParams.get('daily_budget')) : undefined;
+    const duration_days = searchParams.get('duration_days') ? Number(searchParams.get('duration_days')) : 7;
     const target_roas_floor = searchParams.get('target_roas_floor') ? Number(searchParams.get('target_roas_floor')) : 1.8;
     const stratParam = searchParams.get('strategy_focus');
     const strategy_focus = (stratParam === 'BALANCED' || stratParam === 'SCALE_VOLUME') ? stratParam : 'MAX_PROFIT';
+    const audience = searchParams.get('audience') as any;
+    const creative = searchParams.get('creative') as any;
+    const placement = searchParams.get('placement') as any;
 
     const result = computePlaygroundRecommendations({
       sku,
       total_budget,
+      daily_budget,
       duration_days,
       target_roas_floor,
-      strategy_focus
+      strategy_focus,
+      audience,
+      creative,
+      placement
     });
 
     return NextResponse.json({ products, result });
@@ -52,10 +60,14 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify({
           sku: body.sku,
           total_budget: body.total_budget,
+          daily_budget: body.daily_budget,
           duration_days: body.duration_days,
           target_roas_floor: body.target_roas_floor,
           platforms: body.platforms,
-          strategy_focus: body.strategy_focus
+          strategy_focus: body.strategy_focus,
+          audience: body.audience,
+          creative: body.creative,
+          placement: body.placement
         }),
         signal: AbortSignal.timeout(1500)
       });
@@ -70,11 +82,15 @@ export async function POST(request: NextRequest) {
 
     const result = computePlaygroundRecommendations({
       sku: body.sku || '310805-137',
-      total_budget: Number(body.total_budget) || 5000,
-      duration_days: Number(body.duration_days) || 14,
+      daily_budget: body.daily_budget ? Number(body.daily_budget) : undefined,
+      total_budget: body.total_budget ? Number(body.total_budget) : 14000,
+      duration_days: Number(body.duration_days) || 7,
       target_roas_floor: Number(body.target_roas_floor) || 1.8,
       platforms: body.platforms,
-      strategy_focus: body.strategy_focus || 'MAX_PROFIT'
+      strategy_focus: body.strategy_focus || 'MAX_PROFIT',
+      audience: body.audience,
+      creative: body.creative,
+      placement: body.placement
     });
 
     return NextResponse.json(result);

@@ -1,3 +1,14 @@
+export interface ResponseCurvePoint {
+  spend: number;
+  revenue: number;
+  profit: number;
+  roas: number;
+  marginalYield: number;
+  isOptimal?: boolean;
+  isCurrent?: boolean;
+  isSaturation?: boolean;
+}
+
 export interface CandidateAdConfig {
   rank: number;
   config_id: string;
@@ -24,6 +35,9 @@ export interface CandidateAdConfig {
   stockout_risk: boolean;
   explanation: string;
   key_drivers: string[];
+  creative_format?: string;
+  placement?: string;
+  audience_type?: string;
 }
 
 export interface PlaygroundProductSummary {
@@ -42,11 +56,15 @@ export interface PlaygroundProductSummary {
 
 export interface AdPlaygroundConstraints {
   sku: string;
-  total_budget: number;
+  total_budget?: number;
+  daily_budget?: number;
   duration_days: number;
   target_roas_floor: number;
   platforms?: string[];
   strategy_focus: 'MAX_PROFIT' | 'BALANCED' | 'SCALE_VOLUME';
+  audience?: 'broad' | 'lookalike' | 'retargeting' | 'search';
+  creative?: 'ugc_video' | 'static_image' | 'spark_video' | 'product_feed';
+  placement?: 'auto' | 'reels' | 'feed' | 'search';
 }
 
 export interface AdPlaygroundResult {
@@ -58,6 +76,7 @@ export interface AdPlaygroundResult {
   inventory: number;
   photo_url: string;
   total_budget_constraint: number;
+  daily_budget: number;
   duration_days: number;
   candidates: CandidateAdConfig[];
   baseline_historical_roas: number;
@@ -65,4 +84,18 @@ export interface AdPlaygroundResult {
   best_config_id: string;
   profit_lift_over_baseline: number;
   data_quality_warning?: string;
+  // Enhanced Hill Curve & Financial Safety Fields
+  curve_points: ResponseCurvePoint[];
+  optimal_daily_spend: number;
+  saturation_daily_spend: number;
+  marginal_profit_at_operating_point: number;
+  is_profitable: boolean;
+  profitability_status: 'PROFITABLE' | 'UNPROFITABLE_INVENTORY_STOCKOUT' | 'UNPROFITABLE_OVERSPENDING' | 'UNPROFITABLE_LOW_ROAS';
+  recommended_action: 'SCALE' | 'MAINTAIN' | 'REDUCE_SPEND' | 'PAUSE_STOCKOUT';
+  why_this_campaign: string[];
+  hill_parameters: {
+    capacity_a: number;
+    elasticity_b: number;
+    half_saturation_c: number;
+  };
 }
