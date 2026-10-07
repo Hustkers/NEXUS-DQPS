@@ -94,6 +94,7 @@ const VENGEANCE_SECTIONS: SidebarSectionData[] = [
       { name: 'Diagnostic Anomalies & RCA', href: '/dashboard/anomalies' },
       { name: 'ROAS & Health Gauges', href: '/dashboard/gauges', badge: 'Fix' },
       { name: 'Budget Reallocation Feed', href: '/dashboard/reallocations' },
+      { name: 'Ad Playground', href: '/dashboard/playground', badge: 'AI-Rec' },
       { name: 'Decision Ledger & Learning', href: '/dashboard/ledger', badge: 'Audited' }
     ]
   },

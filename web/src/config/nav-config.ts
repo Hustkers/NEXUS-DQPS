@@ -58,6 +58,14 @@ export const navGroups: NavGroup[] = [
         items: []
       },
       {
+        title: 'Ad Playground',
+        url: '/dashboard/playground',
+        icon: 'sparkles',
+        isActive: false,
+        shortcut: ['a', 'p'],
+        items: []
+      },
+      {
         title: 'Decision Ledger & Learning',
         url: '/dashboard/ledger',
         icon: 'check',
