@@ -1,37 +1,30 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useTransition } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Icons } from '@/components/icons';
 import { RoasGauge } from '@/features/decision-engine/components/roas-gauge';
 import { FixProtocolModal } from '@/features/decision-engine/components/fix-protocol-modal';
 import { GaugesDecisionLedgerTable } from '@/features/decision-engine/components/gauges-decision-ledger-table';
 import { ProductAnalysisModal, type ProductAnalysisTarget } from '@/features/decision-engine/components/product-analysis-modal';
+import { useDecisionEngine } from '@/context/decision-engine-store';
 import {
-  INITIAL_PRODUCTS,
-  INITIAL_LEDGER,
-  deriveProduct,
   computeFixPlan,
-  applyFixPlan,
-  type ProductModel,
+  formatINR,
   type DerivedProduct,
   type FixPlanSummary,
-  type GaugesLedgerItem,
-  type ChannelType,
 } from '@/lib/gauges-engine';
 import { cn } from '@/lib/utils';
 
 type FilterChip = 'all' | 'needs_fix' | 'fixed';
 
-const LOCAL_STORAGE_PRODUCTS_KEY = 'nexus_roas_gauges_products_v2';
-const LOCAL_STORAGE_LEDGER_KEY = 'nexus_roas_gauges_ledger_v2';
-
 export default function GaugesPage() {
-  const [, startTransition] = useTransition();
-
-  // State: products and decision ledger
-  const [products, setProducts] = useState<ProductModel[]>(INITIAL_PRODUCTS);
-  const [ledgerEntries, setLedgerEntries] = useState<GaugesLedgerItem[]>(INITIAL_LEDGER);
-  const [isClientLoaded, setIsClientLoaded] = useState(false);
+  const {
+    products,
+    ledger,
+    topKpis,
+    executeFix,
+    resetToDefaults,
+  } = useDecisionEngine();
 
   // Filters
   const [filterChip, setFilterChip] = useState<FilterChip>('all');
@@ -46,81 +39,9 @@ export default function GaugesPage() {
   // Analysing Modal (3D Globe inspection)
   const [analyzingProduct, setAnalyzingProduct] = useState<ProductAnalysisTarget | null>(null);
 
-  // Load from LocalStorage on mount
-  useEffect(() => {
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        const savedProducts = localStorage.getItem(LOCAL_STORAGE_PRODUCTS_KEY);
-        const savedLedger = localStorage.getItem(LOCAL_STORAGE_LEDGER_KEY);
-
-        if (savedProducts) {
-          const parsed = JSON.parse(savedProducts);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setProducts(parsed);
-          }
-        }
-        if (savedLedger) {
-          const parsed = JSON.parse(savedLedger);
-          if (Array.isArray(parsed)) {
-            setLedgerEntries(parsed);
-          }
-        }
-      }
-    } catch {
-      // Fallback silently to default in-memory state
-    } finally {
-      setIsClientLoaded(true);
-    }
-  }, []);
-
-  // Save to LocalStorage upon updates
-  useEffect(() => {
-    if (!isClientLoaded) return;
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        localStorage.setItem(LOCAL_STORAGE_PRODUCTS_KEY, JSON.stringify(products));
-        localStorage.setItem(LOCAL_STORAGE_LEDGER_KEY, JSON.stringify(ledgerEntries));
-      }
-    } catch {
-      // Ignore write errors
-    }
-  }, [products, ledgerEntries, isClientLoaded]);
-
-  // Derive products dynamically
-  const derivedProducts = useMemo(() => {
-    return products.map((p) => deriveProduct(p));
-  }, [products]);
-
-  // Dynamic Top KPIs derived purely from data
-  const { blendedRoas, totalDailySpend, openIssuesCount, spendAtRisk } = useMemo(() => {
-    let totalSpend = 0;
-    let totalRev = 0;
-    let issues = 0;
-    let atRisk = 0;
-
-    for (const p of derivedProducts) {
-      totalSpend += p.dailySpend;
-      totalRev += p.revenue;
-
-      const needsFix = !p.isFixed && p.status !== 'target met';
-      if (needsFix) {
-        issues += 1;
-        atRisk += p.dailySpend;
-      }
-    }
-
-    const blended = totalSpend > 0 ? totalRev / totalSpend : 0;
-    return {
-      blendedRoas: blended,
-      totalDailySpend: totalSpend,
-      openIssuesCount: issues,
-      spendAtRisk: atRisk,
-    };
-  }, [derivedProducts]);
-
   // Filter products by Filter Chips & Channel
   const filteredProducts = useMemo(() => {
-    return derivedProducts.filter((p) => {
+    return products.filter((p) => {
       // Filter Chip filter
       if (filterChip === 'needs_fix') {
         if (p.isFixed || p.status === 'target met') return false;
@@ -135,11 +56,11 @@ export default function GaugesPage() {
 
       return true;
     });
-  }, [derivedProducts, filterChip, activeChannel]);
+  }, [products, filterChip, activeChannel]);
 
   // Handle opening FIX modal
   const handleOpenFixModal = (product: DerivedProduct) => {
-    const plan = computeFixPlan(product, derivedProducts);
+    const plan = computeFixPlan(product, products);
     setActiveModalProduct(product);
     setActiveModalPlan(plan);
     setIsSummaryOnly(false);
@@ -148,7 +69,7 @@ export default function GaugesPage() {
 
   // Handle opening VIEW FIX summary modal
   const handleOpenViewFixModal = (product: DerivedProduct) => {
-    const plan = product.appliedPlan || computeFixPlan(product, derivedProducts);
+    const plan = product.appliedPlan || computeFixPlan(product, products);
     setActiveModalProduct(product);
     setActiveModalPlan(plan);
     setIsSummaryOnly(true);
@@ -158,36 +79,13 @@ export default function GaugesPage() {
   // Handle execution of fix
   const handleExecuteFix = (plan: FixPlanSummary) => {
     if (!activeModalProduct) return;
-
-    startTransition(() => {
-      const { updatedProducts, newLedgerEntry } = applyFixPlan(
-        products,
-        activeModalProduct.id,
-        plan
-      );
-
-      setProducts(updatedProducts);
-      setLedgerEntries((prev) => [newLedgerEntry, ...prev]);
-
-      // Update active modal product with latest fixed state
-      const refreshed = updatedProducts.find((p) => p.id === activeModalProduct.id);
-      if (refreshed) {
-        setActiveModalProduct(deriveProduct(refreshed));
-      }
-    });
+    executeFix(activeModalProduct.id, plan);
   };
 
   // Reset to default test state
   const handleResetToDefaults = () => {
     if (window.confirm('Reset all campaigns and decision ledger to initial state?')) {
-      setProducts(INITIAL_PRODUCTS);
-      setLedgerEntries(INITIAL_LEDGER);
-      try {
-        localStorage.removeItem(LOCAL_STORAGE_PRODUCTS_KEY);
-        localStorage.removeItem(LOCAL_STORAGE_LEDGER_KEY);
-      } catch {
-        // noop
-      }
+      resetToDefaults();
     }
   };
 
@@ -206,7 +104,7 @@ export default function GaugesPage() {
             </span>
           </div>
           <p className='text-xs text-[#8A8A8A] mt-1'>
-            Autonomous Adstock Optimization • Semicircular Target Arcs • 1.8x Floor &amp; 3.2x Target
+            Autonomous Adstock Optimization • Semicircular Target Arcs (0–6x) • 1.8x Floor &amp; 3.2x Target
           </p>
         </div>
 
@@ -230,10 +128,10 @@ export default function GaugesPage() {
           </span>
           <div className='mt-2 flex items-baseline gap-2'>
             <span className='text-2xl font-bold text-white tracking-tight'>
-              {blendedRoas.toFixed(2)}x
+              {topKpis.blendedRoas.toFixed(2)}x
             </span>
             <span className='text-[10px] text-emerald-400 font-semibold'>
-              {blendedRoas >= 3.2 ? '● Target Met' : '○ Pacing'}
+              {topKpis.blendedRoas >= 3.2 ? '● Target Met' : '○ Pacing'}
             </span>
           </div>
           <span className='text-[10px] text-[#737373] mt-1'>
@@ -248,9 +146,8 @@ export default function GaugesPage() {
           </span>
           <div className='mt-2 flex items-baseline gap-2'>
             <span className='text-2xl font-bold text-white tracking-tight'>
-              ₹{totalDailySpend.toLocaleString('en-IN')}
+              {formatINR(topKpis.totalDailySpend)}
             </span>
-            <span className='text-[10px] text-[#8A8A8A]'>/day</span>
           </div>
           <span className='text-[10px] text-[#737373] mt-1'>
             Active Managed Capital
@@ -266,13 +163,13 @@ export default function GaugesPage() {
             <span
               className={cn(
                 'text-2xl font-bold tracking-tight',
-                openIssuesCount > 0 ? 'text-amber-400' : 'text-emerald-400'
+                topKpis.openIssuesCount > 0 ? 'text-amber-400' : 'text-emerald-400'
               )}
             >
-              {openIssuesCount}
+              {topKpis.openIssuesCount}
             </span>
             <span className='text-[10px] text-[#8A8A8A]'>
-              {openIssuesCount === 0 ? 'All Clear' : 'Requires Action'}
+              {topKpis.openIssuesCount === 0 ? 'All Clear' : 'Requires Action'}
             </span>
           </div>
           <span className='text-[10px] text-[#737373] mt-1'>
@@ -289,12 +186,11 @@ export default function GaugesPage() {
             <span
               className={cn(
                 'text-2xl font-bold tracking-tight',
-                spendAtRisk > 0 ? 'text-red-400' : 'text-emerald-400'
+                topKpis.spendAtRisk > 0 ? 'text-red-400' : 'text-emerald-400'
               )}
             >
-              ₹{spendAtRisk.toLocaleString('en-IN')}
+              {formatINR(topKpis.spendAtRisk)}
             </span>
-            <span className='text-[10px] text-[#8A8A8A]'>/day</span>
           </div>
           <span className='text-[10px] text-[#737373] mt-1'>
             In Un-optimized / Out-of-Stock Sets
@@ -309,10 +205,10 @@ export default function GaugesPage() {
           {(
             [
               { id: 'all', label: 'All Products' },
-              { id: 'needs_fix', label: `Needs Fix (${openIssuesCount})` },
+              { id: 'needs_fix', label: `Needs Fix (${topKpis.openIssuesCount})` },
               {
                 id: 'fixed',
-                label: `Fixed (${derivedProducts.filter((p) => p.isFixed).length})`,
+                label: `Fixed (${products.filter((p) => p.isFixed).length})`,
               },
             ] as const
           ).map((chip) => (
@@ -381,8 +277,10 @@ export default function GaugesPage() {
               currentRoas={p.roas}
               targetRoas={3.2}
               breakevenRoas={1.8}
+              maxRoas={6.0}
               healthScore={p.healthScore}
               status={p.status}
+              footerSummary={p.footerSummary}
               isFixed={p.isFixed}
               paused={p.paused}
               restockUnitsOrdered={p.restockUnitsOrdered}
@@ -413,7 +311,7 @@ export default function GaugesPage() {
 
       {/* DECISION LEDGER AUDIT TABLE */}
       <div className='mt-4'>
-        <GaugesDecisionLedgerTable entries={ledgerEntries} />
+        <GaugesDecisionLedgerTable entries={ledger} />
       </div>
 
       {/* 3-STEP FIX PROTOCOL MODAL */}
