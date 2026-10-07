@@ -151,6 +151,7 @@ activemq-data/
 
 # Environments
 .env
+!.env.example
 .envrc
 .venv
 env/
@@ -236,3 +237,4 @@ build/
 
 .vercel
 .env*
+!.env.example

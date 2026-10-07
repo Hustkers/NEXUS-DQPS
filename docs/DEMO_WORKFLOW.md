@@ -1,5 +1,8 @@
 # Live Demo Workflow Plan — DataQuest 3.0
 
+> 🚀 **Live Production Console:** [https://nexus-dqps.vercel.app/dashboard/overview](https://nexus-dqps.vercel.app/dashboard/overview)  
+> 🔗 **Vercel Deployment:** [https://nexus-dqps.vercel.app](https://nexus-dqps.vercel.app)
+
 Judges see a **live, interactive demo**, not slides. Every click must tell part of the story.
 
 ## Demo Narrative Arc (3 minutes)

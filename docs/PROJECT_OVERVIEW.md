@@ -1,6 +1,9 @@
 # NEXUS-DQPS — Project Overview
 **DataQuest 3.0 | Next-Generation Autonomous D2C Advertising Intelligence & Decision Engine**
 
+> 🌐 **Live Production Deployment:** [https://nexus-dqps.vercel.app](https://nexus-dqps.vercel.app)  
+> 📊 **Interactive Decision Console:** [https://nexus-dqps.vercel.app/dashboard/overview](https://nexus-dqps.vercel.app/dashboard/overview)
+
 ---
 
 ## 1. The Problem Space (from DQPS)

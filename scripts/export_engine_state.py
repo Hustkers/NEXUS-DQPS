@@ -7,8 +7,12 @@ import sys
 from pathlib import Path
 import numpy as np
 import pandas as pd
-import psycopg2
-from psycopg2.extras import execute_values
+try:
+    import psycopg2
+    from psycopg2.extras import execute_values
+except ImportError:
+    psycopg2 = None
+    execute_values = None
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -499,6 +503,9 @@ def generate_state():
     print(f"Exported engine state to {out_file} ({len(json.dumps(state))} bytes)")
 
     # Sync to PostgreSQL
+    if psycopg2 is None:
+        print("Note: psycopg2 not installed. PostgreSQL sync skipped (JSON engine state preserved).")
+        return
     try:
         conn = psycopg2.connect(DATABASE_URL)
         sync_nike_products_to_db(conn)

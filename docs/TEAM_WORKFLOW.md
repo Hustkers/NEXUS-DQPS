@@ -6,6 +6,7 @@ Ship a live-demoable, closed-loop D2C advertising intelligence & decision engine
 "Mission Control" UI that judges can click through.
 
 Repo: https://github.com/Hustkers/NEXUS-DQPS
+Live Console: https://nexus-dqps.vercel.app/dashboard/overview
 Local: ~/NEXUS-DQPS
 Demo doc: ~/Desktop/DEMO_WORKFLOW.md
 
