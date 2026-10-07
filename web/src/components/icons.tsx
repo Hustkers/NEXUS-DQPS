@@ -116,8 +116,6 @@ import {
   IconRobot,
   IconMessage2,
   IconArrowsSplit2,
-  IconRefresh,
-  IconChartLine,
   IconX
 } from '@tabler/icons-react';
 
