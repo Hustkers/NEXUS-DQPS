@@ -5,8 +5,8 @@ Ship a live-demoable, closed-loop D2C advertising intelligence & decision engine
 (detect → diagnose → decide → execute → learn) in ~36–48 hours, with a Streamlit
 "Mission Control" UI that judges can click through.
 
-Repo: https://github.com/Hustkers/dataquest3-dqps
-Local: ~/dataquest3-dqps
+Repo: https://github.com/Hustkers/NEXUS-DQPS
+Local: ~/NEXUS-DQPS
 Demo doc: ~/Desktop/DEMO_WORKFLOW.md
 
 ---

@@ -1,4 +1,4 @@
-# DQPS — DataQuest 3.0
+# NEXUS-DQPS — DataQuest 3.0
 
 Next-Generation Autonomous D2C Advertising Intelligence & Decision Engine.
 
