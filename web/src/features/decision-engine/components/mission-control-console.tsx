@@ -469,6 +469,11 @@ export function MissionControlConsole() {
               breakevenRoas={camp.breakevenRoas || 1.8}
               healthScore={camp.healthScore}
               compact
+              onFix={() => {
+                toast.warning(`Fix Stockout: ${camp.productName || camp.campaign}`, {
+                  description: `Stockout on ${camp.platform.toUpperCase()} (Inv: 0). Ready for mitigation routine.`
+                });
+              }}
               onAnalyze={() => {
                 setAnalyzingProduct({
                   productName: camp.productName || camp.campaign,
