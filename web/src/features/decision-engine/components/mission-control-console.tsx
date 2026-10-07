@@ -334,13 +334,13 @@ export function MissionControlConsole() {
         <div className='size-[260px] sm:size-[300px] flex items-center justify-center shrink-0 relative'>
           {consoleGlobeMode === 'arcs' ? (
             <GithubGlobe
-              className='w-full h-full'
+              size={260}
               activeSku='315122-001'
               activePlatform='meta'
               accentColor={[1, 1, 1]}
             />
           ) : (
-            <GlobePulse className='w-full h-full' speed={0.0035} />
+            <GlobePulse size={260} speed={0.0035} />
           )}
         </div>
       </div>

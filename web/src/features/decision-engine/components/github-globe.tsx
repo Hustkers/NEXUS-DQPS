@@ -9,6 +9,7 @@ export interface GithubGlobeProps {
   activeSku?: string;
   activePlatform?: string;
   accentColor?: [number, number, number];
+  size?: number; // Fixed size in px (default 420px)
 }
 
 const DEFAULT_MARKERS: Marker[] = [
@@ -19,7 +20,7 @@ const DEFAULT_MARKERS: Marker[] = [
   { location: [1.3521, 103.8198], size: 0.07, color: [0.54, 0.54, 0.54] }, // Singapore (TikTok SEA)
   { location: [19.076, 72.8777], size: 0.07, color: [0.54, 0.54, 0.54] }, // Mumbai (India Direct)
   { location: [50.1109, 8.6821], size: 0.06, color: [0.54, 0.54, 0.54] }, // Frankfurt (EU Central)
-  { location: [-33.8688, 151.2093], size: 0.06, color: [0.54, 0.54, 0.54] } // Sydney (Oceania)
+  { location: [-33.8688, 151.2093], size: 0.06, color: [0.54, 0.54, 0.54] }, // Sydney (Oceania)
 ];
 
 const DEFAULT_ARCS: Arc[] = [
@@ -30,14 +31,15 @@ const DEFAULT_ARCS: Arc[] = [
   { from: [19.076, 72.8777], to: [1.3521, 103.8198] }, // Mumbai -> Singapore
   { from: [1.3521, 103.8198], to: [35.6762, 139.6503] }, // Singapore -> Tokyo
   { from: [35.6762, 139.6503], to: [37.7749, -122.4194] }, // Tokyo -> SF (Trans-Pacific)
-  { from: [1.3521, 103.8198], to: [-33.8688, 151.2093] } // Singapore -> Sydney
+  { from: [1.3521, 103.8198], to: [-33.8688, 151.2093] }, // Singapore -> Sydney
 ];
 
 export function GithubGlobe({
   className,
-  activeSku,
-  activePlatform,
-  accentColor = [1.0, 1.0, 1.0]
+  activeSku: _activeSku,
+  activePlatform: _activePlatform,
+  accentColor = [1.0, 1.0, 1.0],
+  size = 420,
 }: GithubGlobeProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pointerInteracting = useRef<number | null>(null);
@@ -46,18 +48,17 @@ export function GithubGlobe({
 
   useEffect(() => {
     let phi = 0;
-    let theta = 0.25;
-    let width = 0;
+    const theta = 0.25;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    width = canvas.offsetWidth;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     const globe = createGlobe(canvas, {
-      devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
-      width: (width || 600) * 2,
-      height: (width || 600) * 2,
+      devicePixelRatio: dpr,
+      width: size,
+      height: size,
       phi: 0,
       theta: 0.25,
       dark: 1,
@@ -69,10 +70,10 @@ export function GithubGlobe({
       glowColor: [0.1, 0.1, 0.1],
       markers: DEFAULT_MARKERS,
       arcs: DEFAULT_ARCS,
-      arcColor: [1.0, 1.0, 1.0],
+      arcColor: accentColor,
       arcWidth: 0.8,
       arcHeight: 0.35,
-      scale: 1.05
+      scale: 1.05,
     });
 
     let animationFrameId: number;
@@ -89,23 +90,11 @@ export function GithubGlobe({
 
     animate();
 
-    const handleResize = () => {
-      if (!canvasRef.current) return;
-      const newWidth = canvasRef.current.offsetWidth;
-      globe.update({
-        width: newWidth * 2,
-        height: newWidth * 2
-      });
-    };
-
-    window.addEventListener('resize', handleResize);
-
     return () => {
       cancelAnimationFrame(animationFrameId);
-      window.removeEventListener('resize', handleResize);
       globe.destroy();
     };
-  }, [accentColor, isHovered]);
+  }, [accentColor, isHovered, size]);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     pointerInteracting.current = e.clientX;
@@ -131,20 +120,33 @@ export function GithubGlobe({
 
   return (
     <div
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
+        minWidth: `${size}px`,
+        minHeight: `${size}px`,
+        aspectRatio: '1 / 1',
+      }}
       className={cn(
-        'relative flex items-center justify-center overflow-hidden bg-[#000000]',
+        'relative flex items-center justify-center overflow-hidden bg-[#000000] shrink-0 rounded-2xl select-none',
         className
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Canvas */}
+      {/* Canvas with fixed CSS dimensions */}
       <canvas
         ref={canvasRef}
         onPointerDown={handlePointerDown}
         onPointerUp={handlePointerUp}
         onPointerMove={handlePointerMove}
-        className='size-full max-w-[620px] aspect-square cursor-grab touch-none opacity-95 transition-opacity duration-300'
+        style={{
+          width: `${size}px`,
+          height: `${size}px`,
+          cursor: 'grab',
+          touchAction: 'none',
+        }}
+        className='opacity-95 transition-opacity duration-300'
       />
 
       {/* Atmospheric Ring Overlay (Monochrome) */}

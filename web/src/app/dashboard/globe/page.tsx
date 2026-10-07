@@ -9,13 +9,15 @@ import { computeRLAdAllocation } from '@/lib/rl-ad-optimizer';
 import initialEngineState from '@/data/nexus-engine-state.json';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { IconWorld, IconCpu, IconSparkles, IconArrowRight, IconActivity } from '@tabler/icons-react';
+import { IconWorld, IconCpu, IconSparkles } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 
+type EngineCampaign = (typeof initialEngineState.campaigns)[number];
+
 export default function GlobeIntelligencePage() {
   const [activeGlobeView, setActiveGlobeView] = useState<'both' | 'arcs' | 'pulse'>('both');
-  const [selectedProduct, setSelectedProduct] = useState<any>(initialEngineState.campaigns[0]);
+  const [selectedProduct, setSelectedProduct] = useState<EngineCampaign>(initialEngineState.campaigns[0]);
   const [modalTarget, setModalTarget] = useState<ProductAnalysisTarget | null>(null);
 
   const rlData = React.useMemo(() => {
@@ -103,7 +105,7 @@ export default function GlobeIntelligencePage() {
       {/* Product Quick-Select Strip */}
       <div className='flex items-center gap-2.5 overflow-x-auto pb-1 font-mono text-xs'>
         <span className='text-zinc-500 text-[11px] uppercase tracking-wider shrink-0'>Active Models:</span>
-        {initialEngineState.campaigns.slice(0, 5).map((camp: any) => (
+        {initialEngineState.campaigns.slice(0, 5).map((camp: EngineCampaign) => (
           <button
             key={camp.campaign}
             onClick={() => setSelectedProduct(camp)}
@@ -150,9 +152,8 @@ export default function GlobeIntelligencePage() {
                 Live WebGL telemetry scanning global delivery vectors across Meta, Google Shopping, Amazon DSP &amp; TikTok feeds.
               </p>
 
-              <div className='w-full h-[360px] flex items-center justify-center relative'>
+              <div className='w-full min-h-[440px] flex items-center justify-center relative overflow-x-auto py-2'>
                 <GithubGlobe
-                  className='w-full h-full'
                   activeSku={selectedProduct.sku}
                   activePlatform={selectedProduct.platform}
                   accentColor={[0.2, 0.85, 0.95]}
@@ -201,11 +202,11 @@ export default function GlobeIntelligencePage() {
               </div>
 
               <p className='text-xs font-mono text-zinc-400 mb-2'>
-                Interactive customer interaction pulse: High sales in <strong className='text-rose-400'>Red</strong>, decreasingly <strong className='text-amber-400'>Yellow</strong>, and <strong className='text-zinc-300'>No Grey</strong>.
+                Interactive customer interaction pulse: High sales in <strong className='text-rose-400'>Red</strong>, decreasingly <strong className='text-amber-400'>Yellow</strong>, and suppressed in <strong className='text-zinc-400'>Grey</strong>. Click any dot to inspect telemetry, ROAS, and net profit.
               </p>
 
-              <div className='w-full h-[360px] flex items-center justify-center relative'>
-                <GlobePulse className='w-full h-full max-w-[360px]' speed={0.0035} />
+              <div className='w-full min-h-[440px] flex items-center justify-center relative overflow-x-auto py-2'>
+                <GlobePulse speed={0.0035} />
               </div>
             </div>
 
@@ -215,15 +216,15 @@ export default function GlobeIntelligencePage() {
                 <span>High Sales (US East/West: 78% P_conv)</span>
               </div>
               <div className='flex items-center gap-1.5 text-zinc-300'>
-                <span className='size-2 rounded-full bg-orange-500' />
-                <span>EMEA (56% P_conv)</span>
+                <span className='size-2 rounded-full bg-amber-400' />
+                <span>Decreasing (EMEA, APAC, SEA: 32%-56% P_conv)</span>
               </div>
               <div className='flex items-center gap-1.5 text-zinc-300'>
-                <span className='size-2 rounded-full bg-yellow-400' />
-                <span>APAC (44% P_conv)</span>
+                <span className='size-2 rounded-full bg-zinc-500' />
+                <span>Suppressed (LATAM, Nordic: Low Prob / Paused)</span>
               </div>
               <div className='text-cyan-400 font-bold'>
-                No Grey • Suppressed Low-Prob
+                Click marker for Net Margin &amp; Profit
               </div>
             </div>
           </div>
