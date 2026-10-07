@@ -287,25 +287,20 @@ function SimulationLabContent() {
                   aria-pressed={isSelected}
                   onClick={() => handleSelectScenario(s.id)}
                   className={cn(
-                    'p-4 rounded-xl border text-left transition-all flex flex-col justify-between gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500',
+                    'p-3.5 rounded-xl border text-left transition-all flex items-center justify-between gap-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500',
                     isSelected
                       ? 'border-foreground bg-card shadow-xs ring-1 ring-foreground/20'
                       : 'border-border bg-card/60 hover:bg-card hover:border-border/80'
                   )}
                 >
-                  <div className='flex items-center justify-between w-full'>
-                    <span className='font-semibold text-sm text-foreground'>
-                      {s.title}
-                    </span>
-                    <span
-                      title={severityLabel}
-                      aria-label={severityLabel}
-                      className={cn('size-2.5 rounded-full shrink-0', dotColor)}
-                    />
-                  </div>
-                  <p className='text-xs text-muted-foreground line-clamp-2 leading-relaxed'>
-                    {s.eventDescription}
-                  </p>
+                  <span className='font-semibold text-sm text-foreground'>
+                    {s.title}
+                  </span>
+                  <span
+                    title={severityLabel}
+                    aria-label={severityLabel}
+                    className={cn('size-2.5 rounded-full shrink-0', dotColor)}
+                  />
                 </button>
               );
             })}
