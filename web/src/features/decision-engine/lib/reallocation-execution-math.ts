@@ -24,10 +24,12 @@ export function buildReallocationExecutionDetails(
   const sourceCamp = campaigns.find((c) => c.campaign === item.sourceCampaign);
 
   // 2. Exact destination spend & ROAS from recommendation
-  const absDelta = Math.abs(item.deltaSpend);
-  const destOldSpend = targetCamp?.currentDailySpend ?? (item.currentSpend > 0 ? item.currentSpend : 1200);
-  const destNewSpend = destOldSpend + absDelta;
-  const destNewRoas = item.predictedRoas;
+  const absDelta = Math.abs(item.deltaSpend ?? item.movedAmount ?? 0);
+  const destOldSpend = targetCamp?.currentDailySpend ?? (item.currentSpend && item.currentSpend > 0 ? item.currentSpend : item.targetSpendBefore ?? 1200);
+  const destNewSpend = item.recommendedSpend ?? (destOldSpend + absDelta);
+  const deltaSpend = absDelta;
+  const destNewRoas = item.predictedRoas ?? item.targetMarginalRoas ?? 0;
+  const expectedDailyMargin = item.expectedDailyMargin ?? item.netRevenueLift ?? 0;
   
   // Destination current ROAS from campaign data, fallback to revenue/spend or baseline
   const destOldRoas = targetCamp?.roas ?? (destOldSpend > 0 && targetCamp?.currentDailyRevenue 
@@ -41,10 +43,10 @@ export function buildReallocationExecutionDetails(
 
   // Destination margin
   const destOldMargin = targetCamp?.currentDailyMargin ?? Math.round(destOldRevenue * 0.6);
-  const destNewMargin = destOldMargin + item.expectedDailyMargin;
+  const destNewMargin = destOldMargin + expectedDailyMargin;
 
   // 3. Source allocation
-  const sourceOldSpend = sourceCamp?.currentDailySpend ?? (item.currentSpend > 0 ? item.currentSpend : 1500);
+  const sourceOldSpend = sourceCamp?.currentDailySpend ?? (item.currentSpend && item.currentSpend > 0 ? item.currentSpend : item.sourceSpendBefore ?? 1500);
   const sourceNewSpend = Math.max(0, +(sourceOldSpend - absDelta).toFixed(2));
   const sourceRoas = sourceCamp?.roas ?? 3.75;
 
@@ -52,10 +54,11 @@ export function buildReallocationExecutionDetails(
   const roasDeltaPct = destOldRoas > 0 ? ((destNewRoas - destOldRoas) / destOldRoas) * 100 : 0;
   const spendDeltaPct = destOldSpend > 0 ? ((destNewSpend - destOldSpend) / destOldSpend) * 100 : 0;
   const revenueDeltaPct = destOldRevenue > 0 ? ((destNewRevenue - destOldRevenue) / destOldRevenue) * 100 : 0;
+  const marginDeltaPct = destOldMargin > 0 ? (expectedDailyMargin / destOldMargin) * 100 : 0;
 
   // 5. Why better rationale
   const roasDifference = +(destNewRoas - sourceRoas).toFixed(2);
-  const liftPerRupee = absDelta > 0 ? +(item.expectedDailyMargin / absDelta).toFixed(2) : 0;
+  const liftPerRupee = absDelta > 0 ? +(expectedDailyMargin / absDelta).toFixed(2) : 0;
 
   const whyBetter = {
     sourceRoas,
@@ -93,12 +96,12 @@ export function buildReallocationExecutionDetails(
       key: 'lift',
       label: 'Expected Daily Lift',
       beforeFormatted: '₹0',
-      afterFormatted: `+₹${Math.round(item.expectedDailyMargin).toLocaleString('en-IN')}`,
-      changeFormatted: `+₹${Math.round(item.expectedDailyMargin).toLocaleString('en-IN')}`,
+      afterFormatted: `+₹${Math.round(expectedDailyMargin).toLocaleString('en-IN')}`,
+      changeFormatted: `+₹${Math.round(expectedDailyMargin).toLocaleString('en-IN')}`,
       pctChangeFormatted: `+100%`,
       isPositive: true,
       beforeValue: 0,
-      afterValue: Math.round(item.expectedDailyMargin)
+      afterValue: Math.round(expectedDailyMargin)
     },
     {
       key: 'revenue',
@@ -130,7 +133,7 @@ export function buildReallocationExecutionDetails(
     {
       metric: 'Expected Lift (₹)',
       Before: 0,
-      After: Math.round(item.expectedDailyMargin),
+      After: Math.round(expectedDailyMargin),
       unit: '₹'
     }
   ];
@@ -185,11 +188,11 @@ export function buildReallocationExecutionDetails(
       revenueDelta,
       currentDailyMargin: destOldMargin,
       expectedDailyMargin: destNewMargin,
-      marginLift: item.expectedDailyMargin,
+      marginLift: expectedDailyMargin,
       inventory: targetCamp?.inventory
     },
     capitalMoved: absDelta,
-    expectedDailyLift: item.expectedDailyMargin,
+    expectedDailyLift: expectedDailyMargin,
     predictedRoas: destNewRoas,
     confidencePct: Math.round(Math.abs(item.confidence) * 100),
     reason: item.reason,

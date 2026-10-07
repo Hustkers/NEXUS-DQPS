@@ -318,10 +318,50 @@ export function FixProtocolModal({
               </span>
             </div>
 
+            {/* What Was Wrong */}
+            <div className='rounded-lg border border-[#1F1F1F] bg-[#121212] p-3.5 space-y-2'>
+              <span className='text-[10px] uppercase font-bold tracking-wider text-rose-400 block'>
+                What Was Wrong
+              </span>
+              <p className='text-xs font-semibold text-white'>
+                {currentPlan.issueBanner}
+              </p>
+              <ul className='space-y-1 text-[11px] text-[#A3A3A3] mt-1.5'>
+                {currentPlan.evidence.slice(0, 3).map((item, idx) => (
+                  <li key={idx} className='flex items-start gap-1.5'>
+                    <span className='text-rose-400'>›</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* What We Fixed list (before -> after) */}
+            <div className='rounded-lg border border-[#1F1F1F] bg-[#121212] p-3.5 space-y-2.5'>
+              <span className='text-[10px] uppercase font-bold tracking-wider text-emerald-400 block'>
+                What We Fixed
+              </span>
+              <div className='space-y-2 text-xs'>
+                {currentPlan.steps.map((st, idx) => (
+                  <div key={idx} className='border-b border-[#1F1F1F] last:border-none pb-2 last:pb-0'>
+                    <div className='font-semibold text-white flex items-center gap-2'>
+                      <span className='text-emerald-400'>✓</span>
+                      <span>{st.title}</span>
+                    </div>
+                    <div className='mt-1 pl-5 flex items-center gap-2 text-[11px]'>
+                      <span className='text-[#737373] line-through'>{st.before}</span>
+                      <span className='text-[#737373]'>→</span>
+                      <span className='text-emerald-400 font-semibold'>{st.after}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* 3 Result Tiles (before struck through, after green) */}
             <div>
               <span className='text-[10px] uppercase font-bold tracking-wider text-[#A3A3A3] block mb-2'>
-                Projected Impact Summary (7-Day Calibration)
+                Projected Impact Summary
               </span>
               <div className='grid grid-cols-1 sm:grid-cols-3 gap-2.5'>
                 {currentPlan.resultTiles.map((tile, idx) => (
@@ -339,28 +379,6 @@ export function FixProtocolModal({
                       <div className='text-xs font-bold text-emerald-400 font-mono'>
                         {tile.after}
                       </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* What Changed list (before -> after) */}
-            <div className='rounded-lg border border-[#1F1F1F] bg-[#121212] p-3.5 space-y-2.5'>
-              <span className='text-[10px] uppercase font-bold tracking-wider text-[#A3A3A3] block'>
-                What Changed
-              </span>
-              <div className='space-y-2 text-xs'>
-                {currentPlan.steps.map((st, idx) => (
-                  <div key={idx} className='border-b border-[#1F1F1F] last:border-none pb-2 last:pb-0'>
-                    <div className='font-semibold text-white flex items-center gap-2'>
-                      <span className='text-emerald-400'>✓</span>
-                      <span>{st.title}</span>
-                    </div>
-                    <div className='mt-1 pl-5 flex items-center gap-2 text-[11px]'>
-                      <span className='text-[#737373] line-through'>{st.before}</span>
-                      <span className='text-[#737373]'>→</span>
-                      <span className='text-emerald-400 font-semibold'>{st.after}</span>
                     </div>
                   </div>
                 ))}

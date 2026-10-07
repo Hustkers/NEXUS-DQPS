@@ -4,7 +4,12 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { PlatformLogo } from '@/components/icons/platform-logos';
-import type { ProductStatus } from '@/lib/gauges-engine';
+import {
+  formatINR,
+  getChannelMeta,
+  getProductFooterSummary,
+  type ProductStatus,
+} from '@/lib/gauges-engine';
 
 interface RoasGaugeProps {
   productName?: string;
@@ -19,6 +24,7 @@ interface RoasGaugeProps {
   maxRoas?: number;
   healthScore?: number;
   status?: ProductStatus;
+  footerSummary?: string;
   isFixed?: boolean;
   paused?: boolean;
   restockUnitsOrdered?: number;
@@ -41,9 +47,10 @@ export function RoasGauge({
   currentRoas,
   targetRoas = 3.2,
   breakevenRoas = 1.8,
-  maxRoas: maxRoasProp,
+  maxRoas: maxRoasProp = 6.0,
   healthScore = 75,
   status,
+  footerSummary,
   isFixed = false,
   paused = false,
   restockUnitsOrdered,
@@ -55,7 +62,8 @@ export function RoasGauge({
   onFix,
   onViewFix,
 }: RoasGaugeProps) {
-  const displayChannel = channel || platform || 'Omnichannel';
+  const displayChannel = channel || platform || 'Meta';
+  const channelMeta = getChannelMeta(displayChannel);
   const displayName = productName || campaignName || 'Product Campaign';
   const effectiveCoverDays = coverDays !== undefined ? coverDays : inventory > 0 ? 14 : 0;
 
@@ -75,8 +83,21 @@ export function RoasGauge({
     }
   }
 
-  // Map ROAS (0 to 5.0) to angle on semicircular arc (180deg to 0deg)
-  const maxRoas = maxRoasProp || 5.0;
+  // Derive footer summary if not explicitly provided
+  const effectiveFooterSummary =
+    footerSummary ||
+    getProductFooterSummary(
+      effectiveStatus,
+      dailySpend,
+      effectiveCoverDays,
+      currentRoas,
+      isFixed,
+      paused,
+      restockUnitsOrdered
+    );
+
+  // Gauge scale 0–6x, clamped
+  const maxRoas = maxRoasProp || 6.0;
   const clampedRoas = Math.min(Math.max(currentRoas, 0), maxRoas);
   const percentage = paused ? 0.05 : clampedRoas / maxRoas;
 
@@ -129,15 +150,15 @@ export function RoasGauge({
   return (
     <div
       className={cn(
-        'relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card text-card-foreground p-4 transition-all duration-200 hover:border-foreground/40 hover:bg-muted/15 font-mono shadow-[0_2px_12px_-2px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_-4px_rgba(0,0,0,0.35)] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/25 dark:before:via-white/15 before:to-transparent before:pointer-events-none',
+        'relative flex flex-col justify-between rounded-xl border border-[#222222] bg-[#0E0E0E] p-4 transition-all duration-200 hover:border-[#404040] hover:bg-[#121212] font-mono shadow-sm min-h-[380px]',
         className
       )}
     >
       {/* 1. PRODUCT + CHANNEL + STOCK & 2. HEALTH SCORE */}
-      <div className='flex w-full items-start justify-between gap-2 border-b border-border pb-3 mb-2'>
-        <div className='flex items-center gap-2.5 min-w-0'>
+      <div className='flex w-full items-start justify-between gap-2 border-b border-[#1A1A1A] pb-3 mb-1'>
+        <div className='flex items-start gap-2.5 min-w-0'>
           {photoUrl ? (
-            <div className='relative size-8 rounded-lg bg-muted/40 overflow-hidden shrink-0 border border-border'>
+            <div className='relative size-8 rounded bg-[#171717] overflow-hidden shrink-0 border border-[#222222] mt-0.5'>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={photoUrl}
@@ -150,21 +171,23 @@ export function RoasGauge({
             <span
               onClick={onAnalyze}
               className={cn(
-                'text-xs font-semibold text-foreground truncate max-w-[150px]',
+                'text-xs font-semibold text-white line-clamp-2 leading-snug min-h-[2rem]',
                 onAnalyze && 'cursor-pointer hover:underline'
               )}
               title={displayName}
             >
               {displayName}
             </span>
-            <span className='text-[10px] text-muted-foreground uppercase tracking-wider truncate flex items-center gap-1.5 mt-0.5'>
-              <PlatformLogo platform={displayChannel.toLowerCase()} size={11} className='shrink-0' />
-              <span>{displayChannel}</span>
-              <span>•</span>
-              <span className={cn(inventory <= 0 ? 'text-destructive font-bold' : 'text-foreground/70')}>
-                {inventory <= 0 ? '0 in stock' : `${inventory} stock`}
+            <div className='flex items-center gap-1.5 mt-1 text-[10px] text-[#8A8A8A] flex-wrap'>
+              <span className={cn('inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[10px] font-semibold', channelMeta.badgeBg, channelMeta.badgeBorder, channelMeta.badgeText)}>
+                <PlatformLogo platform={channelMeta.name.toLowerCase()} size={11} className='shrink-0' />
+                <span>{channelMeta.name}</span>
               </span>
-            </span>
+              <span>•</span>
+              <span className={cn('whitespace-nowrap font-medium', inventory <= 0 ? 'text-red-400 font-bold' : 'text-[#D4D4D4]')}>
+                {inventory <= 0 ? '0 in stock' : `${inventory} in stock`}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -268,7 +291,7 @@ export function RoasGauge({
               <span className='font-bold text-foreground tracking-wider text-base uppercase font-mono'>
                 Paused
               </span>
-              <span className='text-[10px] text-emerald-600 dark:text-emerald-400 font-mono mt-0.5 truncate max-w-[130px]'>
+              <span className='text-[10px] text-emerald-400 font-mono mt-0.5 truncate max-w-[140px]'>
                 Restock: {restockUnitsOrdered ?? 0} units ordered
               </span>
             </div>
@@ -277,8 +300,8 @@ export function RoasGauge({
               <span className='font-bold tracking-tight text-foreground text-xl font-mono'>
                 {currentRoas.toFixed(2)}x
               </span>
-              <span className='text-[10px] text-muted-foreground font-mono -mt-0.5'>
-                ROAS
+              <span className='text-[10px] text-[#8A8A8A] font-mono -mt-0.5'>
+                ROAS (0–6x)
               </span>
             </div>
           )}
@@ -286,9 +309,9 @@ export function RoasGauge({
       </div>
 
       {/* 4. SPEND/DAY + DAYS OF COVER */}
-      <div className='mt-3 flex w-full items-center justify-between text-xs text-muted-foreground font-mono px-0.5'>
-        <span className='text-foreground font-semibold'>
-          ₹{dailySpend.toLocaleString('en-IN')}/day
+      <div className='mt-3 flex w-full items-center justify-between text-xs text-[#A3A3A3] font-mono px-0.5'>
+        <span className='text-white font-medium'>
+          {formatINR(dailySpend)}
         </span>
         <span className={cn(effectiveCoverDays < 7 ? 'text-amber-500 font-semibold' : 'text-muted-foreground')}>
           {inventory <= 0 ? '0d cover' : `${effectiveCoverDays.toFixed(1)}d cover`}
@@ -296,12 +319,12 @@ export function RoasGauge({
       </div>
 
       {/* 5. "1.8x floor · 3.2x target" */}
-      <div className='mt-1.5 flex w-full items-center justify-center text-[10px] font-mono text-muted-foreground/80'>
+      <div className='mt-1 flex w-full items-center justify-center text-[10px] font-mono text-[#737373]'>
         <span>1.8x floor · 3.2x target</span>
       </div>
 
       {/* 6. STATUS BADGE */}
-      <div className='mt-2.5 flex w-full items-center justify-center'>
+      <div className='mt-2 flex w-full items-center justify-center'>
         <Badge
           variant='outline'
           className={cn(
@@ -313,8 +336,15 @@ export function RoasGauge({
         </Badge>
       </div>
 
+      {/* Real One-Line Data-Driven Footer Summary */}
+      <div className='mt-2 w-full text-center px-1'>
+        <p className='text-[11px] text-[#8A8A8A] truncate font-mono' title={effectiveFooterSummary}>
+          {effectiveFooterSummary}
+        </p>
+      </div>
+
       {/* 7. FIX BUTTON / VIEW FIX BUTTON */}
-      <div className='mt-3 w-full pt-2.5 border-t border-border'>
+      <div className='mt-2.5 w-full pt-2 border-t border-[#1A1A1A]'>
         {isFixed ? (
           <button
             type='button'
@@ -338,8 +368,8 @@ export function RoasGauge({
             <span>Fix</span>
           </button>
         ) : (
-          <div className='w-full flex items-center justify-center py-1.5 text-[11px] text-muted-foreground font-mono'>
-            <span>Optimal Performance</span>
+          <div className='w-full flex items-center justify-center py-1.5 text-[11px] text-emerald-400/80 font-mono'>
+            <span>● Healthy Pacing</span>
           </div>
         )}
       </div>
