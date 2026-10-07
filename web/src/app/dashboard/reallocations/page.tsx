@@ -26,7 +26,7 @@ export default function ReallocationsPage() {
 
   return (
     <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#000000] text-white min-h-screen'>
-      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-[#8A8A8A] pb-4'>
+      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-[#1A1A1A] pb-4'>
         <div>
           <h1 className='text-xl font-mono font-bold text-white uppercase tracking-tight flex items-center gap-2'>
             <IconCpu className='size-5 text-white' />
@@ -38,7 +38,7 @@ export default function ReallocationsPage() {
         </div>
 
         {/* View Switcher */}
-        <div className='flex items-center bg-[#1A1A1A] rounded border border-[#8A8A8A] p-1 text-xs font-mono'>
+        <div className='flex items-center bg-[#1A1A1A] rounded border border-[#1A1A1A] p-1 text-xs font-mono'>
           <button
             onClick={() => setActiveView('both')}
             className={cn(
@@ -73,7 +73,7 @@ export default function ReallocationsPage() {
 
       {/* RL Analytics Suite */}
       {(activeView === 'both' || activeView === 'rl_analytics') && (
-        <div className='rounded border border-[#8A8A8A] bg-[#1A1A1A] p-4 sm:p-5 shadow-none'>
+        <div className='rounded border border-[#1A1A1A] bg-[#1A1A1A] p-4 sm:p-5 shadow-none'>
           <RLVisualAnalytics data={rlData} />
         </div>
       )}
