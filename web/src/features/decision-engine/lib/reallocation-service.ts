@@ -201,7 +201,7 @@ class ReallocationEngineService {
       reason,
       status: 'READY_FOR_EXECUTION',
       stockoutKill: isStockout
-    };
+    } as unknown as ReallocationItem;
 
     const details = buildReallocationExecutionDetails(
       reallocItem,

@@ -257,14 +257,18 @@ export function computeRLAdAllocation(params: {
   const profitLiftPct = +((totalProjectedProfitLift / (baselineDailyProfit || 1)) * 100).toFixed(1);
 
   // Generate learning curve data points across 24 training episodes
+  const totalEpisodes = 24;
   const learningCurve: RLEpisodeDataPoint[] = [];
   let cumProfitLift = 0;
-  for (let ep = 1; ep <= 24; ep++) {
+  for (let ep = 1; ep <= totalEpisodes; ep++) {
     const epsilon = Math.max(0.04, +(0.45 * Math.exp(-ep / 6.5)).toFixed(3));
     // Logistic learning convergence curve
     const convergenceFactor = 1 / (1 + Math.exp(-(ep - 7) / 2.8));
-    const epRlProfit = Math.round(baselineDailyProfit + (totalProjectedProfitLift * convergenceFactor * (1 - epsilon * 0.15)));
-    const epBaseline = Math.round(baselineDailyProfit + (Math.sin(ep) * 80));
+    const epBaseline = Math.round(baselineDailyProfit + (Math.sin(ep) * 80 * (1 - ep / totalEpisodes)));
+    let epRlProfit = Math.round(baselineDailyProfit + (totalProjectedProfitLift * convergenceFactor * (1 - epsilon * 0.15)));
+    if (ep === totalEpisodes) {
+      epRlProfit = baselineDailyProfit + totalProjectedProfitLift;
+    }
     const incrementalLift = Math.max(0, epRlProfit - epBaseline);
     cumProfitLift += incrementalLift;
 

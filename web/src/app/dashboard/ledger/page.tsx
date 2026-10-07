@@ -1,35 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { DecisionLedgerTable, type LedgerItem } from '@/features/decision-engine/components/decision-ledger-table';
-import initialEngineState from '@/data/nexus-engine-state.json';
+import React from 'react';
+import { DecisionLedgerTable } from '@/features/decision-engine/components/decision-ledger-table';
+import { useDecisionEngine } from '@/context/decision-engine-store';
 
 export default function LedgerPage() {
-  const [entries, setEntries] = useState<LedgerItem[]>(initialEngineState.ledger as unknown as LedgerItem[]);
-
-  useEffect(() => {
-    let isMounted = true;
-    async function loadLedger() {
-      try {
-        const res = await fetch('/api/ledger');
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && Array.isArray(data.ledger) && isMounted) {
-            setEntries(data.ledger);
-          }
-        }
-      } catch {
-        // Fallback to initialEngineState
-      }
-    }
-    loadLedger();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const { ledger } = useDecisionEngine();
 
   return (
-    <div className='flex flex-1 flex-col gap-4 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen'>
+    <div className='flex flex-1 flex-col gap-4 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen font-mono'>
       {/* Compact Terminal-Style Header */}
       <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-3'>
         <div className='space-y-0.5'>
@@ -49,7 +28,7 @@ export default function LedgerPage() {
 
         <div className='text-right'>
           <div className='text-lg font-mono font-bold text-foreground leading-tight'>
-            {initialEngineState.ledger.length}
+            {ledger.length}
           </div>
           <div className='text-[10px] font-mono uppercase tracking-wider text-muted-foreground'>
             AUDITED DECISIONS
@@ -57,7 +36,7 @@ export default function LedgerPage() {
         </div>
       </div>
 
-      <DecisionLedgerTable entries={entries} />
+      <DecisionLedgerTable entries={ledger} />
     </div>
   );
 }
