@@ -25,6 +25,7 @@ export function BackgroundShader() {
       <div className='shader-frame w-full h-full pointer-events-none'>
         <ConstellationField
           variant='interface-lines'
+          className='pointer-events-none'
           mode={isDark ? 'dark' : 'light'}
           speed={1.0}
           size={1.0}
