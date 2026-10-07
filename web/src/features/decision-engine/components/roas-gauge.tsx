@@ -10,6 +10,7 @@ import {
   getProductFooterSummary,
   type ProductStatus,
 } from '@/lib/gauges-engine';
+import { useTheme } from 'next-themes';
 
 interface RoasGaugeProps {
   productName?: string;
@@ -101,64 +102,67 @@ export function RoasGauge({
   const clampedRoas = Math.min(Math.max(currentRoas, 0), maxRoas);
   const percentage = paused ? 0.05 : clampedRoas / maxRoas;
 
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme !== 'light';
+
   // Semicircle dimensions
   const radius = compact ? 45 : 62;
   const strokeWidth = compact ? 6 : 9;
   const circumference = Math.PI * radius;
   const strokeDashoffset = circumference * (1 - percentage);
 
-  // Status mapping & Color styling (white = healthy, amber = warning, red = critical, green = fixed)
-  let arcStrokeColor = '#FFFFFF';
+  // Status mapping & Color styling (theme-adaptive for healthy, amber = warning, red = critical, green = fixed)
+  let arcStrokeColor = isDark ? '#FFFFFF' : '#18181b';
   let statusLabel = 'TARGET MET';
-  let badgeClasses = 'bg-[#171717] text-white border-[#333333]';
+  let badgeClasses = 'bg-muted text-foreground border-border font-medium';
 
   if (isFixed) {
     arcStrokeColor = '#10B981'; // Green
     statusLabel = 'FIXED';
-    badgeClasses = 'bg-emerald-950/70 text-emerald-300 border-emerald-700/70 font-bold';
+    badgeClasses = 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 font-bold';
   } else if (effectiveStatus === 'stockout') {
     arcStrokeColor = '#EF4444'; // Red
     statusLabel = 'STOCKOUT';
-    badgeClasses = 'bg-red-950/80 text-red-300 border-red-700/80 font-bold';
+    badgeClasses = 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30 font-bold';
   } else if (effectiveStatus === 'below floor') {
     arcStrokeColor = '#EF4444'; // Red
     statusLabel = 'BELOW FLOOR';
-    badgeClasses = 'bg-red-950/80 text-red-300 border-red-700/80 font-bold';
+    badgeClasses = 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30 font-bold';
   } else if (effectiveStatus === 'low stock') {
     arcStrokeColor = '#F59E0B'; // Amber
     statusLabel = 'LOW STOCK';
-    badgeClasses = 'bg-amber-950/80 text-amber-300 border-amber-700/80 font-semibold';
+    badgeClasses = 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 font-semibold';
   } else if (effectiveStatus === 'below target') {
     arcStrokeColor = '#F59E0B'; // Amber
     statusLabel = 'BELOW TARGET';
-    badgeClasses = 'bg-amber-950/80 text-amber-300 border-amber-700/80 font-semibold';
+    badgeClasses = 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 font-semibold';
   } else {
-    arcStrokeColor = '#FFFFFF'; // White
+    arcStrokeColor = isDark ? '#FFFFFF' : '#18181b';
     statusLabel = 'TARGET MET';
-    badgeClasses = 'bg-[#141414] text-white border-[#2E2E2E] font-medium';
+    badgeClasses = 'bg-muted text-foreground border-border font-medium';
   }
 
   // Health score badge styling
   const healthBadgeStyle = isFixed
-    ? 'text-emerald-300 bg-emerald-950/60 border border-emerald-800/60 font-bold'
+    ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 font-bold'
     : healthScore >= 75
-    ? 'text-white bg-[#171717] border border-[#2E2E2E] font-bold'
+    ? 'text-foreground bg-muted border border-border font-bold'
     : healthScore >= 50
-    ? 'text-amber-300 bg-amber-950/40 border border-amber-800/50 font-medium'
-    : 'text-red-300 bg-red-950/60 border border-red-800/60 font-bold';
+    ? 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/30 font-medium'
+    : 'text-rose-600 dark:text-rose-400 bg-rose-500/10 border border-rose-500/30 font-bold';
 
   return (
     <div
       className={cn(
-        'relative flex flex-col justify-between rounded-xl border border-[#222222] bg-[#0E0E0E] p-4 transition-all duration-200 hover:border-[#404040] hover:bg-[#121212] font-mono shadow-sm min-h-[380px] min-w-0',
+        'relative flex flex-col justify-between rounded-xl border border-border bg-card p-4 transition-all duration-200 hover:border-foreground/30 font-mono shadow-xs min-h-[380px] min-w-0 text-card-foreground',
         className
       )}
     >
       {/* 1. PRODUCT + CHANNEL + STOCK & 2. HEALTH SCORE */}
-      <div className='flex w-full items-start justify-between gap-2 border-b border-[#1A1A1A] pb-3 mb-1'>
+      <div className='flex w-full items-start justify-between gap-2 border-b border-border pb-3 mb-1'>
         <div className='flex items-start gap-2.5 min-w-0'>
           {photoUrl ? (
-            <div className='relative size-8 rounded bg-[#171717] overflow-hidden shrink-0 border border-[#222222] mt-0.5'>
+            <div className='relative size-8 rounded bg-muted/40 overflow-hidden shrink-0 border border-border mt-0.5'>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={photoUrl}
@@ -172,20 +176,20 @@ export function RoasGauge({
               type='button'
               onClick={onAnalyze}
               className={cn(
-                'text-xs font-semibold text-white line-clamp-2 leading-snug min-h-[2rem] text-left',
+                'text-xs font-semibold text-foreground line-clamp-2 leading-snug min-h-[2rem] text-left',
                 onAnalyze && 'cursor-pointer hover:underline'
               )}
               title={displayName}
             >
               {displayName}
             </button>
-            <div className='flex items-center gap-1.5 mt-1 text-[10px] text-[#8A8A8A] flex-wrap'>
+            <div className='flex items-center gap-1.5 mt-1 text-[10px] text-muted-foreground flex-wrap'>
               <span className={cn('inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[10px] font-semibold', channelMeta.badgeBg, channelMeta.badgeBorder, channelMeta.badgeText)}>
                 <PlatformLogo platform={channelMeta.name.toLowerCase()} size={11} className='shrink-0' />
                 <span>{channelMeta.name}</span>
               </span>
               <span>•</span>
-              <span className={cn('whitespace-nowrap font-medium', inventory <= 0 ? 'text-red-400 font-bold' : 'text-[#D4D4D4]')}>
+              <span className={cn('whitespace-nowrap font-medium', inventory <= 0 ? 'text-rose-500 font-bold' : 'text-foreground')}>
                 {inventory <= 0 ? '0 in stock' : `${inventory} in stock`}
               </span>
             </div>
@@ -301,7 +305,7 @@ export function RoasGauge({
               <span className='font-bold tracking-tight text-foreground text-xl font-mono'>
                 {currentRoas.toFixed(2)}x
               </span>
-              <span className='text-[10px] text-[#8A8A8A] font-mono -mt-0.5'>
+              <span className='text-[10px] text-muted-foreground font-mono -mt-0.5'>
                 ROAS (0–6x)
               </span>
             </div>
@@ -310,8 +314,8 @@ export function RoasGauge({
       </div>
 
       {/* 4. SPEND/DAY + DAYS OF COVER */}
-      <div className='mt-3 flex w-full items-center justify-between text-xs text-[#A3A3A3] font-mono px-0.5'>
-        <span className='text-white font-medium'>
+      <div className='mt-3 flex w-full items-center justify-between text-xs text-muted-foreground font-mono px-0.5'>
+        <span className='text-foreground font-medium'>
           {formatINR(dailySpend)}
         </span>
         <span className={cn(effectiveCoverDays < 7 ? 'text-amber-500 font-semibold' : 'text-muted-foreground')}>
@@ -320,7 +324,7 @@ export function RoasGauge({
       </div>
 
       {/* 5. "1.8x floor · 3.2x target" */}
-      <div className='mt-1 flex w-full items-center justify-center text-[10px] font-mono text-[#737373]'>
+      <div className='mt-1 flex w-full items-center justify-center text-[10px] font-mono text-muted-foreground'>
         <span>1.8x floor · 3.2x target</span>
       </div>
 
@@ -339,13 +343,13 @@ export function RoasGauge({
 
       {/* Real One-Line Data-Driven Footer Summary */}
       <div className='mt-2 w-full text-center px-1'>
-        <p className='text-[11px] text-[#8A8A8A] truncate font-mono' title={effectiveFooterSummary}>
+        <p className='text-[11px] text-muted-foreground truncate font-mono' title={effectiveFooterSummary}>
           {effectiveFooterSummary}
         </p>
       </div>
 
       {/* 7. FIX BUTTON / VIEW FIX BUTTON */}
-      <div className='mt-2.5 w-full pt-2 border-t border-[#1A1A1A]'>
+      <div className='mt-2.5 w-full pt-2 border-t border-border'>
         {isFixed ? (
           <button
             type='button'

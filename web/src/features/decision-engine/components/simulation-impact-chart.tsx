@@ -64,27 +64,27 @@ function ImpactTooltip({ active, payload, label, horizonLabel }: ImpactTooltipPr
         </div>
 
         {/* Shocked / No Action */}
-        <div className='flex justify-between items-center text-rose-400'>
+        <div className='flex justify-between items-center text-rose-600 dark:text-rose-400'>
           <span className='font-medium'>Shocked (No Action):</span>
           <span className='font-mono font-bold'>
             {formatVal(d.Shocked)}
           </span>
         </div>
         {shockDelta !== 0 && (
-          <div className='flex justify-end text-[10px] text-rose-500 font-semibold'>
+          <div className='flex justify-end text-[10px] text-rose-600 dark:text-rose-500 font-semibold'>
             Impact: {shockDelta > 0 ? '+' : ''}{formatVal(shockDelta)} vs Baseline
           </div>
         )}
 
         {/* Mitigated Policy */}
-        <div className='flex justify-between items-center text-emerald-400 pt-1 border-t border-border/40'>
+        <div className='flex justify-between items-center text-emerald-600 dark:text-emerald-400 pt-1 border-t border-border/40'>
           <span className='font-medium'>Mitigated Policy:</span>
           <span className='font-mono font-bold'>
             {formatVal(d.Mitigated)}
           </span>
         </div>
         {mitDelta !== 0 && (
-          <div className='flex justify-end text-[10px] text-emerald-400 font-semibold'>
+          <div className='flex justify-end text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold'>
             Net Lift: {mitDelta > 0 ? '+' : ''}{formatVal(mitDelta)} vs Shocked
           </div>
         )}
@@ -356,7 +356,7 @@ export function SimulationImpactChart({
         <div className='p-2.5 rounded-lg bg-background border border-border space-y-1'>
           <div className='flex items-center justify-between text-[10px] uppercase font-bold text-muted-foreground'>
             <span>Baseline Steady-State</span>
-            <span className='text-zinc-400 font-mono'>REF</span>
+            <span className='text-muted-foreground font-mono'>REF</span>
           </div>
           <div className='text-[11px] text-muted-foreground flex justify-between'>
             <span>Daily Spend:</span>
@@ -374,21 +374,21 @@ export function SimulationImpactChart({
 
         {/* Shocked Card */}
         <div className='p-2.5 rounded-lg bg-background border border-rose-500/30 space-y-1'>
-          <div className='flex items-center justify-between text-[10px] uppercase font-bold text-rose-500'>
+          <div className='flex items-center justify-between text-[10px] uppercase font-bold text-rose-600 dark:text-rose-500'>
             <span>Shocked / No Action</span>
             <span className='text-[9px] bg-rose-500/10 px-1.5 py-0.2 rounded font-bold'>UNMITIGATED</span>
           </div>
           <div className='text-[11px] text-muted-foreground flex justify-between'>
             <span>Daily Spend:</span>
-            <span className='font-mono text-rose-400 font-bold'>₹{shocked.spend.toLocaleString('en-IN')}/d</span>
+            <span className='font-mono text-rose-600 dark:text-rose-400 font-bold'>₹{shocked.spend.toLocaleString('en-IN')}/d</span>
           </div>
           <div className='text-[11px] text-muted-foreground flex justify-between'>
             <span>Daily Margin:</span>
-            <span className='font-mono text-rose-400 font-bold'>₹{shocked.margin.toLocaleString('en-IN')}/d</span>
+            <span className='font-mono text-rose-600 dark:text-rose-400 font-bold'>₹{shocked.margin.toLocaleString('en-IN')}/d</span>
           </div>
           <div className='text-[11px] text-muted-foreground flex justify-between'>
             <span>Daily Loss:</span>
-            <span className='font-mono text-rose-500 font-bold'>
+            <span className='font-mono text-rose-600 dark:text-rose-500 font-bold'>
               -₹{Math.round(financialImpact.dailyLossRate).toLocaleString('en-IN')}/d
             </span>
           </div>
@@ -396,21 +396,21 @@ export function SimulationImpactChart({
 
         {/* Mitigated Card */}
         <div className='p-2.5 rounded-lg bg-background border border-emerald-500/30 space-y-1'>
-          <div className='flex items-center justify-between text-[10px] uppercase font-bold text-emerald-400'>
+          <div className='flex items-center justify-between text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400'>
             <span>Mitigated Policy</span>
             <span className='text-[9px] bg-emerald-500/10 px-1.5 py-0.2 rounded font-bold'>ACTIVE</span>
           </div>
           <div className='text-[11px] text-muted-foreground flex justify-between'>
             <span>Daily Spend:</span>
-            <span className='font-mono text-emerald-400 font-bold'>₹{mitigated.spend.toLocaleString('en-IN')}/d</span>
+            <span className='font-mono text-emerald-600 dark:text-emerald-400 font-bold'>₹{mitigated.spend.toLocaleString('en-IN')}/d</span>
           </div>
           <div className='text-[11px] text-muted-foreground flex justify-between'>
             <span>Daily Margin:</span>
-            <span className='font-mono text-emerald-400 font-bold'>₹{mitigated.margin.toLocaleString('en-IN')}/d</span>
+            <span className='font-mono text-emerald-600 dark:text-emerald-400 font-bold'>₹{mitigated.margin.toLocaleString('en-IN')}/d</span>
           </div>
           <div className='text-[11px] text-muted-foreground flex justify-between'>
             <span>Loss Avoided:</span>
-            <span className='font-mono text-emerald-400 font-bold'>
+            <span className='font-mono text-emerald-600 dark:text-emerald-400 font-bold'>
               +₹{Math.round(financialImpact.lossAvoided / horizonDays).toLocaleString('en-IN')}/d
             </span>
           </div>

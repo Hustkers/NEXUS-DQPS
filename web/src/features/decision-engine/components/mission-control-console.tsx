@@ -391,7 +391,7 @@ export function MissionControlConsole() {
         <RcaWaterfallChart
           totalLoss={hasCriticalAnomaly ? 3008.25 : 0}
           items={hasCriticalAnomaly ? undefined : [
-            { driver: 'Baseline Equilibrium', category: 'Nominal Operations', dollarImpact: 0, percentageShare: 100, color: 'bg-white' }
+            { driver: 'Baseline Equilibrium', category: 'Nominal Operations', dollarImpact: 0, percentageShare: 100, color: 'bg-emerald-500' }
           ]}
         />
       </div>
