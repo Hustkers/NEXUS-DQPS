@@ -67,12 +67,32 @@ export function simulateBudgetDiminishingReturns(
   simulatedBudget: number,
   baseRoas: number,
   baseCpa: number,
-  aov: number = 2850
+  aov: number = 2850,
+  grossMarginPct: number = 62.0
 ) {
-  if (baseBudget <= 0) return { spend: simulatedBudget, revenue: 0, roas: 0, conversions: 0, cpa: 0, efficiencyIndex: 0 };
+  const breakevenRoas = +(100 / grossMarginPct).toFixed(2);
+
+  if (baseBudget <= 0 || simulatedBudget <= 0) {
+    return {
+      spend: Math.max(0, simulatedBudget),
+      revenue: 0,
+      roas: 0,
+      conversions: 0,
+      cpa: 0,
+      grossProfit: 0,
+      netProfit: -Math.max(0, simulatedBudget),
+      profitRoas: 0,
+      marginalRoas: 0,
+      marginalProfit: -1.0,
+      breakevenRoas,
+      isProfitable: false,
+      efficiencyIndex: 0,
+      isDiminishingZone: false
+    };
+  }
 
   const scaleRatio = simulatedBudget / baseBudget;
-  // Elasticity coefficient: < 1.0 models diminishing returns
+  // Elasticity coefficient: < 1.0 models non-linear diminishing returns
   const elasticity = 0.79;
   const scaledRevenue = (baseBudget * baseRoas) * Math.pow(scaleRatio, elasticity);
   const simulatedRoas = +(scaledRevenue / simulatedBudget).toFixed(2);
@@ -82,12 +102,32 @@ export function simulateBudgetDiminishingReturns(
   // Efficiency score drops as budget scales excessively
   const efficiencyIndex = Math.min(100, Math.round((simulatedRoas / baseRoas) * 100));
 
+  // Consistent Profit & Margin Calculation
+  const grossProfit = Math.round(scaledRevenue * (grossMarginPct / 100));
+  const netProfit = Math.round(grossProfit - simulatedBudget);
+  const profitRoas = +(grossProfit / simulatedBudget).toFixed(2);
+  const isProfitable = netProfit > 0;
+
+  // Marginal ROAS & Marginal Profit Headroom for incremental Δ = ₹1,000
+  const deltaSpend = 1000;
+  const nextSpend = simulatedBudget + deltaSpend;
+  const nextRevenue = (baseBudget * baseRoas) * Math.pow(nextSpend / baseBudget, elasticity);
+  const marginalRoas = +((nextRevenue - scaledRevenue) / deltaSpend).toFixed(2);
+  const marginalProfit = +((marginalRoas * (grossMarginPct / 100)) - 1.0).toFixed(2);
+
   return {
     spend: simulatedBudget,
     revenue: Math.round(scaledRevenue),
     roas: simulatedRoas,
     conversions: simulatedConversions,
     cpa: simulatedCpa,
+    grossProfit,
+    netProfit,
+    profitRoas,
+    marginalRoas,
+    marginalProfit,
+    breakevenRoas,
+    isProfitable,
     efficiencyIndex,
     isDiminishingZone: scaleRatio > 1.8
   };

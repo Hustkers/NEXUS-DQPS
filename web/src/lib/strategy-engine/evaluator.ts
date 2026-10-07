@@ -114,6 +114,22 @@ export function evaluateStrategy(
   const expectedRevenue = Math.round(expectedConversions * aov * 100) / 100;
   const expectedRoas = Math.round((expectedRevenue / allocatedBudget) * 100) / 100;
 
+  // Profitability & Marginal Return Analysis
+  const grossMarginPct = config.constraints?.grossMarginPct ?? 62.0;
+  const expectedGrossProfit = Math.round(expectedRevenue * (grossMarginPct / 100) * 100) / 100;
+  const expectedNetProfit = Math.round((expectedGrossProfit - allocatedBudget) * 100) / 100;
+  const expectedProfitRoas = allocatedBudget > 0 ? Math.round((expectedGrossProfit / allocatedBudget) * 100) / 100 : 0;
+  const breakevenRoas = Math.round((100 / grossMarginPct) * 100) / 100;
+  const isProfitable = expectedNetProfit > 0;
+
+  // Marginal ROAS & Marginal Profit Headroom for incremental budget Δ = ₹1,000
+  const deltaSpend = 1000.0;
+  const elasticity = 0.79;
+  const nextSpend = allocatedBudget + deltaSpend;
+  const nextRevenue = expectedRevenue * Math.pow(nextSpend / allocatedBudget, elasticity);
+  const marginalRoas = Math.round(((nextRevenue - expectedRevenue) / deltaSpend) * 100) / 100;
+  const marginalProfit = Math.round((marginalRoas * (grossMarginPct / 100) - 1.0) * 100) / 100;
+
   // 7. Risk Score Modeling (0–100, higher is riskier)
   const funnelRiskMap: Record<string, number> = { BOFU: -10, RETENTION: -15, MOFU: 5, TOFU: 18 };
   const funnelRisk = funnelRiskMap[strategy.funnelStage] ?? 5;
@@ -204,6 +220,14 @@ export function evaluateStrategy(
     expectedCpa,
     expectedRevenue,
     expectedRoas,
+    grossMarginPct,
+    expectedGrossProfit,
+    expectedNetProfit,
+    expectedProfitRoas,
+    marginalRoas,
+    marginalProfit,
+    isProfitable,
+    breakevenRoas,
     riskScore: calculatedRisk,
     confidenceScore: confidence,
     audienceFitScore: fitScore,

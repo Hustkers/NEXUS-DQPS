@@ -46,13 +46,15 @@ export function CampaignLaunchModal({
     }
 
     setIsAuthorizing(true);
-    await new Promise((r) => setTimeout(r, 1200));
-    setIsAuthorizing(false);
-    toast.success('Campaign Authorized & Deployed!', {
-      description: `"${strategy.strategyName}" is now active in Live Campaign Watchdog.`
-    });
-    onLaunchSuccess();
-    onClose();
+    try {
+      toast.success('Campaign Authorized & Deployed!', {
+        description: `"${strategy.strategyName}" is now active in Live Campaign Watchdog.`
+      });
+      onLaunchSuccess();
+      onClose();
+    } finally {
+      setIsAuthorizing(false);
+    }
   };
 
   return (

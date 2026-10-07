@@ -8,8 +8,15 @@ import type { Metadata, Viewport } from 'next';
 import { cookies } from 'next/headers';
 import NextTopLoader from 'nextjs-toploader';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import { Orbitron } from 'next/font/google';
 import BackgroundShader from '@/components/layout/background-shader';
 import '../styles/globals.css';
+
+const orbitron = Orbitron({
+  subsets: ['latin'],
+  variable: '--font-orbitron',
+  display: 'swap',
+});
 
 const META_THEME_COLORS = {
   light: '#ffffff',
@@ -89,6 +96,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body
         className={cn(
           'bg-background font-sans antialiased',
+          orbitron.variable,
           fontVariables
         )}
       >

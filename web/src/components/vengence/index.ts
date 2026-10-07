@@ -12,3 +12,5 @@ export * from './vgpu-canvas';
 export * from './shared-tooltip-avatars';
 export * from './animated-footer';
 export * from './cylinder-carousel';
+export * from './why-us-bento';
+export * from './highlight-grid';
