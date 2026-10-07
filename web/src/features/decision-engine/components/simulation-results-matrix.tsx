@@ -15,133 +15,128 @@ export function SimulationResultsMatrix({
 }: SimulationResultsMatrixProps) {
   const { baseline, shocked, mitigated, horizonDays, activeStrategyName } = result;
 
-  const rows = [
+  const keyMetrics = [
     {
-      label: 'Daily Ad Spend',
-      base: `₹${baseline.spend.toLocaleString('en-IN')}`,
-      shock: `₹${shocked.spend.toLocaleString('en-IN')}`,
-      mitigated: `₹${mitigated.spend.toLocaleString('en-IN')}`,
+      label: 'Daily ad spend',
+      value: `₹${mitigated.spend.toLocaleString('en-IN')}`,
+      comparison: `₹${shocked.spend.toLocaleString('en-IN')} without action`,
       delta: mitigated.spend - shocked.spend,
-      deltaFormatted: `${mitigated.spend >= shocked.spend ? '+' : ''}₹${(mitigated.spend - shocked.spend).toLocaleString('en-IN')}`
+      deltaText: `${mitigated.spend <= shocked.spend ? '-' : '+'}₹${Math.abs(mitigated.spend - shocked.spend).toLocaleString('en-IN')}/day`,
+      isGood: mitigated.spend <= shocked.spend
     },
     {
-      label: 'Daily Impressions',
-      base: baseline.impressions.toLocaleString('en-IN'),
-      shock: shocked.impressions.toLocaleString('en-IN'),
-      mitigated: mitigated.impressions.toLocaleString('en-IN'),
-      delta: mitigated.impressions - shocked.impressions,
-      deltaFormatted: `${mitigated.impressions >= shocked.impressions ? '+' : ''}${(mitigated.impressions - shocked.impressions).toLocaleString('en-IN')}`
-    },
-    {
-      label: 'Daily Clicks',
-      base: baseline.clicks.toLocaleString('en-IN'),
-      shock: shocked.clicks.toLocaleString('en-IN'),
-      mitigated: mitigated.clicks.toLocaleString('en-IN'),
-      delta: mitigated.clicks - shocked.clicks,
-      deltaFormatted: `${mitigated.clicks >= shocked.clicks ? '+' : ''}${(mitigated.clicks - shocked.clicks).toLocaleString('en-IN')}`
-    },
-    {
-      label: 'Daily Conversions (Orders)',
-      base: baseline.conversions.toLocaleString('en-IN'),
-      shock: shocked.conversions.toLocaleString('en-IN'),
-      mitigated: mitigated.conversions.toLocaleString('en-IN'),
+      label: 'Daily orders',
+      value: `${mitigated.conversions.toLocaleString('en-IN')}`,
+      comparison: `${shocked.conversions.toLocaleString('en-IN')} without action`,
       delta: mitigated.conversions - shocked.conversions,
-      deltaFormatted: `${mitigated.conversions >= shocked.conversions ? '+' : ''}${(mitigated.conversions - shocked.conversions).toLocaleString('en-IN')}`
+      deltaText: `${mitigated.conversions >= shocked.conversions ? '+' : ''}${(mitigated.conversions - shocked.conversions).toLocaleString('en-IN')}/day`,
+      isGood: mitigated.conversions >= shocked.conversions
     },
     {
-      label: 'Gross Daily Revenue',
-      base: `₹${baseline.revenue.toLocaleString('en-IN')}`,
-      shock: `₹${shocked.revenue.toLocaleString('en-IN')}`,
-      mitigated: `₹${mitigated.revenue.toLocaleString('en-IN')}`,
-      delta: mitigated.revenue - shocked.revenue,
-      deltaFormatted: `${mitigated.revenue >= shocked.revenue ? '+' : ''}₹${(mitigated.revenue - shocked.revenue).toLocaleString('en-IN')}`
-    },
-    {
-      label: 'Channel ROAS',
-      base: `${baseline.roas.toFixed(2)}x`,
-      shock: `${shocked.roas.toFixed(2)}x`,
-      mitigated: `${mitigated.roas.toFixed(2)}x`,
+      label: 'Return on ad spend',
+      value: `${mitigated.roas.toFixed(2)}x`,
+      comparison: `${shocked.roas.toFixed(2)}x without action`,
       delta: mitigated.roas - shocked.roas,
-      deltaFormatted: `${mitigated.roas >= shocked.roas ? '+' : ''}${(mitigated.roas - shocked.roas).toFixed(2)}x`
+      deltaText: `${mitigated.roas >= shocked.roas ? '+' : ''}${(mitigated.roas - shocked.roas).toFixed(2)}x`,
+      isGood: mitigated.roas >= shocked.roas
     },
     {
-      label: 'Net Contribution Margin',
-      base: `₹${baseline.margin.toLocaleString('en-IN')}`,
-      shock: `₹${shocked.margin.toLocaleString('en-IN')}`,
-      mitigated: `₹${mitigated.margin.toLocaleString('en-IN')}`,
+      label: 'Net daily margin',
+      value: `₹${mitigated.margin.toLocaleString('en-IN')}`,
+      comparison: `₹${shocked.margin.toLocaleString('en-IN')} without action`,
       delta: mitigated.margin - shocked.margin,
-      deltaFormatted: `${mitigated.margin >= shocked.margin ? '+' : ''}₹${(mitigated.margin - shocked.margin).toLocaleString('en-IN')}`
+      deltaText: `${mitigated.margin >= shocked.margin ? '+' : ''}₹${(mitigated.margin - shocked.margin).toLocaleString('en-IN')}/day`,
+      isGood: mitigated.margin >= shocked.margin
+    }
+  ];
+
+  const secondaryMetrics = [
+    {
+      label: 'Daily impressions',
+      value: mitigated.impressions.toLocaleString('en-IN'),
+      note: `Baseline was ${baseline.impressions.toLocaleString('en-IN')}`
+    },
+    {
+      label: 'Daily clicks',
+      value: mitigated.clicks.toLocaleString('en-IN'),
+      note: `Baseline was ${baseline.clicks.toLocaleString('en-IN')}`
+    },
+    {
+      label: 'Gross daily revenue',
+      value: `₹${mitigated.revenue.toLocaleString('en-IN')}`,
+      note: `₹${shocked.revenue.toLocaleString('en-IN')} without action`
+    },
+    {
+      label: 'Baseline daily spend',
+      value: `₹${baseline.spend.toLocaleString('en-IN')}`,
+      note: 'Normal operating level'
     }
   ];
 
   return (
-    <div className={cn('rounded-xl border border-border/80 bg-card p-4 sm:p-5 font-mono shadow-xs space-y-3', className)}>
+    <div className={cn('rounded-xl border border-border bg-card p-6 shadow-xs space-y-6', className)}>
       <div className='flex items-center justify-between border-b border-border/60 pb-3'>
         <div>
-          <h3 className='text-xs font-bold uppercase tracking-wider text-foreground'>
-            Simulation Results Matrix
-          </h3>
-          <p className='text-[10px] text-muted-foreground'>
-            Deterministic multi-channel response ({horizonDays}-day evaluation horizon)
+          <h4 className='text-sm font-semibold text-foreground'>
+            Results breakdown
+          </h4>
+          <p className='text-xs text-muted-foreground mt-0.5'>
+            Projected metrics over {horizonDays} days with {activeStrategyName}.
           </p>
         </div>
-        <span className='text-[10px] px-2 py-0.5 rounded bg-muted font-bold text-foreground'>
+        <span className='text-xs font-medium px-2.5 py-1 rounded-full bg-muted text-foreground'>
           {activeStrategyName}
         </span>
       </div>
 
-      <div className='overflow-x-auto rounded-lg border border-border/70'>
-        <table className='w-full text-left text-xs font-mono'>
-          <thead>
-            <tr className='border-b border-border/80 bg-slate-100/70 dark:bg-zinc-900/60 text-[10px] text-muted-foreground uppercase tracking-wider'>
-              <th className='py-2.5 px-3 font-semibold'>Performance Metric</th>
-              <th className='py-2.5 px-3 text-right font-semibold'>Baseline</th>
-              <th className='py-2.5 px-3 text-right font-semibold text-rose-600 dark:text-rose-400'>
-                Shocked (No Action)
-              </th>
-              <th className='py-2.5 px-3 text-right font-semibold text-emerald-600 dark:text-emerald-400'>
-                Mitigated
-              </th>
-              <th className='py-2.5 px-3 text-right font-semibold'>Strategy Delta</th>
-            </tr>
-          </thead>
-          <tbody className='divide-y divide-border/60'>
-            {rows.map((row) => {
-              const isPositive = row.delta > 0;
-              const isNeutral = row.delta === 0;
+      {/* 4 Key Figures */}
+      <div className='grid grid-cols-2 lg:grid-cols-4 gap-4'>
+        {keyMetrics.map((m) => (
+          <div key={m.label} className='p-4 rounded-lg bg-muted/30 border border-border/60 space-y-1.5'>
+            <div className='text-xs text-muted-foreground font-medium'>
+              {m.label}
+            </div>
+            <div className='text-xl font-semibold text-foreground tracking-tight tabular-nums'>
+              {m.value}
+            </div>
+            <div className='text-xs flex items-center justify-between pt-1 border-t border-border/40 gap-1'>
+              <span className='text-muted-foreground truncate'>{m.comparison}</span>
+              <span
+                className={cn(
+                  'font-medium tabular-nums shrink-0',
+                  m.delta === 0
+                    ? 'text-muted-foreground'
+                    : m.isGood
+                    ? 'text-emerald-600 dark:text-emerald-400'
+                    : 'text-rose-600 dark:text-rose-400'
+                )}
+              >
+                {m.deltaText}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
 
-              return (
-                <tr key={row.label} className='hover:bg-muted/30 transition-colors'>
-                  <td className='py-2 px-3 font-medium text-foreground text-[11px] whitespace-nowrap'>
-                    {row.label}
-                  </td>
-                  <td className='py-2 px-3 text-right text-muted-foreground'>
-                    {row.base}
-                  </td>
-                  <td className='py-2 px-3 text-right font-semibold text-rose-600 dark:text-rose-400'>
-                    {row.shock}
-                  </td>
-                  <td className='py-2 px-3 text-right font-bold text-emerald-600 dark:text-emerald-400'>
-                    {row.mitigated}
-                  </td>
-                  <td className='py-2 px-3 text-right font-bold text-[11px]'>
-                    <span
-                      className={cn(
-                        isNeutral
-                          ? 'text-muted-foreground'
-                          : isPositive
-                          ? 'text-emerald-600 dark:text-emerald-400'
-                          : 'text-rose-600 dark:text-rose-400'
-                      )}
-                    >
-                      {row.deltaFormatted}
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      {/* Plain two-column list for remaining figures */}
+      <div className='border-t border-border/60 pt-4'>
+        <h5 className='text-xs font-medium text-muted-foreground mb-3'>
+          Additional metrics
+        </h5>
+        <div className='grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-sm'>
+          {secondaryMetrics.map((item) => (
+            <div
+              key={item.label}
+              className='flex items-center justify-between py-1.5 border-b border-border/40'
+            >
+              <div>
+                <span className='text-foreground font-medium'>{item.label}</span>
+                <span className='text-xs text-muted-foreground block'>{item.note}</span>
+              </div>
+              <span className='font-medium text-foreground tabular-nums'>{item.value}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
