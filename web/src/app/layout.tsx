@@ -13,7 +13,7 @@ import BackgroundShader from '@/components/layout/background-shader';
 import '../styles/globals.css';
 
 const META_THEME_COLORS = {
-  light: '#000000',
+  light: '#ffffff',
   dark: '#000000'
 };
 
@@ -66,10 +66,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                if (localStorage.theme === 'light') {
-                  localStorage.theme = 'dark';
+                const storedTheme = localStorage.getItem('theme');
+                if (storedTheme === 'light') {
+                  document.documentElement.classList.remove('dark');
+                  document.documentElement.classList.add('light');
+                  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '${META_THEME_COLORS.light}');
+                } else if (storedTheme === 'dark') {
+                  document.documentElement.classList.remove('light');
+                  document.documentElement.classList.add('dark');
+                  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '${META_THEME_COLORS.dark}');
                 }
-                document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '${META_THEME_COLORS.dark}');
               } catch (_) {}
             `
           }}

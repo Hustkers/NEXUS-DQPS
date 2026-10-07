@@ -105,11 +105,11 @@ const NotchThemeToggle = () => {
 
 const DEFAULT_LEFT_ITEMS: NavItem[] = [
   { label: 'Overview', href: '#overview', icon: Home },
-  { label: 'Workflow', href: '#workflow', icon: Zap },
-  { label: 'Features', href: '#features', icon: SquareX }
+  { label: 'Workflow', href: '#workflow', icon: Zap }
 ];
 
 const DEFAULT_RIGHT_ITEMS: NavItem[] = [
+  { label: 'Features', href: '#features', icon: SquareX },
   { label: 'Stack', href: '#stack', icon: Layers }
 ];
 
@@ -324,11 +324,11 @@ export function NotchNavbar({
               </svg>
             </div>
 
-            {/* Content Layer (nexusdqps dead-centered) */}
-            <div className="relative w-full h-full flex items-end justify-between pb-2.5 px-3 sm:px-6 md:px-8 gap-4 md:gap-7">
-              {/* Desktop Left Nav: Overview (Active pill), Workflow, Features */}
-              <div className="flex-1 hidden md:flex items-center justify-start mb-0.5">
-                <nav className="flex gap-3 lg:gap-4 items-center shrink-0">
+            {/* Content Layer (3-column layout: Left Nav | Center Logo | Right Nav) */}
+            <div className="relative w-full h-full flex items-end justify-between pb-2.5 px-3 sm:px-6 md:px-8 gap-2 sm:gap-4">
+              {/* Desktop Left Nav: Overview, Workflow */}
+              <div className="flex-1 hidden md:flex items-center justify-end mb-0.5 min-w-0">
+                <nav className="flex gap-2.5 lg:gap-3.5 items-center shrink-0">
                   {leftItems.map((item) => renderNavLink(item))}
                 </nav>
               </div>
@@ -344,13 +344,13 @@ export function NotchNavbar({
               </button>
 
               {/* Logo (Exact Center - Single Line Horizontal Lockup: [NX] nexusdqps) */}
-              <div className="absolute left-1/2 -translate-x-1/2 bottom-2.5 flex items-center justify-center shrink-0 z-20 pointer-events-auto">
+              <div className="flex items-center justify-center shrink-0 mb-0.5 mx-3 sm:mx-5 z-20 pointer-events-auto">
                 {logo || defaultLogo}
               </div>
 
-              {/* Desktop Right Nav: Stack, | , Moon Toggle, GitHub */}
-              <div className="flex-1 hidden md:flex items-center justify-end mb-0.5">
-                <nav className="flex gap-4 lg:gap-5 items-center shrink-0">
+              {/* Desktop Right Nav: Features, Stack, | , Moon Toggle, GitHub */}
+              <div className="flex-1 hidden md:flex items-center justify-start mb-0.5 min-w-0">
+                <nav className="flex gap-3 lg:gap-4 items-center shrink-0">
                   {rightItems.map((item) => renderNavLink(item))}
 
                   {/* Vertical Divider Line */}

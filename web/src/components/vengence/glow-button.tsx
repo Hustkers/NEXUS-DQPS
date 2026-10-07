@@ -39,15 +39,15 @@ export function GlowButton({
 
   const variantClasses = {
     default:
-      'bg-[#FFFFFF] text-[#000000] font-semibold hover:bg-[#8A8A8A] hover:text-[#000000] border-0 shadow-none',
+      'bg-primary text-primary-foreground font-semibold hover:bg-primary/90 border-0 shadow-sm',
     shimmer:
-      'relative bg-[#1A1A1A] text-[#FFFFFF] font-medium overflow-hidden border border-[#8A8A8A] hover:border-[#FFFFFF] shadow-none group',
+      'relative bg-secondary text-secondary-foreground font-medium overflow-hidden border border-border hover:border-foreground/80 shadow-none group',
     glow:
-      'bg-[#FFFFFF] text-[#000000] font-semibold hover:bg-[#8A8A8A] hover:text-[#000000] border-0 shadow-none',
+      'bg-primary text-primary-foreground font-semibold hover:bg-primary/90 border-0 shadow-sm',
     outline:
-      'bg-[#1A1A1A] text-[#FFFFFF] border border-[#8A8A8A] hover:bg-[#000000] hover:border-[#FFFFFF] font-mono shadow-none',
+      'bg-background text-foreground border border-border hover:bg-muted hover:border-foreground/80 font-mono shadow-none',
     pill:
-      'rounded-[6px] bg-[#1A1A1A] text-[#FFFFFF] border border-[#8A8A8A] hover:bg-[#000000] hover:border-[#FFFFFF] font-mono text-xs shadow-none'
+      'rounded-[6px] bg-background text-foreground border border-border hover:bg-muted hover:border-foreground/80 font-mono text-xs shadow-none'
   }[variant];
 
   const content = (
