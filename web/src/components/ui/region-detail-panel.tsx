@@ -23,6 +23,7 @@ export interface RegionDetailPanelProps {
   isOpen: boolean;
   onClose: () => void;
   isLoading?: boolean;
+  className?: string;
 }
 
 function formatUSD(value: number): string {
@@ -42,6 +43,7 @@ export function RegionDetailPanel({
   isOpen,
   onClose,
   isLoading = false,
+  className,
 }: RegionDetailPanelProps) {
   // Keyboard listener: Esc to close
   useEffect(() => {
@@ -63,14 +65,14 @@ export function RegionDetailPanel({
     switch (marker.status) {
       case 'High sales':
         return (
-          <Badge className='bg-red-950/80 text-red-400 border border-red-500/40 text-[11px] font-mono font-bold uppercase tracking-wider flex items-center gap-1.5'>
+          <Badge className='bg-red-950/80 text-red-400 border border-red-500/40 text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1.5'>
             <span className='size-1.5 rounded-full bg-red-400 animate-pulse' />
             High Sales
           </Badge>
         );
       case 'Decreasing':
         return (
-          <Badge className='bg-amber-950/80 text-amber-400 border border-amber-500/40 text-[11px] font-mono font-bold uppercase tracking-wider flex items-center gap-1.5'>
+          <Badge className='bg-amber-950/80 text-amber-400 border border-amber-500/40 text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1.5'>
             <span className='size-1.5 rounded-full bg-amber-400' />
             Decreasing
           </Badge>
@@ -78,7 +80,7 @@ export function RegionDetailPanel({
       case 'Suppressed':
       default:
         return (
-          <Badge className='bg-zinc-800 text-zinc-400 border border-zinc-700 text-[11px] font-mono font-bold uppercase tracking-wider flex items-center gap-1.5'>
+          <Badge className='bg-zinc-800 text-zinc-400 border border-zinc-700 text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1.5'>
             <span className='size-1.5 rounded-full bg-zinc-400' />
             Suppressed
           </Badge>
@@ -92,12 +94,14 @@ export function RegionDetailPanel({
       aria-modal='true'
       aria-label={`Region Intelligence: ${marker.name}`}
       className={cn(
-        'w-full max-w-md rounded-xl border border-zinc-800 bg-zinc-950/95 p-4 text-zinc-100 shadow-2xl backdrop-blur-md transition-all duration-300',
-        'animate-in fade-in-0 zoom-in-95'
+        'w-full max-w-sm sm:max-w-md rounded-xl border border-zinc-700 bg-zinc-950/95 p-4 text-zinc-100 shadow-2xl backdrop-blur-md transition-all duration-200',
+        'max-h-[min(540px,85vh)] overflow-y-auto overflow-x-hidden [scrollbar-width:thin] [scrollbar-color:#3f3f46_transparent]',
+        'animate-in fade-in-0 zoom-in-95',
+        className
       )}
     >
       {/* Header */}
-      <div className='flex items-start justify-between border-b border-zinc-800/80 pb-3 mb-3 gap-2'>
+      <div className='flex items-start justify-between border-b border-zinc-800 pb-2.5 mb-3 gap-2 sticky top-0 bg-zinc-950/90 backdrop-blur-sm z-10 -mx-4 px-4 pt-0'>
         <div className='flex flex-col gap-1'>
           <div className='flex items-center gap-2 flex-wrap'>
             <h3 className='font-mono text-sm font-bold text-zinc-100 uppercase tracking-tight flex items-center gap-1.5'>
@@ -159,8 +163,8 @@ export function RegionDetailPanel({
         </div>
       ) : (
         /* Data Loaded State */
-        <div className='space-y-3 text-xs font-mono'>
-          {/* Profit & Status Hero Box */}
+        <div className='space-y-2.5 text-xs font-mono'>
+          {/* Net Profit Hero Card with Clear Profitable / Not Profitable Badge */}
           <div
             className={cn(
               'p-3 rounded-lg border flex flex-col gap-2',
@@ -170,7 +174,7 @@ export function RegionDetailPanel({
             )}
           >
             <div className='flex items-center justify-between'>
-              <span className='text-[10px] uppercase font-bold tracking-wider text-zinc-400'>
+              <span className='text-[10px] uppercase font-bold tracking-wider text-zinc-400 font-mono'>
                 Regional Net Profit
               </span>
               <Badge
@@ -178,8 +182,8 @@ export function RegionDetailPanel({
                 className={cn(
                   'text-[10px] font-mono font-bold tracking-wider',
                   financials.isProfitable
-                    ? 'border-emerald-500/50 bg-emerald-950/50 text-emerald-400'
-                    : 'border-rose-500/50 bg-rose-950/50 text-rose-400'
+                    ? 'border-emerald-500/50 bg-emerald-950/60 text-emerald-400'
+                    : 'border-rose-500/50 bg-rose-950/60 text-rose-400'
                 )}
               >
                 {financials.isProfitable ? (
@@ -195,11 +199,11 @@ export function RegionDetailPanel({
             </div>
 
             <div className='flex items-baseline justify-between'>
-              <span className='text-xl font-bold tabular-nums tracking-tight text-zinc-100'>
+              <span className='text-xl font-bold tabular-nums tracking-tight text-zinc-100 font-mono'>
                 {financials.profit >= 0 ? '+' : '-'}
                 {formatUSD(Math.abs(financials.profit))}
               </span>
-              <span className='text-[10px] text-zinc-400'>
+              <span className='text-[10px] text-zinc-400 font-mono'>
                 Profit ROAS:{' '}
                 <strong className='text-zinc-200 tabular-nums'>
                   {financials.spend > 0 ? `${financials.profitRoas.toFixed(2)}x` : 'N/A'}
@@ -207,95 +211,130 @@ export function RegionDetailPanel({
               </span>
             </div>
 
-            <div className='text-[10px] text-zinc-500 leading-tight pt-1 border-t border-zinc-800/60'>
-              Formula: (Revenue × Margin Rate) − Ad Spend = ({formatUSD(financials.revenue)} ×{' '}
+            <div className='text-[10px] text-zinc-500 leading-tight pt-1.5 border-t border-zinc-800/60 font-mono'>
+              Formula: (Revenue × Margin) − Spend = ({formatUSD(financials.revenue)} ×{' '}
               {(financials.marginRate * 100).toFixed(0)}%) − {formatUSD(financials.spend)}
             </div>
           </div>
 
-          {/* Financial & Ad Metrics Grid */}
-          <div className='grid grid-cols-2 gap-2 text-[11px]'>
-            <div className='p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/80'>
-              <div className='text-zinc-400 text-[10px] uppercase tracking-wider'>Ad Spend</div>
-              <div className='text-sm font-bold text-zinc-100 tabular-nums mt-0.5'>
+          {/* Clean 2-Column Metric Grid with Equal Heights */}
+          <div className='grid grid-cols-2 gap-2 text-xs'>
+            {/* 1. Ad Spend */}
+            <div className='p-2.5 rounded-lg bg-zinc-900/70 border border-zinc-800 flex flex-col justify-between min-h-[72px]'>
+              <div className='text-zinc-400 text-[10px] uppercase font-mono tracking-wider'>
+                Ad Spend
+              </div>
+              <div className='text-sm font-bold text-zinc-100 tabular-nums font-mono'>
                 {formatUSD(financials.spend)}
               </div>
-              <div className='text-[10px] text-zinc-500 mt-0.5'>Allocated budget</div>
+              <div className='text-[10px] text-zinc-500 font-mono'>Allocated budget</div>
             </div>
 
-            <div className='p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800/80'>
-              <div className='text-zinc-400 text-[10px] uppercase tracking-wider'>Return (Revenue)</div>
-              <div className='text-sm font-bold text-cyan-400 tabular-nums mt-0.5'>
+            {/* 2. Return (Revenue) */}
+            <div className='p-2.5 rounded-lg bg-zinc-900/70 border border-zinc-800 flex flex-col justify-between min-h-[72px]'>
+              <div className='text-zinc-400 text-[10px] uppercase font-mono tracking-wider'>
+                Return (Revenue)
+              </div>
+              <div className='text-sm font-bold text-cyan-400 tabular-nums font-mono'>
                 {formatUSD(financials.revenue)}
               </div>
-              <div className='text-[10px] text-zinc-500 mt-0.5'>
+              <div className='text-[10px] text-zinc-400 font-mono'>
                 ROAS:{' '}
                 <strong className='text-cyan-300 tabular-nums'>
                   {financials.spend > 0 ? `${financials.roas.toFixed(2)}x` : 'N/A'}
                 </strong>
               </div>
             </div>
-          </div>
 
-          {/* Funnel & Conversion Efficiency */}
-          <div className='p-2.5 rounded-lg bg-zinc-900/40 border border-zinc-800/80 space-y-2'>
-            <div className='flex items-center justify-between text-[10px] text-zinc-400 uppercase tracking-wider font-bold'>
-              <span>Funnel Telemetry</span>
-              <span className='text-zinc-500'>
+            {/* 3. Conversions & CPA */}
+            <div className='p-2.5 rounded-lg bg-zinc-900/70 border border-zinc-800 flex flex-col justify-between min-h-[72px]'>
+              <div className='text-zinc-400 text-[10px] uppercase font-mono tracking-wider'>
+                Conversions
+              </div>
+              <div className='text-sm font-bold text-zinc-100 tabular-nums font-mono'>
+                {formatNumber(marker.metrics.conversions)}
+              </div>
+              <div className='text-[10px] text-zinc-400 font-mono'>
+                CPA:{' '}
+                <strong className='text-zinc-200 tabular-nums'>
+                  {financials.cpa !== null ? formatUSD(financials.cpa) : 'N/A'}
+                </strong>
+              </div>
+            </div>
+
+            {/* 4. CTR & Conversion Probability */}
+            <div className='p-2.5 rounded-lg bg-zinc-900/70 border border-zinc-800 flex flex-col justify-between min-h-[72px]'>
+              <div className='text-zinc-400 text-[10px] uppercase font-mono tracking-wider'>
+                CTR &amp; P_conv
+              </div>
+              <div className='text-sm font-bold text-amber-400 tabular-nums font-mono'>
+                {financials.ctr.toFixed(2)}%
+              </div>
+              <div className='text-[10px] text-zinc-400 font-mono'>
                 P_conv:{' '}
-                <strong className='text-amber-400 tabular-nums'>
+                <strong className='text-amber-300 tabular-nums'>
                   {(marker.metrics.convProbability * 100).toFixed(0)}%
                 </strong>
-              </span>
-            </div>
-
-            <div className='grid grid-cols-3 gap-2 text-center pt-1'>
-              <div className='p-1.5 rounded bg-zinc-950/60 border border-zinc-800/60'>
-                <div className='text-zinc-500 text-[9px]'>Conversions</div>
-                <div className='text-xs font-bold text-zinc-200 tabular-nums'>
-                  {formatNumber(marker.metrics.conversions)}
-                </div>
-              </div>
-
-              <div className='p-1.5 rounded bg-zinc-950/60 border border-zinc-800/60'>
-                <div className='text-zinc-500 text-[9px]'>CPA</div>
-                <div className='text-xs font-bold text-zinc-200 tabular-nums'>
-                  {financials.cpa !== null ? formatUSD(financials.cpa) : 'N/A'}
-                </div>
-              </div>
-
-              <div className='p-1.5 rounded bg-zinc-950/60 border border-zinc-800/60'>
-                <div className='text-zinc-500 text-[9px]'>CTR</div>
-                <div className='text-xs font-bold text-zinc-200 tabular-nums'>
-                  {financials.ctr.toFixed(2)}%
-                </div>
               </div>
             </div>
 
-            <div className='flex items-center justify-between text-[10px] text-zinc-500 px-1'>
-              <span>
-                Impressions: <strong className='text-zinc-300 tabular-nums'>{formatNumber(marker.metrics.impressions)}</strong>
-              </span>
-              <span>
-                Clicks: <strong className='text-zinc-300 tabular-nums'>{formatNumber(marker.metrics.clicks)}</strong>
-              </span>
+            {/* 5. Traffic (Impressions / Clicks) */}
+            <div className='p-2.5 rounded-lg bg-zinc-900/70 border border-zinc-800 flex flex-col justify-between min-h-[72px]'>
+              <div className='text-zinc-400 text-[10px] uppercase font-mono tracking-wider'>
+                Impressions / Clicks
+              </div>
+              <div className='text-sm font-bold text-zinc-100 tabular-nums font-mono'>
+                {formatNumber(marker.metrics.clicks)}{' '}
+                <span className='text-xs font-normal text-zinc-400'>clicks</span>
+              </div>
+              <div className='text-[10px] text-zinc-500 font-mono'>
+                {formatNumber(marker.metrics.impressions)} impressions
+              </div>
+            </div>
+
+            {/* 6. Trend vs Previous Period */}
+            <div className='p-2.5 rounded-lg bg-zinc-900/70 border border-zinc-800 flex flex-col justify-between min-h-[72px]'>
+              <div className='text-zinc-400 text-[10px] uppercase font-mono tracking-wider'>
+                Trend vs Prev
+              </div>
+              <div
+                className={cn(
+                  'text-sm font-bold tabular-nums font-mono flex items-center gap-1',
+                  marker.metrics.trend.direction === 'up' ? 'text-emerald-400' : 'text-amber-400'
+                )}
+              >
+                {marker.metrics.trend.direction === 'up' ? (
+                  <IconTrendingUp className='size-4' />
+                ) : (
+                  <IconTrendingDown className='size-4' />
+                )}
+                <span>
+                  {marker.metrics.trend.percentage > 0 ? '+' : ''}
+                  {marker.metrics.trend.percentage.toFixed(1)}%
+                </span>
+              </div>
+              <div className='text-[10px] text-zinc-500 font-mono'>
+                {marker.metrics.trend.direction === 'up' ? 'Growth momentum' : 'Decreasing pace'}
+              </div>
             </div>
           </div>
 
-          {/* Top Product (SKU) & Inventory */}
-          <div className='p-2.5 rounded-lg bg-zinc-900/40 border border-zinc-800/80 flex items-center justify-between gap-2'>
-            <div className='flex items-center gap-2'>
-              <div className='size-7 rounded bg-zinc-800/80 flex items-center justify-center shrink-0 text-cyan-400'>
+          {/* Top Product (SKU) & Inventory Card */}
+          <div className='p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800 flex items-center justify-between gap-2'>
+            <div className='flex items-center gap-2 min-w-0'>
+              <div className='size-7 rounded bg-zinc-800 flex items-center justify-center shrink-0 text-cyan-400'>
                 <IconPackage className='size-4' />
               </div>
-              <div>
-                <div className='text-[10px] text-zinc-500 uppercase tracking-wider'>Top SKU</div>
-                <div className='text-xs font-bold text-zinc-200 line-clamp-1'>
+              <div className='min-w-0'>
+                <div className='text-[10px] text-zinc-500 uppercase tracking-wider font-mono'>
+                  Top SKU
+                </div>
+                <div className='text-xs font-bold text-zinc-200 truncate font-mono'>
                   {marker.metrics.topProduct.name}
                 </div>
-                <div className='text-[10px] text-zinc-500'>
-                  SKU: <span className='text-zinc-400'>{marker.metrics.topProduct.sku}</span> • Margin:{' '}
-                  <span className='text-zinc-300 tabular-nums'>
+                <div className='text-[10px] text-zinc-400 font-mono'>
+                  SKU: <span className='text-zinc-300'>{marker.metrics.topProduct.sku}</span> • Margin:{' '}
+                  <span className='text-zinc-200 tabular-nums'>
                     {(marker.metrics.topProduct.margin * 100).toFixed(0)}%
                   </span>
                 </div>
@@ -303,10 +342,12 @@ export function RegionDetailPanel({
             </div>
 
             <div className='text-right shrink-0'>
-              <div className='text-[10px] text-zinc-500 uppercase tracking-wider'>Stock</div>
+              <div className='text-[10px] text-zinc-500 uppercase tracking-wider font-mono'>
+                Stock
+              </div>
               <div
                 className={cn(
-                  'text-xs font-bold tabular-nums',
+                  'text-xs font-bold tabular-nums font-mono',
                   marker.metrics.topProduct.stockLevel > 50
                     ? 'text-emerald-400'
                     : marker.metrics.topProduct.stockLevel > 0
@@ -319,29 +360,8 @@ export function RegionDetailPanel({
             </div>
           </div>
 
-          {/* Trend vs Previous Period */}
-          <div className='flex items-center justify-between p-2 rounded-lg bg-zinc-900/60 border border-zinc-800/80 text-[11px]'>
-            <span className='text-zinc-400'>Trend vs Previous Period</span>
-            <div
-              className={cn(
-                'flex items-center gap-1 font-bold tabular-nums',
-                marker.metrics.trend.direction === 'up' ? 'text-emerald-400' : 'text-amber-400'
-              )}
-            >
-              {marker.metrics.trend.direction === 'up' ? (
-                <IconTrendingUp className='size-3.5' />
-              ) : (
-                <IconTrendingDown className='size-3.5' />
-              )}
-              <span>
-                {marker.metrics.trend.percentage > 0 ? '+' : ''}
-                {marker.metrics.trend.percentage.toFixed(1)}%
-              </span>
-            </div>
-          </div>
-
           {/* Decision Engine Recommended Action */}
-          <div className='p-2.5 rounded-lg bg-cyan-950/20 border border-cyan-800/40 space-y-1'>
+          <div className='p-2.5 rounded-lg bg-cyan-950/20 border border-cyan-800/40 space-y-1 font-mono'>
             <div className='flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-wider text-cyan-400'>
               <IconArrowRight className='size-3' />
               <span>Recommended Action</span>

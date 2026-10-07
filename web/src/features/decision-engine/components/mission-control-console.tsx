@@ -1,8 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
 import { PlatformLogo } from '@/components/icons/platform-logos';
 import { AnomalyCard } from './anomaly-card';
@@ -15,10 +13,11 @@ import { CausalDagVisualizer } from './causal-dag-visualizer';
 import { RcaWaterfallChart } from './rca-waterfall-chart';
 import { ScenarioSandbox } from './scenario-sandbox';
 import { ExecutiveGraphBanner } from './executive-graph-banner';
-import { USE_MOCKS, FASTAPI_BASE_URL, approveDirective } from '@/lib/api-adapter';
 import { ProductAnalysisModal, type ProductAnalysisTarget } from './product-analysis-modal';
 import { GithubGlobe } from './github-globe';
 import { GlobePulse } from '@/components/ui/cobe-globe-pulse';
+import { GLOBE_REGIONS, PulseMarker } from '@/data/globe-regions';
+import { RegionDetailPanel } from '@/components/ui/region-detail-panel';
 import initialEngineState from '@/data/nexus-engine-state.json';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -27,9 +26,9 @@ import { useChannel, AdChannel } from '@/context/channel-context';
 
 export function MissionControlConsole() {
   const [state, setState] = useState(initialEngineState);
-  const [liveMode, setLiveMode] = useState(!USE_MOCKS);
   const [analyzingProduct, setAnalyzingProduct] = useState<ProductAnalysisTarget | null>(null);
   const [consoleGlobeMode, setConsoleGlobeMode] = useState<'arcs' | 'pulse'>('pulse');
+  const [selectedGlobeMarker, setSelectedGlobeMarker] = useState<PulseMarker | null>(null);
   const { channel, setChannel } = useChannel();
   const activeTab = channel;
   const setActiveTab = (tab: string) => setChannel(tab as AdChannel);
@@ -147,8 +146,9 @@ export function MissionControlConsole() {
       />
 
       {/* 3.5. Live 3D Global Telemetry & Heatmap Command Center */}
-      <div className='rounded border border-[#1A1A1A] bg-[#1A1A1A] p-5 shadow-none flex flex-col lg:flex-row items-center justify-between gap-6 overflow-hidden'>
-        <div className='flex-1 space-y-3.5 w-full'>
+      <div className='rounded border border-[#1A1A1A] bg-[#1A1A1A] p-6 shadow-none flex flex-col xl:flex-row items-start justify-between gap-6 relative min-h-[460px]'>
+        {/* Left Column: Telemetry info, tabs, region tiles, SKU chips */}
+        <div className='flex-1 space-y-3.5 w-full min-w-0'>
           <div className='flex flex-wrap items-center justify-between gap-2 border-b border-[#000000] pb-2.5'>
             <div className='flex items-center gap-2'>
               <Icons.globe className='size-5 text-white' />
@@ -160,6 +160,7 @@ export function MissionControlConsole() {
               {/* Globe Switcher */}
               <div className='flex items-center bg-[#000000] rounded border border-[#1A1A1A] p-0.5 text-xs font-mono'>
                 <button
+                  type='button'
                   onClick={() => setConsoleGlobeMode('pulse')}
                   className={cn(
                     'px-2.5 py-1 rounded font-semibold transition-all',
@@ -171,6 +172,7 @@ export function MissionControlConsole() {
                   Sales Pulse
                 </button>
                 <button
+                  type='button'
                   onClick={() => setConsoleGlobeMode('arcs')}
                   className={cn(
                     'px-2.5 py-1 rounded font-semibold transition-all',
@@ -199,30 +201,99 @@ export function MissionControlConsole() {
               : 'WebGL ad delivery vectors across Meta, Google, Amazon & Shopify. Visualizing network latency and delivery hops via github.com/globe.'}
           </p>
 
+          {/* Region Status Tiles with Clear Status Dot and Readable Contrast */}
           <div className='grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 font-mono text-xs'>
-            <div className='p-2.5 rounded bg-[#000000]'>
-              <div className='text-[10px] text-[#8A8A8A]'>US-EAST / WEST</div>
-              <div className='text-white font-bold'>High Sales (78%)</div>
-            </div>
-            <div className='p-2.5 rounded bg-[#000000]'>
-              <div className='text-[10px] text-[#8A8A8A]'>WESTERN EUROPE</div>
-              <div className='text-white font-bold'>Strong (56%)</div>
-            </div>
-            <div className='p-2.5 rounded bg-[#000000]'>
-              <div className='text-[10px] text-[#8A8A8A]'>ASIA-PACIFIC</div>
-              <div className='text-[#8A8A8A] font-bold'>Moderate (44%)</div>
-            </div>
-            <div className='p-2.5 rounded bg-[#000000]'>
-              <div className='text-[10px] text-[#8A8A8A]'>LATAM &amp; SEA</div>
-              <div className='text-white font-bold'>RL Suppressed</div>
-            </div>
+            {/* Tile 1: US-EAST / WEST (High Sales - Red) */}
+            <button
+              type='button'
+              onClick={() => {
+                const match = GLOBE_REGIONS.find((m) => m.id === 'us-east');
+                if (match) setSelectedGlobeMarker((prev) => (prev?.id === 'us-east' ? null : match));
+              }}
+              className={cn(
+                'p-2.5 rounded bg-[#000000] border transition-all text-left cursor-pointer group',
+                selectedGlobeMarker?.id === 'us-east'
+                  ? 'border-red-500 ring-1 ring-red-500/50 bg-red-950/20'
+                  : 'border-[#1A1A1A] hover:border-white'
+              )}
+            >
+              <div className='flex items-center gap-1.5 text-[10px] text-zinc-400'>
+                <span className='size-2 rounded-full bg-red-500 shrink-0 shadow-[0_0_6px_#ef4444]' />
+                <span>US-EAST / WEST</span>
+              </div>
+              <div className='text-white font-bold mt-0.5'>High Sales (78%)</div>
+            </button>
+
+            {/* Tile 2: WESTERN EUROPE (Strong - Amber) */}
+            <button
+              type='button'
+              onClick={() => {
+                const match = GLOBE_REGIONS.find((m) => m.id === 'eu-west');
+                if (match) setSelectedGlobeMarker((prev) => (prev?.id === 'eu-west' ? null : match));
+              }}
+              className={cn(
+                'p-2.5 rounded bg-[#000000] border transition-all text-left cursor-pointer group',
+                selectedGlobeMarker?.id === 'eu-west'
+                  ? 'border-amber-500 ring-1 ring-amber-500/50 bg-amber-950/20'
+                  : 'border-[#1A1A1A] hover:border-white'
+              )}
+            >
+              <div className='flex items-center gap-1.5 text-[10px] text-zinc-400'>
+                <span className='size-2 rounded-full bg-amber-400 shrink-0 shadow-[0_0_6px_#f59e0b]' />
+                <span>WESTERN EUROPE</span>
+              </div>
+              <div className='text-white font-bold mt-0.5'>Strong (56%)</div>
+            </button>
+
+            {/* Tile 3: ASIA-PACIFIC (Moderate - Readable Amber/Yellow Text) */}
+            <button
+              type='button'
+              onClick={() => {
+                const match = GLOBE_REGIONS.find((m) => m.id === 'apac');
+                if (match) setSelectedGlobeMarker((prev) => (prev?.id === 'apac' ? null : match));
+              }}
+              className={cn(
+                'p-2.5 rounded bg-[#000000] border transition-all text-left cursor-pointer group',
+                selectedGlobeMarker?.id === 'apac'
+                  ? 'border-amber-500 ring-1 ring-amber-500/50 bg-amber-950/20'
+                  : 'border-[#1A1A1A] hover:border-white'
+              )}
+            >
+              <div className='flex items-center gap-1.5 text-[10px] text-zinc-400'>
+                <span className='size-2 rounded-full bg-amber-400 shrink-0 shadow-[0_0_6px_#f59e0b]' />
+                <span>ASIA-PACIFIC</span>
+              </div>
+              <div className='text-amber-300 font-bold mt-0.5'>Moderate (44%)</div>
+            </button>
+
+            {/* Tile 4: LATAM & SEA (RL Suppressed - Grey) */}
+            <button
+              type='button'
+              onClick={() => {
+                const match = GLOBE_REGIONS.find((m) => m.id === 'latam');
+                if (match) setSelectedGlobeMarker((prev) => (prev?.id === 'latam' ? null : match));
+              }}
+              className={cn(
+                'p-2.5 rounded bg-[#000000] border transition-all text-left cursor-pointer group',
+                selectedGlobeMarker?.id === 'latam'
+                  ? 'border-zinc-400 ring-1 ring-zinc-400/50 bg-zinc-900/60'
+                  : 'border-[#1A1A1A] hover:border-white'
+              )}
+            >
+              <div className='flex items-center gap-1.5 text-[10px] text-zinc-400'>
+                <span className='size-2 rounded-full bg-zinc-500 shrink-0' />
+                <span>LATAM &amp; SEA</span>
+              </div>
+              <div className='text-zinc-200 font-bold mt-0.5'>RL Suppressed</div>
+            </button>
           </div>
 
-          <div className='pt-2 flex flex-wrap items-center gap-2'>
+          <div className='pt-1 flex flex-wrap items-center gap-2'>
             <span className='text-[11px] font-mono text-[#8A8A8A]'>Click any active SKU to open 3D Analysis Modal:</span>
             {state.campaigns.slice(0, 3).map((c: any) => (
               <button
                 key={c.campaign}
+                type='button'
                 onClick={() => {
                   setAnalyzingProduct({
                     productName: c.productName || c.sku,
@@ -245,17 +316,36 @@ export function MissionControlConsole() {
           </div>
         </div>
 
-        {/* The 3D Interactive Canvas */}
-        <div className='size-[260px] sm:size-[300px] flex items-center justify-center shrink-0 relative'>
-          {consoleGlobeMode === 'arcs' ? (
-            <GithubGlobe
-              size={260}
-              activeSku='315122-001'
-              activePlatform='meta'
-              accentColor={[1, 1, 1]}
-            />
-          ) : (
-            <GlobePulse size={260} speed={0.0035} />
+        {/* Right Column: 3D Interactive Globe centered with Clean Non-Disruptive Overlay Panel */}
+        <div className='w-full xl:w-[420px] 2xl:w-[440px] shrink-0 flex items-center justify-center relative min-h-[360px]'>
+          <div className='size-[340px] flex items-center justify-center shrink-0 relative'>
+            {consoleGlobeMode === 'arcs' ? (
+              <GithubGlobe
+                size={340}
+                activeSku='315122-001'
+                activePlatform='meta'
+                accentColor={[1, 1, 1]}
+              />
+            ) : (
+              <GlobePulse
+                size={340}
+                speed={0.0035}
+                selectedMarkerId={selectedGlobeMarker?.id}
+                onSelectMarker={setSelectedGlobeMarker}
+                renderDetailPanel={false}
+              />
+            )}
+          </div>
+
+          {/* Regional Telemetry Detail Overlay Panel */}
+          {selectedGlobeMarker && (
+            <div className='absolute top-0 right-0 z-50 w-full max-w-[340px] sm:max-w-[380px] shadow-2xl transition-all duration-200 animate-in fade-in-0 slide-in-from-right-4'>
+              <RegionDetailPanel
+                marker={selectedGlobeMarker}
+                isOpen={Boolean(selectedGlobeMarker)}
+                onClose={() => setSelectedGlobeMarker(null)}
+              />
+            </div>
           )}
         </div>
       </div>
