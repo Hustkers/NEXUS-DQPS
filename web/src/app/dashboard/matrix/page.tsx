@@ -145,6 +145,16 @@ function SvgSliders({ className = 'size-3.5' }: { className?: string }) {
   );
 }
 
+function SvgDownload({ className = 'size-3.5' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'>
+      <path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4' />
+      <polyline points='7 10 12 15 17 10' />
+      <line x1='12' y1='15' x2='12' y2='3' />
+    </svg>
+  );
+}
+
 // Minimalist pastel channel configs
 const CHANNEL_PRESETS: Record<string, {
   name: string;
@@ -361,6 +371,57 @@ export default function SkuChannelMatrixPage() {
     }
   };
 
+  const handleExportCsv = () => {
+    const headers = [
+      'SKU',
+      'Shoe Name',
+      'Category',
+      'Marketplace',
+      'Unit Price',
+      'Gross Margin (%)',
+      'ERP Stock',
+      'Daily Spend',
+      'Daily Revenue',
+      'Current ROAS',
+      'Target ROAS',
+      'ROAS Status'
+    ];
+
+    const rows: string[][] = [];
+    filteredProducts.forEach((p) => {
+      Object.entries(p.marketplaces).forEach(([platform, camp]) => {
+        rows.push([
+          `"${p.sku}"`,
+          `"${p.productName.replace(/"/g, '""')}"`,
+          `"${p.category}"`,
+          `"${platform.toUpperCase()}"`,
+          `"${p.price}"`,
+          `"${camp.marginPct}%"`,
+          `"${p.inventory}"`,
+          `"${camp.currentDailySpend}"`,
+          `"${camp.currentDailyRevenue}"`,
+          `"${camp.roas.toFixed(2)}x"`,
+          `"${camp.targetRoas.toFixed(2)}x"`,
+          `"${camp.roasStatus}"`
+        ]);
+      });
+    });
+
+    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `nexus-sku-matrix-${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success('SKU Economics Matrix exported to CSV', {
+      description: `Exported ${rows.length} marketplace SKU campaigns.`
+    });
+  };
+
   // Filter products by search and platform
   const filteredProducts = useMemo(() => {
     return productGroups.filter((p) => {
@@ -386,8 +447,8 @@ export default function SkuChannelMatrixPage() {
   };
 
   return (
-    <div className='relative flex flex-1 flex-col w-full min-w-0 min-h-screen bg-[#FBFBFA] dark:bg-[#0C0D0E] text-[#111111] dark:text-[#EEEEEE] font-sans p-4 sm:p-6 md:p-8 space-y-6'>
-      
+    <div className='relative flex flex-1 flex-col w-full min-w-0 max-w-full overflow-hidden min-h-screen bg-[#FBFBFA] dark:bg-[#0C0D0E] text-[#111111] dark:text-[#EEEEEE] font-sans p-4 sm:p-6 md:p-8 space-y-6'>
+
       {/* 1. FAUX-OS WINDOW CHROME & METADATA BAR (Technical Document Header) */}
       <div className='w-full border border-[#EAEAEA] dark:border-[#262626] bg-[#FFFFFF] dark:bg-[#141517] rounded-[8px] p-4 flex flex-col md:flex-row md:items-center justify-between gap-4'>
         <div className='flex items-center gap-3'>
@@ -581,6 +642,15 @@ export default function SkuChannelMatrixPage() {
               E
             </kbd>
           </button>
+
+          <button
+            onClick={handleExportCsv}
+            className='px-2.5 py-1 text-xs font-mono rounded-[4px] border border-[#EAEAEA] dark:border-[#262626] bg-[#F7F6F3] dark:bg-[#1E1F21] text-[#111111] dark:text-[#EEEEEE] hover:bg-[#EAEAEA] dark:hover:bg-[#262626] flex items-center gap-1.5 transition-colors'
+            title='Export filtered matrix to CSV'
+          >
+            <SvgDownload className='size-3 text-[#787774]' />
+            <span>Export CSV</span>
+          </button>
         </div>
       </div>
 
@@ -610,7 +680,7 @@ export default function SkuChannelMatrixPage() {
           </div>
         ) : (
           <div className='overflow-x-auto w-full'>
-            <table className='w-full min-w-full text-left text-xs font-mono'>
+            <table className='w-full min-w-[960px] text-left text-xs font-mono'>
               <thead>
                 <tr className='border-b border-[#EAEAEA] dark:border-[#262626] text-[11px] text-[#787774] uppercase tracking-wider bg-[#FBFBFA] dark:bg-[#111214]'>
                   <th className='py-3.5 px-4'>Shoe &amp; SKU</th>

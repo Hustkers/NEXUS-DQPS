@@ -179,7 +179,7 @@ export function MissionControlConsole() {
       />
 
       {/* 3.5. Live 3D Global Telemetry & Heatmap Command Center */}
-      <div className='rounded border border-border bg-card p-6 shadow-none text-card-foreground flex flex-col xl:flex-row items-start justify-between gap-6 relative min-h-[460px]'>
+      <div className='rounded border border-border bg-card p-6 shadow-none text-card-foreground flex flex-col 2xl:flex-row items-start justify-between gap-6 relative min-h-[460px] min-w-0 max-w-full overflow-hidden'>
         {/* Left Column: Telemetry info, tabs, region tiles, SKU chips */}
         <div className='flex-1 space-y-3.5 w-full min-w-0'>
           <div className='flex flex-wrap items-center justify-between gap-2 border-b border-border pb-2.5'>
@@ -235,7 +235,7 @@ export function MissionControlConsole() {
           </p>
 
           {/* Region Status Tiles with Clear Status Dot and Readable Contrast */}
-          <div className='grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 font-mono text-xs'>
+          <div className='grid grid-cols-2 lg:grid-cols-4 gap-2 pt-1 font-mono text-xs'>
             {/* Tile 1: US-EAST / WEST (High Sales - Red) */}
             <button
               type='button'
@@ -384,7 +384,7 @@ export function MissionControlConsole() {
       </div>
 
       {/* 5. Causal DAG Visualizer & RCA Waterfall Decomposition */}
-      <div className='grid grid-cols-1 xl:grid-cols-2 gap-4 min-w-0 max-w-full'>
+      <div className='grid grid-cols-1 2xl:grid-cols-2 gap-4 min-w-0 max-w-full'>
         <CausalDagVisualizer activeAnomaly={hasCriticalAnomaly} />
         <RcaWaterfallChart
           totalLoss={hasCriticalAnomaly ? 3008.25 : 0}
@@ -409,7 +409,7 @@ export function MissionControlConsole() {
           </span>
         </div>
 
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+        <div className='grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4'>
           {state.anomalies.slice(0, 3).map((anom: any) => (
             <AnomalyCard
               key={anom.id}
@@ -492,7 +492,7 @@ export function MissionControlConsole() {
         </div>
 
         {/* Gauges Grid */}
-        <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-4 gap-4'>
           {products
             .filter((p) => (activeTab === 'all' ? true : p.channel.toLowerCase() === activeTab.toLowerCase()))
             .slice(0, 8)

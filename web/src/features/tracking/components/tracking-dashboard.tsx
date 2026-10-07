@@ -230,7 +230,7 @@ export function TrackingDashboard() {
       </div>
 
       {/* KPI Cards Row */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-5 gap-4">
         <Card className="p-4">
           <p className="text-xs text-muted-foreground font-medium">Tracked Visitors</p>
           <h3 className="text-2xl font-bold mt-1">{initialTrackingData?.visitors?.length || 200}</h3>
@@ -295,7 +295,7 @@ export function TrackingDashboard() {
           <CardContent>
             {activeCampPerf ? (
               <div className="space-y-4">
-                <div className="grid grid-cols-5 gap-2 text-center">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 text-center">
                   <div className="bg-muted/40 p-3 rounded-lg border">
                     <p className="text-[11px] text-muted-foreground">Ad Clicks</p>
                     <p className="text-xl font-bold mt-1">{activeCampPerf.clicks}</p>
