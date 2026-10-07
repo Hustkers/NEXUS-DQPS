@@ -201,95 +201,64 @@ export function ReallocationFeed({ className, initialItems, campaigns, onExecute
           </p>
         </div>
       ) : (
-        <div className='space-y-2.5'>
+        <div className='divide-y divide-[#1F1F1F]'>
           {reallocations.map((item) => {
             const isKill = item.actionTag === 'PAUSE';
-            const srcMeta = getChannelMeta(item.sourceChannel);
-            const tgtMeta = getChannelMeta(item.targetChannel);
+            const isLowStock = item.actionTag === 'REDIRECT';
+            const actionLabel = isKill ? 'PAUSE SPEND' : isLowStock ? 'CAP SPEND' : 'TRIM BUDGET';
+            const badgeColor = isKill
+              ? 'bg-rose-950/60 text-rose-400 border-rose-800/40'
+              : isLowStock
+              ? 'bg-amber-950/60 text-amber-400 border-amber-800/40'
+              : 'bg-neutral-900 text-neutral-300 border-neutral-700/60';
 
             return (
               <div
                 key={item.id}
-                className={cn(
-                  'flex flex-col md:flex-row md:items-center justify-between gap-3 rounded-lg border p-3.5 transition-all',
-                  isKill
-                    ? 'border-red-900/60 bg-red-950/20 hover:border-red-700/80'
-                    : 'border-border bg-background hover:border-foreground/30'
-                )}
+                className='py-6 px-3 sm:px-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors rounded-lg'
               >
-                {/* Route & Flow */}
+                {/* One clear line: Product (Channel) -> Target (Channel) · Move ₹X/day · +₹Y/day · Z% */}
                 <div className='flex-1 min-w-0 space-y-1.5'>
-                  {/* Line 1: Action Tag, Source -> Destination, Reason, Confidence */}
-                  <div className='flex items-center gap-2 text-xs flex-wrap'>
-                    <span
-                      className={cn(
-                        'text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider',
-                        item.actionTag === 'PAUSE'
-                          ? 'bg-red-500 text-black'
-                          : item.actionTag === 'REDIRECT'
-                          ? 'bg-amber-500 text-black'
-                          : 'bg-muted text-foreground'
-                      )}
-                    >
-                      [{item.actionTag}]
+                  <div className='flex items-center gap-2 text-xs flex-wrap leading-relaxed'>
+                    <span className={cn('text-[10px] font-bold px-2 py-0.5 rounded border uppercase font-mono tracking-wider', badgeColor)}>
+                      [{actionLabel}]
                     </span>
 
-                    {/* Source: Product · Channel */}
-                    <span className='font-semibold text-foreground flex items-center gap-1.5'>
-                      <PlatformLogo platform={srcMeta.name.toLowerCase()} size={12} className='shrink-0' />
-                      <span>{item.sourceProductName}</span>
-                      <span className='text-[11px] text-muted-foreground'>({srcMeta.name})</span>
-                      <span className='text-[10px] text-muted-foreground/60 font-mono'>#{item.sourceCampaign}</span>
+                    <span className='font-bold text-white break-words'>
+                      {item.sourceProductName} ({item.sourceChannel}) → {item.targetProductName} ({item.targetChannel})
                     </span>
 
-                    <Icons.arrowRight className='size-3 text-muted-foreground shrink-0' />
+                    <span className='text-[#8A8A8A]'>·</span>
 
-                    {/* Destination: Product · Channel */}
-                    <span className='font-bold text-foreground flex items-center gap-1.5'>
-                      <PlatformLogo platform={tgtMeta.name.toLowerCase()} size={12} className='shrink-0' />
-                      <span>{item.targetProductName}</span>
-                      <span className='text-[11px] text-muted-foreground'>({tgtMeta.name})</span>
+                    <span className='text-white font-medium'>
+                      Move {formatINR(item.movedAmount)}
                     </span>
 
-                    <span className='text-muted-foreground text-[11px] ml-auto md:ml-0 font-medium'>
-                      {item.confidence}% conf
+                    <span className='text-[#8A8A8A]'>·</span>
+
+                    <span className='text-emerald-400 font-bold'>
+                      +{formatINR(item.netRevenueLift)}
+                    </span>
+
+                    <span className='text-[#8A8A8A]'>·</span>
+
+                    <span className='text-[#A3A3A3]'>
+                      {item.confidence}%
                     </span>
                   </div>
 
-                  {/* Line 2: Real numbers with before -> after */}
-                  <div className='flex items-center gap-2.5 text-xs text-muted-foreground flex-wrap'>
-                    <span>
-                      Spend <span className='text-foreground'>{formatINR(item.sourceSpendBefore)}</span> →{' '}
-                      <span className='font-bold text-foreground'>
-                        {formatINR(item.sourceSpendAfter)}
-                      </span>{' '}
-                      <span className='text-amber-400 font-semibold'>
-                        (−{formatINR(item.movedAmount)})
-                      </span>
-                    </span>
-                    <span>•</span>
-                    <span>
-                      Net lift <span className='text-emerald-400 font-bold'>+{formatINR(item.netRevenueLift)}</span>
-                    </span>
-                    <span>•</span>
-                    <span>
-                      Dest. ROAS <span className='text-foreground font-semibold'>{item.targetRoas.toFixed(2)}x</span>
-                    </span>
-                  </div>
-
-                  {/* One-Line Reason */}
-                  <div className='text-[11px] text-muted-foreground'>
-                    <span>Reason: {item.reason}</span>
+                  {/* Campaign IDs only as small grey secondary text */}
+                  <div className='text-[10px] text-[#737373] font-mono'>
+                    #{item.sourceCampaign} → #{item.targetCampaign}
                   </div>
                 </div>
 
-                {/* Execution Button */}
-                <div className='shrink-0 flex items-center gap-2'>
+                {/* Single Execute Button */}
+                <div className='shrink-0 flex items-center'>
                   <Button
                     size='sm'
-                    variant='outline'
                     onClick={() => handleOpenReview(item)}
-                    className='h-8 text-xs font-mono border border-border bg-card hover:bg-muted text-foreground font-bold active:scale-[0.98]'
+                    className='h-8 px-4 text-xs font-mono bg-white hover:bg-neutral-200 text-black font-bold uppercase tracking-wider rounded-lg shadow-sm transition-all active:scale-[0.98]'
                   >
                     Execute
                   </Button>
@@ -300,34 +269,41 @@ export function ReallocationFeed({ className, initialItems, campaigns, onExecute
         </div>
       )}
 
-      {/* THREE-STEP MODAL FOR SINGLE REALLOCATION */}
+      {/* RIGHT-SIDE REALLOCATION CONSOLE DRAWER */}
       {selectedItem && (
-        <div
-          className='fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-in fade-in duration-150'
-          onClick={() => {
-            if (modalStep !== 2) setSelectedItem(null);
-          }}
-          role='dialog'
-          aria-modal='true'
-        >
+        <div className='fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-xs animate-in fade-in duration-200'>
+          {/* Backdrop Click */}
           <div
+            className='fixed inset-0'
+            onClick={() => {
+              if (modalStep !== 2) setSelectedItem(null);
+            }}
+          />
+
+          {/* Right-Side Drawer: width min(560px, 100vw), padding 32px, 28px gap */}
+          <div
+            className='relative z-10 h-full w-full max-w-[min(560px,100vw)] bg-[#0A0A0A] border-l border-[#262626] p-8 overflow-y-auto overflow-x-hidden font-mono shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-200 text-white'
             onClick={(e) => e.stopPropagation()}
-            className='relative w-full max-w-xl rounded-xl border border-[#262626] bg-[#0A0A0A] p-6 text-white shadow-2xl font-mono'
+            role='dialog'
+            aria-modal='true'
           >
-            {/* Header */}
-            <div className='flex items-center justify-between border-b border-[#1F1F1F] pb-4 mb-4'>
-              <div>
-                <h3 className='text-sm font-bold text-white uppercase tracking-tight flex items-center gap-2'>
-                  <span>[{selectedItem.actionTag}] Capital Reallocation Protocol</span>
+            {/* Drawer Header */}
+            <div className='flex items-start justify-between border-b border-[#1F1F1F] pb-5'>
+              <div className='min-w-0 pr-4'>
+                <h3 className='text-base font-bold text-white uppercase tracking-tight'>
+                  Move budget
                 </h3>
-                <p className='text-[11px] text-[#737373] mt-0.5'>
-                  Shift {formatINR(selectedItem.movedAmount)} from {selectedItem.sourceProductName} to {selectedItem.targetProductName}
+                <p className='text-xs text-[#A3A3A3] mt-1 break-words leading-relaxed'>
+                  {selectedItem.sourceProductName} ({selectedItem.sourceChannel}) →{' '}
+                  {selectedItem.targetProductName} ({selectedItem.targetChannel})
                 </p>
               </div>
               {modalStep !== 2 && (
                 <button
+                  type='button'
                   onClick={() => setSelectedItem(null)}
-                  className='size-7 rounded flex items-center justify-center text-[#737373] hover:text-white hover:bg-[#1A1A1A] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white'
+                  className='size-8 rounded-lg flex items-center justify-center text-[#737373] hover:text-white hover:bg-[#1A1A1A] transition-colors shrink-0'
+                  aria-label='Close drawer'
                 >
                   ✕
                 </button>
@@ -336,100 +312,141 @@ export function ReallocationFeed({ className, initialItems, campaigns, onExecute
 
             {/* STEP 1: REVIEW */}
             {modalStep === 1 && (
-              <div className='space-y-4'>
-                {/* Issue Banner */}
-                <div className='rounded-lg border border-amber-900/60 bg-amber-950/30 p-3.5 flex items-start gap-3'>
-                  <div className='size-2.5 rounded-full bg-amber-400 mt-1.5 shrink-0 animate-pulse' />
-                  <div>
-                    <span className='text-[10px] uppercase font-bold tracking-wider text-amber-400 block'>
-                      Reallocation Opportunity
+              <div className='space-y-7 my-auto py-4'>
+                {/* Big Centered Number Block */}
+                <div className='rounded-xl border border-[#262626] bg-[#121212] py-6 px-4 text-center'>
+                  <div className='text-3xl font-extrabold text-white tracking-tight font-mono'>
+                    {formatINR(selectedItem.movedAmount)}
+                  </div>
+                  <p className='text-xs text-[#8A8A8A] mt-1.5'>
+                    moves to a campaign earning more
+                  </p>
+                </div>
+
+                {/* From / To Cards (each with 16px padding; badge sits below name) */}
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                  {/* FROM CARD */}
+                  <div className='rounded-lg border border-[#262626] bg-[#141414] p-4 flex flex-col justify-between'>
+                    <div>
+                      <span className='text-[10px] uppercase tracking-wider font-semibold text-[#8A8A8A] block'>
+                        From
+                      </span>
+                      <div className='text-xs font-bold text-white mt-1 break-words'>
+                        {selectedItem.sourceProductName} · {selectedItem.sourceChannel}
+                      </div>
+                      <div className='mt-2'>
+                        <span className={cn(
+                          'text-[10px] font-bold px-2 py-0.5 rounded border uppercase',
+                          selectedItem.actionTag === 'PAUSE'
+                            ? 'bg-rose-950/60 text-rose-400 border-rose-800/40'
+                            : selectedItem.actionTag === 'REDIRECT'
+                            ? 'bg-amber-950/60 text-amber-400 border-amber-800/40'
+                            : 'bg-neutral-900 text-neutral-300 border-neutral-700/60'
+                        )}>
+                          {selectedItem.actionTag === 'PAUSE' ? 'PAUSE SPEND' : selectedItem.actionTag === 'REDIRECT' ? 'CAP SPEND' : 'TRIM BUDGET'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className='mt-3.5 pt-3 border-t border-[#1F1F1F] space-y-1 text-xs font-mono'>
+                      <div className='text-[#D4D4D4]'>
+                        {formatINR(selectedItem.sourceSpendBefore)} → {formatINR(selectedItem.sourceSpendAfter)}
+                      </div>
+                      <div className='text-[#8A8A8A]'>
+                        ROAS {selectedItem.sourceRoas.toFixed(2)}x
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* TO CARD */}
+                  <div className='rounded-lg border border-[#262626] bg-[#141414] p-4 flex flex-col justify-between'>
+                    <div>
+                      <span className='text-[10px] uppercase tracking-wider font-semibold text-[#8A8A8A] block'>
+                        To
+                      </span>
+                      <div className='text-xs font-bold text-white mt-1 break-words'>
+                        {selectedItem.targetProductName} · {selectedItem.targetChannel}
+                      </div>
+                      <div className='mt-2'>
+                        <span className='text-[10px] font-bold px-2 py-0.5 rounded border uppercase bg-emerald-950/60 text-emerald-400 border-emerald-800/40'>
+                          SCALE REVENUE
+                        </span>
+                      </div>
+                    </div>
+                    <div className='mt-3.5 pt-3 border-t border-[#1F1F1F] space-y-1 text-xs font-mono'>
+                      <div className='text-[#D4D4D4]'>
+                        {formatINR(selectedItem.targetSpendBefore)} → {formatINR(selectedItem.targetSpendAfter)}
+                      </div>
+                      <div className='text-emerald-400 font-semibold'>
+                        ROAS {selectedItem.targetRoas.toFixed(2)}x
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Why and Expected gain */}
+                <div className='space-y-3 rounded-lg border border-[#1F1F1F] bg-[#111111] p-4 text-xs'>
+                  <div className='space-y-1'>
+                    <span className='text-[10px] uppercase tracking-wider font-bold text-[#8A8A8A] block'>
+                      Why
                     </span>
-                    <p className='text-xs font-semibold text-white mt-0.5'>
+                    <p className='text-white leading-relaxed break-words'>
                       {selectedItem.reason}
+                    </p>
+                  </div>
+                  <div className='space-y-1 pt-2.5 border-t border-[#1C1C1C]'>
+                    <span className='text-[10px] uppercase tracking-wider font-bold text-[#8A8A8A] block'>
+                      Expected gain
+                    </span>
+                    <p className='text-emerald-400 font-bold'>
+                      +{formatINR(selectedItem.netRevenueLift)} extra revenue · {selectedItem.confidence}% confidence
                     </p>
                   </div>
                 </div>
 
-                {/* Evidence Bullets */}
-                <div className='rounded-lg border border-[#1F1F1F] bg-[#121212] p-3.5 space-y-2'>
-                  <span className='text-[10px] uppercase font-bold tracking-wider text-[#A3A3A3] block'>
-                    Telemetry Evidence
-                  </span>
-                  <ul className='space-y-1.5 text-xs text-[#D4D4D4]'>
-                    <li className='flex items-start gap-2'>
-                      <span className='text-amber-400 font-bold'>›</span>
-                      <span>Source current spend: {formatINR(selectedItem.sourceSpendBefore)} generating {selectedItem.sourceRoas.toFixed(2)}x ROAS.</span>
-                    </li>
-                    <li className='flex items-start gap-2'>
-                      <span className='text-emerald-400 font-bold'>›</span>
-                      <span>Destination capacity: {selectedItem.targetProductName} ({selectedItem.targetChannel}) at {selectedItem.targetRoas.toFixed(2)}x ROAS.</span>
-                    </li>
-                    <li className='flex items-start gap-2'>
-                      <span className='text-emerald-400 font-bold'>›</span>
-                      <span>Destination marginal efficiency (85% yield): {selectedItem.targetMarginalRoas.toFixed(3)}x ROAS.</span>
-                    </li>
-                    <li className='flex items-start gap-2'>
-                      <span className='text-emerald-400 font-bold'>›</span>
-                      <span>Net daily margin uplift: +{formatINR(selectedItem.netRevenueLift)} ({selectedItem.confidence}% algorithmic confidence).</span>
-                    </li>
-                  </ul>
-                </div>
-
-                {/* What This Will Do (3 actions) */}
-                <div className='space-y-2.5'>
-                  <span className='text-[10px] uppercase font-bold tracking-wider text-[#A3A3A3] block'>
-                    What This Will Do
-                  </span>
-                  <div className='space-y-2'>
-                    {/* Action 1 */}
-                    <div className='rounded-lg border border-[#262626] bg-[#141414] p-3'>
-                      <span className='text-xs font-semibold text-white block mb-1'>
-                        1. Throttle / Pause Source Spend ({selectedItem.sourceProductName})
+                {/* Details (collapsed by default: formula, campaign IDs, assumptions) */}
+                <details className='rounded-lg border border-[#222222] bg-[#0E0E0E] p-3 text-xs group'>
+                  <summary className='cursor-pointer text-[#8A8A8A] hover:text-white font-medium flex items-center justify-between select-none'>
+                    <span>Details (formula, campaign IDs, assumptions)</span>
+                    <span className='text-[10px] text-[#737373] group-open:rotate-90 transition-transform'>▸</span>
+                  </summary>
+                  <div className='mt-3 space-y-2.5 pt-2.5 border-t border-[#1A1A1A] text-[11px] text-[#A3A3A3]'>
+                    <div>
+                      <span className='text-[#737373] block'>Net lift formula:</span>
+                      <span className='font-mono text-white'>
+                        {formatINR(selectedItem.movedAmount)} × ({selectedItem.targetMarginalRoas}x − {selectedItem.sourceRoas.toFixed(2)}x) = +{formatINR(selectedItem.netRevenueLift)}
                       </span>
-                      <div className='flex items-center gap-2 text-xs'>
-                        <span className='line-through text-[#737373]'>{formatINR(selectedItem.sourceSpendBefore)}</span>
-                        <span>→</span>
-                        <span className='text-emerald-400 font-bold'>{formatINR(selectedItem.sourceSpendAfter)}</span>
+                    </div>
+                    <div className='grid grid-cols-2 gap-2 text-[10px] font-mono'>
+                      <div>
+                        <span className='text-[#737373] block'>Source ID:</span>
+                        <span className='text-neutral-300'>{selectedItem.sourceCampaign}</span>
+                      </div>
+                      <div>
+                        <span className='text-[#737373] block'>Destination ID:</span>
+                        <span className='text-neutral-300'>{selectedItem.targetCampaign}</span>
                       </div>
                     </div>
-                    {/* Action 2 */}
-                    <div className='rounded-lg border border-[#262626] bg-[#141414] p-3'>
-                      <span className='text-xs font-semibold text-white block mb-1'>
-                        2. Scale Budget on High-Yield Campaign ({selectedItem.targetProductName})
-                      </span>
-                      <div className='flex items-center gap-2 text-xs'>
-                        <span className='line-through text-[#737373]'>{formatINR(selectedItem.targetSpendBefore)}</span>
-                        <span>→</span>
-                        <span className='text-emerald-400 font-bold'>{formatINR(selectedItem.targetSpendAfter)}</span>
-                      </div>
-                    </div>
-                    {/* Action 3 */}
-                    <div className='rounded-lg border border-[#262626] bg-[#141414] p-3'>
-                      <span className='text-xs font-semibold text-white block mb-1'>
-                        3. Harvest Net Incremental Revenue
-                      </span>
-                      <div className='flex items-center gap-2 text-xs'>
-                        <span className='line-through text-[#737373]'>₹0/day uplift</span>
-                        <span>→</span>
-                        <span className='text-emerald-400 font-bold'>+{formatINR(selectedItem.netRevenueLift)}</span>
-                      </div>
+                    <div className='text-[10px] text-[#737373] leading-relaxed'>
+                      Assumptions: Destination marginal ROAS calculated at 85% of baseline ROAS (diminishing marginal returns); destination expansion capped at +50% of current spend.
                     </div>
                   </div>
-                </div>
+                </details>
 
-                {/* Action buttons */}
+                {/* Action Buttons */}
                 <div className='flex items-center justify-end gap-3 pt-4 border-t border-[#1F1F1F]'>
                   <button
+                    type='button'
                     onClick={() => setSelectedItem(null)}
-                    className='px-4 py-2 rounded-lg border border-[#262626] bg-[#141414] text-xs font-semibold text-[#A3A3A3] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white'
+                    className='px-4 py-2.5 rounded-lg border border-[#262626] bg-[#141414] text-xs font-semibold text-[#A3A3A3] hover:text-white hover:bg-[#1A1A1A] transition-colors'
                   >
                     Cancel
                   </button>
                   <button
+                    type='button'
                     onClick={() => setModalStep(2)}
-                    className='px-5 py-2 rounded-lg bg-white text-black text-xs font-bold uppercase tracking-wider hover:bg-neutral-200 transition-all shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400'
+                    className='px-5 py-2.5 rounded-lg bg-white text-black text-xs font-bold uppercase tracking-wider hover:bg-neutral-200 transition-all shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400'
                   >
-                    Execute Reallocation
+                    Move {formatINR(selectedItem.movedAmount)}
                   </button>
                 </div>
               </div>
@@ -437,148 +454,79 @@ export function ReallocationFeed({ className, initialItems, campaigns, onExecute
 
             {/* STEP 2: EXECUTING */}
             {modalStep === 2 && (
-              <div className='py-6 space-y-6 text-center'>
-                <div className='flex flex-col items-center justify-center gap-2'>
-                  <div className='size-10 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin' />
-                  <h4 className='text-sm font-bold text-white uppercase tracking-wider mt-2'>
-                    Dispatching Reallocation Directives
+              <div className='py-12 space-y-6 text-center my-auto'>
+                <div className='size-12 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin mx-auto' />
+                <div>
+                  <h4 className='text-sm font-bold text-white uppercase tracking-wider'>
+                    Moving Budget
                   </h4>
-                  <p className='text-xs text-[#737373]'>
-                    Calibrating DSP pacing and dispatching budget shift...
+                  <p className='text-xs text-[#737373] mt-1'>
+                    Rebalancing daily allocations across channels...
                   </p>
-                </div>
-
-                <div className='space-y-3 text-left max-w-md mx-auto'>
-                  {[
-                    `Throttle ${selectedItem.sourceProductName} spend to ${formatINR(selectedItem.sourceSpendAfter)}`,
-                    `Scale ${selectedItem.targetProductName} spend to ${formatINR(selectedItem.targetSpendAfter)}`,
-                    `Confirm +${formatINR(selectedItem.netRevenueLift)} net yield capture in ledger`,
-                  ].map((stepDesc, idx) => {
-                    const isDone = idx < executingStepIndex;
-                    const isCurrent = idx === executingStepIndex;
-                    return (
-                      <div
-                        key={idx}
-                        className={cn(
-                          'flex items-center justify-between rounded-lg border p-3 transition-all',
-                          isDone
-                            ? 'border-emerald-800/60 bg-emerald-950/20'
-                            : isCurrent
-                            ? 'border-white/40 bg-[#171717]'
-                            : 'border-[#1F1F1F] bg-[#0F0F0F] opacity-50'
-                        )}
-                      >
-                        <div className='flex items-center gap-3 min-w-0'>
-                          {isDone ? (
-                            <div className='size-5 rounded-full bg-emerald-500 text-black flex items-center justify-center text-[10px] font-bold'>
-                              ✓
-                            </div>
-                          ) : isCurrent ? (
-                            <div className='size-5 rounded-full border-2 border-white border-t-transparent animate-spin' />
-                          ) : (
-                            <div className='size-5 rounded-full border border-[#404040] text-[10px] text-[#737373] flex items-center justify-center'>
-                              {idx + 1}
-                            </div>
-                          )}
-                          <span className={cn('text-xs font-semibold truncate', isDone ? 'text-emerald-300' : isCurrent ? 'text-white' : 'text-[#737373]')}>
-                            {stepDesc}
-                          </span>
-                        </div>
-                        <span className='text-[10px] text-[#8A8A8A] font-mono shrink-0'>
-                          {isDone ? 'Done' : isCurrent ? 'Dispatching...' : 'Pending'}
-                        </span>
-                      </div>
-                    );
-                  })}
                 </div>
               </div>
             )}
 
-            {/* STEP 3: RESULT */}
+            {/* STEP 3: DONE COMPACT STATE */}
             {modalStep === 3 && (
-              <div className='space-y-4'>
-                {/* Green Done Banner */}
-                <div className='rounded-lg border border-emerald-800/60 bg-emerald-950/40 p-3.5 flex items-center justify-between'>
+              <div className='space-y-6 my-auto py-4'>
+                {/* Green Banner: Moved at HH:MM */}
+                <div className='rounded-lg border border-emerald-800/60 bg-emerald-950/40 p-4 flex items-center justify-between'>
                   <div className='flex items-center gap-2.5'>
                     <div className='size-6 rounded-full bg-emerald-500 text-black flex items-center justify-center text-xs font-bold'>
                       ✓
                     </div>
                     <div>
                       <span className='text-xs font-bold text-emerald-300 uppercase tracking-wider'>
-                        Done at {new Date().toTimeString().slice(0, 5)}
+                        Moved at {new Date().toTimeString().slice(0, 5)}
                       </span>
                       <p className='text-[11px] text-emerald-400/80'>
-                        Reallocation active across channels &amp; logged to Decision Ledger
+                        Added to Decision Ledger
                       </p>
                     </div>
                   </div>
                   <span className='text-[10px] font-mono text-emerald-400 bg-emerald-900/50 px-2.5 py-1 rounded border border-emerald-700/60 uppercase font-bold'>
-                    Executed
+                    Moved {formatINR(selectedItem.movedAmount)}
                   </span>
                 </div>
 
-                {/* 3 Result Tiles */}
-                <div className='grid grid-cols-1 sm:grid-cols-3 gap-2.5'>
-                  <div className='rounded-lg border border-[#262626] bg-[#141414] p-3'>
-                    <span className='text-[10px] text-[#8A8A8A] uppercase font-semibold block mb-1'>
-                      Capital Shifted
-                    </span>
-                    <div className='text-[11px] text-[#737373] line-through font-mono'>₹0/day</div>
-                    <div className='text-xs font-bold text-emerald-400 font-mono'>{formatINR(selectedItem.movedAmount)}</div>
-                  </div>
-
-                  <div className='rounded-lg border border-[#262626] bg-[#141414] p-3'>
-                    <span className='text-[10px] text-[#8A8A8A] uppercase font-semibold block mb-1'>
-                      Net Revenue Lift
-                    </span>
-                    <div className='text-[11px] text-[#737373] line-through font-mono'>₹0/day</div>
-                    <div className='text-xs font-bold text-emerald-400 font-mono'>+{formatINR(selectedItem.netRevenueLift)}</div>
-                  </div>
-
-                  <div className='rounded-lg border border-[#262626] bg-[#141414] p-3'>
-                    <span className='text-[10px] text-[#8A8A8A] uppercase font-semibold block mb-1'>
-                      Effective Yield
-                    </span>
-                    <div className='text-[11px] text-[#737373] line-through font-mono'>{selectedItem.sourceRoas.toFixed(2)}x</div>
-                    <div className='text-xs font-bold text-emerald-400 font-mono'>{selectedItem.targetMarginalRoas.toFixed(3)}x ROAS</div>
-                  </div>
-                </div>
-
-                {/* What Changed List */}
-                <div className='rounded-lg border border-[#1F1F1F] bg-[#121212] p-3.5 space-y-2 text-xs'>
+                {/* The two before -> after lines */}
+                <div className='rounded-lg border border-[#1F1F1F] bg-[#121212] p-4 space-y-3 text-xs'>
                   <span className='text-[10px] uppercase font-bold tracking-wider text-[#A3A3A3] block'>
-                    What Changed
+                    Updated Allocations
                   </span>
-                  <div className='border-b border-[#1F1F1F] pb-2'>
-                    <span className='font-semibold text-white'>Source Spend: {selectedItem.sourceProductName}</span>
-                    <div className='flex items-center gap-2 mt-0.5 text-[11px]'>
-                      <span className='line-through text-[#737373]'>{formatINR(selectedItem.sourceSpendBefore)}</span>
-                      <span>→</span>
-                      <span className='text-emerald-400 font-semibold'>{formatINR(selectedItem.sourceSpendAfter)}</span>
+                  <div className='space-y-2.5'>
+                    <div className='flex items-center justify-between'>
+                      <span className='text-neutral-300 font-semibold'>{selectedItem.sourceProductName}</span>
+                      <span className='font-mono'>
+                        <span className='text-[#737373] line-through'>{formatINR(selectedItem.sourceSpendBefore)}</span>{' '}
+                        → <span className='text-white font-bold'>{formatINR(selectedItem.sourceSpendAfter)}</span>
+                      </span>
                     </div>
-                  </div>
-                  <div>
-                    <span className='font-semibold text-white'>Destination Spend: {selectedItem.targetProductName}</span>
-                    <div className='flex items-center gap-2 mt-0.5 text-[11px]'>
-                      <span className='line-through text-[#737373]'>{formatINR(selectedItem.targetSpendBefore)}</span>
-                      <span>→</span>
-                      <span className='text-emerald-400 font-semibold'>{formatINR(selectedItem.targetSpendAfter)}</span>
+                    <div className='flex items-center justify-between'>
+                      <span className='text-neutral-300 font-semibold'>{selectedItem.targetProductName}</span>
+                      <span className='font-mono'>
+                        <span className='text-[#737373] line-through'>{formatINR(selectedItem.targetSpendBefore)}</span>{' '}
+                        → <span className='text-emerald-400 font-bold'>{formatINR(selectedItem.targetSpendAfter)}</span>
+                      </span>
                     </div>
                   </div>
                 </div>
 
-                {/* 7-day projection note */}
-                <div className='flex items-center gap-2 text-[11px] text-[#737373] bg-[#0F0F0F] p-2.5 rounded border border-[#1F1F1F]'>
+                {/* Note that outcomes are projections measured over 7 days */}
+                <div className='flex items-center gap-2 text-[11px] text-[#737373] bg-[#0F0F0F] p-3 rounded border border-[#1F1F1F]'>
                   <Icons.info className='size-3.5 text-[#A3A3A3] shrink-0' />
-                  <span>Outcomes are algorithmic projections modeled over a 7-day calibration window.</span>
+                  <span>Outcomes are projections measured over 7 days.</span>
                 </div>
 
-                <div className='flex items-center justify-end pt-3 border-t border-[#1F1F1F]'>
+                {/* Close Button */}
+                <div className='flex items-center justify-end pt-4 border-t border-[#1F1F1F]'>
                   <button
+                    type='button'
                     onClick={() => setSelectedItem(null)}
-                    className='px-5 py-2 rounded-lg bg-white text-black text-xs font-bold uppercase tracking-wider hover:bg-neutral-200 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400'
+                    className='px-5 py-2.5 rounded-lg bg-white text-black text-xs font-bold uppercase tracking-wider hover:bg-neutral-200 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400'
                   >
-                    Done
+                    Close
                   </button>
                 </div>
               </div>
@@ -587,34 +535,40 @@ export function ReallocationFeed({ className, initialItems, campaigns, onExecute
         </div>
       )}
 
-      {/* EXECUTE ALL FLOW MODAL */}
+      {/* RIGHT-SIDE DRAWER: EXECUTE ALL FLOW */}
       {executeAllState && (
-        <div
-          className='fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-in fade-in duration-150'
-          onClick={() => {
-            if (executeAllState !== 'executing') setExecuteAllState(null);
-          }}
-          role='dialog'
-          aria-modal='true'
-        >
+        <div className='fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-xs animate-in fade-in duration-200'>
+          {/* Backdrop Click */}
           <div
+            className='fixed inset-0'
+            onClick={() => {
+              if (executeAllState !== 'executing') setExecuteAllState(null);
+            }}
+          />
+
+          {/* Right-Side Drawer: width min(560px, 100vw), padding 32px, 28px gap */}
+          <div
+            className='relative z-10 h-full w-full max-w-[min(560px,100vw)] bg-[#0A0A0A] border-l border-[#262626] p-8 overflow-y-auto overflow-x-hidden font-mono shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-200 text-white'
             onClick={(e) => e.stopPropagation()}
-            className='relative w-full max-w-xl rounded-xl border border-[#262626] bg-[#0A0A0A] p-6 text-white shadow-2xl font-mono'
+            role='dialog'
+            aria-modal='true'
           >
             {/* Header */}
-            <div className='flex items-center justify-between border-b border-[#1F1F1F] pb-4 mb-4'>
-              <div>
-                <h3 className='text-sm font-bold text-white uppercase tracking-tight'>
-                  Autonomous Batch Execution Protocol
+            <div className='flex items-start justify-between border-b border-[#1F1F1F] pb-5'>
+              <div className='min-w-0 pr-4'>
+                <h3 className='text-base font-bold text-white uppercase tracking-tight'>
+                  Move all budgets
                 </h3>
-                <p className='text-[11px] text-[#737373] mt-0.5'>
-                  {reallocations.length} pending capital reallocations queued
+                <p className='text-xs text-[#A3A3A3] mt-1'>
+                  {reallocations.length} pending capital moves queued
                 </p>
               </div>
               {executeAllState !== 'executing' && (
                 <button
+                  type='button'
                   onClick={() => setExecuteAllState(null)}
-                  className='size-7 rounded flex items-center justify-center text-[#737373] hover:text-white hover:bg-[#1A1A1A] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white'
+                  className='size-8 rounded-lg flex items-center justify-center text-[#737373] hover:text-white hover:bg-[#1A1A1A] transition-colors shrink-0'
+                  aria-label='Close drawer'
                 >
                   ✕
                 </button>
@@ -623,43 +577,43 @@ export function ReallocationFeed({ className, initialItems, campaigns, onExecute
 
             {/* PREVIEW STEP */}
             {executeAllState === 'preview' && (
-              <div className='space-y-4'>
+              <div className='space-y-7 my-auto py-4'>
                 <div className='grid grid-cols-2 gap-3'>
-                  <div className='rounded-lg border border-[#262626] bg-[#141414] p-3'>
+                  <div className='rounded-lg border border-[#262626] bg-[#141414] p-4'>
                     <span className='text-[10px] text-[#8A8A8A] uppercase font-semibold block'>
-                      Combined Capital Moved
+                      Total Capital Moved
                     </span>
-                    <span className='text-lg font-bold text-white mt-1 block font-mono'>
+                    <span className='text-xl font-bold text-white mt-1 block font-mono'>
                       {formatINR(totalMovedAll)}
                     </span>
                   </div>
-                  <div className='rounded-lg border border-[#262626] bg-[#141414] p-3'>
+                  <div className='rounded-lg border border-[#262626] bg-[#141414] p-4'>
                     <span className='text-[10px] text-[#8A8A8A] uppercase font-semibold block'>
-                      Combined Net Revenue Lift
+                      Total Expected Gain
                     </span>
-                    <span className='text-lg font-bold text-emerald-400 mt-1 block font-mono'>
+                    <span className='text-xl font-bold text-emerald-400 mt-1 block font-mono'>
                       +{formatINR(totalLiftAll)}
                     </span>
                   </div>
                 </div>
 
-                <div className='rounded-lg border border-[#1F1F1F] bg-[#121212] p-3.5 space-y-2'>
+                <div className='rounded-lg border border-[#1F1F1F] bg-[#121212] p-4 space-y-2'>
                   <span className='text-[10px] uppercase font-bold tracking-wider text-[#A3A3A3] block'>
                     Pending Reallocations ({reallocations.length})
                   </span>
-                  <div className='space-y-2 max-h-56 overflow-y-auto pr-1 text-xs'>
+                  <div className='space-y-2 max-h-64 overflow-y-auto pr-1 text-xs'>
                     {reallocations.map((it) => (
-                      <div key={it.id} className='rounded border border-[#262626] bg-[#0F0F0F] p-2.5 flex items-center justify-between'>
-                        <div className='min-w-0'>
+                      <div key={it.id} className='rounded border border-[#262626] bg-[#0F0F0F] p-3 flex items-center justify-between'>
+                        <div className='min-w-0 pr-2'>
                           <span className='text-white font-semibold truncate block'>
                             {it.sourceProductName} → {it.targetProductName}
                           </span>
                           <span className='text-[11px] text-[#737373]'>
-                            Moved {formatINR(it.movedAmount)} · Net lift +{formatINR(it.netRevenueLift)}
+                            Move {formatINR(it.movedAmount)} · Gain +{formatINR(it.netRevenueLift)}
                           </span>
                         </div>
-                        <span className='text-[10px] font-bold text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-800/40'>
-                          {it.confidence}% conf
+                        <span className='text-[10px] font-bold text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-800/40 shrink-0'>
+                          {it.confidence}%
                         </span>
                       </div>
                     ))}
@@ -668,16 +622,18 @@ export function ReallocationFeed({ className, initialItems, campaigns, onExecute
 
                 <div className='flex items-center justify-end gap-3 pt-4 border-t border-[#1F1F1F]'>
                   <button
+                    type='button'
                     onClick={() => setExecuteAllState(null)}
-                    className='px-4 py-2 rounded-lg border border-[#262626] bg-[#141414] text-xs font-semibold text-[#A3A3A3] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white'
+                    className='px-4 py-2.5 rounded-lg border border-[#262626] bg-[#141414] text-xs font-semibold text-[#A3A3A3] hover:text-white transition-colors'
                   >
                     Cancel
                   </button>
                   <button
+                    type='button'
                     onClick={handleConfirmExecuteAll}
-                    className='px-5 py-2 rounded-lg bg-white text-black text-xs font-bold uppercase tracking-wider hover:bg-neutral-200 transition-all shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400'
+                    className='px-5 py-2.5 rounded-lg bg-white text-black text-xs font-bold uppercase tracking-wider hover:bg-neutral-200 transition-all shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400'
                   >
-                    Execute All ({reallocations.length} Actions)
+                    Move All Budget ({reallocations.length} Actions)
                   </button>
                 </div>
               </div>
@@ -685,11 +641,11 @@ export function ReallocationFeed({ className, initialItems, campaigns, onExecute
 
             {/* EXECUTING STEP */}
             {executeAllState === 'executing' && (
-              <div className='py-8 space-y-6 text-center'>
+              <div className='py-12 space-y-6 text-center my-auto'>
                 <div className='size-12 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin mx-auto' />
                 <div>
                   <h4 className='text-sm font-bold text-white uppercase tracking-wider'>
-                    Executing Reallocations Sequentially
+                    Moving All Budgets Sequentially
                   </h4>
                   <p className='text-xs text-[#737373] mt-1'>
                     Applying action {executeAllProgress.current} of {executeAllProgress.total}...
@@ -709,7 +665,7 @@ export function ReallocationFeed({ className, initialItems, campaigns, onExecute
 
             {/* COMBINED RESULT STEP */}
             {executeAllState === 'result' && executeAllSummary && (
-              <div className='space-y-4'>
+              <div className='space-y-6 my-auto py-4'>
                 <div className='rounded-lg border border-emerald-800/60 bg-emerald-950/40 p-4 flex items-center justify-between'>
                   <div className='flex items-center gap-2.5'>
                     <div className='size-6 rounded-full bg-emerald-500 text-black flex items-center justify-center text-xs font-bold'>
@@ -717,7 +673,7 @@ export function ReallocationFeed({ className, initialItems, campaigns, onExecute
                     </div>
                     <div>
                       <span className='text-xs font-bold text-emerald-300 uppercase tracking-wider'>
-                        Batch Execution Complete at {new Date().toTimeString().slice(0, 5)}
+                        Batch Done at {new Date().toTimeString().slice(0, 5)}
                       </span>
                       <p className='text-[11px] text-emerald-400/80'>
                         {executeAllSummary.count} reallocations executed and logged to Decision Ledger
@@ -730,33 +686,34 @@ export function ReallocationFeed({ className, initialItems, campaigns, onExecute
                 </div>
 
                 <div className='grid grid-cols-2 gap-3'>
-                  <div className='rounded-lg border border-[#262626] bg-[#141414] p-3'>
+                  <div className='rounded-lg border border-[#262626] bg-[#141414] p-4'>
                     <span className='text-[10px] text-[#8A8A8A] uppercase font-semibold block'>
                       Total Capital Moved
                     </span>
-                    <span className='text-lg font-bold text-white mt-1 block font-mono'>
+                    <span className='text-xl font-bold text-white mt-1 block font-mono'>
                       {formatINR(executeAllSummary.totalMoved)}
                     </span>
                   </div>
-                  <div className='rounded-lg border border-[#262626] bg-[#141414] p-3'>
+                  <div className='rounded-lg border border-[#262626] bg-[#141414] p-4'>
                     <span className='text-[10px] text-[#8A8A8A] uppercase font-semibold block'>
                       Total Projected Lift
                     </span>
-                    <span className='text-lg font-bold text-emerald-400 mt-1 block font-mono'>
+                    <span className='text-xl font-bold text-emerald-400 mt-1 block font-mono'>
                       +{formatINR(executeAllSummary.totalLift)}
                     </span>
                   </div>
                 </div>
 
-                <div className='flex items-center gap-2 text-[11px] text-[#737373] bg-[#0F0F0F] p-2.5 rounded border border-[#1F1F1F]'>
+                <div className='flex items-center gap-2 text-[11px] text-[#737373] bg-[#0F0F0F] p-3 rounded border border-[#1F1F1F]'>
                   <Icons.info className='size-3.5 text-[#A3A3A3] shrink-0' />
                   <span>Outcomes are algorithmic projections modeled over a 7-day calibration window.</span>
                 </div>
 
-                <div className='flex items-center justify-end pt-3 border-t border-[#1F1F1F]'>
+                <div className='flex items-center justify-end pt-4 border-t border-[#1F1F1F]'>
                   <button
+                    type='button'
                     onClick={() => setExecuteAllState(null)}
-                    className='px-5 py-2 rounded-lg bg-white text-black text-xs font-bold uppercase tracking-wider hover:bg-neutral-200 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400'
+                    className='px-5 py-2.5 rounded-lg bg-white text-black text-xs font-bold uppercase tracking-wider hover:bg-neutral-200 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400'
                   >
                     Done
                   </button>

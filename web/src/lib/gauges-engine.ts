@@ -544,10 +544,13 @@ export function generateReallocations(products: DerivedProduct[]): ReallocationI
   });
 
   for (const src of problemProducts) {
-    // Destination candidates: ROAS >= 3.2, cover >= 21d, not the source, not paused, not fixed with issue
+    // Destination candidates: ROAS >= 3.2, cover >= 21d, dest.roas > src.roas, destMarginalRoas > src.roas
     const eligibleDests = products.filter((dest) => {
       if (dest.id === src.id || dest.paused) return false;
       if (dest.roas < TARGET_ROAS || dest.coverDays < 21) return false;
+      if (dest.roas <= src.roas) return false;
+      const destMarginal = Number((dest.roas * 0.85).toFixed(3));
+      if (destMarginal <= src.roas) return false;
 
       // Cap increase at +50% of current spend
       const maxAllowedIncrease = dest.dailySpend * 0.5;
@@ -580,20 +583,20 @@ export function generateReallocations(products: DerivedProduct[]): ReallocationI
       actionTag = 'PAUSE';
       rawMove = src.dailySpend * 0.8;
       sourceSpendAfter = 0;
-      reason = 'Zero stock with active spend burning; circuit-breaker tripped';
+      reason = `${src.name} is out of stock (${src.inventory} units); pause ad spend and redirect ${formatINR(Math.round(rawMove))} to ${bestDest.name} (${bestDest.roas.toFixed(2)}x ROAS).`;
     } else if (src.coverDays < 7 || src.status === 'low stock') {
       actionTag = 'REDIRECT';
       const allowableSpend = Math.round(src.dailySpend * (src.coverDays / 14));
       const freed = Math.max(0, src.dailySpend - allowableSpend);
       rawMove = freed * 0.8;
       sourceSpendAfter = allowableSpend;
-      reason = `Low runway (${src.coverDays.toFixed(1)}d); throttle spend to extend stock to 14d`;
+      reason = `${src.name} has low stock (${src.coverDays.toFixed(1)} days); cap spend to extend runway to 14 days and redirect surplus to ${bestDest.name}.`;
     } else {
       actionTag = 'TRIM';
       const cut = Math.round(src.dailySpend * 0.35);
       rawMove = cut * 0.7;
       sourceSpendAfter = Math.round(src.dailySpend * 0.65);
-      reason = `${src.roas < FLOOR_ROAS ? 'Below floor' : 'Below target'} at ${src.roas.toFixed(2)}x (CVR ${(src.cvr * 100).toFixed(1)}%); prune low-converting sets`;
+      reason = `${src.name} is ${src.roas < FLOOR_ROAS ? 'below floor' : 'below target'} at ${src.roas.toFixed(2)}x; trim spend and move budget to ${bestDest.name} earning ${bestDest.roas.toFixed(2)}x.`;
     }
 
     // Apply destination +50% cap
@@ -604,12 +607,13 @@ export function generateReallocations(products: DerivedProduct[]): ReallocationI
 
     if (movedAmount <= 0) continue;
 
-    // Update dynamic tracker
-    dynamicDestinationAdditions[bestDest.id] = currentAdded + movedAmount;
-
     // Marginal ROAS and Net Revenue Lift
     const targetMarginalRoas = Number((bestDest.roas * 0.85).toFixed(3));
     const netRevenueLift = Math.round(movedAmount * (targetMarginalRoas - src.roas));
+    if (netRevenueLift <= 0) continue;
+
+    // Update dynamic tracker
+    dynamicDestinationAdditions[bestDest.id] = currentAdded + movedAmount;
 
     // Computed confidence
     const confidence = Math.round(
