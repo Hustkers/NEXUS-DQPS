@@ -396,19 +396,6 @@ export function AnimatedFooter({
             <p className="footer-tagline">{tagline}</p>
           </div>
 
-          {/* Quick Platform Links */}
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3.5 text-xs font-mono text-muted-foreground my-2 lg:my-0">
-            <Link href="/dashboard/overview" className="hover:text-foreground transition-colors">Cockpit</Link>
-            <span className="opacity-25">•</span>
-            <Link href="/dashboard/playground" className="hover:text-foreground transition-colors">Playground</Link>
-            <span className="opacity-25">•</span>
-            <Link href="/dashboard/reallocations" className="hover:text-foreground transition-colors">Reallocations</Link>
-            <span className="opacity-25">•</span>
-            <Link href="/dashboard/anomalies" className="hover:text-foreground transition-colors">Diagnostics</Link>
-            <span className="opacity-25">•</span>
-            <Link href="/dashboard/ledger" className="hover:text-foreground transition-colors">Ledger</Link>
-          </div>
-
           {/* VengeanceUI Shared Tooltip Team Avatars */}
           <div className="footer-social-wrap" id="footerTeamAvatars">
             <SharedTooltipAvatars

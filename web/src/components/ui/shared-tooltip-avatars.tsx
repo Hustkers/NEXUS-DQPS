@@ -105,6 +105,9 @@ export function SharedTooltipAvatars({
               // Graceful SVG fallback with initials if external network/CDN is unavailable
               (e.currentTarget as HTMLImageElement).src = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(item.name)}`;
             }}
+            width={56}
+            height={56}
+            decoding="async"
             className="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover border-[3px] border-white dark:border-[#09090b] shadow-sm hover:shadow-xl transition-all duration-300"
           />
         </div>
