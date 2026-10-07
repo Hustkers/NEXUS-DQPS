@@ -9,5 +9,8 @@
     "start": "pnpm --dir web start",
     "simulate": "python3 scripts/export_engine_state.py",
     "demo": "python3 scripts/run_demo.py"
+  },
+  "devDependencies": {
+    "raw-loader": "^4.0.2"
   }
 }
