@@ -194,7 +194,7 @@ export function RoasGauge({
         {/* 2. Health Score */}
         <div
           className={cn(
-            'flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] shrink-0 font-bold',
+            'flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] shrink-0 font-bold',
             healthBadgeStyle
           )}
           title={`Health Score: ${healthScore}/100`}
@@ -217,7 +217,8 @@ export function RoasGauge({
               radius * 2 + strokeWidth
             } ${radius + strokeWidth}`}
             fill='none'
-            stroke='#1A1A1A'
+            stroke='currentColor'
+            className='text-muted/60 dark:text-muted/80'
             strokeWidth={strokeWidth}
             strokeLinecap='round'
           />
@@ -287,7 +288,7 @@ export function RoasGauge({
         <div className='absolute bottom-0 flex flex-col items-center justify-center text-center'>
           {paused ? (
             <div className='flex flex-col items-center -mb-1'>
-              <span className='font-bold text-white tracking-wider text-base uppercase font-mono'>
+              <span className='font-bold text-foreground tracking-wider text-base uppercase font-mono'>
                 Paused
               </span>
               <span className='text-[10px] text-emerald-400 font-mono mt-0.5 truncate max-w-[140px]'>
@@ -296,7 +297,7 @@ export function RoasGauge({
             </div>
           ) : (
             <div className='flex flex-col items-center -mb-0.5'>
-              <span className='font-bold tracking-tight text-white text-xl font-mono'>
+              <span className='font-bold tracking-tight text-foreground text-xl font-mono'>
                 {currentRoas.toFixed(2)}x
               </span>
               <span className='text-[10px] text-[#8A8A8A] font-mono -mt-0.5'>
@@ -312,7 +313,7 @@ export function RoasGauge({
         <span className='text-white font-medium'>
           {formatINR(dailySpend)}
         </span>
-        <span className={cn(effectiveCoverDays < 7 ? 'text-amber-400 font-semibold' : 'text-[#8A8A8A]')}>
+        <span className={cn(effectiveCoverDays < 7 ? 'text-amber-500 font-semibold' : 'text-muted-foreground')}>
           {inventory <= 0 ? '0d cover' : `${effectiveCoverDays.toFixed(1)}d cover`}
         </span>
       </div>
@@ -351,7 +352,7 @@ export function RoasGauge({
               e.stopPropagation();
               onViewFix?.();
             }}
-            className='w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg border border-emerald-700/60 bg-emerald-950/30 text-emerald-300 font-mono text-xs font-semibold uppercase tracking-wider hover:bg-emerald-900/40 hover:border-emerald-600 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400'
+            className='w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg border border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono text-xs font-semibold uppercase tracking-wider hover:bg-emerald-500/20 active:scale-[0.97] transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400'
           >
             <span>View fix</span>
           </button>
@@ -362,7 +363,7 @@ export function RoasGauge({
               e.stopPropagation();
               onFix?.();
             }}
-            className='w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-white text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-neutral-200 transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white'
+            className='w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-primary text-primary-foreground font-mono text-xs font-bold uppercase tracking-wider shadow-xs hover:brightness-110 active:brightness-95 active:scale-[0.97] transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
           >
             <span>Fix</span>
           </button>

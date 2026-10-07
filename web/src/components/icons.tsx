@@ -34,11 +34,13 @@ import {
   IconClock,
   IconCode,
   IconCommand,
+  IconCopy,
   IconCreditCard,
   IconTerminal,
   IconDeviceLaptop,
   IconDots,
   IconDotsVertical,
+  IconDownload,
   IconEdit,
   IconExternalLink,
   IconEyeOff,
@@ -127,7 +129,9 @@ export const Icons = {
   close: IconX,
   clock: IconClock,
   code: IconCode,
+  copy: IconCopy,
   dots: IconDots,
+  download: IconDownload,
   ellipsis: IconDotsVertical,
   externalLink: IconExternalLink,
   help: IconHelpCircle,
@@ -162,6 +166,7 @@ export const Icons = {
   employee: IconUserX,
   userPen: IconUserEdit,
   teams: IconUsers,
+  users: IconUsers,
 
   // Brand
   github: IconBrandGithub,
@@ -193,6 +198,7 @@ export const Icons = {
 
   // Actions
   add: IconPlus,
+  plus: IconPlus,
   edit: IconEdit,
   upload: IconUpload,
   share: IconShare,

@@ -42,17 +42,17 @@ export function CardSpotlight({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        'group relative overflow-hidden rounded-[6px] border border-border bg-card p-6 text-card-foreground transition-colors duration-150 hover:border-foreground/60 shadow-none',
+        'group relative overflow-hidden rounded-2xl border border-border/80 bg-card/95 backdrop-blur-xs p-6 text-card-foreground transition-all duration-200 hover:border-foreground/50 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_-4px_rgba(0,0,0,0.35)] before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/25 dark:before:via-white/20 before:to-transparent before:pointer-events-none',
         className
       )}
       {...props}
     >
       {/* Dynamic Cursor Spotlight Radial Layer: adaptive illumination */}
       <div
-        className='pointer-events-none absolute -inset-px transition-opacity duration-150'
+        className='pointer-events-none absolute -inset-px transition-opacity duration-200'
         style={{
           background: `radial-gradient(${radius}px circle at ${position.x}px ${position.y}px, var(--color-foreground, currentColor), transparent 80%)`,
-          opacity: isHovered ? 0.04 : 0
+          opacity: isHovered ? 0.06 : 0
         }}
       />
       

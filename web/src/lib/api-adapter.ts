@@ -52,7 +52,7 @@ export async function fetchActiveAnomalies(): Promise<any[]> {
         roas: 0.2,
         spend: 800,
         inventory: 0,
-        explanation: 'Stock level dropped to 0 in Shopify while Meta retargeting ad spend burned $800 with 0 conversions.',
+        explanation: 'Stock level dropped to 0 in Shopify while Meta retargeting ad spend burned ₹800 with 0 conversions.',
         factors: [
           { name: 'Inventory Stockout', deltaPct: -100, impactPts: -66.0, badge: 'Stockout', color: 'rose' },
           { name: 'Conversion Collapse', deltaPct: -95, impactPts: -24.0, badge: 'CVR Drop', color: 'rose' },

@@ -4,6 +4,7 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
+import { toast } from 'sonner';
 import initialEngineState from '@/data/nexus-engine-state.json';
 import { cn } from '@/lib/utils';
 
@@ -215,6 +216,57 @@ export default function MatrixPage() {
   const totalSpend = useMemo(() => rawCampaigns.reduce((acc, c) => acc + c.currentDailySpend, 0), [rawCampaigns]);
   const stockoutCount = useMemo(() => productGroups.filter((p) => p.inventory === 0).length, [productGroups]);
 
+  const handleExportCsv = () => {
+    const headers = [
+      'SKU',
+      'Shoe Name',
+      'Category',
+      'Marketplace',
+      'Unit Price (INR)',
+      'Gross Margin (%)',
+      'ERP Stock',
+      'Daily Spend (INR)',
+      'Daily Revenue (INR)',
+      'Current ROAS',
+      'Target ROAS',
+      'ROAS Status'
+    ];
+
+    const rows: string[][] = [];
+    filteredProducts.forEach((p) => {
+      Object.entries(p.marketplaces).forEach(([platform, camp]) => {
+        rows.push([
+          `"${p.sku}"`,
+          `"${p.productName.replace(/"/g, '""')}"`,
+          `"${p.category}"`,
+          `"${platform.toUpperCase()}"`,
+          `"${p.price}"`,
+          `"${camp.marginPct}%"`,
+          `"${p.inventory}"`,
+          `"${camp.currentDailySpend}"`,
+          `"${camp.currentDailyRevenue}"`,
+          `"${camp.roas.toFixed(2)}x"`,
+          `"${camp.targetRoas.toFixed(2)}x"`,
+          `"${camp.roasStatus}"`
+        ]);
+      });
+    });
+
+    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `nexus-sku-matrix-${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success('SKU Economics Matrix exported to CSV', {
+      description: `Exported ${rows.length} marketplace SKU campaigns.`
+    });
+  };
+
   return (
     <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen'>
       {/* Top Header */}
@@ -305,6 +357,15 @@ export default function MatrixPage() {
                 ? 'Collapse All'
                 : 'Expand All Marketplaces'}
             </span>
+          </button>
+
+          <button
+            onClick={handleExportCsv}
+            className='px-3 py-1 text-xs font-mono rounded-md border border-border bg-muted/40 text-foreground hover:bg-muted flex items-center gap-1.5 shrink-0 transition-colors'
+            title='Export filtered SKU economics matrix to CSV'
+          >
+            <Icons.download className='size-3.5 text-muted-foreground' />
+            <span>Export CSV</span>
           </button>
         </div>
       </div>
@@ -413,7 +474,7 @@ export default function MatrixPage() {
                             setOpenDropdownSku(isDropdownOpen ? null : p.sku);
                           }}
                           className={cn(
-                            'group px-2.5 py-1 rounded-md text-[11px] font-semibold border flex items-center gap-1.5 transition-all shadow-xs cursor-pointer',
+                            'group px-3 py-1.5 rounded-lg text-[11px] font-semibold border flex items-center gap-1.5 transition-all shadow-xs cursor-pointer active:scale-[0.97]',
                             currentCfg.pillColor,
                             'hover:ring-1 hover:ring-current'
                           )}
@@ -428,17 +489,17 @@ export default function MatrixPage() {
                           />
                         </button>
 
-                        {/* Floating Dropdown Menu Panel */}
+                        {/* Floating Dropdown Menu Panel with Apple Glass Material & Origin Spring */}
                         {isDropdownOpen && (
                           <div
-                            className='absolute left-3 top-full mt-1.5 z-50 w-64 rounded-xl border border-border bg-popover text-popover-foreground p-1.5 shadow-xl animate-in fade-in-0 zoom-in-95'
+                            className='absolute left-3 top-full mt-2 z-50 w-64 rounded-2xl border border-border/80 bg-popover/95 dark:bg-zinc-900/95 backdrop-blur-xl text-popover-foreground p-2 shadow-2xl origin-top-left animate-in fade-in-0 zoom-in-95'
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <div className='px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground border-b border-border mb-1'>
+                            <div className='px-2.5 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground border-b border-border/60 mb-1.5'>
                               Select Marketplace: {p.productName}
                             </div>
 
-                            <div className='flex flex-col gap-0.5'>
+                            <div className='flex flex-col gap-1'>
                               {p.availablePlatforms.map((plat) => {
                                 const cData = p.marketplaces[plat];
                                 const cfg = PLATFORM_CONFIG[plat] || PLATFORM_CONFIG['meta'];
@@ -450,10 +511,10 @@ export default function MatrixPage() {
                                     type='button'
                                     onClick={() => handleSelectPlatform(p.sku, plat)}
                                     className={cn(
-                                      'w-full text-left px-2.5 py-2 rounded-lg text-xs font-mono flex items-center justify-between transition-colors',
+                                      'w-full text-left px-2.5 py-2 rounded-xl text-xs font-mono flex items-center justify-between transition-all active:scale-[0.98]',
                                       isSelected
-                                        ? 'bg-muted font-bold text-foreground'
-                                        : 'hover:bg-muted/50 text-muted-foreground hover:text-foreground'
+                                        ? 'bg-muted font-bold text-foreground shadow-2xs'
+                                        : 'hover:bg-muted/60 text-muted-foreground hover:text-foreground'
                                     )}
                                   >
                                     <div className='flex items-center gap-2'>
