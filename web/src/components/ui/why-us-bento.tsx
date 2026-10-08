@@ -1,16 +1,16 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import Image from "next/image";
 import {
   Database,
-  ChartLineUp,
-  Lightning,
+  TrendingUp as ChartLineUp,
+  Zap as Lightning,
   ShieldCheck,
   Rocket,
-  CaretRight,
-} from "@phosphor-icons/react";
+  ChevronRight as CaretRight,
+} from "lucide-react";
 import { IsometricBox01 } from "@/components/ui/isometric-box-01";
 import { IsometricBoxes02 } from "@/components/ui/isometric-boxes-02";
 import { cn } from "@/lib/utils";

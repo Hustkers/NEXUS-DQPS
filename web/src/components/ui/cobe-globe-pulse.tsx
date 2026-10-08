@@ -41,6 +41,10 @@ export interface GlobePulseProps {
   onSelectMarker?: (marker: PulseMarker | null) => void;
   selectedMarkerId?: string | null;
   renderDetailPanel?: boolean; // Set false if parent card hosts the overlay panel
+  showRecentPurchases?: boolean;
+  maxOrders?: number;
+  selectedRegionId?: string | null;
+  onSelectRegion?: (marker: PulseMarker | null) => void;
 }
 
 export function GlobePulse({
