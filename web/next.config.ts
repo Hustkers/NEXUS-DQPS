@@ -39,6 +39,14 @@ const nextConfig: NextConfig = {
       type: 'asset/source',
     });
     return config;
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/dashboard/ad-playground',
+        destination: '/dashboard/playground'
+      }
+    ];
   }
 };
 
