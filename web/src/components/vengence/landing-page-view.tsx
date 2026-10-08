@@ -7,6 +7,7 @@ import { CardSpotlight } from './card-spotlight';
 import { BentoGrid, BentoGridItem } from './bento-grid';
 import { NotchNavbar } from './notch-navbar';
 import { PlotFigure, BranchesFigure, PhosphorFigure, RiffleFigure } from './hairline-figures';
+import { IsometricTelemetryPanel } from './isometric-telemetry-panel';
 import { AnimatedFooter } from '@/components/ui/animated-footer';
 import { WhyUsBento } from './why-us-bento';
 import { HighlightGrid } from './highlight-grid';
@@ -261,6 +262,23 @@ export function LandingPageView() {
             </CardSpotlight>
           ))}
         </div>
+      </section>
+
+      {/* 4. ISOMETRIC ALGORITHMIC TELEMETRY (TACTILE HAIRLINE COCKPIT) */}
+      <section id='instruments' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-16 relative'>
+        <span id='telemetry' className='absolute -top-20' />
+        <div className='text-center max-w-3xl mx-auto mb-12 sm:mb-16'>
+          <div className='inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-primary text-xs font-mono tracking-wider uppercase mb-3'>
+            <span>●</span> TACTILE ALGORITHMIC TELEMETRY
+          </div>
+          <h2 className='text-3xl md:text-4xl font-orbitron font-extrabold tracking-tight text-foreground mb-4'>
+            Interactive Hairline Telemetry Cockpit
+          </h2>
+          <p className='text-sm md:text-base text-muted-foreground leading-relaxed max-w-2xl mx-auto'>
+            Pointer-reactive isometric wireframe instruments modeled from the mathematical core of NEXUS. Glide your cursor to deform geometry, inspect real-time readouts, and simulate algorithmic defense responses.
+          </p>
+        </div>
+        <IsometricTelemetryPanel />
       </section>
 
       {/* DETERMINISTIC ENGINE TECH STACK HIGHLIGHT GRID */}
