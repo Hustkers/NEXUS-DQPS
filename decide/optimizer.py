@@ -285,3 +285,91 @@ def recommend(metrics: pd.DataFrame, total_budget: Optional[float] = None) -> pd
         })
 
     return pd.DataFrame(out).sort_values("expected_daily_margin", ascending=False)
+
+
+def recommend_from_duckdb(
+    db_path: str = "data/dqps.duckdb",
+    total_budget: Optional[float] = None,
+    roas_floor: float = 1.80,
+) -> Tuple[OptimizationResult, pd.DataFrame]:
+    """Load latest telemetry directly from DuckDB unified_commerce_ledger and solve SLSQP budget allocation."""
+    import duckdb
+    conn = duckdb.connect(db_path, read_only=True)
+    recent_df = conn.execute("""
+        WITH ranked AS (
+            SELECT 
+                channel,
+                campaign_id,
+                sku_id,
+                spend,
+                net_revenue,
+                unit_cogs,
+                inventory_on_hand,
+                ROW_NUMBER() OVER (PARTITION BY campaign_id ORDER BY timestamp DESC) as rn
+            FROM unified_commerce_ledger
+        )
+        SELECT 
+            r.channel,
+            r.campaign_id,
+            r.sku_id,
+            r.spend,
+            r.net_revenue,
+            r.unit_cogs,
+            r.inventory_on_hand,
+            c.retail_price as price
+        FROM ranked r
+        LEFT JOIN product_catalog c ON r.sku_id = c.sku
+        WHERE r.rn = 1
+        ORDER BY r.channel, r.campaign_id
+    """).df()
+    conn.close()
+
+    specs: List[CampaignAllocationSpec] = []
+    registry = global_response_registry
+
+    for _, row in recent_df.iterrows():
+        ch = str(row["channel"]).lower()
+        params = registry.get_parameters(ch)
+        price = float(row["price"]) if pd.notna(row["price"]) else 11995.0
+        cogs = float(row["unit_cogs"]) if pd.notna(row["unit_cogs"]) else (price * 0.40)
+        inv = int(row["inventory_on_hand"]) if pd.notna(row["inventory_on_hand"]) else 500
+        curr_spend = float(row["spend"]) if pd.notna(row["spend"]) and float(row["spend"]) > 0 else 500.0
+
+        specs.append(
+            CampaignAllocationSpec(
+                campaign_id=str(row["campaign_id"]),
+                channel=ch,
+                sku_id=str(row["sku_id"]),
+                current_spend=curr_spend,
+                price=price,
+                unit_cogs=cogs,
+                inventory_on_hand=inv,
+                beta=params.beta,
+                eta=params.eta,
+                K=params.K,
+            )
+        )
+
+    optimizer = EnterpriseBudgetOptimizer(roas_floor=roas_floor)
+    opt_res = optimizer.solve(specs, total_budget=total_budget)
+
+    summary_rows = []
+    for s in specs:
+        rec_spend = opt_res.allocations.get(s.campaign_id, s.current_spend)
+        delta = opt_res.spend_deltas.get(s.campaign_id, 0.0)
+        exp_rev = opt_res.expected_revenues.get(s.campaign_id, 0.0)
+        summary_rows.append({
+            "campaign_id": s.campaign_id,
+            "channel": s.channel,
+            "sku_id": s.sku_id,
+            "current_spend": round(s.current_spend, 2),
+            "recommended_spend": round(rec_spend, 2),
+            "delta_spend": round(delta, 2),
+            "expected_revenue": round(exp_rev, 2),
+            "inventory_on_hand": s.inventory_on_hand,
+            "stockout_kill": s.campaign_id in opt_res.throttled_stockouts,
+        })
+
+    summary_df = pd.DataFrame(summary_rows).sort_values("recommended_spend", ascending=False)
+    return opt_res, summary_df
+

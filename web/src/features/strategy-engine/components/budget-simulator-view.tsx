@@ -7,6 +7,7 @@ import {
   runWhatIfScenario
 } from '@/lib/strategy-engine/prediction-engine';
 import { Button } from '@/components/ui/button';
+import { RangeSlider } from '@/components/ui/slider';
 import {
   IconCalculator,
   IconChartBar,
@@ -139,17 +140,14 @@ export function BudgetSimulatorView({ strategies }: BudgetSimulatorViewProps) {
             </span>
           </div>
 
-          <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
-            <input
-              type='range'
-              min={10000}
-              max={250000}
-              step={5000}
-              value={simulatedBudget}
-              onChange={(e) => setSimulatedBudget(Number(e.target.value))}
-              className='w-full accent-cyan-500 cursor-pointer h-2 bg-zinc-800 rounded-lg'
-            />
-          </div>
+          <RangeSlider
+            min={10000}
+            max={250000}
+            step={5000}
+            value={simulatedBudget}
+            onChange={(e) => setSimulatedBudget(Number(e.target.value))}
+            activeColor='#06b6d4'
+          />
 
           <div className='flex justify-between text-[10px] text-muted-foreground'>
             <span>$10,000 (Conservative)</span>
@@ -245,17 +243,14 @@ export function BudgetSimulatorView({ strategies }: BudgetSimulatorViewProps) {
               <span className='text-muted-foreground'>Budget Perturbation:</span>
               <span className='font-bold text-foreground'>{budgetShift > 0 ? `+${budgetShift}%` : `${budgetShift}%`}</span>
             </div>
-            <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
-              <input
-                type='range'
-                min={-50}
-                max={100}
-                step={5}
-                value={budgetShift}
-                onChange={(e) => setBudgetShift(Number(e.target.value))}
-                className='w-full accent-cyan-500 cursor-pointer h-2 bg-zinc-800 rounded-lg'
-              />
-            </div>
+            <RangeSlider
+              min={-50}
+              max={100}
+              step={5}
+              value={budgetShift}
+              onChange={(e) => setBudgetShift(Number(e.target.value))}
+              activeColor='#06b6d4'
+            />
           </div>
 
           <div className='p-3 rounded-xl border border-border/60 bg-muted/10 space-y-2'>
@@ -263,17 +258,14 @@ export function BudgetSimulatorView({ strategies }: BudgetSimulatorViewProps) {
               <span className='text-muted-foreground'>Auction CPC Inflation:</span>
               <span className='font-bold text-foreground'>{cpcShift > 0 ? `+${cpcShift}%` : `${cpcShift}%`}</span>
             </div>
-            <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
-              <input
-                type='range'
-                min={-30}
-                max={50}
-                step={5}
-                value={cpcShift}
-                onChange={(e) => setCpcShift(Number(e.target.value))}
-                className='w-full accent-amber-500 cursor-pointer h-2 bg-zinc-800 rounded-lg'
-              />
-            </div>
+            <RangeSlider
+              min={-30}
+              max={50}
+              step={5}
+              value={cpcShift}
+              onChange={(e) => setCpcShift(Number(e.target.value))}
+              activeColor='#f59e0b'
+            />
           </div>
 
           <div className='p-3 rounded-xl border border-border/60 bg-muted/10 space-y-2'>
@@ -281,17 +273,14 @@ export function BudgetSimulatorView({ strategies }: BudgetSimulatorViewProps) {
               <span className='text-muted-foreground'>Conversion Rate (CVR) Shift:</span>
               <span className='font-bold text-foreground'>{cvrShift > 0 ? `+${cvrShift}%` : `${cvrShift}%`}</span>
             </div>
-            <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
-              <input
-                type='range'
-                min={-40}
-                max={40}
-                step={5}
-                value={cvrShift}
-                onChange={(e) => setCvrShift(Number(e.target.value))}
-                className='w-full accent-emerald-500 cursor-pointer h-2 bg-zinc-800 rounded-lg'
-              />
-            </div>
+            <RangeSlider
+              min={-40}
+              max={40}
+              step={5}
+              value={cvrShift}
+              onChange={(e) => setCvrShift(Number(e.target.value))}
+              activeColor='#10b981'
+            />
           </div>
 
           <div className='p-3 rounded-xl border border-border/60 bg-muted/10 space-y-2'>
@@ -299,17 +288,14 @@ export function BudgetSimulatorView({ strategies }: BudgetSimulatorViewProps) {
               <span className='text-muted-foreground'>Creative Wearout / Ad Age:</span>
               <span className='font-bold text-foreground'>{wearoutDays} Days Elapsed</span>
             </div>
-            <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
-              <input
-                type='range'
-                min={0}
-                max={35}
-                step={1}
-                value={wearoutDays}
-                onChange={(e) => setWearoutDays(Number(e.target.value))}
-                className='w-full accent-purple-500 cursor-pointer h-2 bg-zinc-800 rounded-lg'
-              />
-            </div>
+            <RangeSlider
+              min={0}
+              max={35}
+              step={1}
+              value={wearoutDays}
+              onChange={(e) => setWearoutDays(Number(e.target.value))}
+              activeColor='#a855f7'
+            />
           </div>
         </div>
 

@@ -75,7 +75,7 @@ export function CampaignSelectorModal({
 
       return true;
     });
-  }, [campaigns, platformTab, statusFilter, searchQuery]);
+  }, [campaigns, platformTab, statusFilter, skuFilter, searchQuery]);
 
   if (!isOpen) return null;
 

@@ -3,19 +3,13 @@
 import React, { useState, useMemo } from 'react';
 import {
   IconWorld,
-  IconActivity,
-  IconChartBar,
   IconX,
   IconCheck,
-  IconAdjustments,
   IconReportAnalytics,
   IconArrowRight,
   IconAlertTriangle,
-  IconDatabase,
   IconCpu,
-  IconTrendingUp,
-  IconChartPie,
-  IconGitFork
+  IconReceipt2
 } from '@tabler/icons-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -26,6 +20,20 @@ import { RLVisualAnalytics } from './rl-visual-analytics';
 import { computeRLAdAllocation } from '@/lib/rl-ad-optimizer';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+
+// Ground-truth SKU bill of materials and factory unit economics from DATASET.md §2
+const SKU_COGS_MAP: Record<string, { inrCogs: number; usdCogs: number; inrMsrp: number }> = {
+  '310805-137': { inrCogs: 5800, usdCogs: 69.05, inrMsrp: 15995 }, // Air Jordan 10 Retro
+  '880848-005': { inrCogs: 5250, usdCogs: 62.50, inrMsrp: 14495 }, // Nike Zoom Fly
+  'AH8050-100': { inrCogs: 4800, usdCogs: 57.14, inrMsrp: 13995 }, // Nike Air Max 270
+  '315122-001': { inrCogs: 3150, usdCogs: 37.50, inrMsrp: 7495 },  // Nike Air Force 1 '07
+  'CD4371-001': { inrCogs: 5800, usdCogs: 69.05, inrMsrp: 13995 }, // Nike React Infinity Run Flyknit
+  'AO2924-401': { inrCogs: 4500, usdCogs: 53.57, inrMsrp: 12797 }, // Nike Air Zoom Pegasus 36
+  'BQ8928-011': { inrCogs: 3900, usdCogs: 46.43, inrMsrp: 10397 }, // Nike Epic React Flyknit 2
+  '942851-002': { inrCogs: 3800, usdCogs: 45.24, inrMsrp: 10995 }, // Nike Air Zoom Pegasus 35
+  '849559-004': { inrCogs: 5500, usdCogs: 65.48, inrMsrp: 15995 }, // Nike Air Max 2017
+  'AT5405-001': { inrCogs: 5200, usdCogs: 61.90, inrMsrp: 14995 }, // Nike Joyride Run Flyknit
+};
 
 export interface ProductAnalysisTarget {
   id?: string | number;
@@ -66,19 +74,25 @@ export function ProductAnalysisModal({
   onMitigate
 }: ProductAnalysisModalProps) {
   const [analysisStage, setAnalysisStage] = useState<'analysing' | 'completed'>('analysing');
-  const [viewSection, setViewSection] = useState<'all' | 'globe' | 'rl_analytics'>('all');
+  const [viewSection, setViewSection] = useState<'all' | 'globe' | 'cm3_waterfall' | 'rl_analytics'>('all');
+  const [freightZone, setFreightZone] = useState<'zone2' | 'zone8' | 'blended'>('blended');
+  const [currencyView, setCurrencyView] = useState<'usd' | 'inr'>('usd');
   const [isExecuting, setIsExecuting] = useState(false);
 
   // Automatically transition from "analysing" to "completed" after 2.2 seconds
   React.useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) return;
+    const initialTimer = setTimeout(() => {
       setAnalysisStage('analysing');
-      const timer = setTimeout(() => {
-        setAnalysisStage('completed');
-      }, 2200);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen, product]);
+    }, 0);
+    const timer = setTimeout(() => {
+      setAnalysisStage('completed');
+    }, 2200);
+    return () => {
+      clearTimeout(initialTimer);
+      clearTimeout(timer);
+    };
+  }, [isOpen]);
 
   // Compute RL ad allocation data for the product
   const rlData = useMemo(() => {
@@ -94,7 +108,60 @@ export function ProductAnalysisModal({
     });
   }, [product]);
 
-  if (!isOpen || !product || !rlData) return null;
+  // Compute Itemized Contribution Margin 3 (CM3) Waterfall from DATASET.md §3.4
+  const cm3Data = useMemo(() => {
+    if (!product) return null;
+    const price = product.price ?? 160;
+    const skuData = product.sku ? SKU_COGS_MAP[product.sku] : undefined;
+    const cogsUsd = skuData ? skuData.usdCogs : Math.round(price * 0.38 * 100) / 100;
+    const cogsInr = skuData ? skuData.inrCogs : Math.round(cogsUsd * 84);
+    const cm1Usd = price - cogsUsd;
+
+    const gatewayFeeUsd = Math.round((price * 0.029 + 0.30) * 100) / 100;
+    const gatewayFeeInr = Math.round(gatewayFeeUsd * 84);
+    const cm2Usd = cm1Usd - gatewayFeeUsd;
+
+    let currentFreightUsd = 7.90;
+    let currentFreightInr = 664;
+    if (freightZone === 'zone2') {
+      currentFreightUsd = 4.80;
+      currentFreightInr = 403;
+    } else if (freightZone === 'zone8') {
+      currentFreightUsd = 18.50;
+      currentFreightInr = 1554;
+    }
+
+    const effectiveRoas = product.roas && product.roas > 0 ? product.roas : 3.0;
+    const cacUsd = Math.round((price / effectiveRoas) * 100) / 100;
+    const cacInr = Math.round(cacUsd * 84);
+
+    const totalCostUsd = cogsUsd + gatewayFeeUsd + currentFreightUsd + cacUsd;
+    const netCm3Usd = Math.round((price - totalCostUsd) * 100) / 100;
+    const netCm3Inr = Math.round(netCm3Usd * 84);
+    const netCm3Pct = Math.round((netCm3Usd / price) * 1000) / 10;
+    const poas = cacUsd > 0 ? Math.round((netCm3Usd / cacUsd) * 100) / 100 : 0;
+
+    return {
+      price,
+      cogsUsd,
+      cogsInr,
+      cm1Usd,
+      gatewayFeeUsd,
+      gatewayFeeInr,
+      cm2Usd,
+      currentFreightUsd,
+      currentFreightInr,
+      cacUsd,
+      cacInr,
+      totalCostUsd,
+      netCm3Usd,
+      netCm3Inr,
+      netCm3Pct,
+      poas,
+    };
+  }, [product, freightZone]);
+
+  if (!isOpen || !product || !rlData || !cm3Data) return null;
 
   const handleMitigate = () => {
     setIsExecuting(true);
@@ -168,6 +235,18 @@ export function ProductAnalysisModal({
               >
                 <IconWorld className='size-3 text-muted-foreground' />
                 3D Globe
+              </button>
+              <button
+                onClick={() => setViewSection('cm3_waterfall')}
+                className={cn(
+                  'px-2.5 py-1 rounded-lg transition-all duration-150 font-semibold flex items-center gap-1 active:scale-[0.96]',
+                  viewSection === 'cm3_waterfall'
+                    ? 'bg-background text-foreground shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                <IconReceipt2 className='size-3 text-muted-foreground' />
+                CM3 Waterfall
               </button>
               <button
                 onClick={() => setViewSection('rl_analytics')}
@@ -426,12 +505,234 @@ export function ProductAnalysisModal({
             </div>
           )}
 
+          {/* SECTION: CONTRIBUTION MARGIN 3 (CM3) WATERFALL (DATASET.MD §3.4) */}
+          {(viewSection === 'all' || viewSection === 'cm3_waterfall') && (
+            <div className='rounded-xl border border-zinc-800 bg-zinc-950/70 p-4 space-y-4 font-mono'>
+              <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-900 pb-3'>
+                <div className='flex items-center gap-2.5'>
+                  <div className='size-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 shrink-0'>
+                    <IconReceipt2 className='size-4' />
+                  </div>
+                  <div>
+                    <div className='flex items-center gap-2'>
+                      <h4 className='text-xs font-bold text-zinc-100 uppercase tracking-wide'>
+                        Itemized Contribution Margin 3 (CM3) Waterfall
+                      </h4>
+                      <Badge variant='outline' className='text-[9px] border-zinc-700 bg-zinc-900 text-zinc-300'>
+                        DATASET.md §3.4
+                      </Badge>
+                    </div>
+                    <p className='text-[11px] text-zinc-400 mt-0.5 font-sans'>
+                      Reconciled ERP COGS, 2.9% + $0.30 gateway fee, zone-skipping freight &amp; customer acquisition cost (CAC).
+                    </p>
+                  </div>
+                </div>
+
+                <div className='flex items-center gap-2 flex-wrap'>
+                  {/* Currency Toggle */}
+                  <div className='flex items-center bg-zinc-900 rounded-lg border border-zinc-800 p-0.5 text-[10px]'>
+                    <button
+                      onClick={() => setCurrencyView('usd')}
+                      className={cn(
+                        'px-2 py-0.5 rounded transition-all font-semibold',
+                        currencyView === 'usd' ? 'bg-zinc-800 text-zinc-100 shadow-xs' : 'text-zinc-500 hover:text-zinc-300'
+                      )}
+                    >
+                      USD ($)
+                    </button>
+                    <button
+                      onClick={() => setCurrencyView('inr')}
+                      className={cn(
+                        'px-2 py-0.5 rounded transition-all font-semibold',
+                        currencyView === 'inr' ? 'bg-zinc-800 text-zinc-100 shadow-xs' : 'text-zinc-500 hover:text-zinc-300'
+                      )}
+                    >
+                      INR (₹ @ 84)
+                    </button>
+                  </div>
+
+                  {/* Freight Routing Switcher */}
+                  <div className='flex items-center bg-zinc-900 rounded-lg border border-zinc-800 p-0.5 text-[10px]'>
+                    <button
+                      onClick={() => setFreightZone('zone2')}
+                      className={cn(
+                        'px-2 py-0.5 rounded transition-all font-semibold',
+                        freightZone === 'zone2' ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-800/80 shadow-xs' : 'text-zinc-400 hover:text-zinc-200'
+                      )}
+                    >
+                      Zone 2 Local ($4.80)
+                    </button>
+                    <button
+                      onClick={() => setFreightZone('blended')}
+                      className={cn(
+                        'px-2 py-0.5 rounded transition-all font-semibold',
+                        freightZone === 'blended' ? 'bg-zinc-800 text-zinc-100 shadow-xs' : 'text-zinc-400 hover:text-zinc-200'
+                      )}
+                    >
+                      Blended ($7.90)
+                    </button>
+                    <button
+                      onClick={() => setFreightZone('zone8')}
+                      className={cn(
+                        'px-2 py-0.5 rounded transition-all font-semibold',
+                        freightZone === 'zone8' ? 'bg-rose-950/80 text-rose-300 border border-rose-800/80 shadow-xs' : 'text-zinc-400 hover:text-zinc-200'
+                      )}
+                    >
+                      Zone 8 Cross-Country ($18.50)
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Waterfall Steps Grid */}
+              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2.5 text-xs'>
+                {/* Step 1: MSRP */}
+                <div className='p-3 rounded-lg bg-zinc-900/50 border border-zinc-800/80 flex flex-col justify-between'>
+                  <div className='text-zinc-500 text-[10px] uppercase font-semibold'>1. Retail MSRP</div>
+                  <div className='my-1.5'>
+                    <div className='text-base font-bold text-zinc-100'>
+                      {currencyView === 'usd' ? `+$${cm3Data.price.toFixed(2)}` : `+₹${Math.round(cm3Data.price * 84).toLocaleString('en-IN')}`}
+                    </div>
+                    <div className='text-[10px] text-zinc-400'>
+                      {currencyView === 'usd' ? `₹${Math.round(cm3Data.price * 84).toLocaleString('en-IN')} anchor` : `$${cm3Data.price.toFixed(2)} USD`}
+                    </div>
+                  </div>
+                  <div className='text-[9px] text-zinc-500'>100% Gross Subtotal</div>
+                </div>
+
+                {/* Step 2: ERP COGS */}
+                <div className='p-3 rounded-lg bg-zinc-900/50 border border-zinc-800/80 flex flex-col justify-between'>
+                  <div className='text-zinc-500 text-[10px] uppercase font-semibold'>2. ERP Unit COGS</div>
+                  <div className='my-1.5'>
+                    <div className='text-base font-bold text-rose-400'>
+                      {currencyView === 'usd' ? `-$${cm3Data.cogsUsd.toFixed(2)}` : `-₹${cm3Data.cogsInr.toLocaleString('en-IN')}`}
+                    </div>
+                    <div className='text-[10px] text-zinc-400'>
+                      CM1: ${cm3Data.cm1Usd.toFixed(2)} ({(cm3Data.cm1Usd / cm3Data.price * 100).toFixed(1)}%)
+                    </div>
+                  </div>
+                  <div className='text-[9px] text-zinc-500'>Direct Manufacturing</div>
+                </div>
+
+                {/* Step 3: Gateway Fee */}
+                <div className='p-3 rounded-lg bg-zinc-900/50 border border-zinc-800/80 flex flex-col justify-between'>
+                  <div className='text-zinc-500 text-[10px] uppercase font-semibold'>3. Gateway Fee</div>
+                  <div className='my-1.5'>
+                    <div className='text-base font-bold text-amber-400'>
+                      {currencyView === 'usd' ? `-$${cm3Data.gatewayFeeUsd.toFixed(2)}` : `-₹${cm3Data.gatewayFeeInr.toLocaleString('en-IN')}`}
+                    </div>
+                    <div className='text-[10px] text-zinc-400'>
+                      Stripe 2.9% + $0.30
+                    </div>
+                  </div>
+                  <div className='text-[9px] text-zinc-500'>Payment Friction</div>
+                </div>
+
+                {/* Step 4: Freight */}
+                <div className='p-3 rounded-lg bg-zinc-900/50 border border-zinc-800/80 flex flex-col justify-between'>
+                  <div className='text-zinc-500 text-[10px] uppercase font-semibold flex items-center justify-between'>
+                    <span>4. Freight</span>
+                    {freightZone === 'zone8' && (
+                      <span className='text-[8px] text-rose-400 font-bold bg-rose-950 px-1 rounded'>Δ -$13.70</span>
+                    )}
+                  </div>
+                  <div className='my-1.5'>
+                    <div className={cn('text-base font-bold', freightZone === 'zone8' ? 'text-rose-400' : freightZone === 'zone2' ? 'text-emerald-400' : 'text-zinc-200')}>
+                      {currencyView === 'usd' ? `-$${cm3Data.currentFreightUsd.toFixed(2)}` : `-₹${cm3Data.currentFreightInr.toLocaleString('en-IN')}`}
+                    </div>
+                    <div className='text-[10px] text-zinc-400'>
+                      {freightZone === 'zone2' ? 'Zone 2 Local' : freightZone === 'zone8' ? 'Zone 8 Coast-Coast' : '75/25 Blended Avg'}
+                    </div>
+                  </div>
+                  <div className='text-[9px] text-zinc-500'>
+                    {freightZone === 'zone8' ? 'Zone-Skip Penalty' : 'Optimal Logistics'}
+                  </div>
+                </div>
+
+                {/* Step 5: CAC Allocation */}
+                <div className='p-3 rounded-lg bg-zinc-900/50 border border-zinc-800/80 flex flex-col justify-between'>
+                  <div className='text-zinc-500 text-[10px] uppercase font-semibold'>5. Unit CAC</div>
+                  <div className='my-1.5'>
+                    <div className='text-base font-bold text-indigo-400'>
+                      {currencyView === 'usd' ? `-$${cm3Data.cacUsd.toFixed(2)}` : `-₹${cm3Data.cacInr.toLocaleString('en-IN')}`}
+                    </div>
+                    <div className='text-[10px] text-zinc-400'>
+                      Spend / {product.roas ? `${product.roas.toFixed(2)}x ROAS` : '3.0x'}
+                    </div>
+                  </div>
+                  <div className='text-[9px] text-zinc-500'>Ad Acquisition Cost</div>
+                </div>
+
+                {/* Step 6: Realized Net CM3 */}
+                <div className={cn(
+                  'p-3 rounded-lg border flex flex-col justify-between',
+                  cm3Data.netCm3Usd > 0
+                    ? 'bg-emerald-950/30 border-emerald-800/80'
+                    : 'bg-rose-950/30 border-rose-800/80'
+                )}>
+                  <div className='text-zinc-400 text-[10px] uppercase font-semibold flex items-center justify-between'>
+                    <span>6. Net CM3</span>
+                    <span className={cn('font-bold', cm3Data.netCm3Usd > 0 ? 'text-emerald-400' : 'text-rose-400')}>
+                      {cm3Data.netCm3Pct.toFixed(1)}%
+                    </span>
+                  </div>
+                  <div className='my-1.5'>
+                    <div className={cn('text-lg font-bold', cm3Data.netCm3Usd > 0 ? 'text-emerald-300' : 'text-rose-300')}>
+                      {currencyView === 'usd' ? `+$${cm3Data.netCm3Usd.toFixed(2)}` : `+₹${cm3Data.netCm3Inr.toLocaleString('en-IN')}`}
+                    </div>
+                    <div className='text-[10px] text-zinc-400'>
+                      POAS: <strong className='text-zinc-200'>{cm3Data.poas.toFixed(2)}x</strong>
+                    </div>
+                  </div>
+                  <div className='text-[9px] text-zinc-400 font-bold'>
+                    True Cash Left / Unit
+                  </div>
+                </div>
+              </div>
+
+              {/* Progress Stack Bar of Cost Absorption */}
+              <div className='space-y-1.5 bg-zinc-900/40 p-3 rounded-lg border border-zinc-900'>
+                <div className='flex items-center justify-between text-[11px] text-zinc-400'>
+                  <span className='font-semibold'>MSRP Cost Absorption Breakdown</span>
+                  <span>Net Margin Retained: <strong className='text-emerald-400'>{cm3Data.netCm3Pct.toFixed(1)}%</strong> (${cm3Data.netCm3Usd.toFixed(2)})</span>
+                </div>
+                <div className='h-3 w-full bg-zinc-900 rounded-full overflow-hidden flex'>
+                  <div style={{ width: `${(cm3Data.cogsUsd / cm3Data.price) * 100}%` }} className='bg-rose-500/80 h-full' title={`COGS: ${(cm3Data.cogsUsd / cm3Data.price * 100).toFixed(1)}%`} />
+                  <div style={{ width: `${(cm3Data.gatewayFeeUsd / cm3Data.price) * 100}%` }} className='bg-amber-500/80 h-full' title={`Gateway Fee: ${(cm3Data.gatewayFeeUsd / cm3Data.price * 100).toFixed(1)}%`} />
+                  <div style={{ width: `${(cm3Data.currentFreightUsd / cm3Data.price) * 100}%` }} className='bg-sky-500/80 h-full' title={`Freight: ${(cm3Data.currentFreightUsd / cm3Data.price * 100).toFixed(1)}%`} />
+                  <div style={{ width: `${(cm3Data.cacUsd / cm3Data.price) * 100}%` }} className='bg-indigo-500/80 h-full' title={`CAC: ${(cm3Data.cacUsd / cm3Data.price * 100).toFixed(1)}%`} />
+                  <div style={{ width: `${Math.max(0, cm3Data.netCm3Pct)}%` }} className='bg-emerald-500/90 h-full' title={`Net CM3: ${cm3Data.netCm3Pct.toFixed(1)}%`} />
+                </div>
+                <div className='flex items-center justify-between text-[9px] text-zinc-500 pt-0.5 flex-wrap gap-2'>
+                  <span className='flex items-center gap-1'><span className='size-1.5 rounded-full bg-rose-500' /> COGS ({(cm3Data.cogsUsd / cm3Data.price * 100).toFixed(1)}%)</span>
+                  <span className='flex items-center gap-1'><span className='size-1.5 rounded-full bg-amber-500' /> Gateway ({(cm3Data.gatewayFeeUsd / cm3Data.price * 100).toFixed(1)}%)</span>
+                  <span className='flex items-center gap-1'><span className='size-1.5 rounded-full bg-sky-500' /> Freight ({(cm3Data.currentFreightUsd / cm3Data.price * 100).toFixed(1)}%)</span>
+                  <span className='flex items-center gap-1'><span className='size-1.5 rounded-full bg-indigo-500' /> CAC ({(cm3Data.cacUsd / cm3Data.price * 100).toFixed(1)}%)</span>
+                  <span className='flex items-center gap-1 text-emerald-400 font-bold'><span className='size-1.5 rounded-full bg-emerald-500' /> Net CM3 ({cm3Data.netCm3Pct.toFixed(1)}%)</span>
+                </div>
+              </div>
+
+              {/* Stockout Warning Banner in CM3 Waterfall */}
+              {isStockout && (
+                <div className='p-2.5 rounded-lg bg-rose-950/60 border border-rose-800/80 text-rose-300 text-xs flex items-center justify-between gap-3'>
+                  <div className='flex items-center gap-2'>
+                    <IconAlertTriangle className='size-4 text-rose-400 shrink-0' />
+                    <span><strong>STOCKOUT SHOCK ACTIVE (0 UNITS):</strong> Unit economics theoretical only. Autonomous kill-switch engaged to eliminate $840/day ad spend bleed.</span>
+                  </div>
+                  <span className='font-mono font-bold text-rose-200 bg-rose-900/80 px-2 py-0.5 rounded border border-rose-700 whitespace-nowrap text-[10px]'>
+                    &lambda;_inv = 999.0
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* SECTION 2: REINFORCEMENT LEARNING VISUAL ANALYTICS (FLOWCHARTS, GRAPHS, PIE CHARTS, BAR PLOTS) */}
           {(viewSection === 'all' || viewSection === 'rl_analytics') && (
             <div className='pt-2'>
               <RLVisualAnalytics
                 data={rlData}
-                onApplyAction={(act) => handleMitigate()}
+                onApplyAction={() => handleMitigate()}
               />
             </div>
           )}

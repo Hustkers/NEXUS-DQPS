@@ -94,8 +94,9 @@
 
 ### Section 10: Top HUD & Telemetry Bar
 - **TODO:**
-  - [ ] Add emergency indicator pulsing red when selected campaign SKU has `inventory === 0`.
-  - [ ] Display live Primal-Dual state indicator (`λ_inv = 999.0 • Bleed Prevented: $840/day`).
+  - [x] Add emergency indicator pulsing red when selected campaign SKU has `inventory === 0`.
+  - [x] Display live Primal-Dual state indicator (`λ_inv = 999.0 • Bleed Prevented: $840/day` / `₹70,560/day`).
+  - [x] Display dual-currency spend `$X/d (₹Y/d)` using $1 = ₹84 benchmark.
 
 ### Section 11: Stage 1 GitHub 3D Globe with Regional Heatmap Shading
 - **TODO:**
@@ -109,8 +110,9 @@
 
 ### Section 13: Omnichannel 40-Campaign Command Strip & Modal
 - **TODO:**
-  - [ ] Add SKU quick-filter chips for `All Stockouts (2 SKUs)` and `Surplus Inventory (Air Force 1)`.
-  - [ ] Display dual USD ($) and INR (₹) values under $1 = ₹84 benchmark.
+  - [x] Add SKU quick-filter chips for `All Stockouts (0 Units)`, `AJ10 (310805-137)`, `Pegasus 35 (942851-002)`, `Surplus AF1 (315122-001 • 520u)`, and `Healthy Inventory`.
+  - [x] Display dual USD ($) and INR (₹) values under $1 = ₹84 benchmark across all campaign cards.
+  - [x] Display automated stockout protection badge with dual shadow price `λ_inv = 999.0`.
 
 ### Section 14: Stage 2 Cobe Pulse Globe & 7 Fulfillment Node Matrix
 - **TODO:**
@@ -124,4 +126,7 @@
 
 ### Section 16: Product Deep-Dive Analysis Modal
 - **TODO:**
-  - [ ] Display full Contribution Margin 3 (CM3) itemized waterfall (MSRP, COGS, Gateway fee 2.9%+$0.30, Freight, Net Margin).
+  - [x] Display full Contribution Margin 3 (CM3) itemized waterfall (MSRP, ERP Unit COGS mapped to DATASET.md §2, Gateway fee 2.9%+$0.30, Freight Zone 2 vs Zone 8, CAC, Net Margin).
+  - [x] Add interactive Freight Zone simulator (`Zone 2 Local $4.80` vs `Zone 8 Cross-Country $18.50, Penalty -$13.70` vs `Blended $7.90`).
+  - [x] Add dual currency toggle ($ USD vs ₹ INR @ $1 = ₹84).
+  - [x] Render visual cost absorption stack bar and stockout emergency banner.

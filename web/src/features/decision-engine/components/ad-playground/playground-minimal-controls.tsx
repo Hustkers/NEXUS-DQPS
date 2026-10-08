@@ -14,6 +14,7 @@ import {
 } from '@tabler/icons-react';
 import type { AdPlaygroundConstraints } from '../../types/ad-playground-types';
 import { cn } from '@/lib/utils';
+import { RangeSlider } from '@/components/ui/slider';
 
 interface PlaygroundMinimalControlsProps {
   constraints: AdPlaygroundConstraints;
@@ -108,17 +109,14 @@ export function PlaygroundMinimalControls({
           </div>
         </div>
 
-        <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
-          <input
-            type='range'
-            min={500}
-            max={10000}
-            step={250}
-            value={dailyBudget}
-            onChange={(e) => handleBudgetChange(Number(e.target.value))}
-            className='w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-zinc-300'
-          />
-        </div>
+        <RangeSlider
+          min={500}
+          max={10000}
+          step={250}
+          value={dailyBudget}
+          onChange={(e) => handleBudgetChange(Number(e.target.value))}
+          activeColor='#10b981'
+        />
 
         <div className='flex justify-between text-[10px] text-zinc-500 font-mono tabular-nums'>
           <span>$500/day</span>
@@ -237,17 +235,14 @@ export function PlaygroundMinimalControls({
                   {constraints.target_roas_floor.toFixed(1)}x
                 </span>
               </div>
-              <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
-                <input
-                  type='range'
-                  min={1.2}
-                  max={4.5}
-                  step={0.1}
-                  value={constraints.target_roas_floor}
-                  onChange={(e) => onChangeConstraints({ ...constraints, target_roas_floor: Number(e.target.value) })}
-                  className='w-full h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-zinc-300'
-                />
-              </div>
+              <RangeSlider
+                min={1.2}
+                max={4.5}
+                step={0.1}
+                value={constraints.target_roas_floor}
+                onChange={(e) => onChangeConstraints({ ...constraints, target_roas_floor: Number(e.target.value) })}
+                activeColor='#10b981'
+              />
             </div>
 
             {/* Allowed Channel Platforms */}

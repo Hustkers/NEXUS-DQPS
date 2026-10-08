@@ -3,6 +3,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { RangeSlider } from '@/components/ui/slider';
 import {
   IconAdjustments,
   IconCalendar,
@@ -100,19 +101,16 @@ export function PlaygroundConstraintsPanel({
               ${(constraints.total_budget ?? 5000).toLocaleString()}
             </span>
           </div>
-          <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
-            <input
-              type='range'
-              min={1000}
-              max={25000}
-              step={500}
-              value={constraints.total_budget ?? 5000}
-              onChange={(e) =>
-                onChangeConstraints({ ...constraints, total_budget: Number(e.target.value) })
-              }
-              className='w-full accent-cyan-500 cursor-pointer h-1.5 bg-zinc-800 rounded-lg'
-            />
-          </div>
+          <RangeSlider
+            min={1000}
+            max={25000}
+            step={500}
+            value={constraints.total_budget ?? 5000}
+            onChange={(e) =>
+              onChangeConstraints({ ...constraints, total_budget: Number(e.target.value) })
+            }
+            activeColor='#06b6d4'
+          />
           <div className='flex justify-between text-[10px] text-muted-foreground'>
             <span>$1,000</span>
             <span>$12,500</span>

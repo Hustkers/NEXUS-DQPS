@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Icons } from '@/components/icons';
+import { RangeSlider } from '@/components/ui/slider';
 import Link from 'next/link';
 
 export default function ExclusivePage() {
@@ -61,17 +62,14 @@ export default function ExclusivePage() {
                   <span className='text-muted-foreground'>Incrementality Weight</span>
                   <span className='font-bold text-foreground font-mono'>{(shapleyWeight * 100).toFixed(0)}%</span>
                 </div>
-                <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
-                  <input
-                    type='range'
-                    min='0.1'
-                    max='1.0'
-                    step='0.05'
-                    value={shapleyWeight}
-                    onChange={(e) => setShapleyWeight(parseFloat(e.target.value))}
-                    className='w-full accent-indigo-500 cursor-pointer h-1.5 bg-zinc-800 rounded-lg'
-                  />
-                </div>
+                <RangeSlider
+                  min={0.1}
+                  max={1.0}
+                  step={0.05}
+                  value={shapleyWeight}
+                  onChange={(e) => setShapleyWeight(parseFloat(e.target.value))}
+                  activeColor='#6366f1'
+                />
               </div>
 
               <div className='p-3 rounded-lg border border-border/60 bg-muted/30 grid grid-cols-3 gap-2 text-center text-xs'>

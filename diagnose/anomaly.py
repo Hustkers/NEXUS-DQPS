@@ -222,3 +222,40 @@ def factor_decomposition(df: pd.DataFrame, campaign: str, date) -> dict:
         "roas_delta": (day_row["roas"] - base_mean["roas"]) / max(base_mean["roas"], 1e-9),
     }
     return dict(sorted(factors.items(), key=lambda kv: abs(kv[1]), reverse=True))
+
+
+def load_duckdb_telemetry(db_path: str = "data/dqps.duckdb") -> pd.DataFrame:
+    """Load unified commerce time-series telemetry directly from DuckDB lakehouse."""
+    import duckdb
+    conn = duckdb.connect(db_path, read_only=True)
+    df = conn.execute("""
+        SELECT 
+            CAST(timestamp AS DATE) as date,
+            channel as platform,
+            campaign_id as campaign,
+            sku_id as sku,
+            spend,
+            cpm,
+            impressions,
+            clicks,
+            ad_conversions as conversions,
+            attributed_revenue as revenue,
+            gross_margin as margin,
+            inventory_on_hand as inventory,
+            unit_cogs,
+            net_contribution_margin as ncm
+        FROM unified_commerce_ledger
+        ORDER BY date, campaign
+    """).df()
+    conn.close()
+    return df
+
+
+def detect_anomalies_from_duckdb(
+    db_path: str = "data/dqps.duckdb",
+    dispatcher: Optional[AnomalyEventDispatcher] = None,
+) -> pd.DataFrame:
+    """Run full statistical anomaly detection directly over DuckDB lakehouse records."""
+    df = load_duckdb_telemetry(db_path=db_path)
+    return detect_anomalies(df, dispatcher=dispatcher)
+

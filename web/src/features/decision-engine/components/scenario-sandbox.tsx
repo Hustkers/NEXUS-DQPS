@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
 import { MetaLogo, GoogleLogo, AmazonLogo } from '@/components/icons/platform-logos';
+import { RangeSlider } from '@/components/ui/slider';
 import {
   AreaChart,
   Area,
@@ -441,17 +442,14 @@ export function ScenarioSandbox({
           </div>
 
           <div className='space-y-1.5'>
-            <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
-              <input
-                type='range'
-                min={0}
-                max={1500}
-                step={25}
-                value={metaSpend}
-                onChange={(e) => setMetaSpend(Number(e.target.value))}
-                className='w-full accent-blue-500 cursor-pointer h-1.5 bg-zinc-800 rounded-lg'
-              />
-            </div>
+            <RangeSlider
+              min={0}
+              max={1500}
+              step={25}
+              value={metaSpend}
+              onChange={(e) => setMetaSpend(Number(e.target.value))}
+              activeColor='#3b82f6'
+            />
             <div className='flex justify-between text-[10px] text-muted-foreground'>
               <span>$0/d</span>
               <span>K = $850/d</span>
@@ -494,17 +492,14 @@ export function ScenarioSandbox({
           </div>
 
           <div className='space-y-1.5'>
-            <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
-              <input
-                type='range'
-                min={200}
-                max={1500}
-                step={25}
-                value={googleSpend}
-                onChange={(e) => setGoogleSpend(Number(e.target.value))}
-                className='w-full accent-emerald-500 cursor-pointer h-1.5 bg-zinc-800 rounded-lg'
-              />
-            </div>
+            <RangeSlider
+              min={200}
+              max={1500}
+              step={25}
+              value={googleSpend}
+              onChange={(e) => setGoogleSpend(Number(e.target.value))}
+              activeColor='#10b981'
+            />
             <div className='flex justify-between text-[10px] text-muted-foreground'>
               <span>$200/d</span>
               <span>K = $1,250/d</span>
@@ -541,17 +536,14 @@ export function ScenarioSandbox({
           </div>
 
           <div className='space-y-1.5'>
-            <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
-              <input
-                type='range'
-                min={200}
-                max={1500}
-                step={25}
-                value={amazonSpend}
-                onChange={(e) => setAmazonSpend(Number(e.target.value))}
-                className='w-full accent-amber-500 cursor-pointer h-1.5 bg-zinc-800 rounded-lg'
-              />
-            </div>
+            <RangeSlider
+              min={200}
+              max={1500}
+              step={25}
+              value={amazonSpend}
+              onChange={(e) => setAmazonSpend(Number(e.target.value))}
+              activeColor='#f59e0b'
+            />
             <div className='flex justify-between text-[10px] text-muted-foreground'>
               <span>$200/d</span>
               <span>K = $700/d</span>

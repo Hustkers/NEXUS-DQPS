@@ -44,6 +44,12 @@ CHANNEL_DEFAULTS = {
         "eta": 2.10,
         "K": 700.0,
     },
+    "shopify": {
+        "alpha": 0.15,  # Storefront direct intent
+        "beta": 6000.0,
+        "eta": 1.60,
+        "K": 950.0,
+    },
 }
 
 
@@ -246,10 +252,18 @@ class MediaResponseModelRegistry:
         s_train, r_train = s[:split_idx], r[:split_idx]
         s_test, r_test = s[split_idx:], r[split_idx:]
 
-        # Initial parameter estimates
+        # Initial parameter estimates scaled to actual data magnitude (USD vs INR aware)
         defaults = CHANNEL_DEFAULTS.get(channel.lower(), CHANNEL_DEFAULTS["meta"])
-        p0 = [defaults["beta"], defaults["eta"], defaults["K"]]
-        bounds = ([100.0, 0.5, 50.0], [50000.0, 4.0, 10000.0])
+        r_max = float(np.percentile(r_train, 95)) if len(r_train) > 0 else defaults["beta"]
+        s_median = float(np.median(s_train)) if len(s_train) > 0 else defaults["K"]
+
+        init_beta = max(defaults["beta"], r_max * 1.2)
+        init_k = max(defaults["K"], s_median)
+        p0 = [init_beta, defaults["eta"], init_k]
+
+        max_beta_bound = max(50000.0, r_max * 5.0)
+        max_k_bound = max(10000.0, s_median * 10.0)
+        bounds = ([50.0, 0.5, 10.0], [max_beta_bound, 4.0, max_k_bound])
 
         try:
             popt, _ = curve_fit(
@@ -286,6 +300,34 @@ class MediaResponseModelRegistry:
             return res
         except Exception:
             return self.get_parameters(channel)
+
+    def fit_from_duckdb(
+        self,
+        db_path: str = "data/dqps.duckdb",
+        channel: Optional[str] = None,
+    ) -> Dict[str, HillParameters]:
+        """Directly query DuckDB unified_commerce_ledger to calibrate Hill parameters per channel."""
+        import duckdb
+        conn = duckdb.connect(db_path, read_only=True)
+        channels = [channel.lower()] if channel else ["meta", "google", "amazon", "shopify"]
+        results: Dict[str, HillParameters] = {}
+
+        for ch in channels:
+            try:
+                df = conn.execute(
+                    "SELECT spend, net_revenue FROM unified_commerce_ledger WHERE lower(channel) = ? AND spend > 0 ORDER BY timestamp",
+                    [ch],
+                ).df()
+                if len(df) >= 10:
+                    params = self.fit_curve(df["spend"].to_numpy(), df["net_revenue"].to_numpy(), channel=ch)
+                    results[ch] = params
+                else:
+                    results[ch] = self.get_parameters(ch)
+            except Exception:
+                results[ch] = self.get_parameters(ch)
+
+        conn.close()
+        return results
 
 
 global_response_registry = MediaResponseModelRegistry()
