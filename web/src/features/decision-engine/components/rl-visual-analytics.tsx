@@ -75,11 +75,13 @@ export function RLVisualAnalytics({
     }, 80);
   };
 
+  const currentMode = data.policyMode || 'BALANCED';
   const [isDispatching, setIsDispatching] = useState(false);
   const [lastDispatchReceipt, setLastDispatchReceipt] = useState<string | null>(null);
 
-  const handleDispatchMutation = async () => {
+  const handleDispatchMutation = useCallback(async () => {
     setIsDispatching(true);
+    const timestampStr = Math.floor(performance.now() * 1000).toString(36).toUpperCase();
     try {
       await fetch('/api/reallocations/execute', {
         method: 'POST',
@@ -91,13 +93,13 @@ export function RLVisualAnalytics({
           policyMode: currentMode,
         }),
       });
-      const receipt = `RCPT-${Date.now().toString(36).toUpperCase()}`;
+      const receipt = `RCPT-${timestampStr}`;
       setLastDispatchReceipt(receipt);
       toast.success(
         `Programmatic API Mutation Executed [${data.platform.toUpperCase()}]: Budget set to $${data.totalOptimizedSpend.toLocaleString()}/day (${receipt})`
       );
     } catch {
-      const receipt = `SIM-${Date.now().toString(36).toUpperCase()}`;
+      const receipt = `SIM-${timestampStr}`;
       setLastDispatchReceipt(receipt);
       toast.success(
         `Simulated API Mutation Dispatched to ${data.platform.toUpperCase()} Ads under ±20% velocity guardrails (${receipt})`
@@ -105,10 +107,9 @@ export function RLVisualAnalytics({
     } finally {
       setIsDispatching(false);
     }
-  };
+  }, [data.sku, data.platform, data.totalOptimizedSpend, currentMode]);
 
   const filteredLearningCurve = data.learningCurve.slice(0, retrainStep);
-  const currentMode = data.policyMode || 'BALANCED';
 
   return (
     <div className={cn('flex flex-col space-y-5 text-zinc-100', className)}>
