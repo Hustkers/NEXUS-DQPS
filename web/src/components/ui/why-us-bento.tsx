@@ -77,9 +77,6 @@ export function WhyUsBento({
       <div className="mx-auto max-w-7xl px-4 md:px-8 lg:px-12 flex flex-col gap-6 sm:gap-8">
         {/* Section Header */}
         <div className="flex flex-col items-center text-center space-y-3 mb-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-primary text-xs font-mono tracking-wider uppercase">
-            <span>●</span> ARCHITECTED FOR CAPITAL EFFICIENCY
-          </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-orbitron font-extrabold tracking-tight text-foreground">
             Why High-Growth Brands Run on NEXUS
           </h2>
