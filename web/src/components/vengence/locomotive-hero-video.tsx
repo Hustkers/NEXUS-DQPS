@@ -19,6 +19,8 @@ export function LocomotiveHeroVideo({
 }: LocomotiveHeroVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const seekerRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef<boolean>(false);
 
   // Video playback & audio states
   const [isMuted, setIsMuted] = useState(true);
@@ -62,7 +64,7 @@ export function LocomotiveHeroVideo({
 
   // Time update handler
   const handleTimeUpdate = () => {
-    if (videoRef.current) {
+    if (videoRef.current && !isDraggingRef.current) {
       setCurrentTime(videoRef.current.currentTime);
       if (videoRef.current.duration && !isNaN(videoRef.current.duration)) {
         setDuration(videoRef.current.duration);
@@ -109,6 +111,7 @@ export function LocomotiveHeroVideo({
     const video = videoRef.current;
     if (!video) return;
     video.currentTime = 0;
+    setCurrentTime(0);
     video.play().then(() => setIsPlaying(true)).catch(() => {});
   };
 
@@ -124,17 +127,61 @@ export function LocomotiveHeroVideo({
     }
   };
 
-  // Interactive timeline scrubbing
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
+  // Interactive timeline scrubbing & dragging
+  const updateSeekFromEvent = useCallback((clientX: number) => {
     const video = videoRef.current;
-    if (!video || !duration) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const ratio = Math.max(0, Math.min(1, clickX / rect.width));
-    video.currentTime = ratio * duration;
-    setCurrentTime(ratio * duration);
+    const seeker = seekerRef.current;
+    if (!video || !seeker || !duration) return;
+    const rect = seeker.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    const targetTime = ratio * duration;
+    video.currentTime = targetTime;
+    setCurrentTime(targetTime);
+  }, [duration]);
+
+  const handleSeekMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    isDraggingRef.current = true;
+    updateSeekFromEvent(e.clientX);
   };
+
+  const handleSeekTouchStart = (e: React.TouchEvent) => {
+    e.stopPropagation();
+    isDraggingRef.current = true;
+    if (e.touches[0]) updateSeekFromEvent(e.touches[0].clientX);
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isDraggingRef.current) {
+        updateSeekFromEvent(e.clientX);
+      }
+    };
+    const handleMouseUp = () => {
+      isDraggingRef.current = false;
+    };
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isDraggingRef.current && e.touches[0]) {
+        updateSeekFromEvent(e.touches[0].clientX);
+      }
+    };
+    const handleTouchEnd = () => {
+      isDraggingRef.current = false;
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [updateSeekFromEvent]);
 
   // Format seconds to MM:SS
   const formatTime = (seconds: number) => {
@@ -244,7 +291,7 @@ export function LocomotiveHeroVideo({
       )}
 
       {/* 4. BOTTOM BAR: BRAND IDENTITY (LEFT) & PLAYER CONTROLS (RIGHT) */}
-      <div className="relative z-20 pb-8 sm:pb-12 lg:pb-14 px-6 sm:px-12 lg:px-16 flex flex-col md:flex-row md:items-end justify-between gap-6 pointer-events-auto">
+      <div className="relative z-20 pb-16 sm:pb-20 lg:pb-22 px-6 sm:px-12 lg:px-16 flex flex-col md:flex-row md:items-end justify-between gap-6 pointer-events-auto">
         {/* Left: Giant NEXUS® Title & Digital-First Lead */}
         <div
           className="flex flex-col items-start transition-transform duration-500 will-change-transform max-w-3xl"
@@ -273,7 +320,7 @@ export function LocomotiveHeroVideo({
           </p>
         </div>
 
-        {/* Right: Audio Visualizer & Real-time Seeker / Controller HUD */}
+        {/* Right: Audio Visualizer & Video Actions Bar */}
         <div className="flex flex-col items-start md:items-end gap-3 shrink-0">
           {/* Sound Mode Equalizer Button */}
           <button
@@ -322,9 +369,8 @@ export function LocomotiveHeroVideo({
             )}
           </button>
 
-          {/* Timecode & Video Actions Bar */}
-          <div className="flex items-center gap-3 bg-black/65 backdrop-blur-md border border-white/15 px-3.5 py-1.5 rounded-full text-white font-mono text-xs shadow-lg">
-            {/* Play / Pause */}
+          {/* Video Actions Bar: Play/Pause, Restart, Fullscreen */}
+          <div className="flex items-center gap-3 bg-black/65 backdrop-blur-md border border-white/15 px-3 py-1.5 rounded-full text-white font-mono text-xs shadow-lg">
             <button
               onClick={togglePlay}
               aria-label={isPlaying ? 'Pause' : 'Play'}
@@ -334,7 +380,6 @@ export function LocomotiveHeroVideo({
               {isPlaying ? <Pause className="size-3.5" /> : <Play className="size-3.5" />}
             </button>
 
-            {/* Restart */}
             <button
               onClick={handleRestart}
               aria-label="Restart Video"
@@ -344,12 +389,6 @@ export function LocomotiveHeroVideo({
               <RotateCcw className="size-3.5" />
             </button>
 
-            {/* Live BasicAgency Timecode: ( 00:XX / 00:59 ) */}
-            <div className="px-2 text-white/90 tracking-wider font-medium">
-              ( {formatTime(currentTime)} / {formatTime(duration)} )
-            </div>
-
-            {/* Fullscreen */}
             <button
               onClick={toggleFullscreen}
               aria-label="Toggle Fullscreen"
@@ -362,19 +401,35 @@ export function LocomotiveHeroVideo({
         </div>
       </div>
 
-      {/* 5. INTERACTIVE SEEKER TIMELINE SCRUBBER (BOTTOM EDGE) */}
+      {/* 5. BASIC/DEPT® SIGNATURE TRAVELING TIME SLIDER */}
       <div
-        onClick={handleSeek}
-        className="absolute bottom-0 left-0 right-0 h-1.5 hover:h-2.5 bg-white/15 hover:bg-white/25 cursor-pointer transition-all z-30 group/scrubber"
-        title="Seek Video Timeline"
+        ref={seekerRef}
+        onMouseDown={handleSeekMouseDown}
+        onTouchStart={handleSeekTouchStart}
+        className="absolute bottom-0 left-0 right-0 h-12 sm:h-14 z-30 select-none cursor-grab active:cursor-grabbing pointer-events-auto flex flex-col justify-end group/seeker"
       >
+        {/* Dynamic Traveling Time Indicator (matches 00:20/00:59 aesthetic) */}
         <div
-          className={cn(
-            'h-full transition-[width] duration-100 ease-linear',
-            isMuted ? 'bg-white' : 'bg-emerald-400'
-          )}
-          style={{ width: `${progressPercent}%` }}
-        />
+          className="absolute bottom-3 sm:bottom-4 pointer-events-none transition-transform duration-75 will-change-transform mix-blend-difference"
+          style={{
+            left: `clamp(2.75rem, ${progressPercent}%, calc(100% - 2.75rem))`,
+            transform: 'translateX(-50%)',
+          }}
+        >
+          <div className="flex items-center text-xs sm:text-[13px] font-mono tracking-tight select-none leading-none drop-shadow-md">
+            <span className="font-semibold text-white">{formatTime(currentTime)}</span>
+            <span className="text-white/60">/</span>
+            <span className="text-white/60">{formatTime(duration)}</span>
+          </div>
+        </div>
+
+        {/* Subtle Hairline Progress Bar along the bottom */}
+        <div className="relative w-full h-[2px] group-hover/seeker:h-[3px] bg-white/15 group-hover/seeker:bg-white/25 transition-all">
+          <div
+            className="h-full bg-white transition-[width] duration-100 ease-linear shadow-[0_0_8px_rgba(255,255,255,0.7)]"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
       </div>
 
       {/* 6. SCROLL TO EXPLORE CUE */}
@@ -383,7 +438,7 @@ export function LocomotiveHeroVideo({
         onClick={(e) => {
           e.stopPropagation();
         }}
-        className="hidden md:flex absolute bottom-4 left-1/2 -translate-x-1/2 z-20 items-center gap-2 text-white/50 hover:text-white transition-colors font-mono text-[11px] tracking-widest uppercase pointer-events-auto"
+        className="hidden md:flex absolute bottom-12 left-1/2 -translate-x-1/2 z-20 items-center gap-2 text-white/40 hover:text-white transition-colors font-mono text-[11px] tracking-widest uppercase pointer-events-auto"
       >
         <span>Scroll to Explore</span>
         <span className="animate-bounce inline-block text-xs">↓</span>
