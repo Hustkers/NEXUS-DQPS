@@ -36,14 +36,14 @@ export function BarGraph() {
   return (
     <Card className='bg-[#1A1A1A] border-[#1A1A1A] shadow-none'>
       <CardHeader>
-        <CardTitle className='text-white font-orbitron flex items-center justify-between'>
+        <CardTitle className='text-white font-sans flex items-center justify-between'>
           <span>Channel Execution Breakdown</span>
-          <Badge variant='outline' className='border-none text-[#8A8A8A] bg-[#000000] font-orbitron'>
+          <Badge variant='outline' className='border-none text-[#8A8A8A] bg-[#000000] font-sans'>
             <Icons.trendingDown className='text-[#8A8A8A]' />
             -5.2%
           </Badge>
         </CardTitle>
-        <CardDescription className='text-[#8A8A8A] font-orbitron'>January - June 2025 (Monochrome Telemetry)</CardDescription>
+        <CardDescription className='text-[#8A8A8A] font-sans'>January - June 2025 (Monochrome Telemetry)</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>

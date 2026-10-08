@@ -8,14 +8,25 @@ import type { Metadata, Viewport } from 'next';
 import { cookies } from 'next/headers';
 import NextTopLoader from 'nextjs-toploader';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
-import { Orbitron } from 'next/font/google';
+import localFont from 'next/font/local';
 import BackgroundShader from '@/components/layout/background-shader';
 import '../styles/globals.css';
 
-const orbitron = Orbitron({
-  subsets: ['latin'],
-  variable: '--font-orbitron',
-  display: 'swap',
+const ranade = localFont({
+  src: [
+    {
+      path: '../../public/fonts/ranade/Ranade-Variable.woff2',
+      style: 'normal',
+      weight: '100 700'
+    },
+    {
+      path: '../../public/fonts/ranade/Ranade-VariableItalic.woff2',
+      style: 'italic',
+      weight: '100 700'
+    }
+  ],
+  variable: '--font-ranade',
+  display: 'swap'
 });
 
 const META_THEME_COLORS = {
@@ -68,11 +79,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang='en' suppressHydrationWarning data-theme={themeToApply}>
       <head>
-        <link rel='preconnect' href='https://fonts.googleapis.com' />
-        <link rel='preconnect' href='https://fonts.gstatic.com' crossOrigin='anonymous' />
+        <link rel='preconnect' href='https://api.fontshare.com' crossOrigin='anonymous' />
+        <link rel='preconnect' href='https://cdn.fontshare.com' crossOrigin='anonymous' />
         <link
           rel='stylesheet'
-          href='https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap'
+          href='https://api.fontshare.com/v2/css?f[]=ranade@100,300,400,500,700&display=swap'
         />
         <script
           dangerouslySetInnerHTML={{
@@ -96,7 +107,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body
         className={cn(
           'bg-background font-sans antialiased',
-          orbitron.variable,
+          ranade.variable,
           fontVariables
         )}
       >

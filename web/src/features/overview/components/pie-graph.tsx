@@ -50,14 +50,14 @@ export function PieGraph() {
   return (
     <Card className='flex h-full flex-col bg-[#1A1A1A] border-[#1A1A1A] shadow-none'>
       <CardHeader className='items-center pb-0'>
-        <CardTitle className='text-white font-orbitron flex items-center justify-between w-full'>
+        <CardTitle className='text-white flex items-center justify-between w-full'>
           <span>Device Distribution</span>
-          <Badge variant='outline' className='border-none text-white bg-[#000000] font-orbitron'>
+          <Badge variant='outline' className='border-none text-white bg-[#000000]'>
             <Icons.trendingUp className='text-white' />
             +5.2%
           </Badge>
         </CardTitle>
-        <CardDescription className='text-[#8A8A8A] font-orbitron'>January - June 2024</CardDescription>
+        <CardDescription className='text-[#8A8A8A]'>January - June 2024</CardDescription>
       </CardHeader>
       <CardContent className='flex flex-1 items-center justify-center pb-0'>
         <ChartContainer

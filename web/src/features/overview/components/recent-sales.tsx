@@ -43,8 +43,8 @@ export function RecentSales() {
   return (
     <Card className='h-full bg-card border-border shadow-none text-card-foreground'>
       <CardHeader>
-        <CardTitle className='text-foreground font-orbitron'>Recent Transactions</CardTitle>
-        <CardDescription className='text-muted-foreground font-orbitron'>265 orders processed this telemetry cycle.</CardDescription>
+        <CardTitle className='text-foreground'>Recent Transactions</CardTitle>
+        <CardDescription className='text-muted-foreground'>265 orders processed this telemetry cycle.</CardDescription>
       </CardHeader>
       <CardContent>
         <div className='space-y-8'>
@@ -52,13 +52,13 @@ export function RecentSales() {
             <div key={index} className='flex items-center'>
               <Avatar className='h-9 w-9 border border-border'>
                 <AvatarImage src={sale.avatar} alt='Avatar' />
-                <AvatarFallback className='bg-muted text-foreground font-orbitron text-xs'>{sale.fallback}</AvatarFallback>
+                <AvatarFallback className='bg-muted text-foreground text-xs'>{sale.fallback}</AvatarFallback>
               </Avatar>
               <div className='ml-4 space-y-1'>
-                <p className='text-sm leading-none font-medium text-foreground font-orbitron'>{sale.name}</p>
-                <p className='text-muted-foreground text-xs font-orbitron'>{sale.email}</p>
+                <p className='text-sm leading-none font-medium text-foreground'>{sale.name}</p>
+                <p className='text-muted-foreground text-xs'>{sale.email}</p>
               </div>
-              <div className='ml-auto font-orbitron text-foreground text-sm font-semibold'>{sale.amount}</div>
+              <div className='ml-auto text-foreground text-sm font-semibold'>{sale.amount}</div>
             </div>
           ))}
         </div>

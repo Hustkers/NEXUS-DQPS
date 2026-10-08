@@ -22,20 +22,22 @@
 /* Font variables are defined on [data-theme] (html element) */
 /* We need to override Next.js font variables on body to use html's values */
 /* Using initial removes the property, allowing parent (html) values to cascade */
+[data-theme] {
+  --font-sans: 'Ranade', var(--font-ranade, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+}
+
 [data-theme] body {
-  /* Remove Next.js font variables to allow theme variables from html to cascade */
-  --font-sans: initial;
-  --font-mono: initial;
-  --font-serif: initial;
-  /* Apply font-family - will now resolve from html's [data-theme] variables */
+  --font-sans: 'Ranade', var(--font-ranade, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
   font-family: var(--font-sans);
 }
 
-/* Vengence UI Dashboard font override across all active themes */
-[data-theme].vengence-dashboard-active body,
-[data-theme] body.vengence-dashboard-active,
+/* Ranade Typography universal enforcement */
+html,
+body,
+[data-theme],
+[data-theme] body,
 .vengence-dashboard {
-  --font-sans: var(--font-orbitron, 'Orbitron', 'Space Grotesk', sans-serif) !important;
-  font-family: var(--font-orbitron, 'Orbitron', 'Space Grotesk', sans-serif) !important;
+  --font-sans: 'Ranade', var(--font-ranade, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  font-family: 'Ranade', var(--font-ranade, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
 }
 
