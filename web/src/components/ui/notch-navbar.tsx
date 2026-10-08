@@ -71,7 +71,7 @@ const DEFAULT_LEFT_ITEMS: NavItem[] = [
 
 const DEFAULT_RIGHT_ITEMS: NavItem[] = [
   { label: 'Pipeline', href: '#stack', icon: Layers },
-  { label: 'Simulator', href: '/dashboard/simulator', icon: Zap },
+  { label: 'Telemetry', href: '#instruments', icon: Zap },
   { label: 'Enter App', href: '/dashboard/overview', icon: TerminalPromptIcon, isSpecial: true }
 ];
 
@@ -95,6 +95,8 @@ export function NotchNavbar({
         setActiveItem('Features');
       } else if (hash === '#stack' || hash === '#pipeline') {
         setActiveItem('Pipeline');
+      } else if (hash === '#instruments' || hash === '#telemetry') {
+        setActiveItem('Telemetry');
       } else {
         setActiveItem('Overview');
       }
