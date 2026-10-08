@@ -12,6 +12,7 @@ import { AnimatedFooter } from '@/components/ui/animated-footer';
 import { WhyUsBento } from './why-us-bento';
 import { HighlightGrid } from './highlight-grid';
 import { LocomotiveHeroVideo } from './locomotive-hero-video';
+import { EcosystemStackedLogos } from './ecosystem-stacked-logos';
 import { FaqAccordion } from './faq-accordion';
 
 export function LandingPageView() {
@@ -24,6 +25,9 @@ export function LandingPageView() {
       <div id='overview'>
         <LocomotiveHeroVideo />
       </div>
+
+      {/* 1. STACKED LOGOS: MULTI-CHANNEL AD & COMMERCE ECOSYSTEM */}
+      <EcosystemStackedLogos />
 
       {/* 2. EXPANDABLE / AGENT BENTO GRID (FEATURES & ARCHITECTURE) */}
       <section id='features' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-muted/20 border-b border-border/60 scroll-mt-16 relative'>
