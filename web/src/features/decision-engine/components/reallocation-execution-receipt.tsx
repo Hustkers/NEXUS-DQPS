@@ -99,6 +99,69 @@ export function ReallocationExecutionReceipt({
         </div>
       </div>
 
+      {/* BEFORE / AFTER Execution Comparison Grid */}
+      <div className='mt-4 p-3 rounded-lg border border-border/80 bg-muted/20 font-mono text-[11px] space-y-2'>
+        <div className='flex items-center justify-between text-[10px] text-muted-foreground uppercase font-bold tracking-wider border-b border-border/60 pb-1.5'>
+          <span>Metric</span>
+          <div className='flex items-center gap-6'>
+            <span className='w-20 text-right'>Before</span>
+            <span className='w-20 text-right text-emerald-400'>After</span>
+          </div>
+        </div>
+
+        {/* Source Spend */}
+        <div className='flex items-center justify-between py-0.5'>
+          <span className='text-muted-foreground truncate max-w-[170px]'>Source spend</span>
+          <div className='flex items-center gap-6'>
+            <span className='w-20 text-right font-medium text-foreground'>
+              ₹{Math.round(source.currentSpend).toLocaleString('en-IN')}/d
+            </span>
+            <span className='w-20 text-right font-bold text-foreground'>
+              ₹{Math.round(source.newSpend).toLocaleString('en-IN')}/d
+            </span>
+          </div>
+        </div>
+
+        {/* Destination Spend */}
+        <div className='flex items-center justify-between py-0.5'>
+          <span className='text-muted-foreground truncate max-w-[170px]'>Destination spend</span>
+          <div className='flex items-center gap-6'>
+            <span className='w-20 text-right font-medium text-foreground'>
+              ₹{Math.round(destination.currentSpend).toLocaleString('en-IN')}/d
+            </span>
+            <span className='w-20 text-right font-bold text-emerald-400'>
+              ₹{Math.round(destination.newSpend).toLocaleString('en-IN')}/d
+            </span>
+          </div>
+        </div>
+
+        {/* Target ROAS */}
+        <div className='flex items-center justify-between py-0.5'>
+          <span className='text-muted-foreground truncate max-w-[170px]'>Expected ROAS</span>
+          <div className='flex items-center gap-6'>
+            <span className='w-20 text-right font-medium text-foreground'>
+              {destination.currentRoas.toFixed(2)}x
+            </span>
+            <span className='w-20 text-right font-bold text-emerald-400'>
+              {predictedRoas.toFixed(2)}x
+            </span>
+          </div>
+        </div>
+
+        {/* Daily Margin */}
+        <div className='flex items-center justify-between py-0.5'>
+          <span className='text-muted-foreground truncate max-w-[170px]'>Expected daily margin</span>
+          <div className='flex items-center gap-6'>
+            <span className='w-20 text-right font-medium text-foreground'>
+              ₹{Math.round(destination.currentDailyMargin).toLocaleString('en-IN')}/d
+            </span>
+            <span className='w-20 text-right font-bold text-emerald-400'>
+              +₹{Math.round(expectedDailyLift).toLocaleString('en-IN')}/d
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Ledger Seal */}
       <div className='mt-5 pt-3 border-t border-dashed border-border/80 flex items-center justify-between text-[11px] bg-muted/20 p-2.5 rounded-lg border border-border/60'>
         <div className='flex items-center gap-1.5 text-muted-foreground'>

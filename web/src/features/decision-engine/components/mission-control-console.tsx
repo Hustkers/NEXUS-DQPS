@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Icons } from '@/components/icons';
 import { PlatformLogo } from '@/components/icons/platform-logos';
-import { AnomalyCard } from './anomaly-card';
+import { AnomalyCard, type AnomalyItem } from './anomaly-card';
 import { ReallocationFeed } from './reallocation-feed';
 import { ScenarioController, ScenarioDefinition } from './scenario-controller';
 import { RoasGauge } from './roas-gauge';
@@ -26,6 +26,8 @@ import { useChannel, AdChannel } from '@/context/channel-context';
 import { ActionDrawer } from './action-drawer';
 import { useDecisionEngine } from '@/context/decision-engine-store';
 import type { DerivedProduct } from '@/lib/gauges-engine';
+import { ReallocationExecutionModal } from './reallocation-execution-modal';
+import type { ReallocationExecutionDetails } from '../types/reallocation-execution';
 
 export function MissionControlConsole() {
   const [state, setState] = useState(initialEngineState);
@@ -39,6 +41,108 @@ export function MissionControlConsole() {
   const { channel, setChannel } = useChannel();
   const activeTab = channel;
   const setActiveTab = (tab: string) => setChannel(tab as AdChannel);
+
+  // Auto-Reallocate Modal state for Mission Control
+  const [isReallocationModalOpen, setIsReallocationModalOpen] = useState(false);
+  const [selectedReallocationDetails, setSelectedReallocationDetails] = useState<ReallocationExecutionDetails | null>(null);
+  const [isAlreadyExecuted, setIsAlreadyExecuted] = useState(false);
+  const [mitigatingAnomalyId, setMitigatingAnomalyId] = useState<string | null>(null);
+
+  const handleAutoReallocate = async (anomaly: AnomalyItem) => {
+    if (mitigatingAnomalyId) return;
+    setMitigatingAnomalyId(anomaly.id);
+
+    try {
+      const res = await fetch('/api/reallocations/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ anomalyId: anomaly.id })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success && data.details) {
+        setSelectedReallocationDetails(data.details);
+        setIsAlreadyExecuted(false);
+        setIsReallocationModalOpen(true);
+      } else if (data.code === 'ALREADY_REALLOCATED') {
+        if (data.details) {
+          setSelectedReallocationDetails(data.details);
+        }
+        setIsAlreadyExecuted(true);
+        setIsReallocationModalOpen(true);
+        toast.info('Reallocation Already Audited', {
+          description: data.message
+        });
+      } else {
+        toast.error('Reallocation Unavailable', {
+          description: data.message || 'No safe reallocation path identified for this campaign.'
+        });
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Could not communicate with autonomous optimization engine.';
+      toast.error('Analysis Request Failed', {
+        description: message
+      });
+    } finally {
+      setMitigatingAnomalyId(null);
+    }
+  };
+
+  const handleConfirmExecution = async (details: ReallocationExecutionDetails) => {
+    const anomalyId = details.anomaly?.id || details.item.id.replace('realloc-', '');
+    try {
+      const res = await fetch('/api/reallocations/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          anomalyId,
+          targetCampaign: details.destination.campaign,
+          deltaSpend: details.capitalMoved
+        })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        // Mark anomaly as reallocated in state
+        setState((prev: any) => ({
+          ...prev,
+          anomalies: prev.anomalies.map((a: any) =>
+            a.id === anomalyId
+              ? {
+                  ...a,
+                  isReallocated: true,
+                  reallocationId: data.receipt?.id || details.ledgerRecord.id,
+                  reallocatedAt: data.receipt?.timestamp || details.ledgerRecord.timestamp
+                }
+              : a
+          )
+        }));
+
+        toast.success(`Autonomous Reallocation Dispatched`, {
+          description: `Shifted ₹${Math.round(details.capitalMoved).toLocaleString('en-IN')}/day to ${details.destination.productName}. Decision ID: ${data.receipt?.id || details.ledgerRecord.id}.`
+        });
+
+        return {
+          success: true,
+          receipt: data.receipt,
+          details: data.details || details
+        };
+      } else {
+        return {
+          success: false,
+          error: data.message || 'Execution rejected by closed-loop engine.'
+        };
+      }
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Network execution failed.';
+      return {
+        success: false,
+        error: message
+      };
+    }
+  };
 
   const hasCriticalAnomaly = state.anomalies.some(
     (a: any) => a.severity === 'CRITICAL' || a.factors?.some((f: any) => f.badge === 'Stockout')
@@ -419,6 +523,7 @@ export function MissionControlConsole() {
             <AnomalyCard
               key={anom.id}
               anomaly={anom}
+              isMitigating={mitigatingAnomalyId === anom.id}
               onAnalyze={(a) => {
                 setAnalyzingProduct({
                   id: a.id,
@@ -435,10 +540,9 @@ export function MissionControlConsole() {
                   factors: a.factors
                 });
               }}
-              onMitigate={(a) => {
-                toast.success(`Dispatched mitigation for ${a.campaign}`, {
-                  description: 'Triggered optimizer to reallocate capital to highest marginal-yield campaign.'
-                });
+              onMitigate={handleAutoReallocate}
+              onViewReceipt={(a) => {
+                handleAutoReallocate(a);
               }}
             />
           ))}
@@ -593,6 +697,25 @@ export function MissionControlConsole() {
         isOpen={isFixDrawerOpen}
         initialState={fixingInitialState}
         onClose={() => setIsFixDrawerOpen(false)}
+      />
+
+      {/* Auto-Reallocate Execution Modal */}
+      <ReallocationExecutionModal
+        isOpen={isReallocationModalOpen}
+        onClose={() => {
+          setIsReallocationModalOpen(false);
+          setSelectedReallocationDetails(null);
+        }}
+        details={selectedReallocationDetails}
+        isAlreadyExecuted={isAlreadyExecuted}
+        onConfirmExecution={handleConfirmExecution}
+        onViewLedger={() => {
+          setIsReallocationModalOpen(false);
+          const ledgerEl = document.getElementById('decision-ledger');
+          if (ledgerEl) {
+            ledgerEl.scrollIntoView({ behavior: 'smooth' });
+          }
+        }}
       />
     </div>
   );
