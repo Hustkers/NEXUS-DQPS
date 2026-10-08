@@ -101,13 +101,10 @@ export const columns: ColumnDef<Product>[] = [
     ),
     cell: ({ row }) => {
       const p = row.original;
-      const inrPrice = p.sale_price_inr ?? Math.round(Number(p.price) * 83);
+      const usdPrice = Number(p.price || 0);
       return (
         <div className='font-mono'>
-          <div className='text-zinc-900 dark:text-zinc-100 font-bold'>₹{inrPrice.toLocaleString()}</div>
-          {p.listing_price_inr && (
-            <div className='text-[10px] text-zinc-500 line-through'>₹{p.listing_price_inr.toLocaleString()}</div>
-          )}
+          <div className='text-zinc-900 dark:text-zinc-100 font-bold'>${usdPrice.toFixed(2)}</div>
         </div>
       );
     }

@@ -24,12 +24,12 @@ export default function OverViewPage() {
       timestamp: new Date().toISOString(),
       system: 'NEXUS Autonomous Decision Engine',
       channel_kpis: {
-        totalRevenue: '₹1,250,450',
+        totalRevenue: '$1,250,450',
         activeAccounts: 45231,
         growthRate: '+12.5%',
         averageRoas: '3.42x',
         conversionRate: '4.8%',
-        blendedCpa: '₹412.50'
+        blendedCpa: '$412.50'
       },
       telemetryStatus: 'HEALTHY_SYNCED',
       engineVersion: '2.4.0-dqps'
@@ -80,7 +80,7 @@ export default function OverViewPage() {
                 <CardHeader>
                   <CardDescription className='text-[#8A8A8A] font-mono'>Total Revenue</CardDescription>
                   <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl text-white font-mono'>
-                    ₹1,250.00
+                    $1,250.00
                   </CardTitle>
                   <CardAction>
                     <Badge variant='outline' className='border-none text-white bg-[#000000] font-mono'>
@@ -187,7 +187,7 @@ export default function OverViewPage() {
               <Card className='bg-[#1A1A1A] border-[#1A1A1A] p-5'>
                 <CardHeader className='p-0 pb-3'>
                   <CardDescription className='text-[#8A8A8A] font-mono text-xs uppercase'>Customer Acquisition Cost (CAC)</CardDescription>
-                  <CardTitle className='text-3xl font-bold font-mono text-white'>₹412.50</CardTitle>
+                  <CardTitle className='text-3xl font-bold font-mono text-white'>$412.50</CardTitle>
                 </CardHeader>
                 <CardFooter className='p-0 pt-2 text-xs text-emerald-400 font-mono'>
                   -18.4% reduction via autonomous stockout suppression
@@ -197,7 +197,7 @@ export default function OverViewPage() {
               <Card className='bg-[#1A1A1A] border-[#1A1A1A] p-5'>
                 <CardHeader className='p-0 pb-3'>
                   <CardDescription className='text-[#8A8A8A] font-mono text-xs uppercase'>Estimated Lifetime Value (LTV)</CardDescription>
-                  <CardTitle className='text-3xl font-bold font-mono text-white'>₹3,840.00</CardTitle>
+                  <CardTitle className='text-3xl font-bold font-mono text-white'>$3,840.00</CardTitle>
                 </CardHeader>
                 <CardFooter className='p-0 pt-2 text-xs text-cyan-400 font-mono'>
                   LTV:CAC Ratio of 9.3x across repeat buyers
@@ -213,19 +213,19 @@ export default function OverViewPage() {
                 <div className='space-y-2 text-xs font-mono'>
                   <div className='flex justify-between py-1 border-b border-zinc-800 text-[#8A8A8A]'>
                     <span>Google Search High-Intent</span>
-                    <span className='text-white font-bold'>5.64x ROAS (₹6,100/d spend)</span>
+                    <span className='text-white font-bold'>5.64x ROAS ($6,100/d spend)</span>
                   </div>
                   <div className='flex justify-between py-1 border-b border-zinc-800 text-[#8A8A8A]'>
                     <span>Amazon Sponsored Products</span>
-                    <span className='text-white font-bold'>6.12x ROAS (₹3,950/d spend)</span>
+                    <span className='text-white font-bold'>6.12x ROAS ($3,950/d spend)</span>
                   </div>
                   <div className='flex justify-between py-1 border-b border-zinc-800 text-[#8A8A8A]'>
                     <span>Meta Advantage+ Video Retargeting</span>
-                    <span className='text-white font-bold'>3.21x ROAS (₹8,400/d spend)</span>
+                    <span className='text-white font-bold'>3.21x ROAS ($8,400/d spend)</span>
                   </div>
                   <div className='flex justify-between py-1 text-[#8A8A8A]'>
                     <span>TikTok Dynamic Showcase</span>
-                    <span className='text-amber-400 font-bold'>2.10x ROAS (₹1,200/d spend)</span>
+                    <span className='text-amber-400 font-bold'>2.10x ROAS ($1,200/d spend)</span>
                   </div>
                 </div>
               </div>

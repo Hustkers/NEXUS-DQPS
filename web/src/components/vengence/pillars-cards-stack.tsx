@@ -155,11 +155,11 @@ export function PillarsCardsStack() {
             <div className='grid grid-cols-3 gap-1.5 text-center my-1'>
               <div className='p-1.5 rounded-lg bg-background/80 border border-border/50'>
                 <div className='text-[9px] text-muted-foreground'>Predicted Lift</div>
-                <div className='text-xs font-bold text-foreground'>+₹3,450/d</div>
+                <div className='text-xs font-bold text-foreground'>+$3,450/d</div>
               </div>
               <div className='p-1.5 rounded-lg bg-background/80 border border-border/50'>
                 <div className='text-[9px] text-muted-foreground'>Realized Lift</div>
-                <div className='text-xs font-bold text-emerald-600 dark:text-emerald-400'>+₹3,610/d</div>
+                <div className='text-xs font-bold text-emerald-600 dark:text-emerald-400'>+$3,610/d</div>
               </div>
               <div className='p-1.5 rounded-lg bg-background/80 border border-border/50'>
                 <div className='text-[9px] text-muted-foreground'>Variance</div>

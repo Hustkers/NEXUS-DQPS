@@ -18,43 +18,43 @@ export function SimulationResultsMatrix({
   const rows = [
     {
       label: 'Daily Ad Spend',
-      base: `₹${baseline.spend.toLocaleString('en-IN')}`,
-      shock: `₹${shocked.spend.toLocaleString('en-IN')}`,
-      mitigated: `₹${mitigated.spend.toLocaleString('en-IN')}`,
+      base: `$${baseline.spend.toLocaleString('en-US')}`,
+      shock: `$${shocked.spend.toLocaleString('en-US')}`,
+      mitigated: `$${mitigated.spend.toLocaleString('en-US')}`,
       delta: mitigated.spend - shocked.spend,
-      deltaFormatted: `${mitigated.spend >= shocked.spend ? '+' : ''}₹${(mitigated.spend - shocked.spend).toLocaleString('en-IN')}`
+      deltaFormatted: `${mitigated.spend >= shocked.spend ? '+' : ''}$${(mitigated.spend - shocked.spend).toLocaleString('en-US')}`
     },
     {
       label: 'Daily Impressions',
-      base: baseline.impressions.toLocaleString('en-IN'),
-      shock: shocked.impressions.toLocaleString('en-IN'),
-      mitigated: mitigated.impressions.toLocaleString('en-IN'),
+      base: baseline.impressions.toLocaleString('en-US'),
+      shock: shocked.impressions.toLocaleString('en-US'),
+      mitigated: mitigated.impressions.toLocaleString('en-US'),
       delta: mitigated.impressions - shocked.impressions,
-      deltaFormatted: `${mitigated.impressions >= shocked.impressions ? '+' : ''}${(mitigated.impressions - shocked.impressions).toLocaleString('en-IN')}`
+      deltaFormatted: `${mitigated.impressions >= shocked.impressions ? '+' : ''}${(mitigated.impressions - shocked.impressions).toLocaleString('en-US')}`
     },
     {
       label: 'Daily Clicks',
-      base: baseline.clicks.toLocaleString('en-IN'),
-      shock: shocked.clicks.toLocaleString('en-IN'),
-      mitigated: mitigated.clicks.toLocaleString('en-IN'),
+      base: baseline.clicks.toLocaleString('en-US'),
+      shock: shocked.clicks.toLocaleString('en-US'),
+      mitigated: mitigated.clicks.toLocaleString('en-US'),
       delta: mitigated.clicks - shocked.clicks,
-      deltaFormatted: `${mitigated.clicks >= shocked.clicks ? '+' : ''}${(mitigated.clicks - shocked.clicks).toLocaleString('en-IN')}`
+      deltaFormatted: `${mitigated.clicks >= shocked.clicks ? '+' : ''}${(mitigated.clicks - shocked.clicks).toLocaleString('en-US')}`
     },
     {
       label: 'Daily Conversions (Orders)',
-      base: baseline.conversions.toLocaleString('en-IN'),
-      shock: shocked.conversions.toLocaleString('en-IN'),
-      mitigated: mitigated.conversions.toLocaleString('en-IN'),
+      base: baseline.conversions.toLocaleString('en-US'),
+      shock: shocked.conversions.toLocaleString('en-US'),
+      mitigated: mitigated.conversions.toLocaleString('en-US'),
       delta: mitigated.conversions - shocked.conversions,
-      deltaFormatted: `${mitigated.conversions >= shocked.conversions ? '+' : ''}${(mitigated.conversions - shocked.conversions).toLocaleString('en-IN')}`
+      deltaFormatted: `${mitigated.conversions >= shocked.conversions ? '+' : ''}${(mitigated.conversions - shocked.conversions).toLocaleString('en-US')}`
     },
     {
       label: 'Gross Daily Revenue',
-      base: `₹${baseline.revenue.toLocaleString('en-IN')}`,
-      shock: `₹${shocked.revenue.toLocaleString('en-IN')}`,
-      mitigated: `₹${mitigated.revenue.toLocaleString('en-IN')}`,
+      base: `$${baseline.revenue.toLocaleString('en-US')}`,
+      shock: `$${shocked.revenue.toLocaleString('en-US')}`,
+      mitigated: `$${mitigated.revenue.toLocaleString('en-US')}`,
       delta: mitigated.revenue - shocked.revenue,
-      deltaFormatted: `${mitigated.revenue >= shocked.revenue ? '+' : ''}₹${(mitigated.revenue - shocked.revenue).toLocaleString('en-IN')}`
+      deltaFormatted: `${mitigated.revenue >= shocked.revenue ? '+' : ''}$${(mitigated.revenue - shocked.revenue).toLocaleString('en-US')}`
     },
     {
       label: 'Channel ROAS',
@@ -66,11 +66,11 @@ export function SimulationResultsMatrix({
     },
     {
       label: 'Net Contribution Margin',
-      base: `₹${baseline.margin.toLocaleString('en-IN')}`,
-      shock: `₹${shocked.margin.toLocaleString('en-IN')}`,
-      mitigated: `₹${mitigated.margin.toLocaleString('en-IN')}`,
+      base: `$${baseline.margin.toLocaleString('en-US')}`,
+      shock: `$${shocked.margin.toLocaleString('en-US')}`,
+      mitigated: `$${mitigated.margin.toLocaleString('en-US')}`,
       delta: mitigated.margin - shocked.margin,
-      deltaFormatted: `${mitigated.margin >= shocked.margin ? '+' : ''}₹${(mitigated.margin - shocked.margin).toLocaleString('en-IN')}`
+      deltaFormatted: `${mitigated.margin >= shocked.margin ? '+' : ''}$${(mitigated.margin - shocked.margin).toLocaleString('en-US')}`
     }
   ];
 

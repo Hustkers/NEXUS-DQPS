@@ -26,19 +26,19 @@ export function SimulationImpactChart({
 
   const chartData = [
     {
-      metric: 'Daily Spend (₹)',
+      metric: 'Daily Spend ($)',
       Baseline: baseline.spend,
       Shocked: shocked.spend,
       Mitigated: mitigated.spend
     },
     {
-      metric: 'Daily Revenue (₹)',
+      metric: 'Daily Revenue ($)',
       Baseline: baseline.revenue,
       Shocked: shocked.revenue,
       Mitigated: mitigated.revenue
     },
     {
-      metric: 'Daily Margin (₹)',
+      metric: 'Daily Margin ($)',
       Baseline: baseline.margin,
       Shocked: shocked.margin,
       Mitigated: mitigated.margin
@@ -50,7 +50,7 @@ export function SimulationImpactChart({
       <div className='flex items-center justify-between border-b border-border/60 pb-3'>
         <div>
           <h4 className='text-xs font-bold uppercase tracking-wider text-foreground'>
-            Policy Impact Comparison (₹)
+            Policy Impact Comparison ($)
           </h4>
           <p className='text-[10px] text-muted-foreground'>
             Baseline vs Shocked (No Action) vs Mitigated Strategy
@@ -86,7 +86,7 @@ export function SimulationImpactChart({
               tickLine={false}
               axisLine={false}
               tick={{ fill: '#71717a', fontSize: 10 }}
-              tickFormatter={(v) => `₹${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
+              tickFormatter={(v) => `$${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
             />
             <Tooltip
               cursor={{ fill: 'rgba(16, 185, 129, 0.05)' }}
@@ -101,16 +101,16 @@ export function SimulationImpactChart({
                         <div className='flex justify-between gap-4 text-muted-foreground'>
                           <span>Baseline:</span>
                           <span className='font-medium text-foreground'>
-                            ₹{Number(payload[0]?.value ?? 0).toLocaleString('en-IN')}
+                            ${Number(payload[0]?.value ?? 0).toLocaleString('en-US')}
                           </span>
                         </div>
                         <div className='flex justify-between gap-4 text-rose-500 font-semibold'>
                           <span>Shocked:</span>
-                          <span>₹{Number(payload[1]?.value ?? 0).toLocaleString('en-IN')}</span>
+                          <span>${Number(payload[1]?.value ?? 0).toLocaleString('en-US')}</span>
                         </div>
                         <div className='flex justify-between gap-4 text-emerald-600 dark:text-emerald-400 font-bold'>
                           <span>Mitigated:</span>
-                          <span>₹{Number(payload[2]?.value ?? 0).toLocaleString('en-IN')}</span>
+                          <span>${Number(payload[2]?.value ?? 0).toLocaleString('en-US')}</span>
                         </div>
                       </div>
                     </div>

@@ -360,10 +360,10 @@ def generate_state():
         target_name = NIKE_PRODUCTS.get(target_sku, {}).get("name", target_sku)
 
         if is_kill:
-            reason = f"Inventory Stockout Kill-Switch: Zero warehouse units remaining for {target_name}. Spend throttled to ₹0 to stop margin drain."
+            reason = f"Inventory Stockout Kill-Switch: Zero warehouse units remaining for {target_name}. Spend throttled to $0 to stop margin drain."
             action_type = "EMERGENCY_THROTTLE"
         elif delta > 0:
-            reason = f"High Marginal ROAS: {target_name} demonstrates superior response curve convexity (+₹{exp_margin:.0f}/day contribution) with strong inventory."
+            reason = f"High Marginal ROAS: {target_name} demonstrates superior response curve convexity (+${exp_margin:.0f}/day contribution) with strong inventory."
             action_type = "SCALE_CAPITAL"
         else:
             reason = f"Diminishing Returns: Channel approaching saturation knee. Capital redirected to higher-yield footwear models."
@@ -391,7 +391,7 @@ def generate_state():
         {
             "id": "ledg-1",
             "timestamp": "2026-10-06 14:32:10",
-            "decision": "Shift ₹1,55,400/day from meta-315122-001 (Nike Air Force 1 stockout) -> google-CD4371-001 (React Infinity Flyknit)",
+            "decision": "Shift $1,55,400/day from meta-315122-001 (Nike Air Force 1 stockout) -> google-CD4371-001 (React Infinity Flyknit)",
             "expectedMargin": 289800.0,
             "realizedMargin": 303282.0,
             "variancePct": 4.7,
@@ -403,7 +403,7 @@ def generate_state():
         {
             "id": "ledg-2",
             "timestamp": "2026-10-05 09:15:00",
-            "decision": "Scale tiktok-AH8050-100 (Nike Air Max 270) budget +₹77,280/day on viral footwear trend",
+            "decision": "Scale tiktok-AH8050-100 (Nike Air Max 270) budget +$77,280/day on viral footwear trend",
             "expectedMargin": 571200.0,
             "realizedMargin": 553560.0,
             "variancePct": -3.1,
@@ -415,7 +415,7 @@ def generate_state():
         {
             "id": "ledg-3",
             "timestamp": "2026-10-04 18:45:22",
-            "decision": "Throttle amazon-849559-004 (Air Max 2017) spend -₹54,600/day due to competitor footwear discount",
+            "decision": "Throttle amazon-849559-004 (Air Max 2017) spend -$54,600/day due to competitor footwear discount",
             "expectedMargin": 117600.0,
             "realizedMargin": 115500.0,
             "variancePct": -1.8,
@@ -433,17 +433,17 @@ def generate_state():
             "name": "Hero Air Force 1 '07 Stockout Shock",
             "description": "Top-selling hero shoe (Nike Air Force 1 '07, 65% gross margin) runs out of warehouse inventory. Ad spend keeps driving traffic to an empty product page.",
             "injectedEvent": "ERP inventory reaches 0 on SKU 315122-001",
-            "autonomousResponse": "Stockout Kill-Switch activates in <15 mins. Spend throttled -₹1,84,800/day and diverted to Google Shopping React Infinity Flyknit (+3.6x ROAS).",
-            "expectedSavedWaste": "₹12,93,600 / week",
+            "autonomousResponse": "Stockout Kill-Switch activates in <15 mins. Spend throttled -$1,84,800/day and diverted to Google Shopping React Infinity Flyknit (+3.6x ROAS).",
+            "expectedSavedWaste": "$12,93,600 / week",
             "severity": "CRITICAL"
         },
         {
             "id": "scenario-cpm-spike",
             "name": "Meta Footwear Auction CPM Surge (+45%)",
-            "description": "Holiday sneaker flash sales drive Meta Advantage+ CPM from ₹798 to ₹1,192, compressing ROAS below the 1.8x break-even floor.",
+            "description": "Holiday sneaker flash sales drive Meta Advantage+ CPM from $798 to $1,192, compressing ROAS below the 1.8x break-even floor.",
             "injectedEvent": "Meta network sneaker auction inflation +45%",
-            "autonomousResponse": "ROAS drops below break-even. Engine pulls ₹2,94,000/day from Meta and redistributes to Amazon Sponsored Products & Google PMax.",
-            "expectedSavedWaste": "₹7,72,800 / week",
+            "autonomousResponse": "ROAS drops below break-even. Engine pulls $2,94,000/day from Meta and redistributes to Amazon Sponsored Products & Google PMax.",
+            "expectedSavedWaste": "$7,72,800 / week",
             "severity": "HIGH"
         },
         {
@@ -452,7 +452,7 @@ def generate_state():
             "description": "Hero sneaker UGC video frequency exceeds 5.2. Hook rate collapses, CTR drops 60%, and customer acquisition cost (CAC) doubles.",
             "injectedEvent": "Creative fatigue wear-out on TikTok UGC batch #4",
             "autonomousResponse": "Auto-pauses exhausted ad set, triggers creative refresh alert to Nike design studio, and reroutes spend to high-vitality Meta Reels.",
-            "expectedSavedWaste": "₹4,36,800 / week",
+            "expectedSavedWaste": "$4,36,800 / week",
             "severity": "MEDIUM"
         },
         {
@@ -461,7 +461,7 @@ def generate_state():
             "description": "Rival footwear seller launches aggressive 25% price drop on Amazon, lowering Nike Zoom Fly conversion rate from 4.8% to 2.8%.",
             "injectedEvent": "Marketplace conversion rate drops -35%",
             "autonomousResponse": "Optimizer re-solves scipy convex problem: shifts capital to Nike Direct Brand Search where gross margins are preserved at 68%.",
-            "expectedSavedWaste": "₹5,71,200 / week",
+            "expectedSavedWaste": "$5,71,200 / week",
             "severity": "MEDIUM"
         }
     ]

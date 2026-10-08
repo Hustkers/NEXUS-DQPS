@@ -12,26 +12,28 @@ export interface GithubGlobeProps {
   size?: number; // Fixed size in px (default 420px)
 }
 
+// Grounded in DATASET.MD §5.1 Regional Warehouse Distribution Matrix
 const DEFAULT_MARKERS: Marker[] = [
-  { location: [37.7749, -122.4194], size: 0.038, color: [1.0, 1.0, 1.0] }, // SF (Meta HQ / US-West)
-  { location: [40.7128, -74.006], size: 0.035, color: [1.0, 1.0, 1.0] }, // NY (Google Ads / US-East)
-  { location: [51.5074, -0.1278], size: 0.032, color: [0.65, 0.65, 0.65] }, // London (EMEA Hub)
-  { location: [35.6762, 139.6503], size: 0.035, color: [0.65, 0.65, 0.65] }, // Tokyo (APAC Hub)
-  { location: [1.3521, 103.8198], size: 0.032, color: [0.65, 0.65, 0.65] }, // Singapore (TikTok SEA)
-  { location: [19.076, 72.8777], size: 0.032, color: [0.65, 0.65, 0.65] }, // Mumbai (India Direct)
-  { location: [50.1109, 8.6821], size: 0.03, color: [0.65, 0.65, 0.65] }, // Frankfurt (EU Central)
-  { location: [-33.8688, 151.2093], size: 0.03, color: [0.65, 0.65, 0.65] }, // Sydney (Oceania)
+  { location: [40.6023, -75.4714], size: 0.045, color: [1.0, 1.0, 1.0] }, // FC-EAST-ALLENTOWN (Allentown, PA)
+  { location: [34.0633, -117.6509], size: 0.045, color: [1.0, 1.0, 1.0] }, // FC-WEST-ONTARIO (Ontario, CA)
+  { location: [51.0833, 5.0167], size: 0.038, color: [0.85, 0.85, 0.85] }, // FC-EU-LAAKDAL (Laakdal, BE)
+  { location: [52.2575, -1.1628], size: 0.038, color: [0.85, 0.85, 0.85] }, // FC-EU-DAVENTRY (Daventry, UK)
+  { location: [35.772, 140.3929], size: 0.038, color: [0.85, 0.85, 0.85] }, // FC-APAC-NARITA (Chiba, JP)
+  { location: [1.3644, 103.9915], size: 0.035, color: [0.75, 0.75, 0.75] }, // FC-SEA-CHANGI (Singapore)
+  { location: [-23.5505, -46.6333], size: 0.035, color: [0.75, 0.75, 0.75] }, // FC-LATAM-SAOPAULO (São Paulo, BR)
+  { location: [39.0438, -77.4874], size: 0.032, color: [0.65, 0.65, 0.65] }, // Ad Exchange Edge (Ashburn PoP)
 ];
 
+// Delivery routes from Ad Exchange PoPs to Regional Catchments & Cross-Country Zone 8 Routes
 const DEFAULT_ARCS: Arc[] = [
-  { from: [37.7749, -122.4194], to: [40.7128, -74.006] }, // SF -> NY
-  { from: [40.7128, -74.006], to: [51.5074, -0.1278] }, // NY -> London
-  { from: [51.5074, -0.1278], to: [50.1109, 8.6821] }, // London -> Frankfurt
-  { from: [50.1109, 8.6821], to: [19.076, 72.8777] }, // Frankfurt -> Mumbai
-  { from: [19.076, 72.8777], to: [1.3521, 103.8198] }, // Mumbai -> Singapore
-  { from: [1.3521, 103.8198], to: [35.6762, 139.6503] }, // Singapore -> Tokyo
-  { from: [35.6762, 139.6503], to: [37.7749, -122.4194] }, // Tokyo -> SF (Trans-Pacific)
-  { from: [1.3521, 103.8198], to: [-33.8688, 151.2093] }, // Singapore -> Sydney
+  { from: [39.0438, -77.4874], to: [40.6023, -75.4714] }, // Ashburn -> FC-EAST-ALLENTOWN
+  { from: [39.0438, -77.4874], to: [34.0633, -117.6509] }, // Ashburn -> FC-WEST-ONTARIO
+  { from: [34.0633, -117.6509], to: [40.6023, -75.4714] }, // Zone 8 Cross-Country Route (Freight Penalty -$13.70)
+  { from: [40.6023, -75.4714], to: [52.2575, -1.1628] }, // Transatlantic -> FC-EU-DAVENTRY
+  { from: [52.2575, -1.1628], to: [51.0833, 5.0167] }, // UK -> FC-EU-LAAKDAL
+  { from: [34.0633, -117.6509], to: [35.772, 140.3929] }, // Transpacific -> FC-APAC-NARITA
+  { from: [35.772, 140.3929], to: [1.3644, 103.9915] }, // Japan -> FC-SEA-CHANGI
+  { from: [40.6023, -75.4714], to: [-23.5505, -46.6333] }, // Pan-American -> FC-LATAM-SAOPAULO
 ];
 
 export function GithubGlobe({

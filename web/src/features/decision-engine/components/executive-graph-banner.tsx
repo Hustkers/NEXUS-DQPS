@@ -161,8 +161,8 @@ export function ExecutiveGraphBanner({
       title: '30D Ad Spend',
       badge: '79% Pace',
       badgeSeverity: 'info',
-      value: `₹${((state.telemetry?.totalSpend30d || currentSpend) / 1000).toFixed(1)}k`,
-      subtext: `Cap: ₹${((state.telemetry?.totalManagedBudget || 630000) / 1000).toFixed(0)}k`,
+      value: `$${((state.telemetry?.totalSpend30d || currentSpend) / 1000).toFixed(1)}k`,
+      subtext: `Cap: $${((state.telemetry?.totalManagedBudget || 630000) / 1000).toFixed(0)}k`,
       footerLabel: 'SLSQP Budget Cap',
       footerValue: 'Optimal',
       footerSeverity: 'info',
@@ -170,7 +170,7 @@ export function ExecutiveGraphBanner({
       color: '#3b82f6',
       gradientId: 'sparkSpend',
       referenceLineY: undefined,
-      unit: '₹',
+      unit: '$',
       precision: 0,
       curveType: 'monotone' as const
     },
@@ -179,7 +179,7 @@ export function ExecutiveGraphBanner({
       title: 'Contribution Margin',
       badge: `POAS ${currentPoas.toFixed(2)}x`,
       badgeSeverity: 'cyan',
-      value: `₹${((state.telemetry?.totalMargin30d || currentMargin) / 1000).toFixed(1)}k`,
+      value: `$${((state.telemetry?.totalMargin30d || currentMargin) / 1000).toFixed(1)}k`,
       subtext: '56.8% Gross',
       footerLabel: 'Breakeven: 1.00x',
       footerValue: '+192% Net Margin',
@@ -188,7 +188,7 @@ export function ExecutiveGraphBanner({
       color: '#06b6d4',
       gradientId: 'sparkMargin',
       referenceLineY: undefined,
-      unit: '₹',
+      unit: '$',
       precision: 0,
       curveType: 'monotone' as const
     },
@@ -197,8 +197,8 @@ export function ExecutiveGraphBanner({
       title: 'Protected Lift',
       badge: `${state.telemetry?.activeAnomaliesCount || 0} Anomalies`,
       badgeSeverity: 'purple',
-      value: `+₹${((state.telemetry?.projectedMarginUplift || 84300) / 1000).toFixed(1)}k`,
-      subtext: `Shift: ₹${((state.telemetry?.reallocationCapitalMoved || 142000) / 1000).toFixed(0)}k`,
+      value: `+$${((state.telemetry?.projectedMarginUplift || 84300) / 1000).toFixed(1)}k`,
+      subtext: `Shift: $${((state.telemetry?.reallocationCapitalMoved || 142000) / 1000).toFixed(0)}k`,
       footerLabel: 'CBwK Bandits',
       footerValue: 'Self-Healing',
       footerSeverity: 'purple',
@@ -206,7 +206,7 @@ export function ExecutiveGraphBanner({
       color: '#a855f7',
       gradientId: 'sparkLift',
       referenceLineY: undefined,
-      unit: '+₹',
+      unit: '+$',
       precision: 0,
       curveType: 'monotone' as const
     },
@@ -509,7 +509,7 @@ export function ExecutiveGraphBanner({
                       className='opacity-50 text-[10px]'
                       tickLine={false}
                       fontFamily='monospace'
-                      tickFormatter={(v) => `₹${Math.round(v / 1000)}k`}
+                      tickFormatter={(v) => `$${Math.round(v / 1000)}k`}
                     />
                     <Tooltip
                       content={({ active, payload, label }) => {
@@ -529,7 +529,7 @@ export function ExecutiveGraphBanner({
                                     {p.name}:
                                   </span>
                                   <span className='font-bold text-foreground'>
-                                    ₹{p.value?.toLocaleString()}
+                                    ${p.value?.toLocaleString()}
                                   </span>
                                 </div>
                               ))}
@@ -591,7 +591,7 @@ export function ExecutiveGraphBanner({
                       }
                       tickFormatter={(v) =>
                         expandedMetric === 'lift'
-                          ? `₹${Math.round(v / 1000)}k`
+                          ? `$${Math.round(v / 1000)}k`
                           : expandedMetric === 'stock'
                           ? `${v}%`
                           : `${v}x`
@@ -649,7 +649,7 @@ export function ExecutiveGraphBanner({
                                 </span>
                                 <span className='font-bold text-foreground'>
                                   {expandedMetric === 'lift'
-                                    ? `+₹${p.value?.toLocaleString()}`
+                                    ? `+$${p.value?.toLocaleString()}`
                                     : expandedMetric === 'stock'
                                     ? `${p.value}%`
                                     : `${p.value}x`}

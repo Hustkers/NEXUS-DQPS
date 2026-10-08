@@ -60,7 +60,7 @@ def main():
         spend = g["spend"].sum()
         rev = g["revenue"].sum()
         roas = rev / max(spend, 1e-6)
-        print(f"│ {p.capitalize():<12} │ {len(g):<8} │ ₹{spend:>10,.2f} │ ₹{rev:>10,.2f} │ {roas:>10.2f}x │")
+        print(f"│ {p.capitalize():<12} │ {len(g):<8} │ ${spend:>10,.2f} │ ${rev:>10,.2f} │ {roas:>10.2f}x │")
     print("└──────────────┴──────────┴──────────────┴──────────────┴──────────────┘\n")
 
     # Save to metrics.csv & DuckDB

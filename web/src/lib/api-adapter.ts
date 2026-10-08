@@ -52,7 +52,7 @@ export async function fetchActiveAnomalies(): Promise<any[]> {
         roas: 0.2,
         spend: 800,
         inventory: 0,
-        explanation: 'Stock level dropped to 0 in Shopify while Meta retargeting ad spend burned ₹800 with 0 conversions.',
+        explanation: 'Stock level dropped to 0 in Shopify while Meta retargeting ad spend burned $800 with 0 conversions.',
         factors: [
           { name: 'Inventory Stockout', deltaPct: -100, impactPts: -66.0, badge: 'Stockout', color: 'rose' },
           { name: 'Conversion Collapse', deltaPct: -95, impactPts: -24.0, badge: 'CVR Drop', color: 'rose' },
@@ -163,5 +163,22 @@ export async function fetchVertexAiStatus(): Promise<VertexAiStatus> {
       last_used_provider: 'Google Cloud Vertex AI',
       last_used_model: 'gemini-3.8-flash',
     };
+  }
+}
+
+export async function generateAiContent(
+  prompt: string,
+  systemInstruction?: string
+): Promise<{ content: string; model: string; provider: string } | null> {
+  try {
+    const res = await fetch(`${FASTAPI_BASE_URL}/api/v1/ai/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, system_instruction: systemInstruction }),
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
   }
 }

@@ -561,6 +561,13 @@ export interface RecentPurchase {
   channel: 'meta' | 'google' | 'amazon' | 'shopify';
   channelLabel: string;
   fulfillmentHub: string;
+  // DATASET.MD §5 Physical Logistics & Privacy-Safe Zero-GPS Telemetry
+  freightZone?: 'Zone 2 (Local)' | 'Zone 8 (Cross-Country)';
+  freightCost?: number;
+  freightPenalty?: number; // e.g. -13.70 for Zone 8
+  isZoneSkipping?: boolean;
+  edgePop?: string; // Edge IATA PoP: EWR, SFO, LHR, NRT, SIN
+  subnetMasked?: string; // Masked /24 CIDR prefix under GDPR Recital 30
 }
 
 /**
@@ -582,6 +589,12 @@ export const ALL_RECENT_PURCHASES: RecentPurchase[] = [
     channel: 'meta',
     channelLabel: 'Meta Adv+',
     fulfillmentHub: 'FC-EAST-ALLENTOWN',
+    freightZone: 'Zone 2 (Local)',
+    freightCost: 4.80,
+    freightPenalty: 0.00,
+    isZoneSkipping: false,
+    edgePop: 'EWR',
+    subnetMasked: '198.51.100.14/24',
   },
   {
     id: 'ord-us-2',
@@ -596,6 +609,12 @@ export const ALL_RECENT_PURCHASES: RecentPurchase[] = [
     channel: 'meta',
     channelLabel: 'Meta Adv+',
     fulfillmentHub: 'FC-EAST-ALLENTOWN',
+    freightZone: 'Zone 2 (Local)',
+    freightCost: 4.80,
+    freightPenalty: 0.00,
+    isZoneSkipping: false,
+    edgePop: 'ORD',
+    subnetMasked: '198.51.100.82/24',
   },
   {
     id: 'ord-us-3',
@@ -609,7 +628,13 @@ export const ALL_RECENT_PURCHASES: RecentPurchase[] = [
     timeAgo: '4m ago',
     channel: 'google',
     channelLabel: 'Google PMax',
-    fulfillmentHub: 'FC-EAST-ALLENTOWN',
+    fulfillmentHub: 'FC-WEST-ONTARIO (Cross-Zone)',
+    freightZone: 'Zone 8 (Cross-Country)',
+    freightCost: 18.50,
+    freightPenalty: -13.70,
+    isZoneSkipping: true,
+    edgePop: 'ATL',
+    subnetMasked: '198.51.100.105/24',
   },
   {
     id: 'ord-us-4',
@@ -624,6 +649,12 @@ export const ALL_RECENT_PURCHASES: RecentPurchase[] = [
     channel: 'shopify',
     channelLabel: 'Shopify Direct',
     fulfillmentHub: 'FC-EAST-ALLENTOWN',
+    freightZone: 'Zone 2 (Local)',
+    freightCost: 4.80,
+    freightPenalty: 0.00,
+    isZoneSkipping: false,
+    edgePop: 'BOS',
+    subnetMasked: '198.51.100.56/24',
   },
   {
     id: 'ord-us-5',
@@ -637,7 +668,13 @@ export const ALL_RECENT_PURCHASES: RecentPurchase[] = [
     timeAgo: '9m ago',
     channel: 'meta',
     channelLabel: 'Meta Adv+',
-    fulfillmentHub: 'FC-EAST-ALLENTOWN',
+    fulfillmentHub: 'FC-WEST-ONTARIO (Cross-Zone)',
+    freightZone: 'Zone 8 (Cross-Country)',
+    freightCost: 18.50,
+    freightPenalty: -13.70,
+    isZoneSkipping: true,
+    edgePop: 'MIA',
+    subnetMasked: '198.51.100.211/24',
   },
 
   // 2. US West Hub Catchment
@@ -654,6 +691,12 @@ export const ALL_RECENT_PURCHASES: RecentPurchase[] = [
     channel: 'amazon',
     channelLabel: 'Amazon SP',
     fulfillmentHub: 'FC-WEST-ONTARIO',
+    freightZone: 'Zone 2 (Local)',
+    freightCost: 4.80,
+    freightPenalty: 0.00,
+    isZoneSkipping: false,
+    edgePop: 'LAX',
+    subnetMasked: '198.51.100.33/24',
   },
   {
     id: 'ord-usw-2',
@@ -668,6 +711,12 @@ export const ALL_RECENT_PURCHASES: RecentPurchase[] = [
     channel: 'amazon',
     channelLabel: 'Amazon SP',
     fulfillmentHub: 'FC-WEST-ONTARIO',
+    freightZone: 'Zone 2 (Local)',
+    freightCost: 4.80,
+    freightPenalty: 0.00,
+    isZoneSkipping: false,
+    edgePop: 'SFO',
+    subnetMasked: '198.51.100.77/24',
   },
   {
     id: 'ord-usw-3',
@@ -681,7 +730,13 @@ export const ALL_RECENT_PURCHASES: RecentPurchase[] = [
     timeAgo: '5m ago',
     channel: 'google',
     channelLabel: 'Google PMax',
-    fulfillmentHub: 'FC-WEST-ONTARIO',
+    fulfillmentHub: 'FC-EAST-ALLENTOWN (Cross-Zone)',
+    freightZone: 'Zone 8 (Cross-Country)',
+    freightCost: 18.50,
+    freightPenalty: -13.70,
+    isZoneSkipping: true,
+    edgePop: 'SEA',
+    subnetMasked: '198.51.100.190/24',
   },
   {
     id: 'ord-usw-4',
@@ -696,6 +751,12 @@ export const ALL_RECENT_PURCHASES: RecentPurchase[] = [
     channel: 'shopify',
     channelLabel: 'Shopify Direct',
     fulfillmentHub: 'FC-WEST-ONTARIO',
+    freightZone: 'Zone 2 (Local)',
+    freightCost: 4.80,
+    freightPenalty: 0.00,
+    isZoneSkipping: false,
+    edgePop: 'PHX',
+    subnetMasked: '198.51.100.12/24',
   },
 
   // 3. Western Europe Catchment
@@ -712,6 +773,12 @@ export const ALL_RECENT_PURCHASES: RecentPurchase[] = [
     channel: 'shopify',
     channelLabel: 'Shopify Direct',
     fulfillmentHub: 'FC-EU-DAVENTRY',
+    freightZone: 'Zone 2 (Local)',
+    freightCost: 4.80,
+    freightPenalty: 0.00,
+    isZoneSkipping: false,
+    edgePop: 'LHR',
+    subnetMasked: '198.51.100.41/24',
   },
   {
     id: 'ord-eu-2',
@@ -726,6 +793,12 @@ export const ALL_RECENT_PURCHASES: RecentPurchase[] = [
     channel: 'google',
     channelLabel: 'Google Shopping',
     fulfillmentHub: 'FC-EU-LAAKDAL',
+    freightZone: 'Zone 2 (Local)',
+    freightCost: 4.80,
+    freightPenalty: 0.00,
+    isZoneSkipping: false,
+    edgePop: 'CDG',
+    subnetMasked: '198.51.100.99/24',
   },
   {
     id: 'ord-eu-3',

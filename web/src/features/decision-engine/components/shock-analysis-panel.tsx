@@ -390,7 +390,7 @@ export function ShockAnalysisPanel({ scenarioId, onClose, onReset }: ShockAnalys
                   axisLine={false}
                   tick={{ fill: '#71717a', fontSize: 10 }}
                   tickFormatter={(value) =>
-                    `₹${value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value}`
+                    `$${value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value}`
                   }
                 />
                 <Tooltip

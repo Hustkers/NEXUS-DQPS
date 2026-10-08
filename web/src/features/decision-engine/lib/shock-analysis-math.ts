@@ -109,26 +109,21 @@ function safeRoas(revenue: number, spend: number): number {
   return spend > 0 ? revenue / spend : 0;
 }
 
-function groupIndianDigits(whole: string): string {
-  if (whole.length <= 3) return whole;
-  const last3 = whole.slice(-3);
-  let rest = whole.slice(0, -3);
-  const groups: string[] = [];
-  while (rest.length > 2) {
-    groups.unshift(rest.slice(-2));
-    rest = rest.slice(0, -2);
-  }
-  if (rest.length > 0) groups.unshift(rest);
-  return `${groups.join(',')},${last3}`;
+function groupDigits(whole: string): string {
+  return whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
-/** ₹12,34,567.89 — deterministic Indian-grouped rupee formatting. */
-export function formatInr(value: number): string {
+/** $1,234,567.89 — deterministic USD formatting. */
+export function formatUSD(value: number): string {
   const rounded = round2(value);
   const sign = rounded < 0 ? '-' : '';
   const parts = Math.abs(rounded).toFixed(2).split('.');
-  return `${sign}₹${groupIndianDigits(parts[0])}.${parts[1]}`;
+  return `${sign}$${groupDigits(parts[0])}.${parts[1]}`;
 }
+
+/** Backward compatibility alias pointing to formatUSD. */
+export const formatInr = formatUSD;
+export const formatCurrency = formatUSD;
 
 // ---------------------------------------------------------------------------
 // Three-state campaign model: baseline → shocked → mitigated
@@ -220,7 +215,7 @@ interface CapitalPlan {
   recoveredDailyMargin: number;
   sourceSpendCutDaily: number;
   heldDaily: number;
-  /** FUND_SHIFT trims: campaign name → ₹/day cut. */
+  /** FUND_SHIFT trims: campaign name → $/day cut. */
   cutByCampaign: ReadonlyMap<string, number>;
   /** Worst-yield source trimmed first (FUND_SHIFT narrative). */
   primarySource: RawCampaign | null;

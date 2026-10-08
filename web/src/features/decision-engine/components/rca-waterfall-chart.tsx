@@ -67,7 +67,7 @@ export function RcaWaterfallChart({ items, totalLoss = 3008.25 }: RcaWaterfallCh
         <div className="text-right">
           <span className="text-xs text-muted-foreground block font-mono">Observed Margin Loss</span>
           <span className="text-sm font-mono font-bold bg-foreground text-background px-1.5 py-0.5 rounded inline-block mt-0.5">
-            -₹{totalLoss.toLocaleString()}
+            -${totalLoss.toLocaleString()}
           </span>
         </div>
       </div>

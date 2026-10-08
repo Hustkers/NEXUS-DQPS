@@ -46,7 +46,7 @@ export function SimulationDataLineage({
         <div>
           <span className='text-muted-foreground block text-[10px] uppercase'>Daily Spend Baseline</span>
           <span className='font-semibold text-foreground'>
-            ₹{lineage.baselineSpendDaily.toLocaleString('en-IN')}/day
+            ${lineage.baselineSpendDaily.toLocaleString('en-US')}/day
           </span>
         </div>
 

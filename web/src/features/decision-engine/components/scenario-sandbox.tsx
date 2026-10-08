@@ -128,9 +128,9 @@ function CurveTooltip({ active, payload }: CurveTooltipProps) {
   const d = payload[0].payload;
   return (
     <div className='rounded-lg border border-border bg-popover/95 p-2.5 shadow-xl font-mono text-xs text-popover-foreground'>
-      <div className='text-muted-foreground text-[10px]'>Spend: ₹{d.spend.toLocaleString()}</div>
-      <div className='text-cyan-400 font-bold'>Projected Revenue: ₹{d.revenue.toLocaleString()}</div>
-      <div className='text-emerald-400 font-semibold'>Net Margin: ₹{d.margin.toLocaleString()}</div>
+      <div className='text-muted-foreground text-[10px]'>Spend: ${d.spend.toLocaleString()}</div>
+      <div className='text-cyan-400 font-bold'>Projected Revenue: ${d.revenue.toLocaleString()}</div>
+      <div className='text-emerald-400 font-semibold'>Net Margin: ${d.margin.toLocaleString()}</div>
     </div>
   );
 }
@@ -146,8 +146,8 @@ function BreakdownTooltip({ active, payload }: BreakdownTooltipProps) {
   return (
     <div className='rounded-lg border border-border bg-popover/95 p-2.5 shadow-xl font-mono text-xs text-popover-foreground space-y-1'>
       <div className='font-bold text-foreground'>{d.channel}</div>
-      <div className='text-muted-foreground text-[10px]'>Spend: ₹{d['Current Spend']} → ₹{d['Scenario Spend']}</div>
-      <div className='text-cyan-400 font-semibold'>Revenue: ₹{d['Current Revenue']} → ₹{d['Scenario Revenue']}</div>
+      <div className='text-muted-foreground text-[10px]'>Spend: ${d['Current Spend']} → ${d['Scenario Spend']}</div>
+      <div className='text-cyan-400 font-semibold'>Revenue: ${d['Current Revenue']} → ${d['Scenario Revenue']}</div>
     </div>
   );
 }
@@ -265,7 +265,7 @@ export function ScenarioSandbox({
 
     if (metaSpend > 0) {
       reasons.push(
-        `Allocated ₹${metaSpend}/d to Meta Ads despite warehouse stockout (0 units on Nike Air Force 1 '07) — elevates CAC and conversion drop risk.`
+        `Allocated $${metaSpend}/d to Meta Ads despite warehouse stockout (0 units on Nike Air Force 1 '07) — elevates CAC and conversion drop risk.`
       );
     } else {
       reasons.push('Maintained 0 spend on Meta Ads to eliminate non-converting inventory bleed.');
@@ -274,32 +274,32 @@ export function ScenarioSandbox({
     if (googleSpend > baseline.google) {
       const gLift = scenario.googleRev - baseline.googleRev;
       reasons.push(
-        `Scaled Google Search (+₹${googleSpend - baseline.google}/d) capturing high-intent search queries (+₹${Math.round(gLift)}/d revenue headroom).`
+        `Scaled Google Search (+$${googleSpend - baseline.google}/d) capturing high-intent search queries (+$${Math.round(gLift)}/d revenue headroom).`
       );
     } else if (googleSpend < baseline.google) {
       reasons.push(
-        `Trimmed Google Search (-₹${baseline.google - googleSpend}/d) preventing diminishing returns near the saturation knee.`
+        `Trimmed Google Search (-$${baseline.google - googleSpend}/d) preventing diminishing returns near the saturation knee.`
       );
     }
 
     if (amazonSpend > baseline.amazon) {
       const aLift = scenario.amazonRev - baseline.amazonRev;
       reasons.push(
-        `Boosted Amazon Sponsored Products (+₹${amazonSpend - baseline.amazon}/d) driving elastic bottom-funnel purchases on Air Jordan 10 (+₹${Math.round(aLift)}/d revenue).`
+        `Boosted Amazon Sponsored Products (+$${amazonSpend - baseline.amazon}/d) driving elastic bottom-funnel purchases on Air Jordan 10 (+$${Math.round(aLift)}/d revenue).`
       );
     } else if (amazonSpend < baseline.amazon) {
       reasons.push(
-        `Reduced Amazon SP spend (-₹${baseline.amazon - amazonSpend}/d) preserving margin against auction bid competition.`
+        `Reduced Amazon SP spend (-$${baseline.amazon - amazonSpend}/d) preserving margin against auction bid competition.`
       );
     }
 
     if (deltaMargin > 0) {
       reasons.push(
-        `Portfolio net contribution margin expands by +₹${Math.round(deltaMargin).toLocaleString('en-IN')}/day (${pctMarginChange >= 0 ? '+' : ''}${pctMarginChange.toFixed(1)}%).`
+        `Portfolio net contribution margin expands by +$${Math.round(deltaMargin).toLocaleString('en-US')}/day (${pctMarginChange >= 0 ? '+' : ''}${pctMarginChange.toFixed(1)}%).`
       );
     } else if (deltaMargin < 0) {
       reasons.push(
-        `Portfolio net margin contracts by -₹${Math.abs(Math.round(deltaMargin)).toLocaleString('en-IN')}/day due to ad-spend saturation or unconstrained traffic burn.`
+        `Portfolio net margin contracts by -$${Math.abs(Math.round(deltaMargin)).toLocaleString('en-US')}/day due to ad-spend saturation or unconstrained traffic burn.`
       );
     }
 
@@ -324,7 +324,7 @@ export function ScenarioSandbox({
       };
 
       setAppliedVector({
-        timestamp: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
         financials: scenario,
         deltaRevenue,
         deltaMargin,
@@ -336,7 +336,7 @@ export function ScenarioSandbox({
       }
 
       toast.success('Applied Scenario Reallocation Vector', {
-        description: `Meta: ₹${metaSpend}/d • Google: ₹${googleSpend}/d • Amazon: ₹${amazonSpend}/d. Net Margin Lift: ${deltaMargin >= 0 ? '+' : ''}₹${Math.round(deltaMargin).toLocaleString('en-IN')}/d.`
+        description: `Meta: $${metaSpend}/d • Google: $${googleSpend}/d • Amazon: $${amazonSpend}/d. Net Margin Lift: ${deltaMargin >= 0 ? '+' : ''}$${Math.round(deltaMargin).toLocaleString('en-US')}/d.`
       });
     }, 850);
   };
@@ -348,7 +348,7 @@ export function ScenarioSandbox({
     setAmazonSpend(CHANNEL_MODELS.amazon.baselineSpend);
     setAppliedVector(null);
     toast.info('Sandbox Reset to Baseline Steady-State', {
-      description: 'Restored baseline steady-state allocations: Meta ₹0/d, Google ₹750/d, Amazon ₹625/d.'
+      description: 'Restored baseline steady-state allocations: Meta $0/d, Google $750/d, Amazon $625/d.'
     });
   };
 
@@ -431,10 +431,10 @@ export function ScenarioSandbox({
               Meta Ads
             </span>
             <div className='flex items-baseline gap-1.5'>
-              <span className='text-sm text-foreground font-bold'>₹{metaSpend.toLocaleString('en-IN')}/d</span>
+              <span className='text-sm text-foreground font-bold'>${metaSpend.toLocaleString('en-US')}/d</span>
               {metaSpend !== baseline.meta && (
                 <span className={`text-[10px] font-semibold ${metaSpend > baseline.meta ? 'text-amber-500' : 'text-emerald-500'}`}>
-                  {metaSpend > baseline.meta ? `+₹${metaSpend - baseline.meta}` : `-₹${baseline.meta - metaSpend}`}
+                  {metaSpend > baseline.meta ? `+$${metaSpend - baseline.meta}` : `-$${baseline.meta - metaSpend}`}
                 </span>
               )}
             </div>
@@ -451,16 +451,16 @@ export function ScenarioSandbox({
               className='w-full accent-blue-500 cursor-pointer h-1.5 bg-muted rounded-lg'
             />
             <div className='flex justify-between text-[10px] text-muted-foreground'>
-              <span>₹0/d</span>
-              <span>K = ₹850/d</span>
-              <span>₹1,500/d</span>
+              <span>$0/d</span>
+              <span>K = $850/d</span>
+              <span>$1,500/d</span>
             </div>
           </div>
 
           <div className='flex items-center justify-between text-[11px] pt-1 border-t border-border/60'>
             <div>
               <span className='text-muted-foreground text-[10px] block'>Forecasted Revenue</span>
-              <span className='font-bold text-foreground'>₹{Math.round(scenario.metaRev).toLocaleString('en-IN')}</span>
+              <span className='font-bold text-foreground'>${Math.round(scenario.metaRev).toLocaleString('en-US')}</span>
             </div>
             {metaSpend === 0 ? (
               <Badge variant='outline' className='text-[10px] font-mono border-border text-muted-foreground bg-muted/60'>
@@ -482,10 +482,10 @@ export function ScenarioSandbox({
               Google Search
             </span>
             <div className='flex items-baseline gap-1.5'>
-              <span className='text-sm text-foreground font-bold'>₹{googleSpend.toLocaleString('en-IN')}/d</span>
+              <span className='text-sm text-foreground font-bold'>${googleSpend.toLocaleString('en-US')}/d</span>
               {googleSpend !== baseline.google && (
                 <span className={`text-[10px] font-semibold ${googleSpend > baseline.google ? 'text-emerald-500' : 'text-amber-500'}`}>
-                  {googleSpend > baseline.google ? `+₹${googleSpend - baseline.google}` : `-₹${baseline.google - googleSpend}`}
+                  {googleSpend > baseline.google ? `+$${googleSpend - baseline.google}` : `-$${baseline.google - googleSpend}`}
                 </span>
               )}
             </div>
@@ -502,16 +502,16 @@ export function ScenarioSandbox({
               className='w-full accent-emerald-500 cursor-pointer h-1.5 bg-muted rounded-lg'
             />
             <div className='flex justify-between text-[10px] text-muted-foreground'>
-              <span>₹200/d</span>
-              <span>K = ₹1,250/d</span>
-              <span>₹1,500/d</span>
+              <span>$200/d</span>
+              <span>K = $1,250/d</span>
+              <span>$1,500/d</span>
             </div>
           </div>
 
           <div className='flex items-center justify-between text-[11px] pt-1 border-t border-border/60'>
             <div>
               <span className='text-muted-foreground text-[10px] block'>Forecasted Revenue</span>
-              <span className='font-bold text-foreground'>₹{Math.round(scenario.googleRev).toLocaleString('en-IN')}</span>
+              <span className='font-bold text-foreground'>${Math.round(scenario.googleRev).toLocaleString('en-US')}</span>
             </div>
             <Badge variant='outline' className='text-[10px] font-mono border-border text-foreground bg-muted/60'>
               In-Stock Hero (High Intent)
@@ -527,10 +527,10 @@ export function ScenarioSandbox({
               Amazon SP
             </span>
             <div className='flex items-baseline gap-1.5'>
-              <span className='text-sm text-foreground font-bold'>₹{amazonSpend.toLocaleString('en-IN')}/d</span>
+              <span className='text-sm text-foreground font-bold'>${amazonSpend.toLocaleString('en-US')}/d</span>
               {amazonSpend !== baseline.amazon && (
                 <span className={`text-[10px] font-semibold ${amazonSpend > baseline.amazon ? 'text-emerald-500' : 'text-amber-500'}`}>
-                  {amazonSpend > baseline.amazon ? `+₹${amazonSpend - baseline.amazon}` : `-₹${baseline.amazon - amazonSpend}`}
+                  {amazonSpend > baseline.amazon ? `+$${amazonSpend - baseline.amazon}` : `-$${baseline.amazon - amazonSpend}`}
                 </span>
               )}
             </div>
@@ -547,16 +547,16 @@ export function ScenarioSandbox({
               className='w-full accent-amber-500 cursor-pointer h-1.5 bg-muted rounded-lg'
             />
             <div className='flex justify-between text-[10px] text-muted-foreground'>
-              <span>₹200/d</span>
-              <span>K = ₹700/d</span>
-              <span>₹1,500/d</span>
+              <span>$200/d</span>
+              <span>K = $700/d</span>
+              <span>$1,500/d</span>
             </div>
           </div>
 
           <div className='flex items-center justify-between text-[11px] pt-1 border-t border-border/60'>
             <div>
               <span className='text-muted-foreground text-[10px] block'>Forecasted Revenue</span>
-              <span className='font-bold text-foreground'>₹{Math.round(scenario.amazonRev).toLocaleString('en-IN')}</span>
+              <span className='font-bold text-foreground'>${Math.round(scenario.amazonRev).toLocaleString('en-US')}</span>
             </div>
             <Badge variant='outline' className='text-[10px] font-mono border-border text-foreground bg-muted/60'>
               High Buy-Box (Elastic)
@@ -575,7 +575,7 @@ export function ScenarioSandbox({
             Simulated Budget Distribution Share
           </span>
           <span className='text-foreground font-bold'>
-            Total: ₹{scenario.totalSpend.toLocaleString('en-IN')}/day
+            Total: ${scenario.totalSpend.toLocaleString('en-US')}/day
           </span>
         </div>
 
@@ -611,29 +611,29 @@ export function ScenarioSandbox({
               <span className='size-2 rounded-xs bg-blue-500' />
               <span className='text-muted-foreground'>Meta:</span>
               <span className='text-foreground font-bold'>{metaShare.toFixed(0)}%</span>
-              <span className='text-[10px] text-muted-foreground'>(₹{metaSpend})</span>
+              <span className='text-[10px] text-muted-foreground'>(${metaSpend})</span>
             </div>
             <div className='flex items-center gap-1.5'>
               <span className='size-2 rounded-xs bg-emerald-500' />
               <span className='text-muted-foreground'>Google:</span>
               <span className='text-foreground font-bold'>{googleShare.toFixed(0)}%</span>
-              <span className='text-[10px] text-muted-foreground'>(₹{googleSpend})</span>
+              <span className='text-[10px] text-muted-foreground'>(${googleSpend})</span>
             </div>
             <div className='flex items-center gap-1.5'>
               <span className='size-2 rounded-xs bg-amber-500' />
               <span className='text-muted-foreground'>Amazon:</span>
               <span className='text-foreground font-bold'>{amazonShare.toFixed(0)}%</span>
-              <span className='text-[10px] text-muted-foreground'>(₹{amazonSpend})</span>
+              <span className='text-[10px] text-muted-foreground'>(${amazonSpend})</span>
             </div>
           </div>
 
           <div className='text-[10px] text-muted-foreground'>
             {deltaSpend !== 0 ? (
               <span className={deltaSpend > 0 ? 'text-amber-500 font-semibold' : 'text-emerald-500 font-semibold'}>
-                Budget Delta: {deltaSpend > 0 ? `+₹${deltaSpend}` : `-₹${Math.abs(deltaSpend)}`}/day
+                Budget Delta: {deltaSpend > 0 ? `+$${deltaSpend}` : `-$${Math.abs(deltaSpend)}`}/day
               </span>
             ) : (
-              <span>Budget Neutral (₹0 delta)</span>
+              <span>Budget Neutral ($0 delta)</span>
             )}
           </div>
         </div>
@@ -652,15 +652,15 @@ export function ScenarioSandbox({
           {/* Row 1: Total Budget */}
           <div className='grid grid-cols-4 p-2.5 items-center hover:bg-muted/20 transition-colors'>
             <span className='text-muted-foreground font-medium'>Total Daily Budget</span>
-            <span className='text-muted-foreground font-mono'>₹{baseline.totalSpend.toLocaleString('en-IN')}/d</span>
-            <span className='text-foreground font-bold font-mono'>₹{scenario.totalSpend.toLocaleString('en-IN')}/d</span>
+            <span className='text-muted-foreground font-mono'>${baseline.totalSpend.toLocaleString('en-US')}/d</span>
+            <span className='text-foreground font-bold font-mono'>${scenario.totalSpend.toLocaleString('en-US')}/d</span>
             <span className='text-right font-mono font-bold'>
               {deltaSpend === 0 ? (
-                <span className='text-muted-foreground'>₹0 (Neutral)</span>
+                <span className='text-muted-foreground'>$0 (Neutral)</span>
               ) : deltaSpend > 0 ? (
-                <span className='text-amber-500'>+₹{deltaSpend.toLocaleString('en-IN')} (+{((deltaSpend / baseline.totalSpend) * 100).toFixed(1)}%)</span>
+                <span className='text-amber-500'>+${deltaSpend.toLocaleString('en-US')} (+{((deltaSpend / baseline.totalSpend) * 100).toFixed(1)}%)</span>
               ) : (
-                <span className='text-emerald-500'>-₹{Math.abs(deltaSpend).toLocaleString('en-IN')} ({((deltaSpend / baseline.totalSpend) * 100).toFixed(1)}%)</span>
+                <span className='text-emerald-500'>-${Math.abs(deltaSpend).toLocaleString('en-US')} ({((deltaSpend / baseline.totalSpend) * 100).toFixed(1)}%)</span>
               )}
             </span>
           </div>
@@ -668,15 +668,15 @@ export function ScenarioSandbox({
           {/* Row 2: Forecasted Revenue */}
           <div className='grid grid-cols-4 p-2.5 items-center hover:bg-muted/20 transition-colors'>
             <span className='text-muted-foreground font-medium'>Forecasted Revenue</span>
-            <span className='text-muted-foreground font-mono'>₹{Math.round(baseline.totalRev).toLocaleString('en-IN')}/d</span>
-            <span className='text-foreground font-bold font-mono'>₹{Math.round(scenario.totalRev).toLocaleString('en-IN')}/d</span>
+            <span className='text-muted-foreground font-mono'>${Math.round(baseline.totalRev).toLocaleString('en-US')}/d</span>
+            <span className='text-foreground font-bold font-mono'>${Math.round(scenario.totalRev).toLocaleString('en-US')}/d</span>
             <span className='text-right font-mono font-bold'>
               {deltaRevenue === 0 ? (
-                <span className='text-muted-foreground'>₹0</span>
+                <span className='text-muted-foreground'>$0</span>
               ) : deltaRevenue > 0 ? (
-                <span className='text-emerald-500'>+₹{Math.round(deltaRevenue).toLocaleString('en-IN')} (+{pctRevChange.toFixed(1)}%)</span>
+                <span className='text-emerald-500'>+${Math.round(deltaRevenue).toLocaleString('en-US')} (+{pctRevChange.toFixed(1)}%)</span>
               ) : (
-                <span className='text-rose-500'>-₹{Math.abs(Math.round(deltaRevenue)).toLocaleString('en-IN')} ({pctRevChange.toFixed(1)}%)</span>
+                <span className='text-rose-500'>-${Math.abs(Math.round(deltaRevenue)).toLocaleString('en-US')} ({pctRevChange.toFixed(1)}%)</span>
               )}
             </span>
           </div>
@@ -719,15 +719,15 @@ export function ScenarioSandbox({
               <Icons.sparkles className='size-3 text-emerald-400' />
               Net Contribution Margin
             </span>
-            <span className='text-muted-foreground font-mono'>₹{Math.round(baseline.netContribution).toLocaleString('en-IN')}/d</span>
-            <span className='text-foreground font-bold font-mono'>₹{Math.round(scenario.netContribution).toLocaleString('en-IN')}/d</span>
+            <span className='text-muted-foreground font-mono'>${Math.round(baseline.netContribution).toLocaleString('en-US')}/d</span>
+            <span className='text-foreground font-bold font-mono'>${Math.round(scenario.netContribution).toLocaleString('en-US')}/d</span>
             <span className='text-right font-mono font-bold'>
               {deltaMargin === 0 ? (
-                <span className='text-muted-foreground'>₹0</span>
+                <span className='text-muted-foreground'>$0</span>
               ) : deltaMargin > 0 ? (
-                <span className='text-emerald-500'>+₹{Math.round(deltaMargin).toLocaleString('en-IN')} (+{pctMarginChange.toFixed(1)}%)</span>
+                <span className='text-emerald-500'>+${Math.round(deltaMargin).toLocaleString('en-US')} (+{pctMarginChange.toFixed(1)}%)</span>
               ) : (
-                <span className='text-rose-500'>-₹{Math.abs(Math.round(deltaMargin)).toLocaleString('en-IN')} ({pctMarginChange.toFixed(1)}%)</span>
+                <span className='text-rose-500'>-${Math.abs(Math.round(deltaMargin)).toLocaleString('en-US')} ({pctMarginChange.toFixed(1)}%)</span>
               )}
             </span>
           </div>
@@ -791,11 +791,11 @@ export function ScenarioSandbox({
                 </div>
                 <div className='flex items-center gap-1.5'>
                   <span className='size-2.5 rounded-full bg-muted-foreground border border-foreground' />
-                  <span>Current Baseline (₹{baseline.totalSpend}, ₹{Math.round(baseline.totalRev)})</span>
+                  <span>Current Baseline (${baseline.totalSpend}, ${Math.round(baseline.totalRev)})</span>
                 </div>
                 <div className='flex items-center gap-1.5'>
                   <span className='size-2.5 rounded-full bg-emerald-400 border border-white' />
-                  <span className='text-foreground font-bold'>Scenario Vector (₹{scenario.totalSpend}, ₹{Math.round(scenario.totalRev)})</span>
+                  <span className='text-foreground font-bold'>Scenario Vector (${scenario.totalSpend}, ${Math.round(scenario.totalRev)})</span>
                 </div>
               </div>
             </div>
@@ -815,13 +815,13 @@ export function ScenarioSandbox({
                     tickLine={false}
                     axisLine={false}
                     tick={{ fill: '#888', fontSize: 10 }}
-                    tickFormatter={(v) => `₹${v}`}
+                    tickFormatter={(v) => `$${v}`}
                   />
                   <YAxis
                     tickLine={false}
                     axisLine={false}
                     tick={{ fill: '#888', fontSize: 10 }}
-                    tickFormatter={(v) => `₹${v}`}
+                    tickFormatter={(v) => `$${v}`}
                   />
                   <Tooltip content={<CurveTooltip />} />
                   <Area
@@ -874,7 +874,7 @@ export function ScenarioSandbox({
                 <BarChart data={channelBreakdownData} margin={{ top: 10, right: 15, left: 10, bottom: 5 }} barGap={4}>
                   <CartesianGrid strokeDasharray='3 3' stroke='currentColor' className='text-border/40' vertical={false} />
                   <XAxis dataKey='channel' tickLine={false} axisLine={false} tick={{ fill: '#888', fontSize: 10 }} />
-                  <YAxis tickLine={false} axisLine={false} tick={{ fill: '#888', fontSize: 10 }} tickFormatter={(v) => `₹${v}`} />
+                  <YAxis tickLine={false} axisLine={false} tick={{ fill: '#888', fontSize: 10 }} tickFormatter={(v) => `$${v}`} />
                   <Tooltip content={<BreakdownTooltip />} />
                   <Bar dataKey='Current Spend' fill='#71717a' radius={[3, 3, 0, 0]} />
                   <Bar dataKey='Scenario Spend' fill='#3b82f6' radius={[3, 3, 0, 0]} />
@@ -904,7 +904,7 @@ export function ScenarioSandbox({
             <div className='flex items-center gap-2 text-xs'>
               <span className='text-muted-foreground'>Net Margin Lift:</span>
               <span className={`font-bold font-mono ${appliedVector.deltaMargin >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                {appliedVector.deltaMargin >= 0 ? '+' : ''}₹{Math.round(appliedVector.deltaMargin).toLocaleString('en-IN')}/day
+                {appliedVector.deltaMargin >= 0 ? '+' : ''}${Math.round(appliedVector.deltaMargin).toLocaleString('en-US')}/day
               </span>
             </div>
           </div>
@@ -916,14 +916,14 @@ export function ScenarioSandbox({
               <div className='text-[10px] text-muted-foreground uppercase flex items-center justify-between font-bold'>
                 <span>Meta Ads</span>
                 <span className={appliedVector.financials.meta > baseline.meta ? 'text-amber-500' : 'text-muted-foreground'}>
-                  {appliedVector.financials.meta > baseline.meta ? `+₹${appliedVector.financials.meta - baseline.meta}` : '±₹0'}
+                  {appliedVector.financials.meta > baseline.meta ? `+$${appliedVector.financials.meta - baseline.meta}` : '±$0'}
                 </span>
               </div>
               <div className='font-bold text-foreground'>
-                ₹{baseline.meta}/d → ₹{appliedVector.financials.meta}/d
+                ${baseline.meta}/d → ${appliedVector.financials.meta}/d
               </div>
               <div className='text-[10px] text-muted-foreground'>
-                Rev: ₹{Math.round(appliedVector.financials.metaRev).toLocaleString('en-IN')}
+                Rev: ${Math.round(appliedVector.financials.metaRev).toLocaleString('en-US')}
               </div>
             </div>
 
@@ -933,15 +933,15 @@ export function ScenarioSandbox({
                 <span>Google Search</span>
                 <span className={appliedVector.financials.google >= baseline.google ? 'text-emerald-500' : 'text-amber-500'}>
                   {appliedVector.financials.google >= baseline.google
-                    ? `+₹${appliedVector.financials.google - baseline.google}`
-                    : `-₹${baseline.google - appliedVector.financials.google}`}
+                    ? `+$${appliedVector.financials.google - baseline.google}`
+                    : `-$${baseline.google - appliedVector.financials.google}`}
                 </span>
               </div>
               <div className='font-bold text-foreground'>
-                ₹{baseline.google}/d → ₹{appliedVector.financials.google}/d
+                ${baseline.google}/d → ${appliedVector.financials.google}/d
               </div>
               <div className='text-[10px] text-muted-foreground'>
-                Rev: ₹{Math.round(appliedVector.financials.googleRev).toLocaleString('en-IN')}
+                Rev: ${Math.round(appliedVector.financials.googleRev).toLocaleString('en-US')}
               </div>
             </div>
 
@@ -951,15 +951,15 @@ export function ScenarioSandbox({
                 <span>Amazon SP</span>
                 <span className={appliedVector.financials.amazon >= baseline.amazon ? 'text-emerald-500' : 'text-amber-500'}>
                   {appliedVector.financials.amazon >= baseline.amazon
-                    ? `+₹${appliedVector.financials.amazon - baseline.amazon}`
-                    : `-₹${baseline.amazon - appliedVector.financials.amazon}`}
+                    ? `+$${appliedVector.financials.amazon - baseline.amazon}`
+                    : `-$${baseline.amazon - appliedVector.financials.amazon}`}
                 </span>
               </div>
               <div className='font-bold text-foreground'>
-                ₹{baseline.amazon}/d → ₹{appliedVector.financials.amazon}/d
+                ${baseline.amazon}/d → ${appliedVector.financials.amazon}/d
               </div>
               <div className='text-[10px] text-muted-foreground'>
-                Rev: ₹{Math.round(appliedVector.financials.amazonRev).toLocaleString('en-IN')}
+                Rev: ${Math.round(appliedVector.financials.amazonRev).toLocaleString('en-US')}
               </div>
             </div>
           </div>

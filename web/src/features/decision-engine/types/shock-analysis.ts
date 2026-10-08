@@ -12,11 +12,11 @@ export type ShockSeverityTone = 'critical' | 'high' | 'medium';
 export interface ShockScopePoint {
   /** 'Baseline' | 'Shocked' | 'Mitigated' */
   label: string;
-  /** Daily revenue in ₹ for the scope. */
+  /** Daily revenue in $ for the scope. */
   revenue: number;
-  /** Daily gross margin in ₹ for the scope. */
+  /** Daily gross margin in $ for the scope. */
   margin: number;
-  /** Daily ad spend in ₹ for the scope. */
+  /** Daily ad spend in $ for the scope. */
   spend: number;
   /** revenue / spend; 0 when spend is 0. */
   roas: number;
@@ -53,13 +53,13 @@ export interface ShockMitigationPlan {
   targetCampaign: string;
   targetProductName: string;
   targetPlatform: string;
-  /** ₹/day moved from source(s) to target this optimization cycle. */
+  /** $/day moved from source(s) to target this optimization cycle. */
   movedDaily: number;
-  /** ₹/day gross margin expected from the moved capital (moved × target yield). */
+  /** $/day gross margin expected from the moved capital (moved × target yield). */
   recoveredDailyMargin: number;
-  /** ₹/day total spend removed from shocked source campaign(s). */
+  /** $/day total spend removed from shocked source campaign(s). */
   sourceSpendCutDaily: number;
-  /** ₹/day removed from source but held (not yet redeployed) this cycle. */
+  /** $/day removed from source but held (not yet redeployed) this cycle. */
   heldDaily: number;
 }
 
@@ -73,7 +73,7 @@ export interface ShockLoss {
   withoutMitigation: ShockLossFigure;
   withMitigation: ShockLossFigure;
   avoided: ShockLossFigure;
-  /** ₹/day of spend no longer backed by proportional revenue. */
+  /** $/day of spend no longer backed by proportional revenue. */
   wastedSpendDaily: number;
   wastedSpendWeekly: number;
 }

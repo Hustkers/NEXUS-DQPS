@@ -98,7 +98,7 @@ const INSTRUMENTS: InstrumentSpec[] = [
     description:
       'Tactile filing cards that fan out under pointer motion and arrow keys. Every programmatic budget shift is audited with forecasted vs realized margin delta.',
     badge: 'IMMUTABLE AUDIT',
-    stat: '₹15.4k/w',
+    stat: '$15.4k/w',
     statLabel: 'Protected Weekly Profit',
     href: '/dashboard/ledger',
     component: RiffleFigure

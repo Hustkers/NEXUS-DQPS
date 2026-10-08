@@ -80,19 +80,19 @@ export function SimulationStrategyComparison({
                     </div>
                   </td>
                   <td className='py-2.5 px-3 text-right text-rose-600 dark:text-rose-400 font-medium'>
-                    ₹{strat.financialLoss.toLocaleString('en-IN')}
+                    ${strat.financialLoss.toLocaleString('en-US')}
                   </td>
                   <td className='py-2.5 px-3 text-right font-bold text-foreground'>
                     {strat.roas.toFixed(2)}x
                   </td>
                   <td className='py-2.5 px-3 text-right text-muted-foreground'>
-                    ₹{strat.revenue.toLocaleString('en-IN')}
+                    ${strat.revenue.toLocaleString('en-US')}
                   </td>
                   <td className='py-2.5 px-3 text-right font-medium text-foreground'>
-                    ₹{strat.margin.toLocaleString('en-IN')}
+                    ${strat.margin.toLocaleString('en-US')}
                   </td>
                   <td className='py-2.5 px-3 text-right font-bold text-emerald-600 dark:text-emerald-400'>
-                    +₹{strat.lossAvoided.toLocaleString('en-IN')}
+                    +${strat.lossAvoided.toLocaleString('en-US')}
                   </td>
                   <td className='py-2.5 px-3 text-center'>
                     {isActive ? (
@@ -122,11 +122,11 @@ export function SimulationStrategyComparison({
           {recommendation.reason}
         </p>
         <div className='flex items-center gap-4 pt-1 border-t border-emerald-500/20 text-[10px] text-muted-foreground font-semibold flex-wrap'>
-          <span>Expected Loss Avoided: <strong className='text-emerald-600 dark:text-emerald-400'>+₹{recommendation.expectedLossAvoided.toLocaleString('en-IN')}</strong></span>
+          <span>Expected Loss Avoided: <strong className='text-emerald-600 dark:text-emerald-400'>+${recommendation.expectedLossAvoided.toLocaleString('en-US')}</strong></span>
           <span>•</span>
           <span>Target ROAS: <strong className='text-foreground'>{recommendation.expectedRoas.toFixed(2)}x</strong></span>
           <span>•</span>
-          <span>Protected Margin: <strong className='text-foreground'>₹{recommendation.expectedMargin.toLocaleString('en-IN')}</strong></span>
+          <span>Protected Margin: <strong className='text-foreground'>${recommendation.expectedMargin.toLocaleString('en-US')}</strong></span>
         </div>
       </div>
     </div>
