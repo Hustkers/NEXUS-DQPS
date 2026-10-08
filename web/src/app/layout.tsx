@@ -56,7 +56,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: META_THEME_COLORS.dark
+  themeColor: META_THEME_COLORS.light
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -79,14 +79,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             __html: `
               try {
                 const storedTheme = localStorage.getItem('theme');
-                if (storedTheme === 'light') {
-                  document.documentElement.classList.remove('dark');
-                  document.documentElement.classList.add('light');
-                  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '${META_THEME_COLORS.light}');
-                } else if (storedTheme === 'dark') {
+                if (storedTheme === 'dark') {
                   document.documentElement.classList.remove('light');
                   document.documentElement.classList.add('dark');
                   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '${META_THEME_COLORS.dark}');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                  document.documentElement.classList.add('light');
+                  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '${META_THEME_COLORS.light}');
                 }
               } catch (_) {}
             `
@@ -104,8 +104,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <NuqsAdapter>
           <ThemeProvider
             attribute='class'
-            defaultTheme='dark'
-            enableSystem
+            defaultTheme='light'
+            enableSystem={false}
             disableTransitionOnChange
             enableColorScheme
           >

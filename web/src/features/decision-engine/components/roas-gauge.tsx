@@ -87,7 +87,7 @@ export function RoasGauge({
   const percentage = paused ? 0.05 : clampedRoas / maxRoas;
 
   const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme !== 'light';
+  const isDark = resolvedTheme === 'dark';
 
   // Compact Semicircle Dimensions (~45% smaller than original)
   const radius = 36;

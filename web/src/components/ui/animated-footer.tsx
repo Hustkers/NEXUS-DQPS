@@ -316,11 +316,8 @@ export function AnimatedFooter({
 
       const style = getComputedStyle(document.documentElement);
       const isDark =
-        document.documentElement.getAttribute("data-theme") === "dark" ||
         document.documentElement.classList.contains("dark") ||
-        (!document.documentElement.getAttribute("data-theme") &&
-          window.matchMedia &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches);
+        document.documentElement.getAttribute("data-theme") === "dark";
 
       const charColor =
         style.getPropertyValue("--footer-ascii-color").trim() ||
