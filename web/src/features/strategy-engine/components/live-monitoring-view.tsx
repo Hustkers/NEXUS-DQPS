@@ -44,13 +44,12 @@ export function LiveMonitoringView({ monitoring }: LiveMonitoringViewProps) {
       {/* 1. Header Banner */}
       <div className='flex items-center justify-between border-b border-border/80 pb-3 flex-wrap gap-2'>
         <div className='flex items-center gap-2.5'>
-          <div className='p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'>
-            <IconActivity className='size-5 animate-pulse' />
+          <div className='p-2 rounded-lg bg-zinc-800 text-zinc-200 border border-zinc-700'>
+            <IconActivity className='size-5' />
           </div>
           <div>
             <h2 className='text-base font-bold text-foreground flex items-center gap-2'>
               Live Campaign Telemetry & AI Watchdog
-              <span className='size-2 rounded-full bg-emerald-400 animate-ping' />
             </h2>
             <p className='text-xs text-muted-foreground'>
               Sub-Hour Telemetry Ingestion • Saturation Detection • Continuous Funnel Diagnostic
@@ -83,7 +82,7 @@ export function LiveMonitoringView({ monitoring }: LiveMonitoringViewProps) {
             <div className='flex justify-between text-xs'>
               <span className='text-muted-foreground'>Paced Spend:</span>
               <span className='font-bold text-foreground'>
-                ₹{m.spend.toLocaleString()} / ₹{m.budget.toLocaleString()}
+                ${m.spend.toLocaleString()} / ${m.budget.toLocaleString()}
               </span>
             </div>
             <div className='h-2.5 w-full bg-muted/40 rounded-full overflow-hidden border border-border/60'>
@@ -124,11 +123,11 @@ export function LiveMonitoringView({ monitoring }: LiveMonitoringViewProps) {
           <div className='grid grid-cols-2 gap-2 text-xs pt-1'>
             <div className='p-2 rounded-lg bg-muted/20 border border-border/40'>
               <span className='text-[10px] text-muted-foreground block'>Realized Rev</span>
-              <span className='font-bold text-foreground'>₹{m.revenue.toLocaleString()}</span>
+              <span className='font-bold text-foreground'>${m.revenue.toLocaleString()}</span>
             </div>
             <div className='p-2 rounded-lg bg-muted/20 border border-border/40'>
               <span className='text-[10px] text-muted-foreground block'>Realized CPA</span>
-              <span className='font-bold text-foreground'>₹{m.cpa.toLocaleString()}</span>
+              <span className='font-bold text-foreground'>${m.cpa.toLocaleString()}</span>
             </div>
           </div>
         </div>
@@ -342,7 +341,7 @@ export function LiveMonitoringView({ monitoring }: LiveMonitoringViewProps) {
           <div className='p-3 rounded-xl border border-emerald-500/40 bg-emerald-500/5 space-y-1'>
             <span className='text-[10px] text-emerald-400 uppercase block font-bold'>5. Completed Purchases</span>
             <span className='text-base font-bold text-emerald-400 block'>{m.funnelAnalysis.purchases.toLocaleString()}</span>
-            <span className='text-[10px] text-emerald-400 block'>CPA: ₹{m.cpa.toLocaleString()}</span>
+            <span className='text-[10px] text-emerald-400 block'>CPA: ${m.cpa.toLocaleString()}</span>
           </div>
         </div>
 

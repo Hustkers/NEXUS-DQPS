@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { reallocationService } from '@/features/decision-engine/lib/reallocation-service';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const ledger = reallocationService.getDecisionLedger();

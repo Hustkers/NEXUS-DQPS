@@ -32,11 +32,11 @@ export function PlaygroundConstraintsPanel({
     { id: 'meta', name: 'Meta Ads', color: '#3b82f6' },
     { id: 'google', name: 'Google Ads', color: '#10b981' },
     { id: 'amazon', name: 'Amazon Ads', color: '#f59e0b' },
-    { id: 'tiktok', name: 'TikTok Shop', color: '#ec4899' }
+    { id: 'shopify', name: 'Shopify D2C', color: '#a1a1aa' }
   ];
 
   const togglePlatform = (pId: string) => {
-    const current = constraints.platforms || ['meta', 'google', 'amazon', 'tiktok'];
+    const current = constraints.platforms || ['meta', 'google', 'amazon', 'shopify'];
     let updated: string[];
     if (current.includes(pId)) {
       if (current.length === 1) return; // keep at least 1
@@ -67,7 +67,7 @@ export function PlaygroundConstraintsPanel({
                 total_budget: 5000,
                 duration_days: 14,
                 target_roas_floor: 1.8,
-                platforms: ['meta', 'google', 'amazon', 'tiktok'],
+                platforms: ['meta', 'google', 'amazon', 'shopify'],
                 strategy_focus: 'MAX_PROFIT'
               });
             }}
@@ -219,7 +219,7 @@ export function PlaygroundConstraintsPanel({
           Included Ad Networks:
         </span>
         {allPlatforms.map((plat) => {
-          const isIncluded = (constraints.platforms || ['meta', 'google', 'amazon', 'tiktok']).includes(
+          const isIncluded = (constraints.platforms || ['meta', 'google', 'amazon', 'shopify']).includes(
             plat.id
           );
           return (

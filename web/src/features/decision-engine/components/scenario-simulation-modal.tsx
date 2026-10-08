@@ -66,9 +66,7 @@ export function ScenarioSimulationModal({
   const activeResult = executedResult || (stage === 'completed' ? computedResult : null);
 
   // Sync inputs whenever scenarioId changes
-  const [prevScenarioId, setPrevScenarioId] = useState<ShockScenarioId>(scenarioId);
-  if (scenarioId !== prevScenarioId) {
-    setPrevScenarioId(scenarioId);
+  React.useEffect(() => {
     setInputs(BASELINE_DEFAULTS[scenarioId]);
     const rec = SCENARIO_STRATEGIES[scenarioId]?.find((s) => s.isRecommended)?.id || SCENARIO_STRATEGIES[scenarioId]?.[0]?.id || 'do-nothing';
     setSelectedStrategyId(rec);
@@ -76,7 +74,7 @@ export function ScenarioSimulationModal({
     setExecutedResult(null);
     setProgressPct(0);
     setSimulatedDay(0);
-  }
+  }, [scenarioId]);
 
   // Keyboard accessibility
   React.useEffect(() => {
@@ -86,20 +84,57 @@ export function ScenarioSimulationModal({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose, isSimulating]);
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
 
   const scenarioMeta = SCENARIO_METAS[scenarioId];
 
-  // Deterministic simulation runner for modal
+  // Progressive deterministic simulation runner for modal
   const handleRunSimulation = () => {
     const horizon = inputs.horizonDays;
-    setStage('completed');
-    setProgressPct(100);
-    setSimulatedDay(horizon);
-    setExecutedResult(computedResult);
-    toast.success(`Simulation Completed: ${computedResult.scenarioMeta.title}`, {
-      description: `Applied ${computedResult.activeStrategyName}. Projected Loss Avoided: +₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}.`
-    });
+    setStage('initializing');
+    setProgressPct(10);
+    setSimulatedDay(0);
+
+    // Stage 1: Baseline inspection (150ms)
+    setTimeout(() => {
+      setStage('baseline');
+      setProgressPct(25);
+      setSimulatedDay(1);
+    }, 200);
+
+    // Stage 2: Shock injection (500ms)
+    setTimeout(() => {
+      setStage('shock');
+      setProgressPct(50);
+      setSimulatedDay(Math.max(1, Math.round(horizon * 0.35)));
+    }, 550);
+
+    // Stage 3: DAG Propagation (950ms)
+    setTimeout(() => {
+      setStage('propagating');
+      setProgressPct(75);
+      setSimulatedDay(Math.max(2, Math.round(horizon * 0.7)));
+    }, 950);
+
+    // Stage 4: Autonomous Mitigation & Rebalancing (1300ms)
+    setTimeout(() => {
+      setStage('mitigating');
+      setProgressPct(90);
+      setSimulatedDay(horizon);
+    }, 1300);
+
+    // Stage 5: Finalized (1700ms)
+    setTimeout(() => {
+      setStage('completed');
+      setProgressPct(100);
+      setSimulatedDay(horizon);
+      setExecutedResult(computedResult);
+      toast.success(`Simulation Completed: ${computedResult.scenarioMeta.title}`, {
+        description: `Applied ${computedResult.activeStrategyName}. Projected Loss Avoided: +₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}.`
+      });
+    }, 1700);
   };
 
   const handleResetInputs = () => {
@@ -311,8 +346,6 @@ export function ScenarioSimulationModal({
     };
   }, [scenarioId, stage, inputs, computedResult]);
 
-  if (!isOpen) return null;
-
   return (
     <div
       role='presentation'
@@ -325,17 +358,17 @@ export function ScenarioSimulationModal({
         role='dialog'
         aria-modal='true'
         aria-label={`Interactive Simulation Lab: ${scenarioMeta.title}`}
-        className='my-auto flex w-full max-w-6xl flex-col gap-4 rounded-2xl border border-border bg-card p-4 sm:p-6 text-foreground shadow-2xl'
+        className='my-auto flex w-full max-w-6xl flex-col gap-4 rounded-2xl border border-border bg-card p-4 sm:p-6 text-foreground shadow-2xl font-mono'
       >
         {/* HEADER BAR */}
         <header className='flex flex-wrap items-start justify-between gap-3 border-b border-border/80 pb-3.5'>
           <div className='min-w-0 space-y-1'>
             <div className='flex items-center gap-2'>
-              <span className='size-2 rounded-full bg-emerald-500' />
+              <span className='size-2 rounded-full bg-emerald-500 animate-pulse' />
               <Badge
                 variant='outline'
                 className={cn(
-                  'text-xs font-medium',
+                  'font-mono text-[10px] font-bold uppercase tracking-wider',
                   scenarioMeta.severity === 'CRITICAL' && 'border-rose-500/40 bg-rose-500/10 text-rose-500',
                   scenarioMeta.severity === 'HIGH' && 'border-amber-500/40 bg-amber-500/10 text-amber-500',
                   scenarioMeta.severity === 'MEDIUM' && 'border-sky-500/40 bg-sky-500/10 text-sky-500'
@@ -343,12 +376,12 @@ export function ScenarioSimulationModal({
               >
                 {scenarioMeta.severity}
               </Badge>
-              <span className='text-xs text-muted-foreground'>
+              <span className='text-[10px] uppercase font-bold text-muted-foreground'>
                 {scenarioMeta.tag}
               </span>
             </div>
-            <h2 className='text-lg sm:text-xl font-semibold tracking-tight text-foreground'>
-              Scenario simulation — {scenarioMeta.title}
+            <h2 className='text-lg sm:text-xl font-bold uppercase tracking-tight text-foreground'>
+              Scenario Simulation Lab — {scenarioMeta.title}
             </h2>
             <p className='text-xs text-muted-foreground max-w-3xl leading-relaxed'>
               {scenarioMeta.eventDescription}
@@ -358,22 +391,13 @@ export function ScenarioSimulationModal({
           <div className='flex items-center gap-2'>
             <Button
               size='sm'
-              onClick={handleRunSimulation}
-              disabled={isSimulating}
-              className='h-8 bg-primary text-primary-foreground text-xs font-medium'
-            >
-              <Icons.play className='mr-1.5 size-3.5 fill-current' />
-              {stage === 'completed' ? 'Rerun' : 'Run simulation'}
-            </Button>
-            <Button
-              size='sm'
               variant='outline'
               onClick={handleResetInputs}
               disabled={isSimulating}
               className='h-8 border-border bg-card px-2.5 text-xs text-muted-foreground hover:text-foreground'
             >
               <Icons.clock className='mr-1.5 size-3' />
-              Reset
+              Reset Baseline
             </Button>
             <button
               onClick={onClose}
@@ -425,15 +449,15 @@ export function ScenarioSimulationModal({
 
             {/* AUTONOMOUS DECISION RATIONALE CARD */}
             <div className='rounded-xl border border-emerald-500/40 bg-emerald-500/5 p-4 space-y-2 text-xs'>
-              <div className='flex items-center gap-1.5 font-medium text-xs text-emerald-600 dark:text-emerald-400'>
+              <div className='flex items-center gap-1.5 font-bold uppercase text-[11px] text-emerald-600 dark:text-emerald-400'>
                 <Icons.shieldCheck className='size-3.5' />
-                Why this response was chosen
+                Why NEXUS Chose This Strategy
               </div>
-              <p className='text-muted-foreground leading-relaxed text-xs'>
+              <p className='text-muted-foreground leading-relaxed text-[11px]'>
                 {computedResult.recommendation.reason}
               </p>
-              <div className='flex items-center justify-between pt-2 border-t border-emerald-500/20 text-xs text-muted-foreground'>
-                <span>Protected waste: <strong className='text-emerald-600 dark:text-emerald-400'>+₹{computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}</strong></span>
+              <div className='flex items-center justify-between pt-2 border-t border-emerald-500/20 text-[10px] text-muted-foreground'>
+                <span>Protected Waste: <strong className='text-emerald-600 dark:text-emerald-400'>+₹{computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}</strong></span>
                 <span>Target ROAS: <strong className='text-foreground'>{computedResult.mitigated.roas.toFixed(2)}x</strong></span>
               </div>
             </div>
@@ -488,8 +512,8 @@ export function ScenarioSimulationModal({
 
         {/* FOOTER ACTIONS */}
         <footer className='flex flex-wrap items-center justify-between gap-3 border-t border-border/80 pt-4'>
-          <div className='text-xs text-muted-foreground'>
-            Calculations are grounded in real-time engine state.
+          <div className='text-[10px] text-muted-foreground'>
+            Deterministic evaluation • 0% random variance • All formulas grounded in engine state.
           </div>
           <div className='flex items-center gap-2'>
             <Button
@@ -503,10 +527,10 @@ export function ScenarioSimulationModal({
             <Button
               size='sm'
               onClick={handleApply}
-              className='h-8 px-4 text-xs font-medium bg-emerald-600 hover:bg-emerald-700 text-white'
+              className='h-8 px-4 text-xs font-bold uppercase bg-emerald-600 hover:bg-emerald-700 text-white'
             >
               <Icons.check className='mr-1.5 size-3.5' />
-              Apply mitigation to dashboard
+              Apply Mitigation to Dashboard
             </Button>
           </div>
         </footer>

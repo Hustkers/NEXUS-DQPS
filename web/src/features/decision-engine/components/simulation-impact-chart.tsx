@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React from 'react';
 import {
   BarChart,
   Bar,
@@ -18,399 +18,112 @@ interface SimulationImpactChartProps {
   className?: string;
 }
 
-interface ImpactTooltipProps {
-  active?: boolean;
-  payload?: Array<{
-    payload: {
-      metric: string;
-      Baseline: number;
-      Shocked: number;
-      Mitigated: number;
-      unit: string;
-    };
-  }>;
-  label?: string;
-  horizonLabel: string;
-}
-
-function ImpactTooltip({ active, payload, label, horizonLabel }: ImpactTooltipProps) {
-  if (!active || !payload || !payload.length) return null;
-  const d = payload[0].payload;
-
-  const isCurrency = d.unit === '₹';
-  const formatVal = (v: number) =>
-    isCurrency ? `₹${Math.round(v).toLocaleString('en-IN')}` : `${v}${d.unit}`;
-
-  const shockDelta = d.Shocked - d.Baseline;
-  const mitDelta = d.Mitigated - d.Shocked;
-
-  return (
-    <div className='rounded-xl border border-border bg-popover/95 backdrop-blur-md p-3.5 shadow-xl text-xs text-popover-foreground space-y-2 min-w-[220px]'>
-      <div className='font-semibold text-foreground border-b border-border/60 pb-1.5 flex justify-between items-center text-xs'>
-        <span>{label}</span>
-        <span className='text-xs text-muted-foreground font-normal'>
-          {horizonLabel}
-        </span>
-      </div>
-
-      <div className='space-y-1.5 text-xs'>
-        {/* Baseline */}
-        <div className='flex justify-between items-center text-muted-foreground'>
-          <span>Baseline</span>
-          <span className='font-medium text-foreground tabular-nums'>
-            {formatVal(d.Baseline)}
-          </span>
-        </div>
-
-        {/* Shocked / No Action */}
-        <div className='flex justify-between items-center text-rose-600 dark:text-rose-400'>
-          <span>No action</span>
-          <span className='font-medium tabular-nums'>
-            {formatVal(d.Shocked)}
-          </span>
-        </div>
-        {shockDelta !== 0 && (
-          <div className='flex justify-end text-xs text-rose-600 dark:text-rose-500'>
-            Impact: {shockDelta > 0 ? '+' : ''}{formatVal(shockDelta)} vs baseline
-          </div>
-        )}
-
-        {/* Mitigated Policy */}
-        <div className='flex justify-between items-center text-emerald-600 dark:text-emerald-400 pt-1 border-t border-border/40'>
-          <span>With response</span>
-          <span className='font-medium tabular-nums'>
-            {formatVal(d.Mitigated)}
-          </span>
-        </div>
-        {mitDelta !== 0 && (
-          <div className='flex justify-end text-xs text-emerald-600 dark:text-emerald-400 font-medium'>
-            Net lift: {mitDelta > 0 ? '+' : ''}{formatVal(mitDelta)} vs no action
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 export function SimulationImpactChart({
   result,
   className
 }: SimulationImpactChartProps) {
-  const { baseline, shocked, mitigated, horizonDays, financialImpact, activeStrategyName } = result;
+  const { baseline, shocked, mitigated, horizonDays } = result;
 
-  // Horizon toggle: Daily rate vs Total Horizon
-  const [horizonMode, setHorizonMode] = useState<'daily' | 'horizon'>('daily');
-  // Metric focus toggle: 'all' (Spend, Revenue, Margin, Loss) | 'margin-loss' | 'efficiency'
-  const [metricFocus, setMetricFocus] = useState<'all' | 'margin-loss' | 'efficiency'>('all');
-
-  const multiplier = horizonMode === 'horizon' ? horizonDays : 1;
-  const horizonLabel = horizonMode === 'horizon' ? `${horizonDays}d total` : 'Daily';
-
-  // Loss calculations
-  const shockedLoss = horizonMode === 'horizon'
-    ? financialImpact.lossWithoutMitigation
-    : Math.round(financialImpact.dailyLossRate);
-
-  const mitigatedLoss = horizonMode === 'horizon'
-    ? financialImpact.lossWithMitigation
-    : Math.round(financialImpact.lossWithMitigation / horizonDays);
-
-  const lossAvoided = horizonMode === 'horizon'
-    ? financialImpact.lossAvoided
-    : Math.round(financialImpact.lossAvoided / horizonDays);
-
-  const pctLossAvoided = shockedLoss > 0 ? ((shockedLoss - mitigatedLoss) / shockedLoss) * 100 : 0;
-
-  // Chart datasets based on selected metric focus
-  const chartData = useMemo(() => {
-    if (metricFocus === 'efficiency') {
-      return [
-        {
-          metric: 'ROAS (x)',
-          Baseline: +baseline.roas.toFixed(2),
-          Shocked: +shocked.roas.toFixed(2),
-          Mitigated: +mitigated.roas.toFixed(2),
-          unit: 'x'
-        },
-        {
-          metric: 'CVR (%)',
-          Baseline: +(baseline.clicks > 0 ? (baseline.conversions / baseline.clicks) * 100 : 0).toFixed(2),
-          Shocked: +(shocked.clicks > 0 ? (shocked.conversions / shocked.clicks) * 100 : 0).toFixed(2),
-          Mitigated: +(mitigated.clicks > 0 ? (mitigated.conversions / mitigated.clicks) * 100 : 0).toFixed(2),
-          unit: '%'
-        }
-      ];
+  const chartData = [
+    {
+      metric: 'Daily Spend (₹)',
+      Baseline: baseline.spend,
+      Shocked: shocked.spend,
+      Mitigated: mitigated.spend
+    },
+    {
+      metric: 'Daily Revenue (₹)',
+      Baseline: baseline.revenue,
+      Shocked: shocked.revenue,
+      Mitigated: mitigated.revenue
+    },
+    {
+      metric: 'Daily Margin (₹)',
+      Baseline: baseline.margin,
+      Shocked: shocked.margin,
+      Mitigated: mitigated.margin
     }
-
-    if (metricFocus === 'margin-loss') {
-      return [
-        {
-          metric: `${horizonLabel} margin`,
-          Baseline: Math.round(baseline.margin * multiplier),
-          Shocked: Math.round(shocked.margin * multiplier),
-          Mitigated: Math.round(mitigated.margin * multiplier),
-          unit: '₹'
-        },
-        {
-          metric: `${horizonLabel} loss`,
-          Baseline: 0,
-          Shocked: Math.round(shockedLoss),
-          Mitigated: Math.round(mitigatedLoss),
-          unit: '₹'
-        }
-      ];
-    }
-
-    // Default: 'all' (Daily Spend, Projected Revenue, Daily Margin, Loss)
-    return [
-      {
-        metric: `${horizonLabel} spend`,
-        Baseline: Math.round(baseline.spend * multiplier),
-        Shocked: Math.round(shocked.spend * multiplier),
-        Mitigated: Math.round(mitigated.spend * multiplier),
-        unit: '₹'
-      },
-      {
-        metric: `${horizonLabel} revenue`,
-        Baseline: Math.round(baseline.revenue * multiplier),
-        Shocked: Math.round(shocked.revenue * multiplier),
-        Mitigated: Math.round(mitigated.revenue * multiplier),
-        unit: '₹'
-      },
-      {
-        metric: `${horizonLabel} margin`,
-        Baseline: Math.round(baseline.margin * multiplier),
-        Shocked: Math.round(shocked.margin * multiplier),
-        Mitigated: Math.round(mitigated.margin * multiplier),
-        unit: '₹'
-      },
-      {
-        metric: `${horizonLabel} loss`,
-        Baseline: 0,
-        Shocked: Math.round(shockedLoss),
-        Mitigated: Math.round(mitigatedLoss),
-        unit: '₹'
-      }
-    ];
-  }, [
-    baseline,
-    shocked,
-    mitigated,
-    multiplier,
-    horizonLabel,
-    shockedLoss,
-    mitigatedLoss,
-    metricFocus
-  ]);
+  ];
 
   return (
-    <div className={cn('rounded-xl border border-border bg-card p-6 shadow-xs space-y-4 text-card-foreground', className)}>
-      {/* Header with Title and Mode Controls */}
-      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3'>
+    <div className={cn('rounded-xl border border-border/80 bg-card p-4 sm:p-5 font-mono shadow-xs space-y-3', className)}>
+      <div className='flex items-center justify-between border-b border-border/60 pb-3'>
         <div>
-          <h4 className='text-sm font-semibold text-foreground'>
-            Policy impact comparison
+          <h4 className='text-xs font-bold uppercase tracking-wider text-foreground'>
+            Policy Impact Comparison (₹)
           </h4>
-          <p className='text-xs text-muted-foreground mt-0.5'>
-            Comparing baseline operating level against crisis and response outcomes.
+          <p className='text-[10px] text-muted-foreground'>
+            Baseline vs Shocked (No Action) vs Mitigated Strategy
           </p>
         </div>
-
-        {/* Control Toggles */}
-        <div className='flex flex-wrap items-center gap-2'>
-          {/* Horizon Toggle */}
-          <div className='flex items-center gap-0.5 bg-muted/60 p-0.5 rounded-lg border border-border text-xs'>
-            <button
-              type='button'
-              onClick={() => setHorizonMode('daily')}
-              className={cn(
-                'px-2.5 py-1 rounded-md text-xs font-medium transition-colors',
-                horizonMode === 'daily'
-                  ? 'bg-background text-foreground shadow-2xs'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              Daily rate
-            </button>
-            <button
-              type='button'
-              onClick={() => setHorizonMode('horizon')}
-              className={cn(
-                'px-2.5 py-1 rounded-md text-xs font-medium transition-colors',
-                horizonMode === 'horizon'
-                  ? 'bg-background text-foreground shadow-2xs'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              {horizonDays}d total
-            </button>
+        <div className='flex items-center gap-3 text-[10px] font-semibold'>
+          <div className='flex items-center gap-1.5'>
+            <span className='size-2 rounded-xs bg-zinc-500' />
+            <span className='text-muted-foreground'>Baseline</span>
           </div>
-
-          {/* Metric Filter Tabs */}
-          <div className='flex items-center gap-0.5 bg-muted/60 p-0.5 rounded-lg border border-border text-xs'>
-            <button
-              type='button'
-              onClick={() => setMetricFocus('all')}
-              className={cn(
-                'px-2.5 py-1 rounded-md text-xs font-medium transition-colors',
-                metricFocus === 'all'
-                  ? 'bg-background text-foreground shadow-2xs'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              All metrics
-            </button>
-            <button
-              type='button'
-              onClick={() => setMetricFocus('margin-loss')}
-              className={cn(
-                'px-2.5 py-1 rounded-md text-xs font-medium transition-colors',
-                metricFocus === 'margin-loss'
-                  ? 'bg-background text-foreground shadow-2xs'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              Margin &amp; loss
-            </button>
-            <button
-              type='button'
-              onClick={() => setMetricFocus('efficiency')}
-              className={cn(
-                'px-2.5 py-1 rounded-md text-xs font-medium transition-colors',
-                metricFocus === 'efficiency'
-                  ? 'bg-background text-foreground shadow-2xs'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              ROAS
-            </button>
+          <div className='flex items-center gap-1.5'>
+            <span className='size-2 rounded-xs bg-rose-500' />
+            <span className='text-rose-600 dark:text-rose-400'>Shocked</span>
+          </div>
+          <div className='flex items-center gap-1.5'>
+            <span className='size-2 rounded-xs bg-emerald-500' />
+            <span className='text-emerald-600 dark:text-emerald-400'>Mitigated</span>
           </div>
         </div>
       </div>
 
-      {/* Legend Bar */}
-      <div className='flex flex-wrap items-center justify-between text-xs px-1 gap-2'>
-        <div className='flex items-center gap-4'>
-          <div className='flex items-center gap-1.5'>
-            <span className='size-2 rounded-full bg-zinc-500' />
-            <span className='text-muted-foreground font-medium'>Baseline</span>
-          </div>
-          <div className='flex items-center gap-1.5'>
-            <span className='size-2 rounded-full bg-rose-500' />
-            <span className='text-rose-600 dark:text-rose-400 font-medium'>No action</span>
-          </div>
-          <div className='flex items-center gap-1.5'>
-            <span className='size-2 rounded-full bg-emerald-500' />
-            <span className='text-emerald-600 dark:text-emerald-400 font-medium'>With response ({activeStrategyName})</span>
-          </div>
-        </div>
-
-        <div className='text-xs text-muted-foreground'>
-          Loss protected: <span className='text-emerald-600 dark:text-emerald-400 font-semibold tabular-nums'>+₹{lossAvoided.toLocaleString('en-IN')}</span> ({pctLossAvoided.toFixed(1)}%)
-        </div>
-      </div>
-
-      {/* Main Bar Chart */}
-      <div className='h-[240px] w-full pt-1'>
+      <div className='h-[200px] w-full pt-1'>
         <ResponsiveContainer width='100%' height='100%'>
-          <BarChart data={chartData} margin={{ top: 12, right: 15, left: 10, bottom: 5 }} barGap={6}>
-            <CartesianGrid strokeDasharray='3 3' stroke='currentColor' className='text-border/40' vertical={false} />
+          <BarChart data={chartData} margin={{ top: 10, right: 15, left: 10, bottom: 5 }} barGap={6}>
+            <CartesianGrid strokeDasharray='3 3' stroke='#e2e8f0' vertical={false} className='dark:stroke-zinc-800' />
             <XAxis
               dataKey='metric'
               tickLine={false}
               axisLine={false}
-              tick={{ fill: '#71717a', fontSize: 12 }}
+              tick={{ fill: '#71717a', fontSize: 11 }}
             />
             <YAxis
               tickLine={false}
               axisLine={false}
-              tick={{ fill: '#71717a', fontSize: 12 }}
-              tickFormatter={(v) => {
-                if (metricFocus === 'efficiency') return `${v}x`;
-                if (v >= 100000) return `₹${(v / 100000).toFixed(1)}L`;
-                if (v >= 1000) return `₹${(v / 1000).toFixed(0)}k`;
-                return `₹${v}`;
-              }}
+              tick={{ fill: '#71717a', fontSize: 10 }}
+              tickFormatter={(v) => `₹${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
             />
             <Tooltip
-              cursor={{ fill: 'rgba(255, 255, 255, 0.04)' }}
-              content={<ImpactTooltip horizonLabel={horizonLabel} />}
+              cursor={{ fill: 'rgba(16, 185, 129, 0.05)' }}
+              content={({ active, payload, label }) => {
+                if (active && payload && payload.length) {
+                  return (
+                    <div className='rounded-lg border border-border bg-card p-2.5 shadow-md text-xs font-mono'>
+                      <div className='font-bold text-foreground mb-1 border-b border-border/60 pb-1 text-[11px]'>
+                        {label}
+                      </div>
+                      <div className='space-y-1 text-[11px]'>
+                        <div className='flex justify-between gap-4 text-muted-foreground'>
+                          <span>Baseline:</span>
+                          <span className='font-medium text-foreground'>
+                            ₹{Number(payload[0]?.value ?? 0).toLocaleString('en-IN')}
+                          </span>
+                        </div>
+                        <div className='flex justify-between gap-4 text-rose-500 font-semibold'>
+                          <span>Shocked:</span>
+                          <span>₹{Number(payload[1]?.value ?? 0).toLocaleString('en-IN')}</span>
+                        </div>
+                        <div className='flex justify-between gap-4 text-emerald-600 dark:text-emerald-400 font-bold'>
+                          <span>Mitigated:</span>
+                          <span>₹{Number(payload[2]?.value ?? 0).toLocaleString('en-IN')}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              }}
             />
-            {/* Baseline Bar */}
-            <Bar dataKey='Baseline' fill='#71717a' radius={[4, 4, 0, 0]} maxBarSize={28} />
-            {/* Shocked / No Action Bar */}
-            <Bar dataKey='Shocked' fill='#e11d48' radius={[4, 4, 0, 0]} maxBarSize={28} />
-            {/* Mitigated Policy Bar */}
-            <Bar dataKey='Mitigated' fill='#10b981' radius={[4, 4, 0, 0]} maxBarSize={28} />
+            <Bar dataKey='Baseline' fill='#71717a' radius={[3, 3, 0, 0]} maxBarSize={28} />
+            <Bar dataKey='Shocked' fill='#e11d48' radius={[3, 3, 0, 0]} maxBarSize={28} />
+            <Bar dataKey='Mitigated' fill='#10b981' radius={[3, 3, 0, 0]} maxBarSize={28} />
           </BarChart>
         </ResponsiveContainer>
-      </div>
-
-      {/* Policy Comparison Flat Summary */}
-      <div className='grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs border-t border-border/60'>
-        {/* Baseline */}
-        <div className='p-3.5 rounded-lg bg-muted/20 border border-border/60 space-y-1.5'>
-          <div className='flex items-center justify-between text-xs font-medium text-muted-foreground'>
-            <span>Baseline</span>
-            <span className='text-xs text-muted-foreground'>Reference</span>
-          </div>
-          <div className='text-xs text-muted-foreground flex justify-between'>
-            <span>Daily spend:</span>
-            <span className='text-foreground font-medium tabular-nums'>₹{baseline.spend.toLocaleString('en-IN')}/d</span>
-          </div>
-          <div className='text-xs text-muted-foreground flex justify-between'>
-            <span>Daily margin:</span>
-            <span className='text-foreground font-medium tabular-nums'>₹{baseline.margin.toLocaleString('en-IN')}/d</span>
-          </div>
-          <div className='text-xs text-muted-foreground flex justify-between'>
-            <span>Daily loss:</span>
-            <span className='text-foreground font-medium tabular-nums'>₹0/d</span>
-          </div>
-        </div>
-
-        {/* Shocked */}
-        <div className='p-3.5 rounded-lg bg-rose-500/5 border border-rose-500/20 space-y-1.5'>
-          <div className='flex items-center justify-between text-xs font-medium text-rose-600 dark:text-rose-400'>
-            <span>No action</span>
-            <span className='text-xs'>Unmitigated</span>
-          </div>
-          <div className='text-xs text-muted-foreground flex justify-between'>
-            <span>Daily spend:</span>
-            <span className='text-rose-600 dark:text-rose-400 font-medium tabular-nums'>₹{shocked.spend.toLocaleString('en-IN')}/d</span>
-          </div>
-          <div className='text-xs text-muted-foreground flex justify-between'>
-            <span>Daily margin:</span>
-            <span className='text-rose-600 dark:text-rose-400 font-medium tabular-nums'>₹{shocked.margin.toLocaleString('en-IN')}/d</span>
-          </div>
-          <div className='text-xs text-muted-foreground flex justify-between'>
-            <span>Daily loss:</span>
-            <span className='text-rose-600 dark:text-rose-400 font-semibold tabular-nums'>
-              -₹{Math.round(financialImpact.dailyLossRate).toLocaleString('en-IN')}/d
-            </span>
-          </div>
-        </div>
-
-        {/* Mitigated */}
-        <div className='p-3.5 rounded-lg bg-emerald-500/5 border border-emerald-500/20 space-y-1.5'>
-          <div className='flex items-center justify-between text-xs font-medium text-emerald-600 dark:text-emerald-400'>
-            <span>With response</span>
-            <span className='text-xs'>Active</span>
-          </div>
-          <div className='text-xs text-muted-foreground flex justify-between'>
-            <span>Daily spend:</span>
-            <span className='text-emerald-600 dark:text-emerald-400 font-medium tabular-nums'>₹{mitigated.spend.toLocaleString('en-IN')}/d</span>
-          </div>
-          <div className='text-xs text-muted-foreground flex justify-between'>
-            <span>Daily margin:</span>
-            <span className='text-emerald-600 dark:text-emerald-400 font-medium tabular-nums'>₹{mitigated.margin.toLocaleString('en-IN')}/d</span>
-          </div>
-          <div className='text-xs text-muted-foreground flex justify-between'>
-            <span>Loss avoided:</span>
-            <span className='text-emerald-600 dark:text-emerald-400 font-semibold tabular-nums'>
-              +₹{Math.round(financialImpact.lossAvoided / horizonDays).toLocaleString('en-IN')}/d
-            </span>
-          </div>
-        </div>
       </div>
     </div>
   );

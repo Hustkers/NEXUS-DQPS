@@ -1,16 +1,16 @@
 "use client";
 import React from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import {
   Database,
-  Browser,
-  Cube,
+  Globe as Browser,
+  Box as Cube,
   Brain,
   FileCode,
   HardDrive,
-  DeviceMobile,
+  Smartphone as DeviceMobile,
   Cloud,
-} from "@phosphor-icons/react";
+} from "lucide-react";
 
 export function IsometricBoxes02({
   className,
@@ -155,7 +155,7 @@ export function IsometricBoxes02({
           style={{ animationDelay: `${b.customDelay}s` }}
         >
           <g transform="translate(-10, -14)">
-            <b.Icon width="20" height="20" weight="fill" color="currentColor" />
+            <b.Icon width="20" height="20" color="currentColor" />
           </g>
           <text
             x="0"

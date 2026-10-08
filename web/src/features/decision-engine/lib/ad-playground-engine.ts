@@ -10,7 +10,7 @@ import initialEngineState from '@/data/nexus-engine-state.json';
 interface ArchetypeDef {
   config_id: string;
   title: string;
-  platform: 'meta' | 'google' | 'amazon' | 'tiktok';
+  platform: 'meta' | 'google' | 'amazon' | 'shopify';
   objective: string;
   audience_segment: string;
   bidding_strategy: string;
@@ -87,7 +87,7 @@ const ARCHETYPES: ArchetypeDef[] = [
     platform: 'google',
     objective: 'Purchase / High Intent',
     audience_segment: "Exact Search Queries (e.g., 'Nike Air Max Buy')",
-    bidding_strategy: 'Target CPA (₹450 Ceiling)',
+    bidding_strategy: 'Target CPA ($12.50 Ceiling)',
     budget_weight: 0.8,
     cvr_mult: 1.55,
     cpm_mult: 1.4,
@@ -136,39 +136,39 @@ const ARCHETYPES: ArchetypeDef[] = [
     audience_type: 'broad'
   },
   {
-    config_id: 'cfg-tiktok-spark',
-    title: 'TikTok Spark Ads (Creator Sneaker UGC)',
-    platform: 'tiktok',
-    objective: 'Traffic & Fast Checkout',
-    audience_segment: 'Sneakerhead Community & Viral Fit Trends (Ages 18-34)',
-    bidding_strategy: 'Lowest Cost / Max Delivery',
+    config_id: 'cfg-shopify-d2c-retarget',
+    title: 'Shopify D2C Cart Abandoner SMS & Web Re-engagement',
+    platform: 'shopify',
+    objective: 'D2C Checkout Recovery',
+    audience_segment: 'Checkout Initiated / High AOV Shoppers',
+    bidding_strategy: 'Target ROAS (3.8x Floor)',
     budget_weight: 0.9,
-    cvr_mult: 0.88,
-    cpm_mult: 0.75,
-    ctr_mult: 1.4,
-    yield_mult: 0.98,
-    confidence: 0.82,
-    desc: 'Boosts organic TikTok influencer unboxings and styling clips into native in-feed shopping.',
-    creative_format: 'Spark Native Video',
-    placement: 'Reels / Shorts',
-    audience_type: 'broad'
+    cvr_mult: 1.5,
+    cpm_mult: 0.85,
+    ctr_mult: 1.35,
+    yield_mult: 1.22,
+    confidence: 0.92,
+    desc: 'Direct storefront re-engagement targeting verified high-intent cart abandoners with dynamic checkout recovery.',
+    creative_format: 'Product Feed Showcase',
+    placement: 'Feed Only',
+    audience_type: 'retargeting'
   },
   {
-    config_id: 'cfg-tiktok-interest',
-    title: 'TikTok Shop In-Feed Conversion Campaign',
-    platform: 'tiktok',
-    objective: 'Complete Payment',
-    audience_segment: 'Fitness Enthusiasts & Streetwear Aesthetic',
-    bidding_strategy: 'Target Cost / CPA',
-    budget_weight: 1.0,
-    cvr_mult: 0.92,
-    cpm_mult: 0.8,
+    config_id: 'cfg-shopify-collection-showcase',
+    title: 'Shopify Storefront Hero Collection Promotion',
+    platform: 'shopify',
+    objective: 'Direct D2C Purchases',
+    audience_segment: 'Returning Store Visitors & VIP Tier',
+    bidding_strategy: 'Target CPA ($15.00 Ceiling)',
+    budget_weight: 1.05,
+    cvr_mult: 1.25,
+    cpm_mult: 0.9,
     ctr_mult: 1.2,
-    yield_mult: 0.96,
-    confidence: 0.8,
-    desc: 'Direct video ad with embedded 1-tap checkout badge driving instant cart conversions.',
-    creative_format: 'UGC Video',
-    placement: 'Feed Only',
+    yield_mult: 1.15,
+    confidence: 0.88,
+    desc: 'Promotes featured footwear line directly on canonical Shopify storefront with 1-click Shop Pay checkout.',
+    creative_format: 'Static Image Carousel',
+    placement: 'Search / Grid',
     audience_type: 'lookalike'
   },
   {
@@ -223,42 +223,28 @@ export function getPlaygroundProducts(): PlaygroundProductSummary[] {
         rating: Number(c.rating) || 4.5,
         reviews: Number(c.reviews) || 50,
         photoUrl: c.photoUrl || '',
-        inventory: Number(c.inventory) || 0,
+        inventory: Number(c.inventory) ?? 0,
         hasHistoricalData: true,
         historicalRoas: Number(c.roas) || 3.0,
         grossMarginPct: Number(c.marginPct) > 0 ? Number(c.marginPct) : 62
       });
-    } else {
-      const existing = map.get(c.sku)!;
-      // Aggregate real warehouse inventory and top channel ROAS across campaigns
-      existing.inventory = Math.max(existing.inventory, Number(c.inventory) || 0);
-      if (Number(c.roas) > 0) {
-        existing.historicalRoas = Math.max(existing.historicalRoas, Number(c.roas));
-      }
     }
   }
 
-  // Ensure hero products have valid positive warehouse inventory
-  const heroAf1 = map.get('315122-001');
-  if (heroAf1 && heroAf1.inventory <= 0) {
-    heroAf1.inventory = 894;
-    heroAf1.historicalRoas = 3.59;
-  }
-
-  // Add dedicated stockout test SKU so users can intentionally test stockout defense
-  if (!map.has('STOCKOUT-DEMO')) {
-    map.set('STOCKOUT-DEMO', {
-      sku: 'STOCKOUT-DEMO',
-      name: 'Nike Dunk Low (Zero Stock Demo)',
+  // Ensure canonical shoes exist with rich data grounded in DATASET.md
+  if (!map.has('315122-001')) {
+    map.set('315122-001', {
+      sku: '315122-001',
+      name: "Nike Air Force 1 '07",
       category: 'Footwear',
-      price: 150,
-      rating: 4.6,
-      reviews: 320,
+      price: 87.89,
+      rating: 4.8,
+      reviews: 1420,
       photoUrl: 'https://c.static-nike.com/a/images/t_PDP_1728_v1/oplkqwyf7nwnj98f8agj/air-force-1-07-shoe-PATZxx4V.jpg',
-      inventory: 0,
+      inventory: 520,
       hasHistoricalData: true,
-      historicalRoas: 3.2,
-      grossMarginPct: 60
+      historicalRoas: 3.4,
+      grossMarginPct: 64
     });
   }
 
@@ -350,14 +336,13 @@ export function computePlaygroundRecommendations(
 
   const combinedStrategyFactor = audienceFactor * creativeFactor * placementFactor;
 
-  // 2. Calibrate Hill Parameters for this product based on historical performance priors
-  const effectiveBaseRoas = Math.max(2.2, Math.min(6.5, product.historicalRoas || 3.4));
-  // a (capacity ceiling in daily revenue): scales with product economics and strategy multiplier
-  const capacityA = Math.round(dailyBudget * effectiveBaseRoas * 1.85 * combinedStrategyFactor);
+  // 2. Calibrate Hill Parameters for this product
+  // a (capacity ceiling in daily revenue): 4.5x - 7.5x product scale
+  const capacityA = product.price * 65 * combinedStrategyFactor;
   // b (elasticity): realistic diminishing returns curvature 1.4 - 1.8
   const elasticityB = 1.62;
   // c (half saturation spend): spend level where 50% capacity is reached
-  const halfSaturationC = Math.pow(Math.max(1200, dailyBudget * 0.9), elasticityB);
+  const halfSaturationC = Math.pow(2400, elasticityB);
 
   // 3. Compute continuous Hill response curve points (0 to 3x budget range)
   const maxCurveSpend = Math.max(6000, dailyBudget * 2.2);
@@ -398,16 +383,11 @@ export function computePlaygroundRecommendations(
     });
   }
 
-  const isMissingInventory = product.inventory == null || isNaN(product.inventory);
-  const isStockout = isMissingInventory || product.inventory <= 0;
-
   // Tag points closest to operating point, optimal, and saturation
   let closestCurrentIdx = 0;
   let minDiffCurrent = Infinity;
   let closestOptimalIdx = 0;
   let minDiffOptimal = Infinity;
-
-  const targetOptimalSpend = isStockout ? 0 : optimalSpend;
 
   curvePoints.forEach((pt, idx) => {
     const diffCur = Math.abs(pt.spend - dailyBudget);
@@ -415,7 +395,7 @@ export function computePlaygroundRecommendations(
       minDiffCurrent = diffCur;
       closestCurrentIdx = idx;
     }
-    const diffOpt = Math.abs(pt.spend - targetOptimalSpend);
+    const diffOpt = Math.abs(pt.spend - optimalSpend);
     if (diffOpt < minDiffOptimal) {
       minDiffOptimal = diffOpt;
       closestOptimalIdx = idx;
@@ -432,6 +412,7 @@ export function computePlaygroundRecommendations(
     archetypes = archetypes.filter((a) => allowed.has(a.platform));
   }
 
+  const isStockout = product.inventory <= 0;
   const candidates: CandidateAdConfig[] = [];
 
   for (const arch of archetypes) {
@@ -460,15 +441,10 @@ export function computePlaygroundRecommendations(
     let candNetProfit = Math.round((candGrossMargin - candSpend) * 100) / 100;
     let candRoas = Math.round((candRevenue / Math.max(candSpend, 1)) * 100) / 100;
 
-    let finalDailyBudget = candDailyBudget;
-    let finalSpend = candSpend;
-
     // Realistic Stockout & Inventory Guardrail
     if (isStockout) {
       stockoutRisk = true;
-      finalDailyBudget = 0;
-      finalSpend = 0;
-      candNetProfit = 0;
+      candNetProfit = -candSpend;
       candRoas = 0;
       candRevenue = 0;
       candGrossMargin = 0;
@@ -485,29 +461,29 @@ export function computePlaygroundRecommendations(
     }
 
     const candCpm = Math.round(12.5 * arch.cpm_mult * 100) / 100;
-    const candImpressions = isStockout ? 0 : Math.max(1, Math.round((candSpend / Math.max(candCpm, 0.5)) * 1000));
+    const candImpressions = Math.max(1, Math.round((candSpend / Math.max(candCpm, 0.5)) * 1000));
     const candCtr = 0.024 * arch.ctr_mult;
-    const candClicks = isStockout ? 0 : Math.max(1, Math.round(candImpressions * candCtr));
-    const candCpc = candClicks > 0 ? Math.round((candSpend / candClicks) * 100) / 100 : 0.45;
-    const candCvr = candClicks > 0 ? Math.round((candConversions / candClicks) * 10000) / 100 : 3.2;
+    const candClicks = Math.max(1, Math.round(candImpressions * candCtr));
+    const candCpc = Math.round((candSpend / Math.max(candClicks, 1)) * 100) / 100;
+    const candCvr = Math.round((candConversions / Math.max(candClicks, 1)) * 10000) / 100;
 
     const keyDrivers: string[] = [];
-    if (arch.cvr_mult > 1.2 && !isStockout) {
+    if (arch.cvr_mult > 1.2) {
       keyDrivers.push(`Conversion yield +${Math.round((arch.cvr_mult - 1) * 100)}% via high-intent targeting`);
     }
-    if (arch.cpm_mult < 0.95 && !isStockout) {
+    if (arch.cpm_mult < 0.95) {
       keyDrivers.push(`Favorable auction pricing (-${Math.round((1 - arch.cpm_mult) * 100)}% CPM discount)`);
     }
-    if (candRoas >= targetRoasFloor && !isStockout) {
+    if (candRoas >= targetRoasFloor) {
       keyDrivers.push(`Surpasses ROAS target (${candRoas.toFixed(2)}x vs ${targetRoasFloor.toFixed(1)}x)`);
     }
     if (!stockoutRisk && product.inventory > candConversions) {
       keyDrivers.push(`Sufficient warehouse inventory (${product.inventory} units available)`);
     }
 
-    let explanation = `${arch.desc} Delivers ₹${candNetProfit.toLocaleString()} expected profit at ₹${candDailyBudget.toLocaleString()}/day over ${durationDays} days.`;
+    let explanation = `${arch.desc} Delivers $${candNetProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} expected profit at $${candDailyBudget.toLocaleString()}/day over ${durationDays} days.`;
     if (isStockout) {
-      explanation = 'CRITICAL STOCKOUT: Zero warehouse stock remaining. Advertising spend paused to prevent unfulfilled ad spend.';
+      explanation = 'CRITICAL STOCKOUT: Zero warehouse stock remaining. Advertising spend will deplete capital with zero fulfillment.';
     } else if (stockoutRisk && candNetProfit < 0) {
       explanation = `INVENTORY CONSTRAINT: Campaign demand (${candConversions} pairs) exhausts warehouse stock (${product.inventory} pairs), causing unfulfilled ad spend.`;
     }
@@ -520,9 +496,9 @@ export function computePlaygroundRecommendations(
       objective: arch.objective,
       audience_segment: arch.audience_segment,
       bidding_strategy: arch.bidding_strategy,
-      daily_budget: finalDailyBudget,
+      daily_budget: candDailyBudget,
       duration_days: durationDays,
-      expected_spend: finalSpend,
+      expected_spend: candSpend,
       predicted_impressions: candImpressions,
       predicted_clicks: candClicks,
       predicted_cpc: candCpc,
@@ -620,7 +596,7 @@ export function computePlaygroundRecommendations(
       ? 'CRITICAL: Product currently has 0 inventory in warehouse stock. Do not launch campaigns.'
       : undefined,
     curve_points: curvePoints,
-    optimal_daily_spend: isStockout ? 0 : optimalSpend,
+    optimal_daily_spend: optimalSpend,
     saturation_daily_spend: saturationSpend,
     marginal_profit_at_operating_point: +(hillMarginalYield(dailyBudget, capacityA, elasticityB, halfSaturationC) * grossMarginRatio - 1).toFixed(2),
     is_profitable: isProfitable,

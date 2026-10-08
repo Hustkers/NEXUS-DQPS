@@ -2,11 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Icons } from '@/components/icons';
-import { CardSpotlight } from './card-spotlight';
-import { BentoGrid, BentoGridItem } from './bento-grid';
+import { SkewCards, type GradientCardItem } from '@/components/ui/gradient-card-showcase';
 import { NotchNavbar } from './notch-navbar';
-import { PlotFigure, BranchesFigure, PhosphorFigure, RiffleFigure } from './hairline-figures';
 import { IsometricTelemetryPanel } from './isometric-telemetry-panel';
 import { AnimatedFooter } from '@/components/ui/animated-footer';
 import { WhyUsBento } from './why-us-bento';
@@ -15,6 +12,50 @@ import { LocomotiveHeroVideo } from './locomotive-hero-video';
 import { EcosystemStackedLogos } from './ecosystem-stacked-logos';
 import { FaqAccordion } from './faq-accordion';
 import { PillarsCardsStack } from './pillars-cards-stack';
+import { CornerButton } from '@/components/ui/corner-button';
+
+const ARCHITECTURE_PHASES: GradientCardItem[] = [
+  {
+    step: '01',
+    badge: 'DUCKDB / POSTGRES',
+    title: 'Multi-Channel Ingestion',
+    desc: 'Unifies ad spend from Meta, Google, Amazon, and TikTok with Shopify orders, GA4 events, and ERP inventory into DuckDB.',
+    gradientFrom: '#ffbc00',
+    gradientTo: '#ff0058',
+    href: '/dashboard/matrix',
+    ctaText: 'Launch Multi-Channel Module →'
+  },
+  {
+    step: '02',
+    badge: 'ROOT CAUSE RCA',
+    title: 'Causal Anomaly Diagnostic',
+    desc: 'Z-score metric monitors detect spikes and run counterfactual DAG logic to separate ad issues from inventory stockouts.',
+    gradientFrom: '#03a9f4',
+    gradientTo: '#ff0058',
+    href: '/dashboard/anomalies',
+    ctaText: 'Launch Causal Module →'
+  },
+  {
+    step: '03',
+    badge: 'SCIPY SOLVER',
+    title: 'Convex Capital Allocation',
+    desc: 'Equi-marginal solver shifts capital across channels and SKUs along response saturation curves under ±20% safety guardrails.',
+    gradientFrom: '#4dff03',
+    gradientTo: '#00d0ff',
+    href: '/dashboard/reallocations',
+    ctaText: 'Launch Convex Module →'
+  },
+  {
+    step: '04',
+    badge: 'CLOSED LOOP',
+    title: 'Autonomous Dispatch & Audit',
+    desc: 'Dispatches API mutations with instant 1-click rollback, comparing realized outcome vs predicted margin in the ledger.',
+    gradientFrom: '#a855f7',
+    gradientTo: '#ec4899',
+    href: '/dashboard/ledger',
+    ctaText: 'Launch Autonomous Module →'
+  }
+];
 
 export function LandingPageView() {
   return (
@@ -51,6 +92,20 @@ export function LandingPageView() {
         </div>
 
         <PillarsCardsStack />
+
+        {/* Action Gateway: Vengence UI CornerButton CTA */}
+        <div className='flex flex-col items-center justify-center pt-8 pb-4 text-center relative z-20'>
+          <p className='text-xs font-mono font-bold uppercase tracking-widest text-muted-foreground mb-4'>
+            Ready to deploy autonomous capital allocation?
+          </p>
+          <CornerButton
+            href='/dashboard/overview'
+            accentColor='#e5ff00'
+            className='font-orbitron font-bold text-sm tracking-wider uppercase'
+          >
+            Get Started
+          </CornerButton>
+        </div>
       </section>
 
       {/* 3. 4-PHASE ARCHITECTURAL FLOW (STACK & PIPELINE) */}
@@ -73,66 +128,14 @@ export function LandingPageView() {
           </div>
         </div>
 
-        <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
-          {[
-            {
-              step: '01',
-              title: 'Multi-Channel Ingestion',
-              desc: 'Unifies ad spend from Meta, Google, Amazon, and TikTok with Shopify orders, GA4 events, and ERP inventory into DuckDB.',
-              badge: 'DUCKDB / POSTGRES',
-              href: '/dashboard/matrix'
-            },
-            {
-              step: '02',
-              title: 'Causal Anomaly Diagnostic',
-              desc: 'Z-score metric monitors detect spikes and run counterfactual DAG logic to separate ad issues from inventory stockouts.',
-              badge: 'ROOT CAUSE RCA',
-              href: '/dashboard/anomalies'
-            },
-            {
-              step: '03',
-              title: 'Convex Capital Allocation',
-              desc: 'Equi-marginal solver shifts capital across channels and SKUs along response saturation curves under ±20% safety guardrails.',
-              badge: 'SCIPY SOLVER',
-              href: '/dashboard/reallocations'
-            },
-            {
-              step: '04',
-              title: 'Autonomous Dispatch & Audit',
-              desc: 'Dispatches API mutations with instant 1-click rollback, comparing realized outcome vs predicted margin in the ledger.',
-              badge: 'CLOSED LOOP',
-              href: '/dashboard/ledger'
-            }
-          ].map((phase, idx) => (
-            <CardSpotlight
-              key={idx}
-              className='p-6 flex flex-col justify-between space-y-4 border-border/80'
-            >
-              <div>
-                <div className='font-orbitron text-2xl font-black text-primary mb-2'>
-                  {phase.step}
-                </div>
-                <div className='font-orbitron text-[10px] px-2 py-0.5 rounded bg-muted text-muted-foreground uppercase font-bold inline-block mb-3'>
-                  {phase.badge}
-                </div>
-                <h3 className='font-orbitron font-bold text-base text-foreground mb-2'>
-                  {phase.title}
-                </h3>
-                <p className='text-xs text-muted-foreground leading-relaxed'>
-                  {phase.desc}
-                </p>
-              </div>
-              <Link
-                href={phase.href}
-                className='pt-2.5 border-t border-border/60 text-[11px] font-mono text-primary font-semibold hover:text-primary/80 flex items-center justify-between group/link'
-              >
-                <span>Launch {phase.title.split(' ')[0]} Module</span>
-                <span className='group-hover/link:translate-x-0.5 transition-transform'>→</span>
-              </Link>
-            </CardSpotlight>
-          ))}
-        </div>
+        <SkewCards
+          cards={ARCHITECTURE_PHASES}
+          className='py-2'
+          cardWidth='w-[280px] sm:w-[290px] xl:w-[285px]'
+          cardHeight='min-h-[410px] h-[420px]'
+        />
       </section>
+
 
       {/* 4. ISOMETRIC ALGORITHMIC TELEMETRY (TACTILE HAIRLINE COCKPIT) */}
       <section id='instruments' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-16 relative'>

@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import {
   IconChevronDown,
   IconChevronUp,
+  IconCode,
+  IconInfoCircle,
   IconCpu
 } from '@tabler/icons-react';
 import type { AdPlaygroundResult } from '../../types/ad-playground-types';
@@ -59,10 +61,10 @@ export function PlaygroundModelDetails({ result }: PlaygroundModelDetailsProps) 
 
           {/* 2. Fitted Parameters Table */}
           <div className='grid grid-cols-2 sm:grid-cols-4 gap-2.5'>
-            <div className='p-2.5 rounded-lg bg-background/60 border border-border/40'>
-              <span className='text-[10px] text-muted-foreground block'>Capacity Ceiling (a)</span>
-              <span className='text-xs font-bold text-foreground'>
-                ₹{result.hill_parameters.capacity_a.toLocaleString()}
+            <div className='p-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800 font-mono tabular-nums'>
+              <span className='text-[10px] text-zinc-400 block font-sans'>Capacity Ceiling (a)</span>
+              <span className='text-xs font-semibold text-zinc-100'>
+                ${result.hill_parameters.capacity_a.toLocaleString()}
               </span>
             </div>
             <div className='p-2.5 rounded-lg bg-background/60 border border-border/40'>

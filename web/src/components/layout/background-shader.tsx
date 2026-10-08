@@ -15,7 +15,7 @@ export function BackgroundShader() {
     () => false
   );
 
-  const isDark = mounted && resolvedTheme === 'dark';
+  const isDark = !mounted || resolvedTheme === 'dark';
 
   return (
     <div
@@ -25,7 +25,6 @@ export function BackgroundShader() {
       <div className='shader-frame w-full h-full pointer-events-none'>
         <ConstellationField
           variant='interface-lines'
-          className='pointer-events-none'
           mode={isDark ? 'dark' : 'light'}
           speed={1.0}
           size={1.0}
@@ -35,6 +34,8 @@ export function BackgroundShader() {
           hue={0}
           saturation={1.0}
           brightness={1.0}
+          className='pointer-events-none'
+          style={{ pointerEvents: 'none' }}
         />
       </div>
     </div>

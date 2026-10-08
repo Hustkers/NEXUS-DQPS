@@ -39,17 +39,10 @@ export interface CampaignConfig {
     targetRoas?: number;
     maxCpa?: number;
     minSpendPerPlatform?: number;
-    grossMarginPct?: number;
-    unitCogs?: number;
   };
 }
 
-export type StrategyClassification =
-  | 'PROVEN'
-  | 'PROMISING'
-  | 'EXPERIMENTAL'
-  | 'NO_PROFITABLE_CONFIGURATION'
-  | 'DEFENSIVE_FLOOR';
+export type StrategyClassification = 'PROVEN' | 'PROMISING' | 'EXPERIMENTAL';
 export type ConfidenceLevel = 'HIGH' | 'MEDIUM' | 'LOW' | 'INSUFFICIENT_DATA';
 
 export interface StrategyRisk {
@@ -105,20 +98,12 @@ export interface StrategyEvaluation {
   expectedCpa: number;
   expectedRevenue: number;
   expectedRoas: number;
-  grossMarginPct?: number;
-  expectedGrossProfit?: number;
-  expectedNetProfit?: number;
-  expectedProfitRoas?: number;
-  marginalRoas?: number;
-  marginalProfit?: number;
-  isProfitable?: boolean;
-  breakevenRoas?: number;
   riskScore: number; // 0 to 100
   confidenceScore: number; // 0.0 to 1.0
   audienceFitScore: number; // 0.0 to 1.0
   overallScore: number; // 0 to 100
   rank: number;
-  status: 'SELECTED' | 'NOT SELECTED' | 'DEFENSIVE_FLOOR' | 'UNPROFITABLE';
+  status: 'SELECTED' | 'NOT SELECTED';
   classification: StrategyClassification;
   confidenceLevel: ConfidenceLevel;
   similarCampaignsCount: number;
@@ -138,7 +123,7 @@ export interface StrategyEvaluation {
     isModelEstimate: boolean;
     modelBasis: string;
     historicalCalibrated: boolean;
-    currency: 'INR' | 'USD';
+    currency: 'INR';
   };
   selectionReasons: string[];
   rejectionReasons: string[];
@@ -185,14 +170,6 @@ export interface BestChoiceExplanation {
   predictedRevenue: number;
   predictedConversions: number;
   predictedCpa: number;
-  predictedGrossProfit?: number;
-  predictedNetProfit?: number;
-  predictedProfitRoas?: number;
-  marginalRoas?: number;
-  marginalProfit?: number;
-  isProfitable?: boolean;
-  decisionState?: 'PROFITABLE_RECOMMENDATION' | 'NO_PROFITABLE_CONFIGURATION' | 'DEFENSIVE_FLOOR';
-  recommendedAction?: 'SCALE' | 'MAINTAIN' | 'REDUCE_SPEND';
   riskScore: number;
   confidencePct: number;
   classification: StrategyClassification;

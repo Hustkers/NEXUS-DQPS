@@ -5,67 +5,6 @@
  * Buy-Box Win Rate, Catalog Halo Sales, and True Net Contribution Margin (CM3/POAS).
  */
 
-import rawMetaPartials from '@/data/raw-api-partials/meta_insights_partial.json';
-import rawGooglePartials from '@/data/raw-api-partials/google_ads_rows_partial.json';
-import rawAmazonPartials from '@/data/raw-api-partials/amazon_sponsored_products_partial.json';
-import rawShopifyOrders from '@/data/raw-api-partials/shopify_orders_partial.json';
-
-export interface VideoFunnelPoint {
-  stage: string;
-  views: number;
-  retentionRate: number; // percentage of total impressions or initial plays
-}
-
-export interface FatigueDecayPoint {
-  frequency: number;
-  ctr: number;
-  status: 'OPTIMAL' | 'ACCEPTABLE' | 'WEAROUT_RISK';
-  isCurrent?: boolean;
-}
-
-export interface ImpressionSharePoint {
-  category: string;
-  share: number;
-  description: string;
-  color: string;
-}
-
-export interface SalesAttributionSplit {
-  type: string;
-  amount: number;
-  pct: number;
-}
-
-export interface UnitEconomicsPoint {
-  component: string;
-  amount: number;
-  pctOfRevenue: number;
-  type: 'revenue' | 'cost' | 'profit';
-}
-
-export interface FunnelConversionStep {
-  step: string;
-  count: number;
-  rate: string;
-  dropoff?: string;
-}
-
-export interface CrossChannelComparisonItem {
-  channel: string;
-  channelKey: 'meta' | 'google' | 'amazon' | 'shopify';
-  spend: number;
-  revenue: number;
-  grossMargin: number;
-  netMargin: number;
-  roas: number;
-  poas: number;
-  ctr: number;
-  cpc: number;
-  conversions: number;
-  color: string;
-  sku: string;
-}
-
 export interface UnifiedCommerceRecord {
   id: string;
   timestamp: string;
@@ -108,15 +47,6 @@ export interface UnifiedCommerceRecord {
   payment_gateway_fee?: number;
   net_contribution_margin?: number; // True Contribution Margin 3 (CM3)
   poas?: number; // Profit on Ad Spend: net_margin / spend
-
-  // Graph Data Models
-  video_funnel?: VideoFunnelPoint[];
-  fatigue_decay_curve?: FatigueDecayPoint[];
-  impression_share_breakdown?: ImpressionSharePoint[];
-  amazon_sales_split?: SalesAttributionSplit[];
-  shopify_fee_breakdown?: UnitEconomicsPoint[];
-  unit_economics_waterfall?: UnitEconomicsPoint[];
-  funnel_steps?: FunnelConversionStep[];
 
   raw_payload_snippet: string;
 }
@@ -204,92 +134,27 @@ export function normalizeMetaInsights(item: any, inventoryMap: Record<string, nu
   const revAction = Array.isArray(item.action_values)
     ? item.action_values.find((av: any) => av.action_type === 'omni_purchase' || av.action_type === 'purchase')
     : null;
-  const attributed_revenue = revAction ? Number(revAction.value) : (conversions > 0 ? conversions * catalog.price : (spend > 0 ? spend * 4.2 : 0));
+  const attributed_revenue = revAction ? Number(revAction.value) : conversions * catalog.price;
 
-  const total_cogs = conversions > 0 ? conversions * catalog.cogs : (attributed_revenue > 0 ? attributed_revenue * 0.41 : 0);
+  const total_cogs = conversions * catalog.cogs;
   const gross_margin = Math.max(0, attributed_revenue - total_cogs);
   const roas = spend > 0 ? attributed_revenue / spend : 0;
-  const gross_margin_pct = attributed_revenue > 0 ? (gross_margin / attributed_revenue) * 100 : 59.1;
+  const gross_margin_pct = attributed_revenue > 0 ? (gross_margin / attributed_revenue) * 100 : 60.0;
   const inventory_on_hand = inventoryMap[sku] ?? (sku === '310805-137' ? 0 : 420);
 
   // Extraordinary Meta Telemetry
-  const frequency = Number(item.frequency) || 1.25;
+  const frequency = Number(item.frequency) || 1.0;
   const reach = Number(item.reach) || (impressions > 0 ? Math.round(impressions / frequency) : 0);
   const learning_phase_status = item.learning_phase_status || 'SUCCESS';
   const quality_ranking = item.quality_ranking || 'AVERAGE';
-
-  // Video 3s hook rate & funnel
-  const vActions = item.video_play_actions;
-  const video3s = Number(vActions?.video_3_sec_watched_actions) || 0;
-  const video_hook_rate_pct = impressions > 0 && video3s > 0 ? Number(((video3s / impressions) * 100).toFixed(1)) : (vActions ? 38.8 : undefined);
-
-  const video_funnel: VideoFunnelPoint[] | undefined = vActions
-    ? [
-        { stage: 'Play Start', views: Number(vActions.video_play) || 0, retentionRate: 100 },
-        {
-          stage: '2s View',
-          views: Number(vActions.video_continuous_2_sec_watched_actions) || 0,
-          retentionRate: Number(((Number(vActions.video_continuous_2_sec_watched_actions) / Number(vActions.video_play)) * 100).toFixed(1))
-        },
-        {
-          stage: '3s Hook',
-          views: Number(vActions.video_3_sec_watched_actions) || 0,
-          retentionRate: Number(((Number(vActions.video_3_sec_watched_actions) / Number(vActions.video_play)) * 100).toFixed(1))
-        },
-        {
-          stage: '25% Mid',
-          views: Number(vActions.video_p25_watched_actions) || 0,
-          retentionRate: Number(((Number(vActions.video_p25_watched_actions) / Number(vActions.video_play)) * 100).toFixed(1))
-        },
-        {
-          stage: '50% Half',
-          views: Number(vActions.video_p50_watched_actions) || 0,
-          retentionRate: Number(((Number(vActions.video_p50_watched_actions) / Number(vActions.video_play)) * 100).toFixed(1))
-        },
-        {
-          stage: '75% Late',
-          views: Number(vActions.video_p75_watched_actions) || 0,
-          retentionRate: Number(((Number(vActions.video_p75_watched_actions) / Number(vActions.video_play)) * 100).toFixed(1))
-        },
-        {
-          stage: '100% End',
-          views: Number(vActions.video_p100_watched_actions) || 0,
-          retentionRate: Number(((Number(vActions.video_p100_watched_actions) / Number(vActions.video_play)) * 100).toFixed(1))
-        }
-      ]
-    : undefined;
-
-  // Ad Fatigue Decay curve simulation centered on actual frequency
-  const baseCtr = ctr > 0 ? ctr : 0.05;
-  const fatigue_decay_curve: FatigueDecayPoint[] = [
-    { frequency: 1.0, ctr: Number((baseCtr * 1.15).toFixed(3)), status: 'OPTIMAL' as const },
-    { frequency: 1.25, ctr: Number((baseCtr * 1.0).toFixed(3)), status: 'OPTIMAL' as const },
-    { frequency: 1.5, ctr: Number((baseCtr * 0.86).toFixed(3)), status: 'OPTIMAL' as const },
-    { frequency: 2.0, ctr: Number((baseCtr * 0.62).toFixed(3)), status: 'ACCEPTABLE' as const },
-    { frequency: 2.5, ctr: Number((baseCtr * 0.41).toFixed(3)), status: 'ACCEPTABLE' as const },
-    { frequency: 3.0, ctr: Number((baseCtr * 0.24).toFixed(3)), status: 'WEAROUT_RISK' as const },
-    { frequency: 3.5, ctr: Number((baseCtr * 0.12).toFixed(3)), status: 'WEAROUT_RISK' as const }
-  ].map((p) => ({
-    ...p,
-    isCurrent: Math.abs(p.frequency - frequency) <= 0.2
-  }));
+  
+  // Video 3s hook rate
+  const video3s = Number(item.video_play_actions?.video_3_sec_watched_actions) || 0;
+  const video_hook_rate_pct = impressions > 0 && video3s > 0 ? Number(((video3s / impressions) * 100).toFixed(1)) : undefined;
 
   // Net Contribution Margin & POAS
   const net_contribution_margin = Math.max(0, gross_margin - spend);
   const poas = spend > 0 ? Number((gross_margin / spend).toFixed(2)) : undefined;
-
-  const unit_economics_waterfall: UnitEconomicsPoint[] = [
-    { component: 'Attributed Rev', amount: Number(attributed_revenue.toFixed(2)), pctOfRevenue: 100, type: 'revenue' },
-    { component: 'Product COGS', amount: Number(total_cogs.toFixed(2)), pctOfRevenue: attributed_revenue > 0 ? Number(((total_cogs / attributed_revenue) * 100).toFixed(1)) : 0, type: 'cost' },
-    { component: 'Meta Ad Spend', amount: Number(spend.toFixed(2)), pctOfRevenue: attributed_revenue > 0 ? Number(((spend / attributed_revenue) * 100).toFixed(1)) : 0, type: 'cost' },
-    { component: 'Net Margin (CM3)', amount: Number(net_contribution_margin.toFixed(2)), pctOfRevenue: attributed_revenue > 0 ? Number(((net_contribution_margin / attributed_revenue) * 100).toFixed(1)) : 0, type: 'profit' }
-  ];
-
-  const funnel_steps: FunnelConversionStep[] = [
-    { step: 'Impressions', count: impressions, rate: '100%' },
-    { step: 'Link Clicks', count: clicks, rate: `${ctr.toFixed(2)}% CTR`, dropoff: `${(100 - ctr).toFixed(1)}% bounce` },
-    { step: 'Conversions', count: conversions, rate: clicks > 0 ? `${((conversions / clicks) * 100).toFixed(1)}% CVR` : '0%', dropoff: clicks > 0 ? `${(100 - (conversions / clicks) * 100).toFixed(1)}% drop` : 'N/A' }
-  ];
 
   return {
     id: `meta_${item.ad_id || item.campaign_id}`,
@@ -322,10 +187,6 @@ export function normalizeMetaInsights(item: any, inventoryMap: Record<string, nu
     video_hook_rate_pct,
     net_contribution_margin: Number(net_contribution_margin.toFixed(2)),
     poas,
-    video_funnel,
-    fatigue_decay_curve,
-    unit_economics_waterfall,
-    funnel_steps,
     raw_payload_snippet: JSON.stringify(item, null, 2)
   };
 }
@@ -362,39 +223,20 @@ export function normalizeGoogleAdsRow(item: any, inventoryMap: Record<string, nu
   const isMetrics = item.metrics || {};
   const search_impression_share_pct = isMetrics.searchImpressionShare != null
     ? Number((isMetrics.searchImpressionShare * 100).toFixed(1))
-    : 74.2;
+    : undefined;
   const search_budget_lost_is_pct = isMetrics.searchBudgetLostImpressionShare != null
     ? Number((isMetrics.searchBudgetLostImpressionShare * 100).toFixed(1))
-    : 17.6;
+    : undefined;
   const search_rank_lost_is_pct = isMetrics.searchRankLostImpressionShare != null
     ? Number((isMetrics.searchRankLostImpressionShare * 100).toFixed(1))
-    : 8.2;
+    : undefined;
 
-  const quality_score = item.ad_group_criterion?.qualityInfo?.qualityScore ?? 9;
+  const quality_score = item.ad_group_criterion?.qualityInfo?.qualityScore ?? undefined;
   const net_contribution_margin = Math.max(0, gross_margin - spend);
   const poas = spend > 0 ? Number((gross_margin / spend).toFixed(2)) : undefined;
 
-  const impression_share_breakdown: ImpressionSharePoint[] = [
-    { category: 'Captured IS', share: search_impression_share_pct, description: 'Auctions won & displayed on Google SERP', color: '#10b981' },
-    { category: 'Lost IS (Budget)', share: search_budget_lost_is_pct, description: 'Lost due to daily budget ceiling limitation', color: '#f59e0b' },
-    { category: 'Lost IS (Rank)', share: search_rank_lost_is_pct, description: 'Lost due to competitor ad rank & keyword bid', color: '#ef4444' }
-  ];
-
-  const unit_economics_waterfall: UnitEconomicsPoint[] = [
-    { component: 'Attributed Rev', amount: Number(attributed_revenue.toFixed(2)), pctOfRevenue: 100, type: 'revenue' },
-    { component: 'Product COGS', amount: Number(total_cogs.toFixed(2)), pctOfRevenue: attributed_revenue > 0 ? Number(((total_cogs / attributed_revenue) * 100).toFixed(1)) : 0, type: 'cost' },
-    { component: 'Google Ads Spend', amount: Number(spend.toFixed(2)), pctOfRevenue: attributed_revenue > 0 ? Number(((spend / attributed_revenue) * 100).toFixed(1)) : 0, type: 'cost' },
-    { component: 'Net Margin (CM3)', amount: Number(net_contribution_margin.toFixed(2)), pctOfRevenue: attributed_revenue > 0 ? Number(((net_contribution_margin / attributed_revenue) * 100).toFixed(1)) : 0, type: 'profit' }
-  ];
-
-  const funnel_steps: FunnelConversionStep[] = [
-    { step: 'Impressions', count: impressions, rate: '100%' },
-    { step: 'Ad Clicks', count: clicks, rate: `${ctr.toFixed(2)}% CTR`, dropoff: `${(100 - ctr).toFixed(1)}%` },
-    { step: 'Conversions', count: conversions, rate: clicks > 0 ? `${((conversions / clicks) * 100).toFixed(1)}% CVR` : '0%', dropoff: clicks > 0 ? `${(100 - (conversions / clicks) * 100).toFixed(1)}%` : '0%' }
-  ];
-
   return {
-    id: `google_${item.campaign?.id || (campName || sku || 'feed')}`,
+    id: `google_${item.campaign?.id || Math.random()}`,
     timestamp: item.segments?.date ? `${item.segments.date}T00:00:00Z` : new Date().toISOString(),
     channel: 'google',
     campaign_id: String(item.campaign?.id || 'google_camp'),
@@ -423,9 +265,6 @@ export function normalizeGoogleAdsRow(item: any, inventoryMap: Record<string, nu
     quality_score,
     net_contribution_margin: Number(net_contribution_margin.toFixed(2)),
     poas,
-    impression_share_breakdown,
-    unit_economics_waterfall,
-    funnel_steps,
     raw_payload_snippet: JSON.stringify(item, null, 2)
   };
 }
@@ -467,37 +306,8 @@ export function normalizeAmazonSponsoredProducts(
     ? Number((item.buyBoxWinPercentage * 100).toFixed(1))
     : 95.0;
   const halo_attributed_revenue = Number(item.attributedSalesOtherSku14d) || 0;
-  const direct_sku_revenue = Number(item.attributedSalesSameSku14d) || Math.max(0, attributed_revenue - halo_attributed_revenue);
-
   const net_contribution_margin = Math.max(0, gross_margin - spend);
   const poas = spend > 0 ? Number((gross_margin / spend).toFixed(2)) : undefined;
-
-  const amazon_sales_split: SalesAttributionSplit[] = [
-    {
-      type: 'Direct Target SKU',
-      amount: direct_sku_revenue,
-      pct: attributed_revenue > 0 ? Number(((direct_sku_revenue / attributed_revenue) * 100).toFixed(1)) : 78
-    },
-    {
-      type: 'Catalog Halo Sales',
-      amount: halo_attributed_revenue,
-      pct: attributed_revenue > 0 ? Number(((halo_attributed_revenue / attributed_revenue) * 100).toFixed(1)) : 22
-    }
-  ];
-
-  const unit_economics_waterfall: UnitEconomicsPoint[] = [
-    { component: 'Attributed Rev', amount: Number(attributed_revenue.toFixed(2)), pctOfRevenue: 100, type: 'revenue' },
-    { component: 'Product COGS', amount: Number(total_cogs.toFixed(2)), pctOfRevenue: attributed_revenue > 0 ? Number(((total_cogs / attributed_revenue) * 100).toFixed(1)) : 0, type: 'cost' },
-    { component: 'Amazon Ad Cost', amount: Number(spend.toFixed(2)), pctOfRevenue: attributed_revenue > 0 ? Number(((spend / attributed_revenue) * 100).toFixed(1)) : 0, type: 'cost' },
-    { component: 'FBA & Referral Fees', amount: Number((total_fba_fees + referral_fees).toFixed(2)), pctOfRevenue: attributed_revenue > 0 ? Number((((total_fba_fees + referral_fees) / attributed_revenue) * 100).toFixed(1)) : 0, type: 'cost' },
-    { component: 'Net Margin (CM3)', amount: Number(net_contribution_margin.toFixed(2)), pctOfRevenue: attributed_revenue > 0 ? Number(((net_contribution_margin / attributed_revenue) * 100).toFixed(1)) : 0, type: 'profit' }
-  ];
-
-  const funnel_steps: FunnelConversionStep[] = [
-    { step: 'Impressions', count: impressions, rate: '100%' },
-    { step: 'Product Clicks', count: clicks, rate: `${ctr.toFixed(2)}% CTR`, dropoff: `${(100 - ctr).toFixed(1)}%` },
-    { step: 'Orders (14-Day)', count: conversions, rate: clicks > 0 ? `${((conversions / clicks) * 100).toFixed(1)}% CVR` : '0%', dropoff: clicks > 0 ? `${(100 - (conversions / clicks) * 100).toFixed(1)}%` : '0%' }
-  ];
 
   return {
     id: `amazon_${item.campaignId}_${sku}`,
@@ -528,9 +338,6 @@ export function normalizeAmazonSponsoredProducts(
     fba_fees: Number(total_fba_fees.toFixed(2)),
     net_contribution_margin: Number(net_contribution_margin.toFixed(2)),
     poas,
-    amazon_sales_split,
-    unit_economics_waterfall,
-    funnel_steps,
     raw_payload_snippet: JSON.stringify(item, null, 2)
   };
 }
@@ -543,7 +350,7 @@ export function normalizeShopifyOrder(item: any, inventoryMap: Record<string, nu
     price: lineItem.price || 150.0,
     cogs: 55.0,
     asin: 'B07Q8Z9101',
-    variantId: 'gid://shopify/ProductVariant/41001'
+    variantId: lineItem.variant_id || 'gid://shopify/ProductVariant/41001'
   };
 
   const revenue = Number(item.total_price) || catalog.price;
@@ -569,28 +376,6 @@ export function normalizeShopifyOrder(item: any, inventoryMap: Record<string, nu
   const customer_acquisition_type = item.customer?.orders_count === 1 ? 'NEW_ACQUISITION' : 'RETURNING_VIP';
   const net_contribution_margin = Math.max(0, gross_margin - spend);
   const poas = spend > 0 ? Number((gross_margin / spend).toFixed(2)) : undefined;
-
-  const shopify_fee_breakdown: UnitEconomicsPoint[] = [
-    { component: 'Gross Checkout', amount: revenue, pctOfRevenue: 100, type: 'revenue' },
-    { component: 'Sales Tax', amount: taxes, pctOfRevenue: Number(((taxes / revenue) * 100).toFixed(1)), type: 'cost' },
-    { component: 'Stripe Gateway Fee', amount: payment_gateway_fee, pctOfRevenue: Number(((payment_gateway_fee / revenue) * 100).toFixed(1)), type: 'cost' },
-    { component: 'Footwear COGS', amount: total_cogs, pctOfRevenue: Number(((total_cogs / revenue) * 100).toFixed(1)), type: 'cost' },
-    { component: 'Net Merchant Margin', amount: Number(gross_margin.toFixed(2)), pctOfRevenue: Number(((gross_margin / revenue) * 100).toFixed(1)), type: 'profit' }
-  ];
-
-  const unit_economics_waterfall: UnitEconomicsPoint[] = [
-    { component: 'D2C Checkout', amount: Number(revenue.toFixed(2)), pctOfRevenue: 100, type: 'revenue' },
-    { component: 'Product COGS', amount: Number(total_cogs.toFixed(2)), pctOfRevenue: Number(((total_cogs / revenue) * 100).toFixed(1)), type: 'cost' },
-    { component: 'Promo / App Fee', amount: Number(spend.toFixed(2)), pctOfRevenue: Number(((spend / revenue) * 100).toFixed(1)), type: 'cost' },
-    { component: 'Gateway & Taxes', amount: Number((payment_gateway_fee + taxes).toFixed(2)), pctOfRevenue: Number((((payment_gateway_fee + taxes) / revenue) * 100).toFixed(1)), type: 'cost' },
-    { component: 'Net Margin (CM3)', amount: Number(net_contribution_margin.toFixed(2)), pctOfRevenue: Number(((net_contribution_margin / revenue) * 100).toFixed(1)), type: 'profit' }
-  ];
-
-  const funnel_steps: FunnelConversionStep[] = [
-    { step: 'Sessions (Est)', count: clicks * 3, rate: '100%' },
-    { step: 'Add to Cart', count: Math.round(clicks * 0.8), rate: '26.7%' },
-    { step: 'Orders Fulfilled', count: conversions, rate: `${((conversions / (clicks * 3)) * 100).toFixed(1)}% CVR` }
-  ];
 
   return {
     id: `shopify_${item.id}`,
@@ -620,83 +405,6 @@ export function normalizeShopifyOrder(item: any, inventoryMap: Record<string, nu
     payment_gateway_fee,
     net_contribution_margin: Number(net_contribution_margin.toFixed(2)),
     poas,
-    shopify_fee_breakdown,
-    unit_economics_waterfall,
-    funnel_steps,
     raw_payload_snippet: JSON.stringify(item, null, 2)
   };
-}
-
-/**
- * Returns a normalized cross-channel overview across all 4 platforms
- * for simultaneous side-by-side comparison charts and executive reporting.
- */
-export function getCrossChannelOverview(inventoryMap: Record<string, number>): CrossChannelComparisonItem[] {
-  const metaRec = normalizeMetaInsights(rawMetaPartials[0], inventoryMap);
-  const googleRec = normalizeGoogleAdsRow(rawGooglePartials[0], inventoryMap);
-  const amazonRec = normalizeAmazonSponsoredProducts(rawAmazonPartials[0], inventoryMap);
-  const shopifyRec = normalizeShopifyOrder(rawShopifyOrders[0], inventoryMap);
-
-  return [
-    {
-      channel: 'Meta Ads',
-      channelKey: 'meta',
-      spend: metaRec.spend,
-      revenue: metaRec.attributed_revenue,
-      grossMargin: metaRec.gross_margin,
-      netMargin: metaRec.net_contribution_margin ?? metaRec.gross_margin - metaRec.spend,
-      roas: metaRec.roas,
-      poas: metaRec.poas ?? 0,
-      ctr: metaRec.ctr,
-      cpc: metaRec.cpc,
-      conversions: metaRec.conversions,
-      color: '#3b82f6',
-      sku: metaRec.sku_id
-    },
-    {
-      channel: 'Google Ads',
-      channelKey: 'google',
-      spend: googleRec.spend,
-      revenue: googleRec.attributed_revenue,
-      grossMargin: googleRec.gross_margin,
-      netMargin: googleRec.net_contribution_margin ?? googleRec.gross_margin - googleRec.spend,
-      roas: googleRec.roas,
-      poas: googleRec.poas ?? 0,
-      ctr: googleRec.ctr,
-      cpc: googleRec.cpc,
-      conversions: googleRec.conversions,
-      color: '#10b981',
-      sku: googleRec.sku_id
-    },
-    {
-      channel: 'Amazon Ads',
-      channelKey: 'amazon',
-      spend: amazonRec.spend,
-      revenue: amazonRec.attributed_revenue,
-      grossMargin: amazonRec.gross_margin,
-      netMargin: amazonRec.net_contribution_margin ?? amazonRec.gross_margin - amazonRec.spend,
-      roas: amazonRec.roas,
-      poas: amazonRec.poas ?? 0,
-      ctr: amazonRec.ctr,
-      cpc: amazonRec.cpc,
-      conversions: amazonRec.conversions,
-      color: '#f59e0b',
-      sku: amazonRec.sku_id
-    },
-    {
-      channel: 'Shopify D2C',
-      channelKey: 'shopify',
-      spend: shopifyRec.spend,
-      revenue: shopifyRec.attributed_revenue,
-      grossMargin: shopifyRec.gross_margin,
-      netMargin: shopifyRec.net_contribution_margin ?? shopifyRec.gross_margin - shopifyRec.spend,
-      roas: shopifyRec.roas,
-      poas: shopifyRec.poas ?? 0,
-      ctr: shopifyRec.ctr,
-      cpc: shopifyRec.cpc,
-      conversions: shopifyRec.conversions,
-      color: '#96bf48',
-      sku: shopifyRec.sku_id
-    }
-  ];
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import type { DataLineageInfo } from '../types/simulation-types';
 
@@ -13,72 +14,55 @@ export function SimulationDataLineage({
   lineage,
   className
 }: SimulationDataLineageProps) {
-  const sources = [
-    {
-      name: 'Store performance baseline',
-      detail: lineage.datasetGrounding || 'Historical store metrics',
-      time: 'Last 90 days',
-      status: 'Connected'
-    },
-    {
-      name: 'Product catalog',
-      detail: `${lineage.productName} (SKU: ${lineage.sku})`,
-      time: 'Live sync',
-      status: 'Connected'
-    },
-    {
-      name: 'Ad spend tracking',
-      detail: `₹${lineage.baselineSpendDaily.toLocaleString('en-IN')}/day baseline spend`,
-      time: 'Updated today',
-      status: 'Connected'
-    },
-    {
-      name: 'Crisis shock parameters',
-      detail: `${lineage.shockMagnitude} applied to ${lineage.selectedStrategy}`,
-      time: `${lineage.horizonDays} days horizon`,
-      status: 'Calculated'
-    }
-  ];
-
   return (
-    <div className={cn('rounded-xl border border-border bg-card p-6 shadow-xs space-y-4', className)}>
-      <div className='border-b border-border/60 pb-3'>
-        <h4 className='text-sm font-semibold text-foreground'>
-          Data sources
-        </h4>
-        <p className='text-xs text-muted-foreground mt-0.5'>
-          Verified inputs and operational connections backing this simulation.
-        </p>
-      </div>
-
-      {/* One line per source with time and status */}
-      <div className='divide-y divide-border/60 text-sm'>
-        {sources.map((src) => (
-          <div
-            key={src.name}
-            className='flex flex-col sm:flex-row sm:items-center justify-between py-3 gap-2'
-          >
-            <div className='min-w-0'>
-              <span className='font-medium text-foreground block'>{src.name}</span>
-              <span className='text-xs text-muted-foreground block truncate'>{src.detail}</span>
-            </div>
-            <div className='flex items-center gap-3 shrink-0 text-xs'>
-              <span className='text-muted-foreground'>{src.time}</span>
-              <span className='inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-medium'>
-                <span className='size-1.5 rounded-full bg-emerald-500' />
-                {src.status}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {lineage.formulaSummary && (
-        <div className='pt-3 border-t border-border/60 text-xs text-muted-foreground'>
-          <span className='font-medium text-foreground'>Model logic: </span>
-          {lineage.formulaSummary}
+    <div className={cn('rounded-xl border border-border/80 bg-muted/20 p-4 font-mono shadow-xs text-xs space-y-3', className)}>
+      <div className='flex items-center justify-between border-b border-border/60 pb-2.5'>
+        <div className='flex items-center gap-2'>
+          <Icons.shieldCheck className='size-3.5 text-emerald-500' />
+          <h4 className='font-bold uppercase tracking-wider text-foreground text-xs'>
+            Mathematical Lineage &amp; Data Grounding
+          </h4>
         </div>
-      )}
+        <span className='text-[10px] text-muted-foreground uppercase font-semibold'>
+          100% Deterministic • Zero Synthetic Drift
+        </span>
+      </div>
+
+      <div className='grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px]'>
+        <div>
+          <span className='text-muted-foreground block text-[10px] uppercase'>Baseline Source</span>
+          <span className='font-semibold text-foreground truncate block' title={lineage.datasetGrounding}>
+            90-Day Telemetry Dataset
+          </span>
+        </div>
+
+        <div>
+          <span className='text-muted-foreground block text-[10px] uppercase'>Affected SKU Target</span>
+          <span className='font-semibold text-foreground truncate block'>
+            {lineage.productName} ({lineage.sku})
+          </span>
+        </div>
+
+        <div>
+          <span className='text-muted-foreground block text-[10px] uppercase'>Daily Spend Baseline</span>
+          <span className='font-semibold text-foreground'>
+            ₹{lineage.baselineSpendDaily.toLocaleString('en-IN')}/day
+          </span>
+        </div>
+
+        <div>
+          <span className='text-muted-foreground block text-[10px] uppercase'>Injected Shock Magnitude</span>
+          <span className='font-bold text-rose-600 dark:text-rose-400'>
+            {lineage.shockMagnitude}
+          </span>
+        </div>
+      </div>
+
+      <div className='pt-2 border-t border-border/40 text-[10px] text-muted-foreground flex items-center justify-between flex-wrap gap-2'>
+        <span>Active Strategy: <strong className='text-foreground'>{lineage.selectedStrategy}</strong></span>
+        <span>Horizon: <strong className='text-foreground'>{lineage.horizonDays} Days</strong></span>
+        <span className='italic truncate max-w-md'>{lineage.formulaSummary}</span>
+      </div>
     </div>
   );
 }

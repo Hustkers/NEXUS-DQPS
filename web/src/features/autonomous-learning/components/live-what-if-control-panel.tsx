@@ -72,14 +72,14 @@ export function LiveWhatIfControlPanel({
     } else if (preset === 'AGGRESSIVE_GROWTH') {
       onChangeInputs({
         ...inputs,
-        totalBudget: 1600000,
+        totalBudget: 220000,
         riskTolerance: 'aggressive',
         explorationBudgetPct: 20
       });
     } else if (preset === 'CONSERVATIVE_GROWTH') {
       onChangeInputs({
         ...inputs,
-        totalBudget: 750000,
+        totalBudget: 95000,
         riskTolerance: 'conservative',
         explorationBudgetPct: 5
       });
@@ -87,20 +87,19 @@ export function LiveWhatIfControlPanel({
   };
 
   return (
-    <div className={cn('rounded-2xl border border-border/80 bg-card p-5 sm:p-6 font-mono shadow-xs space-y-4', className)}>
-      {/* Header */}
-      <div className='flex items-center justify-between border-b border-border/60 pb-3'>
+    <div className={cn('rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 font-mono shadow-none space-y-4', className)}>
+      <div className='flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3'>
         <div className='flex items-center gap-2'>
-          <Icons.sliders className='size-4 text-emerald-500' />
-          <h2 className='text-xs font-bold uppercase tracking-wider text-foreground'>
-            SCENARIO ASSUMPTION CONTROLS
-          </h2>
+          <Icons.sliders className='size-3.5 text-zinc-500' />
+          <h3 className='text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100'>
+            What-If Scenario Simulation Parameters
+          </h3>
         </div>
         <Button
           size='sm'
           variant='outline'
           onClick={onResetDefaults}
-          className='h-7 text-[11px] border-border text-muted-foreground hover:text-foreground hover:border-foreground/40'
+          className='h-7 text-[11px] border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100'
         >
           <Icons.clock className='mr-1 size-3' />
           Reset Baseline
@@ -108,66 +107,59 @@ export function LiveWhatIfControlPanel({
       </div>
 
       {/* Preset Scenario Buttons */}
-      <div className='flex flex-wrap gap-1.5'>
-        {[
-          { id: 'NORMAL', label: 'Baseline' },
-          { id: 'HIGH_DEMAND', label: 'High Demand' },
-          { id: 'LOW_INVENTORY', label: 'Low Inventory' },
-          { id: 'CPC_SPIKE', label: 'CPC Spike (+45%)' },
-          { id: 'CREATIVE_FATIGUE', label: 'Creative Fatigue' },
-          { id: 'HIGH_MARGIN', label: 'High Margin (+12%)' },
-          { id: 'AGGRESSIVE_GROWTH', label: 'Aggressive' },
-          { id: 'CONSERVATIVE_GROWTH', label: 'Conservative' }
-        ].map((p) => (
-          <button
-            key={p.id}
-            onClick={() => applyPreset(p.id)}
-            className='px-2.5 py-1 rounded-md text-[10px] font-bold border border-border/70 bg-muted/20 text-foreground hover:bg-card hover:border-foreground transition-all active:scale-[0.98] cursor-pointer'
-          >
-            {p.label}
-          </button>
-        ))}
+      <div className='space-y-1.5'>
+        <div className='text-[10px] text-zinc-500 uppercase font-semibold tracking-wider'>
+          Scenario Presets
+        </div>
+        <div className='flex flex-wrap gap-1.5'>
+          {[
+            { id: 'NORMAL', label: 'Baseline' },
+            { id: 'HIGH_DEMAND', label: 'Demand Surge' },
+            { id: 'LOW_INVENTORY', label: 'Stockout Pressure' },
+            { id: 'CPC_SPIKE', label: 'Auction CPM Spike (+45%)' },
+            { id: 'CREATIVE_FATIGUE', label: 'Ad Fatigue' },
+            { id: 'HIGH_MARGIN', label: 'High Margin (+12%)' },
+            { id: 'AGGRESSIVE_GROWTH', label: 'Aggressive ($220k)' },
+            { id: 'CONSERVATIVE_GROWTH', label: 'Conservative ($95k)' }
+          ].map((p) => (
+            <button
+              key={p.id}
+              onClick={() => applyPreset(p.id)}
+              className='px-2.5 py-1 rounded text-[10px] font-medium border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 hover:border-zinc-400 dark:hover:border-zinc-600 transition-colors'
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* 6 Minimal, High-Precision Sliders */}
-      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-1 text-xs'>
-        {/* 1. Total Budget Slider */}
-        <div className='rounded-xl border border-border/70 bg-muted/15 p-3 space-y-2 hover:border-foreground/30 transition-all'>
-          <div className='flex justify-between items-center text-[10px] font-bold uppercase'>
-            <span className='text-muted-foreground'>Total Budget</span>
-            <span className='font-mono font-bold text-foreground px-1.5 py-0.2 rounded bg-muted border border-border'>
-              ₹{(inputs.totalBudget / 100000).toFixed(2)}L
+      {/* Interactive Variable Sliders */}
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-1 text-xs'>
+        {/* Total Budget Slider */}
+        <div className='rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 p-3 space-y-1.5'>
+          <div className='flex justify-between items-center text-[10px] font-semibold uppercase'>
+            <span className='text-zinc-500'>Total Cycle Spend</span>
+            <span className='text-zinc-900 dark:text-zinc-100 font-mono font-bold'>
+              ${inputs.totalBudget.toLocaleString('en-US')}
             </span>
           </div>
           <input
             type='range'
-            min={200000}
-            max={2500000}
-            step={25000}
+            min={40000}
+            max={350000}
+            step={5000}
             value={inputs.totalBudget}
             onChange={(e) => updateField('totalBudget', Number(e.target.value))}
-            className='w-full accent-primary h-1 bg-border rounded-lg cursor-pointer'
+            className='w-full accent-zinc-900 dark:accent-zinc-100 h-1 bg-zinc-200 dark:bg-zinc-800 rounded cursor-pointer'
           />
-          <div className='flex justify-between text-[9px] text-muted-foreground'>
-            <span>₹2.0L</span>
-            <span>₹25.0L</span>
-          </div>
+          <span className='text-[9px] text-zinc-500 font-mono block'>Operating range: $40k to $350k</span>
         </div>
 
-        {/* 2. Expected CPC Shift Slider */}
-        <div className='rounded-xl border border-border/70 bg-muted/15 p-3 space-y-2 hover:border-foreground/30 transition-all'>
-          <div className='flex justify-between items-center text-[10px] font-bold uppercase'>
-            <span className='text-muted-foreground'>Market CPC Shift</span>
-            <span
-              className={cn(
-                'font-mono font-bold text-[10px] px-1.5 py-0.2 rounded border',
-                inputs.cpcShiftPct > 0
-                  ? 'border-rose-500/30 text-rose-500 bg-rose-500/10'
-                  : inputs.cpcShiftPct < 0
-                  ? 'border-emerald-500/30 text-emerald-500 bg-emerald-500/10'
-                  : 'border-border text-foreground bg-muted'
-              )}
-            >
+        {/* Expected CPC Shift Slider */}
+        <div className='rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 p-3 space-y-1.5'>
+          <div className='flex justify-between items-center text-[10px] font-semibold uppercase'>
+            <span className='text-zinc-500'>Auction CPC Shift</span>
+            <span className={cn('font-mono font-bold', inputs.cpcShiftPct > 0 ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-600')}>
               {inputs.cpcShiftPct > 0 ? '+' : ''}{inputs.cpcShiftPct}%
             </span>
           </div>
@@ -178,28 +170,16 @@ export function LiveWhatIfControlPanel({
             step={5}
             value={inputs.cpcShiftPct}
             onChange={(e) => updateField('cpcShiftPct', Number(e.target.value))}
-            className='w-full accent-primary h-1 bg-border rounded-lg cursor-pointer'
+            className='w-full accent-zinc-900 dark:accent-zinc-100 h-1 bg-zinc-200 dark:bg-zinc-800 rounded cursor-pointer'
           />
-          <div className='flex justify-between text-[9px] text-muted-foreground'>
-            <span>-40%</span>
-            <span>+80%</span>
-          </div>
+          <span className='text-[9px] text-zinc-500 block'>Auction bid competition</span>
         </div>
 
-        {/* 3. Conversion Rate Shift Slider */}
-        <div className='rounded-xl border border-border/70 bg-muted/15 p-3 space-y-2 hover:border-foreground/30 transition-all'>
-          <div className='flex justify-between items-center text-[10px] font-bold uppercase'>
-            <span className='text-muted-foreground'>Conversion Rate (CVR)</span>
-            <span
-              className={cn(
-                'font-mono font-bold text-[10px] px-1.5 py-0.2 rounded border',
-                inputs.cvrShiftPct > 0
-                  ? 'border-emerald-500/30 text-emerald-500 bg-emerald-500/10'
-                  : inputs.cvrShiftPct < 0
-                  ? 'border-rose-500/30 text-rose-500 bg-rose-500/10'
-                  : 'border-border text-foreground bg-muted'
-              )}
-            >
+        {/* Conversion Rate Shift Slider */}
+        <div className='rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 p-3 space-y-1.5'>
+          <div className='flex justify-between items-center text-[10px] font-semibold uppercase'>
+            <span className='text-zinc-500'>Conversion Rate (CVR)</span>
+            <span className='font-mono font-bold text-zinc-900 dark:text-zinc-100'>
               {inputs.cvrShiftPct > 0 ? '+' : ''}{inputs.cvrShiftPct}%
             </span>
           </div>
@@ -210,28 +190,16 @@ export function LiveWhatIfControlPanel({
             step={5}
             value={inputs.cvrShiftPct}
             onChange={(e) => updateField('cvrShiftPct', Number(e.target.value))}
-            className='w-full accent-primary h-1 bg-border rounded-lg cursor-pointer'
+            className='w-full accent-zinc-900 dark:accent-zinc-100 h-1 bg-zinc-200 dark:bg-zinc-800 rounded cursor-pointer'
           />
-          <div className='flex justify-between text-[9px] text-muted-foreground'>
-            <span>-50%</span>
-            <span>+50%</span>
-          </div>
+          <span className='text-[9px] text-zinc-500 block'>Shopper checkout elasticity</span>
         </div>
 
-        {/* 4. Gross Margin Shift Slider */}
-        <div className='rounded-xl border border-border/70 bg-muted/15 p-3 space-y-2 hover:border-foreground/30 transition-all'>
-          <div className='flex justify-between items-center text-[10px] font-bold uppercase'>
-            <span className='text-muted-foreground'>Gross Margin Shift</span>
-            <span
-              className={cn(
-                'font-mono font-bold text-[10px] px-1.5 py-0.2 rounded border',
-                inputs.grossMarginShiftPct > 0
-                  ? 'border-emerald-500/30 text-emerald-500 bg-emerald-500/10'
-                  : inputs.grossMarginShiftPct < 0
-                  ? 'border-rose-500/30 text-rose-500 bg-rose-500/10'
-                  : 'border-border text-foreground bg-muted'
-              )}
-            >
+        {/* Gross Margin Shift Slider */}
+        <div className='rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 p-3 space-y-1.5'>
+          <div className='flex justify-between items-center text-[10px] font-semibold uppercase'>
+            <span className='text-zinc-500'>Gross Margin Shift</span>
+            <span className='font-mono font-bold text-zinc-900 dark:text-zinc-100'>
               {inputs.grossMarginShiftPct > 0 ? '+' : ''}{inputs.grossMarginShiftPct}%
             </span>
           </div>
@@ -242,28 +210,16 @@ export function LiveWhatIfControlPanel({
             step={2}
             value={inputs.grossMarginShiftPct}
             onChange={(e) => updateField('grossMarginShiftPct', Number(e.target.value))}
-            className='w-full accent-primary h-1 bg-border rounded-lg cursor-pointer'
+            className='w-full accent-zinc-900 dark:accent-zinc-100 h-1 bg-zinc-200 dark:bg-zinc-800 rounded cursor-pointer'
           />
-          <div className='flex justify-between text-[9px] text-muted-foreground'>
-            <span>-20%</span>
-            <span>+20%</span>
-          </div>
+          <span className='text-[9px] text-zinc-500 block'>ERP unit COGS perturbation</span>
         </div>
 
-        {/* 5. Inventory Shock Slider */}
-        <div className='rounded-xl border border-border/70 bg-muted/15 p-3 space-y-2 hover:border-foreground/30 transition-all'>
-          <div className='flex justify-between items-center text-[10px] font-bold uppercase'>
-            <span className='text-muted-foreground'>Inventory Availability</span>
-            <span
-              className={cn(
-                'font-mono font-bold text-[10px] px-1.5 py-0.2 rounded border',
-                inputs.inventoryShockPct < 0
-                  ? 'border-amber-500/30 text-amber-500 bg-amber-500/10'
-                  : inputs.inventoryShockPct > 0
-                  ? 'border-emerald-500/30 text-emerald-500 bg-emerald-500/10'
-                  : 'border-border text-foreground bg-muted'
-              )}
-            >
+        {/* Inventory Shock Slider */}
+        <div className='rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 p-3 space-y-1.5'>
+          <div className='flex justify-between items-center text-[10px] font-semibold uppercase'>
+            <span className='text-zinc-500'>Inventory Shock</span>
+            <span className='font-mono font-bold text-zinc-900 dark:text-zinc-100'>
               {inputs.inventoryShockPct > 0 ? '+' : ''}{inputs.inventoryShockPct}%
             </span>
           </div>
@@ -274,26 +230,16 @@ export function LiveWhatIfControlPanel({
             step={10}
             value={inputs.inventoryShockPct}
             onChange={(e) => updateField('inventoryShockPct', Number(e.target.value))}
-            className='w-full accent-primary h-1 bg-border rounded-lg cursor-pointer'
+            className='w-full accent-zinc-900 dark:accent-zinc-100 h-1 bg-zinc-200 dark:bg-zinc-800 rounded cursor-pointer'
           />
-          <div className='flex justify-between text-[9px] text-muted-foreground'>
-            <span>-100%</span>
-            <span>+50%</span>
-          </div>
+          <span className='text-[9px] text-zinc-500 block'>Warehouse buffer perturbation</span>
         </div>
 
-        {/* 6. Creative Fatigue Days Slider */}
-        <div className='rounded-xl border border-border/70 bg-muted/15 p-3 space-y-2 hover:border-foreground/30 transition-all'>
-          <div className='flex justify-between items-center text-[10px] font-bold uppercase'>
-            <span className='text-muted-foreground'>Creative Wearout</span>
-            <span
-              className={cn(
-                'font-mono font-bold text-[10px] px-1.5 py-0.2 rounded border',
-                inputs.creativeFatigueDays > 7
-                  ? 'border-rose-500/30 text-rose-500 bg-rose-500/10'
-                  : 'border-border text-foreground bg-muted'
-              )}
-            >
+        {/* Creative Fatigue Days Slider */}
+        <div className='rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 p-3 space-y-1.5'>
+          <div className='flex justify-between items-center text-[10px] font-semibold uppercase'>
+            <span className='text-zinc-500'>Creative Wearout Age</span>
+            <span className='font-mono font-bold text-zinc-900 dark:text-zinc-100'>
               {inputs.creativeFatigueDays} Days
             </span>
           </div>
@@ -304,12 +250,9 @@ export function LiveWhatIfControlPanel({
             step={1}
             value={inputs.creativeFatigueDays}
             onChange={(e) => updateField('creativeFatigueDays', Number(e.target.value))}
-            className='w-full accent-primary h-1 bg-border rounded-lg cursor-pointer'
+            className='w-full accent-zinc-900 dark:accent-zinc-100 h-1 bg-zinc-200 dark:bg-zinc-800 rounded cursor-pointer'
           />
-          <div className='flex justify-between text-[9px] text-muted-foreground'>
-            <span>0d</span>
-            <span>30d</span>
-          </div>
+          <span className='text-[9px] text-zinc-500 block'>Adstock wearout decay</span>
         </div>
       </div>
     </div>

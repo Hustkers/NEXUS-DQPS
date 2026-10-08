@@ -72,7 +72,7 @@ export function ReallocationWhyBetter({
       <div className='rounded bg-[#1A1A1A] border border-[#1A1A1A] p-2.5 text-[11px] space-y-1'>
         <div className='text-[10px] font-bold uppercase text-[#FFFFFF] flex items-center gap-1.5'>
           <Icons.check className='size-3 text-[#FFFFFF]' />
-          Marginal Return Headroom (+₹{Math.round(details.expectedDailyLift).toLocaleString('en-IN')}/day lift)
+          Marginal Return Headroom (+${Math.round(details.expectedDailyLift).toLocaleString('en-US')}/day lift)
         </div>
         <p className='text-[#8A8A8A] leading-relaxed'>
           {item.reason}

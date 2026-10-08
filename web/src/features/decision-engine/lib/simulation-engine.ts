@@ -1,5 +1,6 @@
 import type {
   ShockScenarioId,
+  SimulationHorizon,
   ScenarioMeta,
   ScenarioInputParams,
   StrategyOption,
@@ -19,9 +20,9 @@ export const SCENARIO_METAS: Record<ShockScenarioId, ScenarioMeta> = {
     tag: 'ERP Inventory Bleed',
     severity: 'CRITICAL',
     eventDescription: 'ERP warehouse inventory reaches 0 units on hero SKU 315122-001 while active ad campaigns continue spending.',
-    traditionalOutcome: 'Ad platforms continue burning ₹2,200/day driving traffic to an empty product page with 0 inventory.',
+    traditionalOutcome: 'Ad platforms continue burning ₹1,84,800/day driving traffic to an empty product page with 0 inventory.',
     autonomousAction: 'Instant Circuit Breaker kills spend in <15 mins. Capital redirected to Google PMax React Infinity (+3.6x ROAS).',
-    savedWasteWeekly: '₹15,400 / week',
+    savedWasteWeekly: '₹12,93,600 / week',
     responseSpeed: '< 15 mins',
     affectedSku: '315122-001',
     affectedProductName: "Nike Air Force 1 '07",
@@ -32,10 +33,10 @@ export const SCENARIO_METAS: Record<ShockScenarioId, ScenarioMeta> = {
     title: 'Meta Sneaker Auction CPM Surge (+45%)',
     tag: 'Auction Inflation',
     severity: 'HIGH',
-    eventDescription: 'Holiday competitive rush pushes Meta Advantage+ CPM from ₹9.50 to ₹14.20, dropping ROAS below the 1.8x break-even floor.',
+    eventDescription: 'Holiday competitive rush pushes Meta Advantage+ CPM from ₹798 to ₹1,192, dropping ROAS below the 1.8x break-even floor.',
     traditionalOutcome: 'Marketers notice 48 hours later after daily spend burns operating margin.',
-    autonomousAction: 'Optimizer shifts ₹3,500/day into Amazon Sponsored Products & Google Shopping where margin elasticity is preserved.',
-    savedWasteWeekly: '₹9,200 / week',
+    autonomousAction: 'Optimizer shifts ₹2,94,000/day into Amazon Sponsored Products & Google Shopping where margin elasticity is preserved.',
+    savedWasteWeekly: '₹7,72,800 / week',
     responseSpeed: 'Real-time (<30s)',
     affectedSku: 'AO2924-401',
     affectedProductName: 'Nike Air Max 720',
@@ -49,7 +50,7 @@ export const SCENARIO_METAS: Record<ShockScenarioId, ScenarioMeta> = {
     eventDescription: 'Hero TikTok video ad set frequency exceeds 5.2. Hook rate collapses, CTR drops 60%, doubling customer acquisition cost.',
     traditionalOutcome: 'Fatigued video continues eating 40% of TikTok ad budget with plummeting conversion rate.',
     autonomousAction: 'Auto-pauses exhausted ad set, triggers creative refresh alert, and reroutes spend to high-vitality Meta Reels.',
-    savedWasteWeekly: '₹5,200 / week',
+    savedWasteWeekly: '₹4,36,800 / week',
     responseSpeed: 'Autonomous (<1hr)',
     affectedSku: 'AH8050-100',
     affectedProductName: 'Nike Air Max 270',
@@ -63,7 +64,7 @@ export const SCENARIO_METAS: Record<ShockScenarioId, ScenarioMeta> = {
     eventDescription: 'Rival seller launches aggressive 25% price drop on Amazon Buy Box, lowering conversion rate from 4.8% to 2.8%.',
     traditionalOutcome: 'Amazon Sponsored spend continues bidding high CPC for unprofitable and losing Buy Box sessions.',
     autonomousAction: 'Scipy convex optimizer re-solves: shifts capital to Nike Direct Brand Search where gross margin is 68%.',
-    savedWasteWeekly: '₹6,800 / week',
+    savedWasteWeekly: '₹5,71,200 / week',
     responseSpeed: '< 30 mins',
     affectedSku: '880848-005',
     affectedProductName: 'Nike Zoom Fly',
@@ -76,13 +77,13 @@ export const BASELINE_DEFAULTS: Record<ShockScenarioId, ScenarioInputParams> = {
     horizonDays: 7,
     inventoryUnits: 420,
     inventoryShockUnits: 0,
-    baselineDailySpend: 2200,
-    baselineCvrPct: 1.2,
+    baselineDailySpend: 184800,
+    baselineCvrPct: 3.4,
     aov: 7295,
     marginPct: 65,
-    baselineCpm: 220.0,
+    baselineCpm: 924.0,
     cpmMultiplier: 1.0,
-    ctrPct: 1.2,
+    ctrPct: 2.1,
     fatiguePct: 0,
     ourPrice: 7295,
     competitorPrice: 7295,
@@ -93,13 +94,13 @@ export const BASELINE_DEFAULTS: Record<ShockScenarioId, ScenarioInputParams> = {
     horizonDays: 7,
     inventoryUnits: 650,
     inventoryShockUnits: 650,
-    baselineDailySpend: 3500,
-    baselineCvrPct: 0.8,
+    baselineDailySpend: 294000,
+    baselineCvrPct: 2.8,
     aov: 12797,
     marginPct: 62,
-    baselineCpm: 240.0,
+    baselineCpm: 798.0,
     cpmMultiplier: 1.45,
-    ctrPct: 1.1,
+    ctrPct: 2.1,
     fatiguePct: 0,
     ourPrice: 12797,
     competitorPrice: 12797,
@@ -110,13 +111,13 @@ export const BASELINE_DEFAULTS: Record<ShockScenarioId, ScenarioInputParams> = {
     horizonDays: 7,
     inventoryUnits: 510,
     inventoryShockUnits: 510,
-    baselineDailySpend: 2400,
-    baselineCvrPct: 0.5,
+    baselineDailySpend: 201600,
+    baselineCvrPct: 2.8,
     aov: 13995,
     marginPct: 60,
-    baselineCpm: 210.0,
+    baselineCpm: 571.2,
     cpmMultiplier: 1.0,
-    ctrPct: 1.4,
+    ctrPct: 2.4,
     fatiguePct: 60,
     ourPrice: 13995,
     competitorPrice: 13995,
@@ -127,17 +128,17 @@ export const BASELINE_DEFAULTS: Record<ShockScenarioId, ScenarioInputParams> = {
     horizonDays: 7,
     inventoryUnits: 380,
     inventoryShockUnits: 380,
-    baselineDailySpend: 2800,
-    baselineCvrPct: 0.7,
+    baselineDailySpend: 235200,
+    baselineCvrPct: 4.8,
     aov: 14495,
     marginPct: 58,
-    baselineCpm: 260.0,
+    baselineCpm: 940.8,
     cpmMultiplier: 1.0,
-    ctrPct: 1.2,
+    ctrPct: 2.6,
     fatiguePct: 0,
     ourPrice: 14495,
     competitorPrice: 10871,
-    buyBoxProbabilityPct: 25,
+    buyBoxProbabilityPct: 80,
     competitorUndercutPct: 25
   }
 };
@@ -310,61 +311,10 @@ export function runDeterministicSimulation(
     : Math.max(0, (shocked.spend - (shocked.revenue * 0.25)));
   const wastedSpend = Math.round(wastedSpendPerDay * horizon);
 
-  // Build dailyShocked once using computeDayShockedMetrics
-  const dailyShocked: MetricSnapshot[] = [];
-  for (let d = 1; d <= horizon; d++) {
-    dailyShocked.push(computeDayShockedMetrics(scenarioId, inputs, baseline, shocked, d));
-  }
-
-  function buildSeries(strategyId: string): DailyLossPoint[] {
-    const series: DailyLossPoint[] = [];
-    let cumNoAction = 0;
-    let cumMitigated = 0;
-    const latency = getLatency(strategyId);
-
-    for (let d = 1; d <= horizon; d++) {
-      const dayShock = dailyShocked[d - 1];
-      const dayShockLoss = Math.max(0, baseline.margin - dayShock.margin);
-      const dayMit = computeMitigatedMetrics(scenarioId, inputs, baseline, dayShock, strategyId);
-      const steady = Math.max(0, baseline.margin - dayMit.margin);
-
-      let dayMitLoss: number;
-      if (strategyId === 'do-nothing') {
-        dayMitLoss = dayShockLoss;
-      } else if (d === 1) {
-        dayMitLoss = latency * dayShockLoss + (1 - latency) * steady;
-      } else {
-        dayMitLoss = steady;
-      }
-
-      cumNoAction += dayShockLoss;
-      cumMitigated += dayMitLoss;
-
-      series.push({
-        day: d,
-        label: `Day ${d}`,
-        noActionLoss: Math.round(cumNoAction),
-        mitigatedLoss: Math.round(cumMitigated),
-        baselineMargin: Math.round(baseline.margin * d),
-        shockedMargin: Math.round(baseline.margin * d - cumNoAction),
-        mitigatedMargin: Math.round(baseline.margin * d - cumMitigated)
-      });
-    }
-
-    return series;
-  }
-
-  // 5. Daily Cumulative Time Series (Calculated via buildSeries for active strategy)
-  const timeSeries = buildSeries(activeStrategy.id);
-  const lastPoint = timeSeries[timeSeries.length - 1];
-  const lossWithoutMitigation = lastPoint
-    ? lastPoint.noActionLoss
-    : Math.round(Math.max(0, (baseline.margin - shocked.margin) * horizon));
-  const lossWithMitigation = lastPoint
-    ? lastPoint.mitigatedLoss
-    : Math.round(Math.max(0, (baseline.margin - mitigated.margin) * horizon));
-  const lossAvoided = Math.round(lossWithoutMitigation - lossWithMitigation);
-  const protectedWasteWeekly = Math.round((lossAvoided / horizon) * 7);
+  const lossWithoutMitigation = Math.round(Math.max(0, (baseline.margin - shocked.margin) * horizon));
+  const lossWithMitigation = Math.round(Math.max(0, (baseline.margin - mitigated.margin) * horizon));
+  const lossAvoided = Math.round(Math.max(0, lossWithoutMitigation - lossWithMitigation));
+  const protectedWasteWeekly = Math.round((Math.max(0, lossWithoutMitigation - lossWithMitigation) / horizon) * 7);
   const dailyLossRate = Math.round(lossWithoutMitigation / horizon);
 
   const financialImpact: FinancialImpactSummary = {
@@ -378,13 +328,27 @@ export function runDeterministicSimulation(
     dailyLossRate
   };
 
-  // 6. Strategy Evaluation Table (Evaluates ALL strategies using buildSeries)
+  // 5. Daily Cumulative Time Series
+  const timeSeries: DailyLossPoint[] = [];
+  for (let d = 1; d <= horizon; d++) {
+    const noActionLoss = Math.round((lossWithoutMitigation / horizon) * d);
+    const mitigatedLoss = Math.round((lossWithMitigation / horizon) * d);
+    timeSeries.push({
+      day: d,
+      label: `Day ${d}`,
+      noActionLoss,
+      mitigatedLoss,
+      baselineMargin: Math.round(baseline.margin * d),
+      shockedMargin: Math.round(shocked.margin * d),
+      mitigatedMargin: Math.round(mitigated.margin * d)
+    });
+  }
+
+  // 6. Strategy Evaluation Table (Evaluates ALL strategies under identical inputs)
   const strategyComparisons: StrategyEvaluation[] = strategies.map((s) => {
-    const sSeries = buildSeries(s.id);
-    const sLast = sSeries[sSeries.length - 1];
-    const sLoss = sLast ? sLast.mitigatedLoss : 0;
-    const sAvoided = Math.round(lossWithoutMitigation - sLoss);
     const sMetrics = computeMitigatedMetrics(scenarioId, inputs, baseline, shocked, s.id);
+    const sLoss = Math.round(Math.max(0, (baseline.margin - sMetrics.margin) * horizon));
+    const sAvoided = Math.round(Math.max(0, lossWithoutMitigation - sLoss));
 
     let rationale = '';
     if (s.id === 'do-nothing') {
@@ -420,13 +384,13 @@ export function runDeterministicSimulation(
 
   let recReason = '';
   if (scenarioId === 'stockout') {
-    recReason = 'Redirecting ad spend to in-stock React Infinity restores campaign ROAS and prevents burning budget on out-of-stock sessions.';
+    recReason = 'Redirecting ad spend to in-stock React Infinity restores campaign ROAS to 3.6x and prevents burning ₹2,200/day on out-of-stock sessions.';
   } else if (scenarioId === 'cpm-spike') {
     recReason = 'Meta auction surge makes customer acquisition unprofitable; shifting capital to Google & Amazon captures preserved margin elasticity.';
   } else if (scenarioId === 'creative-fatigue') {
-    recReason = 'TikTok creative fatigue has doubled CAC; rerouting spend to fresh Meta Reels immediately restores click-through performance and conversion rate.';
+    recReason = 'TikTok creative fatigue has doubled CAC; rerouting spend to fresh Meta Reels immediately restores CTR from 0.96% back to 2.8%.';
   } else {
-    recReason = 'Competitor undercut on Amazon destroys Buy Box conversion; shifting ad capital to Nike Direct protects gross margin and pricing integrity.';
+    recReason = 'Competitor undercut on Amazon destroys Buy Box conversion; shifting ad capital to Nike Direct protects gross margin at 68%.';
   }
 
   // 9. Data Lineage Grounding
@@ -480,43 +444,23 @@ export function runDeterministicSimulation(
 // Pure Deterministic Math Helpers
 // -------------------------------------------------------------
 
-function getLatency(strategyId: string): number {
-  if (strategyId === 'do-nothing') return 1;
-  if (strategyId === 'pause-spend') return 0.15;
-  if (strategyId.includes('reduce')) return 0.1;
-  return 0.25;
-}
-
-interface FunnelResult {
-  impressions: number;
-  clicks: number;
-  conversions: number;
-}
-
-function exactFunnel(spend: number, cpm: number, ctrPct: number, cvrPct: number): FunnelResult {
-  const safeCpm = cpm > 0 ? cpm : 10.0;
-  const impressions = (spend / safeCpm) * 1000;
-  const clicks = impressions * (ctrPct / 100);
-  const conversions = clicks * (cvrPct / 100);
-  return { impressions, clicks, conversions };
-}
-
-function makeSnapshot(
-  spend: number,
-  funnel: FunnelResult,
-  inputs: ScenarioInputParams,
-  marginPct?: number
-): MetricSnapshot {
-  const revenue = Math.round(funnel.conversions * inputs.aov);
-  const conversions = Math.round(funnel.conversions * 10) / 10;
-  const effectiveMarginPct = (marginPct ?? inputs.marginPct) / 100;
-  const margin = Math.round(revenue * effectiveMarginPct - spend);
+function computeBaselineMetrics(scenarioId: ShockScenarioId, inputs: ScenarioInputParams): MetricSnapshot {
+  const spend = inputs.baselineDailySpend;
+  const cpm = inputs.baselineCpm > 0 ? inputs.baselineCpm : 10.0;
+  const impressions = Math.round((spend / cpm) * 1000);
+  const ctr = inputs.ctrPct / 100;
+  const clicks = Math.round(impressions * ctr);
+  const cvr = inputs.baselineCvrPct / 100;
+  const conversions = Math.max(1, Math.round(clicks * cvr));
+  const revenue = Math.round(conversions * inputs.aov);
   const roas = spend > 0 ? +(revenue / spend).toFixed(2) : 0;
+  const marginPct = inputs.marginPct / 100;
+  const margin = Math.round(revenue * marginPct - spend);
 
   return {
-    spend: Math.round(spend),
-    impressions: Math.round(funnel.impressions),
-    clicks: Math.round(funnel.clicks),
+    spend,
+    impressions,
+    clicks,
     conversions,
     revenue,
     roas,
@@ -524,173 +468,59 @@ function makeSnapshot(
   };
 }
 
-function computeBaselineMetrics(scenarioId: ShockScenarioId, inputs: ScenarioInputParams): MetricSnapshot {
-  const funnel = exactFunnel(
-    inputs.baselineDailySpend,
-    inputs.baselineCpm,
-    inputs.ctrPct,
-    inputs.baselineCvrPct
-  );
-  return makeSnapshot(inputs.baselineDailySpend, funnel, inputs);
-}
-
 function computeShockedMetrics(
   scenarioId: ShockScenarioId,
   inputs: ScenarioInputParams,
-  _baseline: MetricSnapshot
+  baseline: MetricSnapshot
 ): MetricSnapshot {
   if (scenarioId === 'stockout') {
-    const baseFunnel = exactFunnel(
-      inputs.baselineDailySpend,
-      inputs.baselineCpm,
-      inputs.ctrPct,
-      inputs.baselineCvrPct
-    );
-    return makeSnapshot(
-      inputs.baselineDailySpend,
-      {
-        impressions: baseFunnel.impressions,
-        clicks: baseFunnel.clicks,
-        conversions: baseFunnel.conversions * 0.05
-      },
-      inputs
-    );
+    // Inventory = 0: Spend continues burning, conversions drop by 95%
+    const spend = baseline.spend;
+    const impressions = baseline.impressions;
+    const clicks = baseline.clicks;
+    const conversions = Math.max(0, Math.round(baseline.conversions * 0.05));
+    const revenue = Math.round(conversions * inputs.aov);
+    const roas = spend > 0 ? +(revenue / spend).toFixed(2) : 0;
+    const margin = Math.round(revenue * (inputs.marginPct / 100) - spend);
+    return { spend, impressions, clicks, conversions, revenue, roas, margin };
   }
 
   if (scenarioId === 'cpm-spike') {
-    const funnel = exactFunnel(
-      inputs.baselineDailySpend,
-      inputs.baselineCpm * inputs.cpmMultiplier,
-      inputs.ctrPct,
-      inputs.baselineCvrPct
-    );
-    return makeSnapshot(inputs.baselineDailySpend, funnel, inputs);
+    // CPM surges by multiplier: Same spend buys fewer impressions
+    const shockedCpm = inputs.baselineCpm * inputs.cpmMultiplier;
+    const spend = baseline.spend;
+    const impressions = Math.round((spend / shockedCpm) * 1000);
+    const clicks = Math.round(impressions * (inputs.ctrPct / 100));
+    const conversions = Math.max(1, Math.round(clicks * (inputs.baselineCvrPct / 100)));
+    const revenue = Math.round(conversions * inputs.aov);
+    const roas = spend > 0 ? +(revenue / spend).toFixed(2) : 0;
+    const margin = Math.round(revenue * (inputs.marginPct / 100) - spend);
+    return { spend, impressions, clicks, conversions, revenue, roas, margin };
   }
 
   if (scenarioId === 'creative-fatigue') {
-    const shockedCtr = inputs.ctrPct * (1 - inputs.fatiguePct / 100);
-    const funnel = exactFunnel(
-      inputs.baselineDailySpend,
-      inputs.baselineCpm,
-      shockedCtr,
-      inputs.baselineCvrPct
-    );
-    return makeSnapshot(inputs.baselineDailySpend, funnel, inputs);
+    // CTR drops by fatigue %
+    const fatiguedCtr = (inputs.ctrPct * (1 - inputs.fatiguePct / 100)) / 100;
+    const spend = baseline.spend;
+    const impressions = baseline.impressions;
+    const clicks = Math.round(impressions * fatiguedCtr);
+    const conversions = Math.max(1, Math.round(clicks * (inputs.baselineCvrPct / 100)));
+    const revenue = Math.round(conversions * inputs.aov);
+    const roas = spend > 0 ? +(revenue / spend).toFixed(2) : 0;
+    const margin = Math.round(revenue * (inputs.marginPct / 100) - spend);
+    return { spend, impressions, clicks, conversions, revenue, roas, margin };
   }
 
-  // price-undercut
-  const funnel = exactFunnel(
-    inputs.baselineDailySpend,
-    inputs.baselineCpm,
-    inputs.ctrPct,
-    inputs.baselineCvrPct * 0.58
-  );
-  return makeSnapshot(inputs.baselineDailySpend, funnel, inputs);
-}
-
-function computeDayShockedMetrics(
-  scenarioId: ShockScenarioId,
-  inputs: ScenarioInputParams,
-  baseline: MetricSnapshot,
-  shocked: MetricSnapshot,
-  day: number
-): MetricSnapshot {
-  const horizon = inputs.horizonDays;
-
-  if (scenarioId === 'creative-fatigue') {
-    const progress = horizon === 1 ? 1 : Math.pow(day / horizon, 0.7);
-    const effectiveFatigue = (inputs.fatiguePct / 100) * (0.35 + 0.65 * progress);
-    const ctr = Math.max(0.1, inputs.ctrPct * (1 - effectiveFatigue));
-    const funnel = exactFunnel(inputs.baselineDailySpend, inputs.baselineCpm, ctr, inputs.baselineCvrPct);
-    return makeSnapshot(inputs.baselineDailySpend, funnel, inputs);
-  }
-
-  if (scenarioId === 'cpm-spike') {
-    const ramp = 1 + (inputs.cpmMultiplier - 1) * Math.min(1, 0.45 + 0.55 * (day / horizon));
-    const funnel = exactFunnel(inputs.baselineDailySpend, inputs.baselineCpm * ramp, inputs.ctrPct, inputs.baselineCvrPct);
-    return makeSnapshot(inputs.baselineDailySpend, funnel, inputs);
-  }
-
-  return shocked;
-}
-
-interface MitigationProfile {
-  spendFactor: number;
-  recovery: number;
-  marginPct?: number;
-  priceFactor?: number;
-}
-
-function getMitigationProfile(
-  scenarioId: ShockScenarioId,
-  strategyId: string,
-  inputs: ScenarioInputParams
-): MitigationProfile {
-  if (scenarioId === 'stockout') {
-    if (strategyId === 'redirect-spend') {
-      return { spendFactor: 1, recovery: 0.78 };
-    }
-    if (strategyId === 'aggressive-realloc') {
-      return { spendFactor: 1.4, recovery: 0.72 };
-    }
-    const cutPct = (inputs.customSpendReductionPct ?? 0) / 100;
-    const shiftPct = (inputs.customBudgetShiftPct ?? 50) / 100;
-    return {
-      spendFactor: 1 - cutPct,
-      recovery: 0.78 * shiftPct
-    };
-  }
-
-  if (scenarioId === 'cpm-spike') {
-    if (strategyId === 'reduce-spend') {
-      return { spendFactor: 0.5, recovery: 0 };
-    }
-    if (strategyId === 'reallocate-channels') {
-      return { spendFactor: 1, recovery: 0.8 };
-    }
-    if (strategyId === 'balanced-realloc') {
-      return { spendFactor: 1, recovery: 0.55 };
-    }
-    const cutPct = (inputs.customSpendReductionPct ?? 25) / 100;
-    return {
-      spendFactor: 1 - cutPct,
-      recovery: 0.6
-    };
-  }
-
-  if (scenarioId === 'creative-fatigue') {
-    if (strategyId === 'reduce-spend') {
-      return { spendFactor: 0.6, recovery: 0 };
-    }
-    if (strategyId === 'shift-fresh-creative') {
-      return { spendFactor: 1, recovery: 0.8 };
-    }
-    if (strategyId === 'rotate-audiences') {
-      return { spendFactor: 1, recovery: 0.55 };
-    }
-    return {
-      spendFactor: 0.8,
-      recovery: 0.6
-    };
-  }
-
-  if (scenarioId === 'price-undercut') {
-    if (strategyId === 'reduce-marketplace-ads') {
-      return { spendFactor: 0.4, recovery: 0 };
-    }
-    if (strategyId === 'shift-to-direct') {
-      return { spendFactor: 1, recovery: 0.7, marginPct: 68 };
-    }
-    if (strategyId === 'match-price-floor') {
-      return { spendFactor: 1, recovery: 0.9, marginPct: 48, priceFactor: 0.82 };
-    }
-    return {
-      spendFactor: 0.7,
-      recovery: 0.55
-    };
-  }
-
-  return { spendFactor: 1, recovery: 0 };
+  // Price undercut: Conversion drops by ~42% due to Buy Box loss
+  const undercutCvr = (inputs.baselineCvrPct * 0.58) / 100;
+  const spend = baseline.spend;
+  const impressions = baseline.impressions;
+  const clicks = baseline.clicks;
+  const conversions = Math.max(1, Math.round(clicks * undercutCvr));
+  const revenue = Math.round(conversions * inputs.aov);
+  const roas = spend > 0 ? +(revenue / spend).toFixed(2) : 0;
+  const margin = Math.round(revenue * (inputs.marginPct / 100) - spend);
+  return { spend, impressions, clicks, conversions, revenue, roas, margin };
 }
 
 function computeMitigatedMetrics(
@@ -704,42 +534,231 @@ function computeMitigatedMetrics(
     return { ...shocked };
   }
 
-  if (strategyId === 'pause-spend') {
+  // Stockout Strategies
+  if (scenarioId === 'stockout') {
+    if (strategyId === 'pause-spend') {
+      // Spend dropped to 0, zero further waste
+      return {
+        spend: 0,
+        impressions: 0,
+        clicks: 0,
+        conversions: 0,
+        revenue: 0,
+        roas: 0,
+        margin: 0
+      };
+    }
+    if (strategyId === 'redirect-spend') {
+      // Reallocate to Google PMax React Infinity (3.6x ROAS, 62% margin)
+      const spend = inputs.baselineDailySpend;
+      const roas = 3.62;
+      const revenue = Math.round(spend * roas);
+      const conversions = Math.round(revenue / 13995);
+      const clicks = Math.round(conversions / 0.032);
+      const impressions = Math.round(clicks / 0.022);
+      const margin = Math.round(revenue * 0.62 - spend);
+      return { spend, impressions, clicks, conversions, revenue, roas, margin };
+    }
+    if (strategyId === 'aggressive-realloc') {
+      // 140% scale spend into top alternative (3.38x ROAS)
+      const spend = Math.round(inputs.baselineDailySpend * 1.4);
+      const roas = 3.38;
+      const revenue = Math.round(spend * roas);
+      const conversions = Math.round(revenue / 13995);
+      const clicks = Math.round(conversions / 0.032);
+      const impressions = Math.round(clicks / 0.022);
+      const margin = Math.round(revenue * 0.61 - spend);
+      return { spend, impressions, clicks, conversions, revenue, roas, margin };
+    }
+    // Custom strategy
+    const shiftPct = (inputs.customBudgetShiftPct ?? 50) / 100;
+    const cutPct = (inputs.customSpendReductionPct ?? 0) / 100;
+    const spend = Math.round(inputs.baselineDailySpend * (1 - cutPct));
+    const redirectedSpend = spend * shiftPct;
+    const remainingSpend = spend * (1 - shiftPct);
+    const redirectedRev = redirectedSpend * 3.5;
+    const remainingRev = remainingSpend * (shocked.roas || 0.2);
+    const revenue = Math.round(redirectedRev + remainingRev);
+    const roas = spend > 0 ? +(revenue / spend).toFixed(2) : 0;
+    const margin = Math.round(revenue * (inputs.marginPct / 100) - spend);
     return {
-      spend: 0,
-      impressions: 0,
-      clicks: 0,
-      conversions: 0,
-      revenue: 0,
-      roas: 0,
-      margin: 0
+      spend,
+      impressions: Math.round(shocked.impressions * (1 - cutPct)),
+      clicks: Math.round(shocked.clicks * (1 - cutPct)),
+      conversions: Math.round(revenue / inputs.aov),
+      revenue,
+      roas,
+      margin
     };
   }
 
-  const profile = getMitigationProfile(scenarioId, strategyId, inputs);
-  const lostRevenue = Math.max(0, baseline.revenue - shocked.revenue);
-  const recovered = shocked.revenue + profile.recovery * lostRevenue;
-  const elasticity = profile.recovery === 0 ? 0.25 : 0.6;
-  const revenue = Math.round(
-    recovered * Math.pow(profile.spendFactor, elasticity) * (profile.priceFactor ?? 1)
-  );
-  const spend = Math.round(baseline.spend * profile.spendFactor);
-  const effectiveMarginPct = (profile.marginPct ?? inputs.marginPct) / 100;
-  const margin = Math.round(revenue * effectiveMarginPct - spend);
-  const impressions = Math.round(baseline.impressions * profile.spendFactor);
-  const clicks = baseline.revenue > 0 ? Math.round(baseline.clicks * (revenue / baseline.revenue)) : 0;
-  const conversions = inputs.aov > 0 ? Math.round((revenue / inputs.aov) * 10) / 10 : 0;
-  const roas = spend > 0 ? +(revenue / spend).toFixed(2) : 0;
+  // CPM Surge Strategies
+  if (scenarioId === 'cpm-spike') {
+    if (strategyId === 'reduce-spend') {
+      const spend = Math.round(inputs.baselineDailySpend * 0.5);
+      const impressions = Math.round(shocked.impressions * 0.5);
+      const clicks = Math.round(shocked.clicks * 0.5);
+      const conversions = Math.round(shocked.conversions * 0.5);
+      const revenue = Math.round(conversions * inputs.aov);
+      const roas = spend > 0 ? +(revenue / spend).toFixed(2) : 0;
+      const margin = Math.round(revenue * (inputs.marginPct / 100) - spend);
+      return { spend, impressions, clicks, conversions, revenue, roas, margin };
+    }
+    if (strategyId === 'reallocate-channels') {
+      // Shift capital to Amazon & Google (stable CPM, 3.2x ROAS)
+      const spend = inputs.baselineDailySpend;
+      const roas = 3.24;
+      const revenue = Math.round(spend * roas);
+      const conversions = Math.round(revenue / inputs.aov);
+      const clicks = Math.round(conversions / 0.028);
+      const impressions = Math.round(clicks / 0.024);
+      const margin = Math.round(revenue * (inputs.marginPct / 100) - spend);
+      return { spend, impressions, clicks, conversions, revenue, roas, margin };
+    }
+    if (strategyId === 'balanced-realloc') {
+      const spend = inputs.baselineDailySpend;
+      const roas = 2.75;
+      const revenue = Math.round(spend * roas);
+      const conversions = Math.round(revenue / inputs.aov);
+      const clicks = Math.round(conversions / 0.026);
+      const impressions = Math.round(clicks / 0.022);
+      const margin = Math.round(revenue * (inputs.marginPct / 100) - spend);
+      return { spend, impressions, clicks, conversions, revenue, roas, margin };
+    }
+    // Custom
+    const cutPct = (inputs.customSpendReductionPct ?? 25) / 100;
+    const spend = Math.round(inputs.baselineDailySpend * (1 - cutPct));
+    const roas = 2.85;
+    const revenue = Math.round(spend * roas);
+    const margin = Math.round(revenue * (inputs.marginPct / 100) - spend);
+    return {
+      spend,
+      impressions: Math.round(shocked.impressions * (1 - cutPct)),
+      clicks: Math.round(shocked.clicks * (1 - cutPct)),
+      conversions: Math.round(revenue / inputs.aov),
+      revenue,
+      roas,
+      margin
+    };
+  }
 
-  return {
-    spend,
-    impressions,
-    clicks,
-    conversions,
-    revenue,
-    roas,
-    margin
-  };
+  // Creative Fatigue Strategies
+  if (scenarioId === 'creative-fatigue') {
+    if (strategyId === 'reduce-spend') {
+      const spend = Math.round(inputs.baselineDailySpend * 0.6);
+      const revenue = Math.round(shocked.revenue * 0.6);
+      const roas = spend > 0 ? +(revenue / spend).toFixed(2) : 0;
+      const margin = Math.round(revenue * (inputs.marginPct / 100) - spend);
+      return {
+        spend,
+        impressions: Math.round(shocked.impressions * 0.6),
+        clicks: Math.round(shocked.clicks * 0.6),
+        conversions: Math.round(shocked.conversions * 0.6),
+        revenue,
+        roas,
+        margin
+      };
+    }
+    if (strategyId === 'shift-fresh-creative') {
+      // Shifts spend to high-hook creative (+31% CTR restored, 3.45x ROAS)
+      const spend = inputs.baselineDailySpend;
+      const roas = 3.45;
+      const revenue = Math.round(spend * roas);
+      const conversions = Math.round(revenue / inputs.aov);
+      const clicks = Math.round(conversions / 0.028);
+      const impressions = Math.round(clicks / 0.026);
+      const margin = Math.round(revenue * (inputs.marginPct / 100) - spend);
+      return { spend, impressions, clicks, conversions, revenue, roas, margin };
+    }
+    if (strategyId === 'rotate-audiences') {
+      const spend = inputs.baselineDailySpend;
+      const roas = 2.65;
+      const revenue = Math.round(spend * roas);
+      const conversions = Math.round(revenue / inputs.aov);
+      const clicks = Math.round(conversions / 0.024);
+      const impressions = Math.round(clicks / 0.021);
+      const margin = Math.round(revenue * (inputs.marginPct / 100) - spend);
+      return { spend, impressions, clicks, conversions, revenue, roas, margin };
+    }
+    // Custom
+    const spend = Math.round(inputs.baselineDailySpend * 0.8);
+    const roas = 2.95;
+    const revenue = Math.round(spend * roas);
+    const margin = Math.round(revenue * (inputs.marginPct / 100) - spend);
+    return {
+      spend,
+      impressions: shocked.impressions,
+      clicks: Math.round(shocked.clicks * 1.3),
+      conversions: Math.round(revenue / inputs.aov),
+      revenue,
+      roas,
+      margin
+    };
+  }
+
+  // Price Undercut Strategies
+  if (scenarioId === 'price-undercut') {
+    if (strategyId === 'reduce-marketplace-ads') {
+      const spend = Math.round(inputs.baselineDailySpend * 0.4);
+      const revenue = Math.round(shocked.revenue * 0.4);
+      const roas = spend > 0 ? +(revenue / spend).toFixed(2) : 0;
+      const margin = Math.round(revenue * (inputs.marginPct / 100) - spend);
+      return {
+        spend,
+        impressions: Math.round(shocked.impressions * 0.4),
+        clicks: Math.round(shocked.clicks * 0.4),
+        conversions: Math.round(shocked.conversions * 0.4),
+        revenue,
+        roas,
+        margin
+      };
+    }
+    if (strategyId === 'shift-to-direct') {
+      // Diverts ad capital to Nike Direct Brand Search (68% margin, 4.12x ROAS)
+      const spend = inputs.baselineDailySpend;
+      const roas = 4.12;
+      const revenue = Math.round(spend * roas);
+      const conversions = Math.round(revenue / inputs.aov);
+      const clicks = Math.round(conversions / 0.045);
+      const impressions = Math.round(clicks / 0.035);
+      const margin = Math.round(revenue * 0.68 - spend);
+      return { spend, impressions, clicks, conversions, revenue, roas, margin };
+    }
+    if (strategyId === 'match-price-floor') {
+      // Reprices down to competitive price, conversion rate recovers to 4.2%, margin drops to 48%
+      const spend = inputs.baselineDailySpend;
+      const repricedAov = Math.round(inputs.aov * 0.82);
+      const conversions = Math.round(baseline.conversions * 0.9);
+      const revenue = Math.round(conversions * repricedAov);
+      const roas = spend > 0 ? +(revenue / spend).toFixed(2) : 0;
+      const margin = Math.round(revenue * 0.48 - spend);
+      return {
+        spend,
+        impressions: baseline.impressions,
+        clicks: baseline.clicks,
+        conversions,
+        revenue,
+        roas,
+        margin
+      };
+    }
+    // Custom
+    const spend = Math.round(inputs.baselineDailySpend * 0.7);
+    const roas = 3.2;
+    const revenue = Math.round(spend * roas);
+    const margin = Math.round(revenue * 0.62 - spend);
+    return {
+      spend,
+      impressions: shocked.impressions,
+      clicks: shocked.clicks,
+      conversions: Math.round(revenue / inputs.aov),
+      revenue,
+      roas,
+      margin
+    };
+  }
+
+  return { ...shocked };
 }
 
 function buildCausalChain(

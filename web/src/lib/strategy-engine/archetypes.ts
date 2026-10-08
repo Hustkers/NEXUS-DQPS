@@ -338,7 +338,7 @@ export const STRATEGIC_ARCHETYPES: StrategicArchetype[] = [
     budgetShare: 0.06,
     advantages: [
       "Leverages creator's genuine social capital and comments section",
-      'Seamless native look prevents ad-blindness skip behavior',
+      'Authentic in-feed styling prevents ad-blindness skip behavior',
       'Retains social engagement metrics (likes, shares, comments) on profile'
     ],
     disadvantages: [
@@ -357,7 +357,7 @@ export const STRATEGIC_ARCHETYPES: StrategicArchetype[] = [
     platformDefault: 'google',
     adFormat: 'Google Merchant Shopping Product Listing Ads (PLA)',
     creativeAngle: 'Clean Product Imagery, Price Transparency & Google Customer Reviews',
-    messagingAngle: 'Clear pricing, 4.8★ Rating, Free Shipping & 30-Day Trial Guarantee',
+    messagingAngle: 'Clear pricing, 4.8/5 Customer Rating, Free Shipping & 30-Day Trial Guarantee',
     targetingMethod: 'Custom Label Filter: High Gross Margin SKUs (>55% Margin)',
     audienceSegment: 'Direct product comparators seeking specific footwear models',
     biddingStrategy: 'Target ROAS with Profit Margin Tier Segmentation',
@@ -580,7 +580,7 @@ export const STRATEGIC_ARCHETYPES: StrategicArchetype[] = [
     retargetingType: 'Intent-Led Video Prospecting',
     demographicTargeting: 'Ages 18-40, Mobile YouTube app users',
     timingStrategy: 'Leisure viewing hours: Late afternoons and weekend mornings',
-    offerStrategy: 'Exclusive YouTube Viewer Link with Instant ₹500 Off Promo',
+    offerStrategy: 'Exclusive YouTube Viewer Link with Instant $10 Off Promo',
     keywordInterestTargeting: 'Shoe review queries, fitness YouTube channels, running advice',
     baseCtr: 0.015,
     baseCpcRatio: 0.6,
@@ -712,38 +712,38 @@ export const STRATEGIC_ARCHETYPES: StrategicArchetype[] = [
   },
   {
     code: 'ARCH-20',
-    name: 'Regional Tier-2 & Tier-3 Growth Expansion',
+    name: 'Shopify D2C National Regional Fulfillment Expansion',
     funnelStage: 'MOFU',
     platformDefault: 'meta',
-    adFormat: 'Localized Regional Video Reels with Vernacular Nuances',
-    creativeAngle: 'Aspirational Premium Brand Status & Nationwide Free Delivery',
-    messagingAngle: 'Genuine Global Quality Delivered Right to Your Doorstep',
-    targetingMethod: 'Geographic Exclusion of Top 6 Metros (Targeting Tier-2 & Tier-3 Cities)',
-    audienceSegment: 'Emerging aspirational consumers in rapidly growing non-metro hubs',
-    biddingStrategy: 'Lowest Cost with Broad Reach Guardrail',
-    retargetingType: 'Regional Expansion Acquisition',
-    demographicTargeting: 'Tier-2/3 high-growth cities, Ages 18-38',
+    adFormat: 'Localized Regional Video Reels with Direct Storefront Link',
+    creativeAngle: 'Direct D2C Brand Exclusives & Regional Hub 2-Day Delivery',
+    messagingAngle: 'Authentic Nike Catalog Exclusives Delivered Direct from Regional Hubs',
+    targetingMethod: 'Geographic Expansion across US Regional Urban & Suburban Hubs',
+    audienceSegment: 'Aspirational sportswear buyers across secondary US metropolitan markets',
+    biddingStrategy: 'Lowest Cost with Target ROAS Guardrail',
+    retargetingType: 'Regional Storefront Acquisition',
+    demographicTargeting: 'US Regional metropolitan clusters, Ages 18-42',
     timingStrategy: 'Steady continuous pacing throughout the week',
-    offerStrategy: 'Cash on Delivery (COD) Option Available + Pre-paid Discount Perk',
-    keywordInterestTargeting: 'Online shopping, athletic brands, aspirational sportswear',
+    offerStrategy: 'Exclusive D2C Member Rewards & Complimentary 2-Day Shipping',
+    keywordInterestTargeting: 'Online footwear shopping, athletic performance, premium sneakers',
     baseCtr: 0.028,
-    baseCpcRatio: 0.5,
-    baseCvr: 0.025,
-    baseRisk: 42,
-    baseConfidence: 0.77,
+    baseCpcRatio: 0.65,
+    baseCvr: 0.027,
+    baseRisk: 34,
+    baseConfidence: 0.81,
     budgetShare: 0.06,
     advantages: [
-      'Substantially lower auction CPM and CPC costs than saturated metros',
-      'Massive untapped market with skyrocketing brand appetite',
-      'Lower ad fatigue rates and higher initial engagement curiosity'
+      'Substantially lower auction CPM and CPC costs than saturated major metros',
+      'Expands customer acquisition across high-margin direct Shopify storefront',
+      'Lower ad fatigue rates and strong initial engagement curiosity'
     ],
     disadvantages: [
-      'Higher RTO (Return to Origin) rate if Cash on Delivery is enabled',
-      'Longer shipping transit times may affect customer satisfaction'
+      'Regional ground transit requires warehouse inventory alignment',
+      'Lower initial brand familiarity than Amazon Prime'
     ],
     assumptions: [
-      'Reliable courier partners with doorstep tracking in non-metro pin codes',
-      'COD fraud mitigation or pre-paid incentives active'
+      'Regional fulfillment centers maintain target stock levels',
+      'Shopify D2C checkout pipeline optimized for mobile'
     ]
   },
   {
@@ -825,7 +825,7 @@ export const STRATEGIC_ARCHETYPES: StrategicArchetype[] = [
     platformDefault: 'meta',
     adFormat: "Side-by-Side Multi-Item Collection Ad with 'Shop the Look'",
     creativeAngle: 'Full Kit Cohesion: Matching Shoe, Performance Tee & Shorts Bundle',
-    messagingAngle: 'The Complete Runner Kit: Save ₹2,500 When Purchased as a Set',
+    messagingAngle: 'The Complete Runner Kit: Save $35 When Purchased as a Set',
     targetingMethod: 'High Household Income Zip Codes + Lookalike of High-AOV Buyers',
     audienceSegment: 'Affluent shoppers seeking complete coordinated athletic attire',
     biddingStrategy: 'Target ROAS with High Minimum Order Value Floor',

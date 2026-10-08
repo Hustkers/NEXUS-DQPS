@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { Icons } from '@/components/icons';
+import { cn } from '@/lib/utils';
 import { AnomalyCard, type AnomalyItem } from '@/features/decision-engine/components/anomaly-card';
 import { ProductAnalysisModal, type ProductAnalysisTarget } from '@/features/decision-engine/components/product-analysis-modal';
 import { ReallocationExecutionModal } from '@/features/decision-engine/components/reallocation-execution-modal';
 import type { ReallocationExecutionDetails } from '@/features/decision-engine/types/reallocation-execution';
 import initialEngineState from '@/data/nexus-engine-state.json';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
 
 export default function AnomaliesPage() {
   const [filterSeverity, setFilterSeverity] = useState<'ALL' | 'CRITICAL' | 'HIGH' | 'WARNING'>('ALL');
@@ -121,7 +121,7 @@ export default function AnomaliesPage() {
         );
 
         toast.success(`Autonomous Reallocation Dispatched`, {
-          description: `Shifted ₹${Math.round(details.capitalMoved).toLocaleString('en-IN')}/day to ${details.destination.productName}. Decision ID: ${data.receipt?.id || details.ledgerRecord.id}.`
+          description: `Shifted $${Math.round(details.capitalMoved).toLocaleString('en-US')}/day to ${details.destination.productName}. Decision ID: ${data.receipt?.id || details.ledgerRecord.id}.`
         });
 
         return {
@@ -155,29 +155,29 @@ export default function AnomaliesPage() {
   };
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-background text-foreground min-h-screen min-w-0 max-w-full'>
-      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4'>
+    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-background text-foreground min-h-screen'>
+      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-border/80 pb-4'>
         <div>
           <div className='flex items-center gap-2'>
-            <Icons.warning className='size-5 text-foreground' />
-            <h1 className='text-xl font-mono font-bold text-foreground uppercase tracking-tight'>
-              Diagnostic Root-Cause Analysis (RCA) &amp; Anomalies
+            <Icons.warning className='size-5 text-amber-500' />
+            <h1 className='text-xl sm:text-2xl font-semibold text-foreground tracking-tight font-sans'>
+              Diagnostic Anomalies &amp; RCA
             </h1>
           </div>
-          <p className='text-xs font-mono text-muted-foreground mt-1'>
-            modery68 4-Week Rolling Baselines • IsolationForest &amp; Z-Score Attribution (|Z| &gt; 2.2)
+          <p className='text-xs text-muted-foreground mt-1'>
+            4-week rolling empirical baselines with IsolationForest and Z-score attribution (|Z| &gt; 2.2).
           </p>
         </div>
 
-        <div className='flex items-center gap-1.5 bg-muted/60 p-1 rounded border border-border text-xs font-mono'>
+        <div className='flex items-center gap-1 bg-muted/60 p-1 rounded-xl border border-border/70 text-xs font-mono shadow-2xs'>
           {(['ALL', 'CRITICAL', 'HIGH', 'WARNING'] as const).map((sev) => (
             <button
               key={sev}
               onClick={() => setFilterSeverity(sev)}
               className={cn(
-                'px-3 py-1 rounded transition-all font-semibold',
+                'px-3 py-1.5 rounded-lg transition-all duration-150 font-semibold active:scale-[0.96] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
                 filterSeverity === sev
-                  ? 'bg-background text-foreground font-bold shadow-2xs'
+                  ? 'bg-background text-foreground shadow-xs'
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
@@ -187,7 +187,7 @@ export default function AnomaliesPage() {
         </div>
       </div>
 
-      <div className='grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5'>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5'>
         {filtered.map((anom) => (
           <AnomalyCard
             key={anom.id}

@@ -1,5 +1,6 @@
 import Providers from '@/components/layout/providers';
 import { Toaster } from '@/components/ui/sonner';
+import { AppAiAssistant } from '@/features/ai-assistant';
 import { fontVariables } from '@/components/themes/font.config';
 import { DEFAULT_THEME, THEMES } from '@/components/themes/theme.config';
 import ThemeProvider from '@/components/themes/theme-provider';
@@ -9,7 +10,6 @@ import { cookies } from 'next/headers';
 import NextTopLoader from 'nextjs-toploader';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import localFont from 'next/font/local';
-import BackgroundShader from '@/components/layout/background-shader';
 import '../styles/globals.css';
 
 const ranade = localFont({
@@ -28,7 +28,6 @@ const ranade = localFont({
   variable: '--font-ranade',
   display: 'swap'
 });
-
 
 const META_THEME_COLORS = {
   light: '#ffffff',
@@ -68,7 +67,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: META_THEME_COLORS.light
+  themeColor: META_THEME_COLORS.dark
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -79,7 +78,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang='en' suppressHydrationWarning data-theme={themeToApply}>
-      <head>
         <link rel='preconnect' href='https://api.fontshare.com' crossOrigin='anonymous' />
         <link rel='preconnect' href='https://cdn.fontshare.com' crossOrigin='anonymous' />
         <link
@@ -91,14 +89,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             __html: `
               try {
                 const storedTheme = localStorage.getItem('theme');
-                if (storedTheme === 'dark') {
-                  document.documentElement.classList.remove('light');
-                  document.documentElement.classList.add('dark');
-                  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '${META_THEME_COLORS.dark}');
-                } else {
+                if (storedTheme === 'light') {
                   document.documentElement.classList.remove('dark');
                   document.documentElement.classList.add('light');
                   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '${META_THEME_COLORS.light}');
+                } else if (storedTheme === 'dark') {
+                  document.documentElement.classList.remove('light');
+                  document.documentElement.classList.add('dark');
+                  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '${META_THEME_COLORS.dark}');
                 }
               } catch (_) {}
             `
@@ -116,8 +114,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <NuqsAdapter>
           <ThemeProvider
             attribute='class'
-            defaultTheme='light'
-            enableSystem={false}
+            defaultTheme='dark'
+            enableSystem
             disableTransitionOnChange
             enableColorScheme
           >
@@ -125,6 +123,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <BackgroundShader />
               <Toaster />
               {children}
+              <AppAiAssistant />
             </Providers>
           </ThemeProvider>
         </NuqsAdapter>

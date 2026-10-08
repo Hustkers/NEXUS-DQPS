@@ -52,109 +52,108 @@ export default function OverViewPage() {
     <PageContainer>
       <div className='flex flex-1 flex-col space-y-2'>
         <div className='flex items-center justify-between space-y-2'>
-          <h2 className='text-2xl font-bold tracking-tight text-foreground'>System Overview</h2>
+          <h2 className='text-2xl font-bold tracking-tight text-white font-mono'>System Overview</h2>
           <div className='flex items-center space-x-2'>
             <Link href='/dashboard/strategy-engine'>
-              <Button className='bg-emerald-600 dark:bg-[#39FF14] text-white dark:text-black hover:bg-emerald-700 dark:hover:bg-[#32e012] font-semibold flex items-center gap-1.5 shadow-sm'>
-                <Icons.bot className='size-4' /> AI Strategy Engine
+              <Button className='bg-[#39FF14] text-black hover:bg-[#32e012] font-mono font-semibold flex items-center gap-1.5 shadow-sm shadow-[#39FF14]/20'>
+                <Icons.bot className='size-4 text-black' /> AI Strategy Engine
               </Button>
             </Link>
             <Button
               onClick={handleExportTelemetry}
-              variant='outline'
-              className='hidden md:inline-flex font-semibold transition-all active:scale-[0.98]'
+              className='hidden md:inline-flex bg-white text-black hover:bg-[#8A8A8A] font-semibold transition-all active:scale-[0.98]'
             >
               Export Telemetry
             </Button>
           </div>
         </div>
         <Tabs defaultValue='overview' className='space-y-4'>
-          <TabsList className='bg-muted border border-border'>
-            <TabsTrigger value='overview' className=''>Overview</TabsTrigger>
-            <TabsTrigger value='analytics' className=''>
+          <TabsList className='bg-[#1A1A1A] border border-[#1A1A1A]'>
+            <TabsTrigger value='overview' className='data-[state=active]:bg-white data-[state=active]:text-black'>Overview</TabsTrigger>
+            <TabsTrigger value='analytics' className='data-[state=active]:bg-white data-[state=active]:text-black text-[#8A8A8A]'>
               Analytics
             </TabsTrigger>
           </TabsList>
           <TabsContent value='overview' className='space-y-4'>
             <div className='grid grid-cols-1 gap-4 px-4 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4'>
-              <Card className='@container/card bg-card border-border shadow-none text-card-foreground'>
+              <Card className='@container/card bg-[#1A1A1A] border-[#1A1A1A] shadow-none'>
                 <CardHeader>
-                  <CardDescription className='text-muted-foreground'>Total Revenue</CardDescription>
-                  <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl text-foreground'>
+                  <CardDescription className='text-[#8A8A8A] font-mono'>Total Revenue</CardDescription>
+                  <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl text-white font-mono'>
                     ₹1,250.00
                   </CardTitle>
                   <CardAction>
-                    <Badge variant='outline' className='border border-border text-foreground bg-muted'>
-                      <Icons.trendingUp className='text-emerald-500' />
+                    <Badge variant='outline' className='border-none text-white bg-[#000000] font-mono'>
+                      <Icons.trendingUp className='text-white' />
                       +12.5%
                     </Badge>
                   </CardAction>
                 </CardHeader>
                 <CardFooter className='flex-col items-start gap-1.5 text-sm'>
-                  <div className='line-clamp-1 flex gap-2 font-medium text-foreground'>
-                    Trending up this month <Icons.trendingUp className='size-4 text-emerald-500' />
+                  <div className='line-clamp-1 flex gap-2 font-medium text-white'>
+                    Trending up this month <Icons.trendingUp className='size-4 text-white' />
                   </div>
-                  <div className='text-muted-foreground text-xs'>Visitors for the last 6 months</div>
+                  <div className='text-[#8A8A8A] text-xs font-mono'>Visitors for the last 6 months</div>
                 </CardFooter>
               </Card>
-              <Card className='@container/card bg-card border-border shadow-none text-card-foreground'>
+              <Card className='@container/card bg-[#1A1A1A] border-[#1A1A1A] shadow-none'>
                 <CardHeader>
-                  <CardDescription className='text-muted-foreground'>New Customers</CardDescription>
-                  <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl text-foreground'>
+                  <CardDescription className='text-[#8A8A8A] font-mono'>New Customers</CardDescription>
+                  <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl text-white font-mono'>
                     1,234
                   </CardTitle>
                   <CardAction>
-                    <Badge variant='outline' className='border border-border text-foreground bg-muted'>
-                      <Icons.trendingDown className='text-rose-500' />
+                    <Badge variant='outline' className='border-none text-white bg-[#000000] font-mono'>
+                      <Icons.trendingDown className='text-[#8A8A8A]' />
                       -20%
                     </Badge>
                   </CardAction>
                 </CardHeader>
                 <CardFooter className='flex-col items-start gap-1.5 text-sm'>
-                  <div className='line-clamp-1 flex gap-2 font-medium text-foreground'>
-                    Down 20% this period <Icons.trendingDown className='size-4 text-rose-500' />
+                  <div className='line-clamp-1 flex gap-2 font-medium text-white'>
+                    Down 20% this period <Icons.trendingDown className='size-4 text-[#8A8A8A]' />
                   </div>
-                  <div className='text-muted-foreground text-xs'>Acquisition needs attention</div>
+                  <div className='text-[#8A8A8A] text-xs font-mono'>Acquisition needs attention</div>
                 </CardFooter>
               </Card>
-              <Card className='@container/card bg-card border-border shadow-none text-card-foreground'>
+              <Card className='@container/card bg-[#1A1A1A] border-[#1A1A1A] shadow-none'>
                 <CardHeader>
-                  <CardDescription className='text-muted-foreground'>Active Accounts</CardDescription>
-                  <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl text-foreground'>
+                  <CardDescription className='text-[#8A8A8A] font-mono'>Active Accounts</CardDescription>
+                  <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl text-white font-mono'>
                     45,678
                   </CardTitle>
                   <CardAction>
-                    <Badge variant='outline' className='border border-border text-foreground bg-muted'>
-                      <Icons.trendingUp className='text-emerald-500' />
+                    <Badge variant='outline' className='border-none text-white bg-[#000000] font-mono'>
+                      <Icons.trendingUp className='text-white' />
                       +12.5%
                     </Badge>
                   </CardAction>
                 </CardHeader>
                 <CardFooter className='flex-col items-start gap-1.5 text-sm'>
-                  <div className='line-clamp-1 flex gap-2 font-medium text-foreground'>
-                    Strong user retention <Icons.trendingUp className='size-4 text-emerald-500' />
+                  <div className='line-clamp-1 flex gap-2 font-medium text-white'>
+                    Strong user retention <Icons.trendingUp className='size-4 text-white' />
                   </div>
-                  <div className='text-muted-foreground text-xs'>Engagement exceed targets</div>
+                  <div className='text-[#8A8A8A] text-xs font-mono'>Engagement exceed targets</div>
                 </CardFooter>
               </Card>
-              <Card className='@container/card bg-card border-border shadow-none text-card-foreground'>
+              <Card className='@container/card bg-[#1A1A1A] border-[#1A1A1A] shadow-none'>
                 <CardHeader>
-                  <CardDescription className='text-muted-foreground'>Growth Rate</CardDescription>
-                  <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl text-foreground'>
+                  <CardDescription className='text-[#8A8A8A] font-mono'>Growth Rate</CardDescription>
+                  <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl text-white font-mono'>
                     4.5%
                   </CardTitle>
                   <CardAction>
-                    <Badge variant='outline' className='border border-border text-foreground bg-muted'>
-                      <Icons.trendingUp className='text-emerald-500' />
+                    <Badge variant='outline' className='border-none text-white bg-[#000000] font-mono'>
+                      <Icons.trendingUp className='text-white' />
                       +4.5%
                     </Badge>
                   </CardAction>
                 </CardHeader>
                 <CardFooter className='flex-col items-start gap-1.5 text-sm'>
-                  <div className='line-clamp-1 flex gap-2 font-medium text-foreground'>
-                    Steady performance increase <Icons.trendingUp className='size-4 text-emerald-500' />
+                  <div className='line-clamp-1 flex gap-2 font-medium text-white'>
+                    Steady performance increase <Icons.trendingUp className='size-4 text-white' />
                   </div>
-                  <div className='text-muted-foreground text-xs'>Meets growth projections</div>
+                  <div className='text-[#8A8A8A] text-xs font-mono'>Meets growth projections</div>
                 </CardFooter>
               </Card>
             </div>
@@ -162,7 +161,7 @@ export default function OverViewPage() {
               <div className='col-span-4'>
                 <BarGraph />
               </div>
-              <Card className='col-span-4 md:col-span-3 bg-card border-border shadow-none text-card-foreground'>
+              <Card className='col-span-4 md:col-span-3 bg-[#1A1A1A] border-[#1A1A1A] shadow-none'>
                 <RecentSales />
               </Card>
               <div className='col-span-4'>
@@ -175,77 +174,77 @@ export default function OverViewPage() {
           </TabsContent>
           <TabsContent value='analytics' className='space-y-4'>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-              <Card className='bg-card border-border p-5 text-card-foreground'>
+              <Card className='bg-[#1A1A1A] border-[#1A1A1A] p-5'>
                 <CardHeader className='p-0 pb-3'>
-                  <CardDescription className='text-muted-foreground text-xs uppercase'>Cross-Channel Blended ROAS</CardDescription>
-                  <CardTitle className='text-3xl font-bold text-emerald-600 dark:text-emerald-400'>3.84x</CardTitle>
+                  <CardDescription className='text-[#8A8A8A] font-mono text-xs uppercase'>Cross-Channel Blended ROAS</CardDescription>
+                  <CardTitle className='text-3xl font-bold font-mono text-emerald-400'>3.84x</CardTitle>
                 </CardHeader>
-                <CardFooter className='p-0 pt-2 text-xs text-muted-foreground'>
+                <CardFooter className='p-0 pt-2 text-xs text-[#8A8A8A] font-mono'>
                   +0.42x lift compared to manual baseline allocation
                 </CardFooter>
               </Card>
 
-              <Card className='bg-card border-border p-5 text-card-foreground'>
+              <Card className='bg-[#1A1A1A] border-[#1A1A1A] p-5'>
                 <CardHeader className='p-0 pb-3'>
-                  <CardDescription className='text-muted-foreground text-xs uppercase'>Customer Acquisition Cost (CAC)</CardDescription>
-                  <CardTitle className='text-3xl font-bold text-foreground'>₹412.50</CardTitle>
+                  <CardDescription className='text-[#8A8A8A] font-mono text-xs uppercase'>Customer Acquisition Cost (CAC)</CardDescription>
+                  <CardTitle className='text-3xl font-bold font-mono text-white'>₹412.50</CardTitle>
                 </CardHeader>
-                <CardFooter className='p-0 pt-2 text-xs text-emerald-600 dark:text-emerald-400'>
+                <CardFooter className='p-0 pt-2 text-xs text-emerald-400 font-mono'>
                   -18.4% reduction via autonomous stockout suppression
                 </CardFooter>
               </Card>
 
-              <Card className='bg-card border-border p-5 text-card-foreground'>
+              <Card className='bg-[#1A1A1A] border-[#1A1A1A] p-5'>
                 <CardHeader className='p-0 pb-3'>
-                  <CardDescription className='text-muted-foreground text-xs uppercase'>Estimated Lifetime Value (LTV)</CardDescription>
-                  <CardTitle className='text-3xl font-bold text-foreground'>₹3,840.00</CardTitle>
+                  <CardDescription className='text-[#8A8A8A] font-mono text-xs uppercase'>Estimated Lifetime Value (LTV)</CardDescription>
+                  <CardTitle className='text-3xl font-bold font-mono text-white'>₹3,840.00</CardTitle>
                 </CardHeader>
-                <CardFooter className='p-0 pt-2 text-xs text-cyan-600 dark:text-cyan-400'>
+                <CardFooter className='p-0 pt-2 text-xs text-cyan-400 font-mono'>
                   LTV:CAC Ratio of 9.3x across repeat buyers
                 </CardFooter>
               </Card>
             </div>
 
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <div className='p-5 rounded-xl bg-card border border-border space-y-3 text-card-foreground'>
-                <h4 className='text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2'>
-                  <Icons.trendingUp className='size-4 text-emerald-600 dark:text-emerald-400' /> Channel Efficiency &amp; Marginal Return
+              <div className='p-5 rounded-xl bg-[#1A1A1A] border border-[#1A1A1A] space-y-3'>
+                <h4 className='text-sm font-mono font-bold text-white uppercase tracking-wider flex items-center gap-2'>
+                  <Icons.trendingUp className='size-4 text-emerald-400' /> Channel Efficiency &amp; Marginal Return
                 </h4>
-                <div className='space-y-2 text-xs'>
-                  <div className='flex justify-between py-1 border-b border-border text-muted-foreground'>
+                <div className='space-y-2 text-xs font-mono'>
+                  <div className='flex justify-between py-1 border-b border-zinc-800 text-[#8A8A8A]'>
                     <span>Google Search High-Intent</span>
-                    <span className='text-foreground font-bold'>5.64x ROAS (₹6,100/d spend)</span>
+                    <span className='text-white font-bold'>5.64x ROAS (₹6,100/d spend)</span>
                   </div>
-                  <div className='flex justify-between py-1 border-b border-border text-muted-foreground'>
+                  <div className='flex justify-between py-1 border-b border-zinc-800 text-[#8A8A8A]'>
                     <span>Amazon Sponsored Products</span>
-                    <span className='text-foreground font-bold'>6.12x ROAS (₹3,950/d spend)</span>
+                    <span className='text-white font-bold'>6.12x ROAS (₹3,950/d spend)</span>
                   </div>
-                  <div className='flex justify-between py-1 border-b border-border text-muted-foreground'>
+                  <div className='flex justify-between py-1 border-b border-zinc-800 text-[#8A8A8A]'>
                     <span>Meta Advantage+ Video Retargeting</span>
-                    <span className='text-foreground font-bold'>3.21x ROAS (₹8,400/d spend)</span>
+                    <span className='text-white font-bold'>3.21x ROAS (₹8,400/d spend)</span>
                   </div>
-                  <div className='flex justify-between py-1 text-muted-foreground'>
+                  <div className='flex justify-between py-1 text-[#8A8A8A]'>
                     <span>TikTok Dynamic Showcase</span>
-                    <span className='text-amber-500 font-bold'>2.10x ROAS (₹1,200/d spend)</span>
+                    <span className='text-amber-400 font-bold'>2.10x ROAS (₹1,200/d spend)</span>
                   </div>
                 </div>
               </div>
 
-              <div className='p-5 rounded-xl bg-card border border-border space-y-3 text-card-foreground'>
-                <h4 className='text-sm font-bold text-foreground uppercase tracking-wider flex items-center gap-2'>
-                  <Icons.check className='size-4 text-cyan-600 dark:text-cyan-400' /> Autonomous Directive Efficiency
+              <div className='p-5 rounded-xl bg-[#1A1A1A] border border-[#1A1A1A] space-y-3'>
+                <h4 className='text-sm font-mono font-bold text-white uppercase tracking-wider flex items-center gap-2'>
+                  <Icons.check className='size-4 text-cyan-400' /> Autonomous Directive Efficiency
                 </h4>
-                <p className='text-xs text-muted-foreground leading-relaxed font-sans'>
+                <p className='text-xs text-[#8A8A8A] leading-relaxed font-sans'>
                   Real-time convex optimization dynamically tracks Hill saturation thresholds to prevent ad spend waste on saturated fatigue curves.
                 </p>
                 <div className='pt-2 flex items-center gap-3'>
                   <Link href='/dashboard/strategy-engine'>
-                    <Button size='sm' className='bg-emerald-600 dark:bg-[#39FF14] text-white dark:text-black hover:bg-emerald-700 dark:hover:bg-[#32e012] font-mono text-xs font-semibold'>
+                    <Button size='sm' className='bg-[#39FF14] text-black hover:bg-[#32e012] font-mono text-xs font-semibold'>
                       Open Strategy Engine &rarr;
                     </Button>
                   </Link>
                   <Link href='/dashboard/gauges'>
-                    <Button size='sm' variant='outline' className='text-xs font-mono border-border text-foreground hover:bg-muted'>
+                    <Button size='sm' variant='outline' className='text-xs font-mono border-zinc-700 text-white hover:bg-zinc-800'>
                       View ROAS Gauges
                     </Button>
                   </Link>

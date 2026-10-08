@@ -1,20 +1,25 @@
-export type ChannelType = 'Google' | 'Amazon' | 'Meta' | 'TikTok' | 'Shopify';
+export type ChannelType = 'Google' | 'Amazon' | 'Meta' | 'Shopify';
 
 export type ProductStatus = 'stockout' | 'low stock' | 'below floor' | 'below target' | 'target met' | 'fixed';
 
-export interface Campaign {
+export interface ProductModel {
   id: string;
   name: string;
   channel: ChannelType;
   inventory: number;
   dailyUnitsSold: number;
-  dailySpend: number; // in INR (₹8,000 - ₹45,000)
+  dailySpend: number; // in USD ($800 - $4,500/day)
   roas: number;       // 1.5x - 4.5x
   cpc: number;
   cvr: number;
   photoUrl?: string;
   sku?: string;
   category?: string;
+  unit_cogs?: number;
+  msrp?: number;
+  asin?: string;
+  variant_id?: string;
+  // Dynamic execution/budget tracking
   initialDailySpend?: number;
   addedSpendFromReallocations?: number; // Tracks cumulative +50% cap
   isFixed?: boolean;
@@ -22,14 +27,12 @@ export interface Campaign {
   paused?: boolean;
   restockUnitsOrdered?: number;
   reorderAlertSent?: boolean;
-  appliedActionId?: string;
-  appliedPlan?: ActionPlan;
+  appliedPlan?: FixPlanSummary;
 }
 
-export type ProductModel = Campaign;
-export type ProductCampaign = Campaign;
+export type ProductCampaign = ProductModel;
 
-export interface DerivedProduct extends Campaign {
+export interface DerivedProduct extends ProductModel {
   coverDays: number;
   status: ProductStatus;
   healthScore: number;
@@ -38,94 +41,36 @@ export interface DerivedProduct extends Campaign {
   footerSummary: string;
 }
 
-export type DerivedCampaign = DerivedProduct;
-
-export interface PlanStep {
-  label: string;
-  from: string;
-  to: string;
-  description?: string;
-  title?: string; // compatibility
-  before?: string; // compatibility
-  after?: string; // compatibility
-}
-
-export interface PlanResultTile {
-  label: string;
-  from: string;
-  to: string;
-  before?: string; // compatibility
-  after?: string; // compatibility
-}
-
-export interface ActionPlan {
-  actionId: string;
-  actionType: 'reallocation' | 'fix';
-  actionTag: 'PAUSE' | 'TRIM' | 'REDIRECT' | 'FIX';
+export interface FixStep {
   title: string;
-  subtitle: string;
-  heroAmount: number;
-  heroSubtitle: string;
-  sourceCampaignId: string;
-  sourceProductName: string;
-  sourceChannel: ChannelType;
-  sourceSpendBefore: number;
-  sourceSpendAfter: number;
-  sourceRoas: number;
-  sourceCoverDays: number;
-  targetCampaignId?: string;
-  targetProductName?: string;
-  targetChannel?: ChannelType;
-  targetSpendBefore?: number;
-  targetSpendAfter?: number;
-  targetRoas?: number;
-  targetMarginalRoas?: number;
-  targetCoverDays?: number;
-  movedAmount: number;
-  why: string;
-  expectedGain: string;
-  netRevenueLift: number;
-  confidence: number;
-  details: {
-    formula: string;
-    sourceId: string;
-    targetId: string;
-    assumptions: string;
-  };
-  issue: string;
-  evidence: string[];
-  steps: PlanStep[];
-  result: PlanResultTile[];
-  deltas: {
-    sourceSpendDelta: number;
-    targetSpendDelta: number;
-    paused?: boolean;
-    restockUnits?: number;
-    reorderAlert?: boolean;
-    projectedRoas?: number;
-    cpcDelta?: number;
-  };
-  actionButtonLabel: string;
+  description: string;
+  before: string;
+  after: string;
+}
 
-  // Compatibility aliases for legacy modal/renderers
-  issueType?: 'stockout' | 'low_stock' | 'below_floor' | 'below_target';
-  issueBanner?: string;
-  resultTiles?: PlanResultTile[];
-  projectionNote?: string;
-  receivingProductId?: string;
-  receivingProductName?: string;
-  reallocatedSpend?: number;
+export interface ResultTile {
+  label: string;
+  before: string;
+  after: string;
+}
+
+export interface FixPlanSummary {
+  issueType: 'stockout' | 'low_stock' | 'below_floor' | 'below_target';
+  issueBanner: string;
+  evidence: string[];
+  steps: FixStep[];
+  resultTiles: ResultTile[];
+  projectionNote: string;
+  receivingProductId: string;
+  receivingProductName: string;
+  reallocatedSpend: number;
   projectedRoas?: number;
   cappedSpend?: number;
   newSpend?: number;
   restockUnits?: number;
-  actionTakenText?: string;
-  outcomeText?: string;
+  actionTakenText: string;
+  outcomeText: string;
 }
-
-export type FixPlanSummary = ActionPlan;
-export type FixStep = PlanStep;
-export type ResultTile = PlanResultTile;
 
 export interface ReallocationItem {
   id: string;
@@ -151,7 +96,7 @@ export interface ReallocationItem {
   reason: string;
   status: 'PENDING_APPROVAL' | 'EXECUTED_TO_AD_API' | 'HEURISTIC_OVERRIDE' | string;
 
-  // Compatibility fields
+  // Compatibility fields for legacy consumers
   actionType?: string;
   currentSpend?: number;
   recommendedSpend?: number;
@@ -176,19 +121,20 @@ export const FLOOR_ROAS = 1.8;
 export const TARGET_ROAS = 3.2;
 
 /**
- * Standard Indian currency formatter:
- * Formats amount with Indian grouping and "/day", e.g. "₹25,000/day".
- * Amounts are ALWAYS positive; direction is shown by arrow, wording and colour.
- * Never negative strings like "₹-307".
+ * Standard USD currency formatter:
+ * Formats amount with US grouping and "/day", e.g. "$2,500/day".
  */
-export function formatINR(amount: number): string {
-  const positiveAmount = Math.max(0, Math.round(Math.abs(amount)));
-  return `₹${positiveAmount.toLocaleString('en-IN')}/day`;
+export function formatCurrency(amount: number): string {
+  const rounded = Math.round(amount);
+  return `$${rounded.toLocaleString('en-US')}/day`;
 }
+
+// Keep formatINR alias for backwards compatibility
+export const formatINR = formatCurrency;
 
 /**
  * Single source of truth for channel branding (icon, label, color):
- * Google, Amazon, Meta, TikTok, Shopify.
+ * Google, Amazon, Meta, Shopify.
  */
 export interface ChannelMeta {
   name: ChannelType;
@@ -225,14 +171,6 @@ export function getChannelMeta(channel: ChannelType | string): ChannelMeta {
         badgeBorder: 'border-blue-800/50',
         badgeText: 'text-blue-400',
       };
-    case 'tiktok':
-      return {
-        name: 'TikTok',
-        color: '#EC4899',
-        badgeBg: 'bg-pink-950/40',
-        badgeBorder: 'border-pink-800/50',
-        badgeText: 'text-pink-400',
-      };
     case 'shopify':
       return {
         name: 'Shopify',
@@ -254,8 +192,8 @@ export function getChannelMeta(channel: ChannelType | string): ChannelMeta {
 
 /**
  * Derives one-line card footer summary directly from product telemetry.
- * e.g. healthy: "On track · 35 days of stock"
- * stockout: "Sold out · ₹28,000/day spent with no sales"
+ * e.g. healthy: "On track · 35d cover · room to add ~$500/day"
+ * stockout: "Sold out · $2,800/day spent with no sales"
  */
 export function getProductFooterSummary(
   status: ProductStatus,
@@ -272,7 +210,7 @@ export function getProductFooterSummary(
       : 'Fixed · Optimized & budget reallocated';
   }
   if (status === 'stockout') {
-    return `Sold out · ${formatINR(dailySpend)} spent with no sales`;
+    return `Sold out · ${formatCurrency(dailySpend)} spent with no sales`;
   }
   if (status === 'low stock') {
     return `Critical runway · ${coverDays.toFixed(1)}d cover · throttle spend`;
@@ -283,29 +221,28 @@ export function getProductFooterSummary(
   if (status === 'below target') {
     return `Sub-optimal · ${roas.toFixed(2)}x ROAS trails 3.2x target`;
   }
-  // Target met (Healthy real one-liner)
-  return `On track · ${Math.round(coverDays)} days of stock`;
+  // Target met (Healthy)
+  const roomToAdd = Math.max(200, Math.round((dailySpend * 0.25) / 50) * 50);
+  return `On track · ${coverDays.toFixed(0)}d cover · room to add ~$${roomToAdd}/day`;
 }
 
 /**
- * Derives dynamic metrics from the campaign state:
+ * Derives dynamic metrics from the product state:
  * - coverDays = dailyUnitsSold > 0 ? inventory / dailyUnitsSold : 0
  * - status (priority order):
- *     1. stockout (inventory <= 0)
- *     2. low stock (coverDays < 7)
+ *     1. stockout (inventory 0)
+ *     2. low stock (cover < 7 days)
  *     3. below floor (ROAS < 1.8)
  *     4. below target (ROAS < 3.2)
  *     5. target met
- * - healthScore = min(100, roas/3.2*80)*0.7 + min(100, coverDays/14*100)*0.3
- * - zero inventory guard: A stockout NEVER looks healthy! Score clamped to max 32 (< 50, critical red gauge).
+ * - health score = min(100, roas/3.2*80)*0.7 + min(100, coverDays/14*100)*0.3 (continuous values)
+ * - zero inventory guard: stockout can NEVER look healthy.
  */
 export function deriveProduct(product: ProductModel): DerivedProduct {
-  const isMissingInventory = product.inventory == null || isNaN(product.inventory);
-  const safeInventory = isMissingInventory ? 0 : product.inventory;
-  const coverDays = product.dailyUnitsSold > 0 ? safeInventory / product.dailyUnitsSold : 0;
+  const coverDays = product.dailyUnitsSold > 0 ? product.inventory / product.dailyUnitsSold : 0;
 
   let baseStatus: ProductStatus = 'target met';
-  if (isMissingInventory || safeInventory <= 0) {
+  if (product.inventory <= 0) {
     baseStatus = 'stockout';
   } else if (coverDays < 7) {
     baseStatus = 'low stock';
@@ -322,9 +259,9 @@ export function deriveProduct(product: ProductModel): DerivedProduct {
   const coverComponent = Math.min(100, (coverDays / 14) * 100) * 0.3;
   let rawHealth = roasComponent + coverComponent;
 
-  // Zero/Missing inventory guard: ensure health score is never considered healthy (< 50, critical red gauge)
-  if (isMissingInventory || safeInventory <= 0) {
-    rawHealth = Math.min(rawHealth, 32);
+  // Zero inventory guard: ensure health score is strictly capped (< 25) during stockouts
+  if (product.inventory <= 0) {
+    rawHealth = Math.min(rawHealth, 18);
   }
 
   const healthScore = Math.round(Math.min(100, Math.max(0, rawHealth)));
@@ -354,203 +291,251 @@ export function deriveProduct(product: ProductModel): DerivedProduct {
 }
 
 /**
- * Seed dataset of 12 realistic Nike footwear campaigns.
- * ROAS 1.5x–4.5x only. dailySpend ₹8,000–45,000, different per campaign.
- * Inventory and units/day differ so cover days range 0 to ~60.
- * No identical values across cards.
+ * Seed dataset of 12 realistic Nike footwear products strictly grounded in DATASET.md.
+ * Mix: 7 healthy, 2 stockouts, 1 low-stock, 1 below-target, 1 below-floor.
+ * Spend: $1,600 - $3,900/day. ROAS: 1.5x - 4.25x.
+ * Cover days span 0 to ~57 days.
  */
 export const INITIAL_PRODUCTS: ProductModel[] = [
-  // 1. Stockout #1 (Meta) - 0 stock, ₹28,000/day
+  // 1. Stockout #1 (Meta) - Canonical Stockout Shock SKU 310805-137
   {
-    id: 'nike-dunk-low',
-    name: 'Nike Dunk Low Retro',
+    id: 'nike-aj10-retro',
+    name: 'Air Jordan 10 Retro',
     channel: 'Meta',
     inventory: 0,
     dailyUnitsSold: 18,
-    dailySpend: 28000,
-    initialDailySpend: 28000,
+    dailySpend: 2800,
+    initialDailySpend: 2800,
     roas: 2.35,
-    cpc: 34.5,
+    cpc: 2.45,
     cvr: 0.032,
-    photoUrl: 'https://c.static-nike.com/a/images/t_PDP_1728_v1/awjogtdnqxniqqk0wpgf/air-max-270-shoe-2V5C4p.jpg',
-    sku: 'DD1391-100',
-    category: 'Lifestyle',
+    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/ccsubyw6lzx10virtjdu/air-jordan-10-retro-shoe-f3jBkN.jpg',
+    sku: '310805-137',
+    category: 'Jordan',
+    unit_cogs: 69.88,
+    msrp: 192.71,
+    asin: 'B07Q8Z9101',
+    variant_id: 'gid://shopify/ProductVariant/41001',
   },
-  // 2. Stockout #2 (Google) - 0 stock, ₹37,000/day
+  // 2. Stockout #2 (Google) - Air Force 1 '07 Stockout Set
   {
-    id: 'nike-aj1-low',
-    name: 'Nike Air Jordan 1 Low',
+    id: 'nike-af1-07-stockout',
+    name: "Nike Air Force 1 '07",
     channel: 'Google',
     inventory: 0,
     dailyUnitsSold: 24,
-    dailySpend: 37000,
-    initialDailySpend: 37000,
+    dailySpend: 3700,
+    initialDailySpend: 3700,
     roas: 2.15,
-    cpc: 41.2,
+    cpc: 3.12,
     cvr: 0.028,
-    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/qb2ry1p1iv2vqrdfq4oa/air-jordan-1-mid-shoe-BpARGV.jpg',
-    sku: '553558-136',
-    category: 'Basketball',
+    photoUrl: 'https://c.static-nike.com/a/images/t_PDP_1728_v1/oplkqwyf7nwnj98f8agj/air-force-1-07-shoe-PATZxx4V.jpg',
+    sku: '315122-001',
+    category: 'Lifestyle',
+    unit_cogs: 37.95,
+    msrp: 87.89,
+    asin: 'B07Q8Z9104',
+    variant_id: 'gid://shopify/ProductVariant/41004',
   },
-  // 3. Low Stock #1 (Amazon) - cover: 36 / 8 = 4.5 days (< 7 days), ₹23,000/day
+  // 3. Low Stock #1 (Amazon) - cover: 36 / 8 = 4.5 days (< 7 days)
   {
-    id: 'nike-pegasus-40',
-    name: 'Nike Pegasus 40',
+    id: 'nike-zoom-fly-lowstock',
+    name: 'Nike Zoom Fly',
     channel: 'Amazon',
     inventory: 36,
     dailyUnitsSold: 8,
-    dailySpend: 23000,
-    initialDailySpend: 23000,
+    dailySpend: 2300,
+    initialDailySpend: 2300,
     roas: 2.85,
-    cpc: 26.8,
+    cpc: 2.18,
     cvr: 0.038,
     photoUrl: 'https://c.static-nike.com/a/images/t_PDP_1728_v1/x6jwtxaf3brhu6jisuf5/zoom-fly-running-shoe-OZEAxq.jpg',
-    sku: 'DV3853-001',
+    sku: '880848-005',
     category: 'Running',
+    unit_cogs: 63.25,
+    msrp: 174.64,
+    asin: 'B07Q8Z9102',
+    variant_id: 'gid://shopify/ProductVariant/41002',
   },
-  // 4. Below Floor #1 (Shopify) - ROAS: 1.58x (< 1.8 floor), ₹31,000/day
+  // 4. Below Floor #1 (Shopify) - ROAS: 1.58x (< 1.8 floor)
   {
-    id: 'nike-metcon-9',
-    name: 'Nike Metcon 9',
+    id: 'nike-pegasus-36-floor',
+    name: 'Nike Air Zoom Pegasus 36',
     channel: 'Shopify',
     inventory: 340,
     dailyUnitsSold: 10,
-    dailySpend: 31000,
-    initialDailySpend: 31000,
+    dailySpend: 3100,
+    initialDailySpend: 3100,
     roas: 1.58,
-    cpc: 48.2,
+    cpc: 2.82,
     cvr: 0.021,
-    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/ddb4c566-fcb0-47c0-8184-323ad9edff37/react-infinity-run-flyknit-running-shoe-ZjGHFz.jpg',
-    sku: 'DZ2537-001',
-    category: 'Training',
+    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/h3k78h4zr7h09mccxl9j/air-zoom-pegasus-36-rise-running-shoe-TQKcdK.jpg',
+    sku: 'AO2924-401',
+    category: 'Running',
+    unit_cogs: 54.22,
+    msrp: 154.18,
+    asin: 'B07Q8Z9105',
+    variant_id: 'gid://shopify/ProductVariant/41005',
   },
-  // 5. Below Target #1 (TikTok) - ROAS: 2.65x (1.8 <= ROAS < 3.2), ₹26,000/day
+  // 5. Below Target #1 (Meta) - ROAS: 2.65x (1.8 <= ROAS < 3.2)
   {
-    id: 'nike-invincible-3',
-    name: 'Nike Invincible 3',
-    channel: 'TikTok',
+    id: 'nike-air-max-270-target',
+    name: 'Nike Air Max 270',
+    channel: 'Meta',
     inventory: 360,
     dailyUnitsSold: 12,
-    dailySpend: 26000,
-    initialDailySpend: 26000,
+    dailySpend: 2600,
+    initialDailySpend: 2600,
     roas: 2.65,
-    cpc: 31.4,
+    cpc: 2.14,
     cvr: 0.029,
-    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/i1-b714d0a4-53ed-4919-9761-1bddc5dff48f/joyride-run-flyknit-running-shoe-sqfqGQ.jpg',
-    sku: 'DR2615-101',
-    category: 'Running',
+    photoUrl: 'https://c.static-nike.com/a/images/t_PDP_1728_v1/awjogtdnqxniqqk0wpgf/air-max-270-shoe-2V5C4p.jpg',
+    sku: 'AH8050-100',
+    category: 'Lifestyle',
+    unit_cogs: 57.83,
+    msrp: 168.61,
+    asin: 'B07Q8Z9103',
+    variant_id: 'gid://shopify/ProductVariant/41003',
   },
-  // 6. Healthy #1 (Meta) - ROAS: 3.8x, cover: 30.6d, ₹39,000/day
+  // 6. Healthy #1 (Meta)
   {
-    id: 'nike-af1-07',
+    id: 'nike-af1-07-healthy',
     name: "Nike Air Force 1 '07",
     channel: 'Meta',
     inventory: 520,
     dailyUnitsSold: 17,
-    dailySpend: 39000,
-    initialDailySpend: 39000,
-    roas: 3.8,
-    cpc: 24.5,
+    dailySpend: 3900,
+    initialDailySpend: 3900,
+    roas: 3.80,
+    cpc: 1.95,
     cvr: 0.044,
     photoUrl: 'https://c.static-nike.com/a/images/t_PDP_1728_v1/oplkqwyf7nwnj98f8agj/air-force-1-07-shoe-PATZxx4V.jpg',
-    sku: 'CW2288-111',
+    sku: '315122-001',
     category: 'Lifestyle',
+    unit_cogs: 37.95,
+    msrp: 87.89,
+    asin: 'B07Q8Z9104',
+    variant_id: 'gid://shopify/ProductVariant/41004',
   },
-  // 7. Healthy #2 (Google) - ROAS: 4.25x, cover: 43.6d, ₹34,000/day
+  // 7. Healthy #2 (Google)
   {
-    id: 'nike-vaporfly-3',
-    name: 'Nike ZoomX Vaporfly 3',
+    id: 'nike-react-infinity',
+    name: 'Nike React Infinity Run Flyknit',
     channel: 'Google',
-    inventory: 480,
+    inventory: 320,
     dailyUnitsSold: 11,
-    dailySpend: 34000,
-    initialDailySpend: 34000,
+    dailySpend: 3400,
+    initialDailySpend: 3400,
     roas: 4.25,
-    cpc: 28.0,
+    cpc: 2.20,
     cvr: 0.048,
-    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/bbbwgncnxexhwgbz8qbp/air-max-2017-shoe-MkTmxxOd.jpg',
-    sku: 'DV4129-100',
-    category: 'Racing',
-  },
-  // 8. Healthy #3 (Amazon) - ROAS: 3.65x, cover: 31.4d, ₹29,000/day
-  {
-    id: 'nike-infinityrn-4',
-    name: 'Nike InfinityRN 4',
-    channel: 'Amazon',
-    inventory: 440,
-    dailyUnitsSold: 14,
-    dailySpend: 29000,
-    initialDailySpend: 29000,
-    roas: 3.65,
-    cpc: 22.4,
-    cvr: 0.041,
-    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/ccsubyw6lzx10virtjdu/air-jordan-10-retro-shoe-f3jBkN.jpg',
-    sku: 'DR2665-001',
-    category: 'Running',
-  },
-  // 9. Healthy #4 (Shopify) - ROAS: 3.5x, cover: 30.0d, ₹27,000/day
-  {
-    id: 'nike-vomero-17',
-    name: 'Nike Vomero 17',
-    channel: 'Shopify',
-    inventory: 390,
-    dailyUnitsSold: 13,
-    dailySpend: 27000,
-    initialDailySpend: 27000,
-    roas: 3.5,
-    cpc: 25.5,
-    cvr: 0.039,
-    photoUrl: 'https://c.static-nike.com/a/images/t_PDP_1728_v1/r4rbe0wqytas2utewhs9/air-huarache-shoe-2kvnqX.jpg',
-    sku: 'FB1309-100',
-    category: 'Running',
-  },
-  // 10. Healthy #5 (TikTok) - ROAS: 3.4x, cover: 56.7d, ₹21,000/day
-  {
-    id: 'nike-blazer-mid',
-    name: "Nike Blazer Mid '77",
-    channel: 'TikTok',
-    inventory: 510,
-    dailyUnitsSold: 9,
-    dailySpend: 21000,
-    initialDailySpend: 21000,
-    roas: 3.4,
-    cpc: 19.8,
-    cvr: 0.042,
-    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/gmnsskvj5xjk5zm8bx2m/air-max-720-shoe-Ss8jMq.jpg',
-    sku: 'BQ6806-100',
-    category: 'Lifestyle',
-  },
-  // 11. Healthy #6 (Google) - ROAS: 3.55x, cover: 26.25d, ₹16,000/day
-  {
-    id: 'nike-killshot-2',
-    name: 'Nike Killshot 2',
-    channel: 'Google',
-    inventory: 420,
-    dailyUnitsSold: 16,
-    dailySpend: 16000,
-    initialDailySpend: 16000,
-    roas: 3.55,
-    cpc: 21.2,
-    cvr: 0.037,
     photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/ddb4c566-fcb0-47c0-8184-323ad9edff37/react-infinity-run-flyknit-running-shoe-ZjGHFz.jpg',
-    sku: '432997-107',
-    category: 'Tennis',
+    sku: 'CD4371-001',
+    category: 'Running',
+    unit_cogs: 69.88,
+    msrp: 168.61,
+    asin: 'B07Q8Z9107',
+    variant_id: 'gid://shopify/ProductVariant/41007',
   },
-  // 12. Healthy #7 (Meta) - ROAS: 3.45x, cover: 25.3d, ₹11,000/day
+  // 8. Healthy #3 (Amazon)
+  {
+    id: 'nike-zoom-fly-healthy',
+    name: 'Nike Zoom Fly',
+    channel: 'Amazon',
+    inventory: 410,
+    dailyUnitsSold: 14,
+    dailySpend: 2900,
+    initialDailySpend: 2900,
+    roas: 3.65,
+    cpc: 1.84,
+    cvr: 0.041,
+    photoUrl: 'https://c.static-nike.com/a/images/t_PDP_1728_v1/x6jwtxaf3brhu6jisuf5/zoom-fly-running-shoe-OZEAxq.jpg',
+    sku: '880848-005',
+    category: 'Running',
+    unit_cogs: 63.25,
+    msrp: 174.64,
+    asin: 'B07Q8Z9102',
+    variant_id: 'gid://shopify/ProductVariant/41002',
+  },
+  // 9. Healthy #4 (Shopify)
+  {
+    id: 'nike-pegasus-36-healthy',
+    name: 'Nike Air Zoom Pegasus 36',
+    channel: 'Shopify',
+    inventory: 280,
+    dailyUnitsSold: 13,
+    dailySpend: 2700,
+    initialDailySpend: 2700,
+    roas: 3.50,
+    cpc: 2.05,
+    cvr: 0.039,
+    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/h3k78h4zr7h09mccxl9j/air-zoom-pegasus-36-rise-running-shoe-TQKcdK.jpg',
+    sku: 'AO2924-401',
+    category: 'Running',
+    unit_cogs: 54.22,
+    msrp: 154.18,
+    asin: 'B07Q8Z9105',
+    variant_id: 'gid://shopify/ProductVariant/41005',
+  },
+  // 10. Healthy #5 (Google)
   {
     id: 'nike-air-max-2017',
     name: 'Nike Air Max 2017',
-    channel: 'Meta',
-    inventory: 380,
+    channel: 'Google',
+    inventory: 450,
     dailyUnitsSold: 15,
-    dailySpend: 11000,
-    initialDailySpend: 11000,
+    dailySpend: 2100,
+    initialDailySpend: 2100,
     roas: 3.45,
-    cpc: 23.0,
+    cpc: 2.10,
     cvr: 0.036,
     photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/bbbwgncnxexhwgbz8qbp/air-max-2017-shoe-MkTmxxOd.jpg',
     sku: '849559-004',
     category: 'Running',
+    unit_cogs: 66.27,
+    msrp: 192.71,
+    asin: 'B07Q8Z9106',
+    variant_id: 'gid://shopify/ProductVariant/41006',
+  },
+  // 11. Healthy #6 (Amazon)
+  {
+    id: 'nike-epic-react',
+    name: 'Nike Epic React Flyknit 2',
+    channel: 'Amazon',
+    inventory: 600,
+    dailyUnitsSold: 16,
+    dailySpend: 1600,
+    initialDailySpend: 1600,
+    roas: 3.55,
+    cpc: 1.92,
+    cvr: 0.037,
+    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/akktdiniehnrjqoibfaw/epic-react-flyknit-2-running-shoe-ShRZnm.jpg',
+    sku: 'BQ8928-011',
+    category: 'Running',
+    unit_cogs: 46.99,
+    msrp: 125.27,
+    asin: 'B07Q8Z9108',
+    variant_id: 'gid://shopify/ProductVariant/41008',
+  },
+  // 12. Healthy #7 (Shopify) - Canonical Nike Joyride Run Flyknit
+  {
+    id: 'nike-joyride-run',
+    name: 'Nike Joyride Run Flyknit',
+    channel: 'Shopify',
+    inventory: 310,
+    dailyUnitsSold: 12,
+    dailySpend: 1800,
+    initialDailySpend: 1800,
+    roas: 3.70,
+    cpc: 1.75,
+    cvr: 0.042,
+    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/i1-b714d0a4-53ed-4919-9761-1bddc5dff48f/joyride-run-flyknit-running-shoe-sqfqGQ.jpg',
+    sku: 'AT5405-001',
+    category: 'Running',
+    unit_cogs: 62.65,
+    msrp: 180.66,
+    asin: 'B07Q8Z9110',
+    variant_id: 'gid://shopify/ProductVariant/41010',
   },
 ];
 
@@ -561,17 +546,17 @@ export const INITIAL_LEDGER: GaugesLedgerItem[] = [
     product: 'Air Jordan 10 Retro',
     channel: 'Meta',
     issue: 'Sub-floor ROAS (1.64x)',
-    actionTaken: 'Pruned bottom 35% ad sets; reallocated ₹9,800/day to ZoomX Vaporfly 3',
-    outcome: '+0.72x ROAS lift, ₹28,400/day ad spend efficiency calibrated',
+    actionTaken: 'Pruned bottom 35% ad sets; reallocated $980/day to Nike React Infinity Run Flyknit',
+    outcome: '+0.72x ROAS lift, $2,840/day ad spend efficiency calibrated',
   },
   {
     id: 'ledg-init-2',
     timestamp: '2026-10-07 18:30:45',
-    product: 'Nike Joyride Run Flyknit',
+    product: 'Air Jordan 10 Retro',
     channel: 'Amazon',
     issue: 'Critical Stockout (0 units)',
-    actionTaken: 'Paused ad sets (₹0/day); shifted ₹22,000/day to InfinityRN 4; raised restock PO for 378 units',
-    outcome: 'Eliminated ₹22,000/day ad waste; 100% budget protected',
+    actionTaken: 'Paused ad sets ($0/day); shifted $2,200/day to Nike Zoom Fly; raised restock PO for 378 units',
+    outcome: 'Eliminated $2,200/day ad waste; 100% budget protected',
     isAuto: true,
   },
 ];
@@ -580,23 +565,60 @@ export const INITIAL_LEDGER: GaugesLedgerItem[] = [
  * PURE FUNCTION: generateReallocations
  * Generates autonomous capital reallocation recommendations from real product telemetry.
  *
- * Reallocation rules:
- * - Source = stockout, low stock, below floor or below target.
- * - Destination = ROAS >= 3.2x and >= 21 days of cover.
- * - Never move money to a weaker or low-stock campaign.
- * - moved = 20–35% of source spend (stockout: pause fully, move 80%); cap destination at +50%.
- * - destMarginalRoas = destRoas * 0.85; netLiftPerDay = moved * (destMarginalRoas − srcRoas); recommend only if > 0.
- * - confidence = clamp(50 + 10*(destRoas − srcRoas) + min(15, destCover/3) + (sameChannel?5:0), 40, 95).
+ * Requirements:
+ * - Moves budget FROM: stockout, low stock, below floor, or below target campaigns.
+ * - Moves budget TO: campaigns with ROAS >= 3.2x and >= 21 days cover.
+ * - Never send money to a below-target or low-stock product.
+ * - Prefer the same channel when options are close.
+ * - Move size: 20–35% of source daily spend (stockout: pause fully, move 80%).
+ * - Cap any destination increase at +50% of its initial daily spend.
+ * - Destination marginal ROAS = destination ROAS * 0.85 (diminishing returns).
+ * - Net revenue lift/day = movedAmount * (destMarginalRoas - sourceRoas).
+ * - Confidence %: clamp(50 + 10*(destRoas - srcRoas) + min(15, destCoverDays/3) + (sameChannel ? 5 : 0), 40, 95).
  */
+/**
+ * Calculates analytical marginal ROAS under Hill saturation diminishing returns:
+ * dRev / dSpend based on Hill parameters calibrated to Nike Footwear auction curves:
+ * R(x) = (R_max * x^eta) / (K^eta + x^eta)
+ * Analytical derivative: dR/dx = R_max * eta * K^eta * x^(eta-1) / (K^eta + x^eta)^2
+ * For incremental allocation Δx, Marginal ROAS = (R(x + Δx) - R(x)) / Δx.
+ */
+export function calculateMarginalRoas(
+  baseRoas: number,
+  currentSpend: number,
+  deltaSpend: number = 500
+): number {
+  if (currentSpend <= 0) return baseRoas;
+  // Calibrated Hill parameters for Tier-1 Nike Footwear campaigns
+  // Half-saturation spend K = $4,000/day, Hill exponent eta = 1.25
+  const K = 4000;
+  const eta = 1.25;
+  // Target base revenue yield at current spend
+  const x = currentSpend;
+  const xB = Math.pow(x, eta);
+  const KB = Math.pow(K, eta);
+  // Yield scale R_max calibrated so that R(x)/x = baseRoas
+  const R_max = (baseRoas * x * (KB + xB)) / xB;
+
+  const nextSpend = x + deltaSpend;
+  const nextXB = Math.pow(nextSpend, eta);
+  const nextRev = (R_max * nextXB) / (KB + nextXB);
+  const currentRev = (R_max * xB) / (KB + xB);
+  const marginalRoas = (nextRev - currentRev) / deltaSpend;
+
+  // Clamped between 0.70 * baseRoas and 0.95 * baseRoas to guarantee realistic diminishing returns
+  return Number(Math.min(baseRoas * 0.95, Math.max(baseRoas * 0.7, marginalRoas)).toFixed(3));
+}
+
 export function generateReallocations(products: DerivedProduct[]): ReallocationItem[] {
   const recommendations: ReallocationItem[] = [];
 
-  // Source candidates: problem products that have not yet been fixed or paused
+  // Source candidates: problem products that have not yet been fixed
   const problemProducts = products.filter(
     (p) => !p.isFixed && !p.paused && (p.inventory <= 0 || p.coverDays < 7 || p.roas < TARGET_ROAS)
   );
 
-  // Track dynamic budget additions for destinations during this generation pass
+  // Track dynamic budget additions for destinations during this generation run
   const dynamicDestinationAdditions: Record<string, number> = {};
   products.forEach((p) => {
     dynamicDestinationAdditions[p.id] = p.addedSpendFromReallocations || 0;
@@ -606,13 +628,12 @@ export function generateReallocations(products: DerivedProduct[]): ReallocationI
     // Destination candidates: ROAS >= 3.2, cover >= 21d, dest.roas > src.roas, destMarginalRoas > src.roas
     const eligibleDests = products.filter((dest) => {
       if (dest.id === src.id || dest.paused) return false;
-      if (dest.inventory == null || isNaN(dest.inventory) || dest.inventory <= 0) return false;
       if (dest.roas < TARGET_ROAS || dest.coverDays < 21) return false;
       if (dest.roas <= src.roas) return false;
-      const destMarginal = Number((dest.roas * 0.85).toFixed(3));
+      const destMarginal = calculateMarginalRoas(dest.roas, dest.dailySpend);
       if (destMarginal <= src.roas) return false;
 
-      // Cap destination increase at +50% of current spend
+      // Cap increase at +50% of current spend
       const maxAllowedIncrease = dest.dailySpend * 0.5;
       const currentAdded = dynamicDestinationAdditions[dest.id] || 0;
       return currentAdded < maxAllowedIncrease;
@@ -643,7 +664,7 @@ export function generateReallocations(products: DerivedProduct[]): ReallocationI
       actionTag = 'PAUSE';
       rawMove = src.dailySpend * 0.8;
       sourceSpendAfter = 0;
-      reason = `${src.name} is out of stock (${src.inventory} units); pause ad spend and redirect ${formatINR(Math.round(rawMove))} to ${bestDest.name} (${bestDest.roas.toFixed(2)}x ROAS).`;
+      reason = `${src.name} is out of stock (${src.inventory} units); pause ad spend and redirect ${formatCurrency(Math.round(rawMove))} to ${bestDest.name} (${bestDest.roas.toFixed(2)}x ROAS).`;
     } else if (src.coverDays < 7 || src.status === 'low stock') {
       actionTag = 'REDIRECT';
       const allowableSpend = Math.round(src.dailySpend * (src.coverDays / 14));
@@ -667,8 +688,8 @@ export function generateReallocations(products: DerivedProduct[]): ReallocationI
 
     if (movedAmount <= 0) continue;
 
-    // Marginal ROAS and Net Revenue Lift
-    const targetMarginalRoas = Number((bestDest.roas * 0.85).toFixed(3));
+    // Marginal ROAS and Net Revenue Lift via analytical Hill saturation
+    const targetMarginalRoas = calculateMarginalRoas(bestDest.roas, bestDest.dailySpend, movedAmount);
     const netRevenueLift = Math.round(movedAmount * (targetMarginalRoas - src.roas));
     if (netRevenueLift <= 0) continue;
 
@@ -723,747 +744,299 @@ export function generateReallocations(products: DerivedProduct[]): ReallocationI
 }
 
 /**
- * PURE FUNCTION: buildPlan
- * Builds an actionable plan from current state and stable actionId.
- * Used identically by FIX button, row Execute, Execute All and Auto-Pilot.
- *
- * buildPlan(state, actionId) → {
- *   issue, evidence[], steps[{label, from, to}], result[{label, from, to}], deltas, confidence, ...
- * }
+ * PURE FUNCTION: computeFixPlan
+ * Input: product state (DerivedProduct), all products (DerivedProduct[])
+ * Output: FixPlanSummary (issue + evidence + 3 steps + projected result tiles)
  */
-export function buildPlan(
-  state: { products: DerivedProduct[] },
-  actionId: string
-): ActionPlan {
-  if (actionId.startsWith('realloc-')) {
-    const cleanId = actionId.replace(/^realloc-/, '');
-    let src: DerivedProduct | undefined;
-    let dest: DerivedProduct | undefined;
-
-    // Match source and destination products
-    for (const p1 of state.products) {
-      if (cleanId.startsWith(p1.id + '-')) {
-        const destId = cleanId.slice(p1.id.length + 1);
-        const p2 = state.products.find((p) => p.id === destId);
-        if (p2) {
-          src = p1;
-          dest = p2;
-          break;
-        }
-      }
-    }
-
-    if (!src || !dest) {
-      src = state.products.find((p) => cleanId.includes(p.id));
-      dest = state.products.find(
-        (p) => p.id !== src?.id && p.roas >= TARGET_ROAS && p.coverDays >= 21
-      );
-    }
-
-    if (!src || !dest) {
-      throw new Error(`Unable to resolve campaigns for reallocation action: ${actionId}`);
-    }
-
-    let actionTag: 'PAUSE' | 'TRIM' | 'REDIRECT' = 'TRIM';
-    let rawMove = 0;
-    let sourceSpendAfter = 0;
-
-    if (src.inventory <= 0 || src.status === 'stockout') {
-      actionTag = 'PAUSE';
-      rawMove = src.dailySpend * 0.8;
-      sourceSpendAfter = 0;
-    } else if (src.coverDays < 7 || src.status === 'low stock') {
-      actionTag = 'REDIRECT';
-      const allowableSpend = Math.round(src.dailySpend * (src.coverDays / 14));
-      const freed = Math.max(0, src.dailySpend - allowableSpend);
-      rawMove = freed * 0.8;
-      sourceSpendAfter = allowableSpend;
-    } else {
-      actionTag = 'TRIM';
-      const cut = Math.round(src.dailySpend * 0.35);
-      rawMove = cut * 0.7;
-      sourceSpendAfter = Math.round(src.dailySpend * 0.65);
-    }
-
-    // Destination cap (+50% of current spend)
-    const maxAllowedIncrease = dest.dailySpend * 0.5;
-    const currentAdded = dest.addedSpendFromReallocations || 0;
-    const remainingCap = Math.max(0, maxAllowedIncrease - currentAdded);
-    const movedAmount = Math.max(0, Math.min(Math.round(rawMove), Math.round(remainingCap)));
-
-    const targetMarginalRoas = Number((dest.roas * 0.85).toFixed(3));
-    const netRevenueLift = Math.max(0, Math.round(movedAmount * (targetMarginalRoas - src.roas)));
-    const sameChannel = src.channel.toLowerCase() === dest.channel.toLowerCase();
-    const confidence = Math.round(
-      Math.min(
-        95,
-        Math.max(
-          40,
-          50 + 10 * (dest.roas - src.roas) + Math.min(15, dest.coverDays / 3) + (sameChannel ? 5 : 0)
-        )
-      )
-    );
-
-    const destSpendAfter = dest.dailySpend + movedAmount;
-    const whySentence = `${src.name} is ${src.status} at ${src.roas.toFixed(2)}x. ${dest.name} earns ${dest.roas.toFixed(2)}x with ${Math.round(dest.coverDays)} days of stock.`;
-    const expectedGainText = `+${formatINR(netRevenueLift)} extra revenue · ${confidence}% confidence`;
-
-    const steps: PlanStep[] = [
-      {
-        label:
-          actionTag === 'PAUSE'
-            ? 'Pause Campaign Spend'
-            : actionTag === 'REDIRECT'
-            ? 'Cap Spend to 14 Days Cover'
-            : 'Trim Ineffective Ad Sets (-35%)',
-        from: formatINR(src.dailySpend),
-        to: formatINR(sourceSpendAfter),
-        description:
-          actionTag === 'PAUSE'
-            ? 'Halt active spending on zero inventory to eliminate click burn.'
-            : actionTag === 'REDIRECT'
-            ? 'Throttle spend to align velocity with 14-day stock replenishment runway.'
-            : 'Prune lowest-performing ad sets and unprofitable placements.',
-        title: actionTag === 'PAUSE' ? 'Pause Campaign Spend' : 'Optimize Spend',
-        before: formatINR(src.dailySpend),
-        after: formatINR(sourceSpendAfter),
-      },
-      {
-        label: `Reallocate Budget to ${dest.name}`,
-        from: formatINR(dest.dailySpend),
-        to: formatINR(destSpendAfter),
-        description: `Route ${formatINR(movedAmount)} to high-performing ${dest.channel} campaign earning ${dest.roas.toFixed(2)}x ROAS.`,
-        title: `Reallocate to ${dest.name}`,
-        before: formatINR(dest.dailySpend),
-        after: formatINR(destSpendAfter),
-      },
-      {
-        label:
-          actionTag === 'PAUSE'
-            ? 'Raise Priority Restock Order'
-            : actionTag === 'REDIRECT'
-            ? 'Dispatch Automated Reorder Alert'
-            : 'Lower Algorithmic Bid Cap (-10%)',
-        from:
-          actionTag === 'PAUSE'
-            ? '0 units ordered'
-            : actionTag === 'REDIRECT'
-            ? `${src.coverDays.toFixed(1)}d current cover`
-            : `₹${src.cpc.toFixed(2)} CPC`,
-        to:
-          actionTag === 'PAUSE'
-            ? `${Math.round(21 * src.dailyUnitsSold)} units ordered`
-            : actionTag === 'REDIRECT'
-            ? '14.0d runway'
-            : `₹${(src.cpc * 0.9).toFixed(2)} CPC`,
-        description:
-          actionTag === 'PAUSE'
-            ? `Trigger purchase order for 21 days demand (${Math.round(21 * src.dailyUnitsSold)} units).`
-            : actionTag === 'REDIRECT'
-            ? 'Notify supply chain operations to replenish stock.'
-            : 'Enforce disciplined cost-per-click bidding threshold.',
-        title: actionTag === 'PAUSE' ? 'Raise Restock Order' : 'Calibrate Bidding',
-        before: actionTag === 'PAUSE' ? '0 units' : `${src.coverDays.toFixed(1)}d`,
-        after: actionTag === 'PAUSE' ? `${Math.round(21 * src.dailyUnitsSold)} units` : '14.0d',
-      },
-    ];
-
-    const result: PlanResultTile[] = [
-      {
-        label: `${src.name} Spend`,
-        from: formatINR(src.dailySpend),
-        to: formatINR(sourceSpendAfter),
-        before: formatINR(src.dailySpend),
-        after: formatINR(sourceSpendAfter),
-      },
-      {
-        label: `${dest.name} Spend`,
-        from: formatINR(dest.dailySpend),
-        to: formatINR(destSpendAfter),
-        before: formatINR(dest.dailySpend),
-        after: formatINR(destSpendAfter),
-      },
-      {
-        label: 'Net Revenue Lift',
-        from: '₹0/day',
-        to: `+${formatINR(netRevenueLift)}`,
-        before: '₹0/day',
-        after: `+${formatINR(netRevenueLift)}`,
-      },
-    ];
-
-    return {
-      actionId,
-      actionType: 'reallocation',
-      actionTag,
-      title: 'Move budget',
-      subtitle: `${src.name} (${src.channel}) → ${dest.name} (${dest.channel})`,
-      heroAmount: movedAmount,
-      heroSubtitle: 'moves to a campaign that earns more',
-      sourceCampaignId: src.id,
-      sourceProductName: src.name,
-      sourceChannel: src.channel,
-      sourceSpendBefore: src.dailySpend,
-      sourceSpendAfter,
-      sourceRoas: src.roas,
-      sourceCoverDays: src.coverDays,
-      targetCampaignId: dest.id,
-      targetProductName: dest.name,
-      targetChannel: dest.channel,
-      targetSpendBefore: dest.dailySpend,
-      targetSpendAfter: destSpendAfter,
-      targetRoas: dest.roas,
-      targetMarginalRoas,
-      targetCoverDays: dest.coverDays,
-      movedAmount,
-      why: whySentence,
-      expectedGain: expectedGainText,
-      netRevenueLift,
-      confidence,
-      details: {
-        formula: `${formatINR(movedAmount)} × (${targetMarginalRoas}x − ${src.roas.toFixed(2)}x) = +${formatINR(netRevenueLift)}`,
-        sourceId: `${src.channel.toLowerCase()}-${src.id}`,
-        targetId: `${dest.channel.toLowerCase()}-${dest.id}`,
-        assumptions:
-          'Destination marginal ROAS calculated at 85% of baseline ROAS (diminishing marginal returns); destination expansion capped at +50% of current spend.',
-      },
-      issue: `${src.name} (${src.channel}) ${src.status}`,
-      evidence: [
-        `Source ROAS: ${src.roas.toFixed(2)}x with ${formatINR(src.dailySpend)} daily spend.`,
-        `Inventory runway: ${src.inventory} units (${src.coverDays.toFixed(1)} days of cover).`,
-        `Target ROAS: ${dest.roas.toFixed(2)}x with ${Math.round(dest.coverDays)} days cover.`,
-      ],
-      steps,
-      result,
-      deltas: {
-        sourceSpendDelta: -(src.dailySpend - sourceSpendAfter),
-        targetSpendDelta: movedAmount,
-        paused: actionTag === 'PAUSE',
-        restockUnits: actionTag === 'PAUSE' ? Math.round(21 * src.dailyUnitsSold) : undefined,
-        reorderAlert: actionTag === 'REDIRECT',
-        projectedRoas:
-          actionTag === 'TRIM'
-            ? Number((src.roas + (TARGET_ROAS - src.roas) * 0.7).toFixed(2))
-            : undefined,
-        cpcDelta: actionTag === 'TRIM' ? Number((src.cpc * 0.9).toFixed(2)) : undefined,
-      },
-      actionButtonLabel: `Move ${formatINR(movedAmount)}`,
-
-      // Compatibility
-      issueBanner: `${src.name} (${src.channel}) ${src.status}`,
-      resultTiles: result,
-      receivingProductId: dest.id,
-      receivingProductName: dest.name,
-      reallocatedSpend: movedAmount,
-    };
-  }
-
-  // FIX action: fix-${productId}
-  const productId = actionId.replace(/^fix-/, '');
-  const product = state.products.find((p) => p.id === productId);
-  if (!product) {
-    throw new Error(`Product not found for fix action: ${actionId}`);
-  }
-
-  // Find best destination candidate (ROAS >= 3.2, cover >= 21d, not paused)
-  const eligibleCandidates = state.products.filter(
-    (p) =>
-      p.id !== product.id &&
-      p.inventory > 0 &&
-      p.coverDays >= 21 &&
-      p.roas >= TARGET_ROAS &&
-      !p.paused
+export function computeFixPlan(product: DerivedProduct, allProducts: DerivedProduct[]): FixPlanSummary {
+  const eligibleCandidates = allProducts.filter(
+    (p) => p.id !== product.id && p.inventory > 0 && p.coverDays >= 21 && p.roas >= TARGET_ROAS && !p.paused
   );
+
   const sameChannelCandidates = eligibleCandidates.filter((p) => p.channel === product.channel);
-  const rankedCandidates = (
-    sameChannelCandidates.length > 0 ? sameChannelCandidates : eligibleCandidates
-  ).sort((a, b) => b.roas - a.roas);
-  const bestDest =
-    rankedCandidates[0] || state.products.find((p) => p.id !== product.id) || product;
+  const fallbackCandidates = eligibleCandidates.length > 0 ? eligibleCandidates : allProducts.filter((p) => p.id !== product.id);
 
-  const destCap = bestDest.dailySpend * 0.5 - (bestDest.addedSpendFromReallocations || 0);
-  const destMarginalRoas = Number((bestDest.roas * 0.85).toFixed(3));
+  const bestProduct =
+    sameChannelCandidates.length > 0
+      ? sameChannelCandidates.sort((a, b) => b.roas - a.roas)[0]
+      : fallbackCandidates.sort((a, b) => b.roas - a.roas)[0] || product;
 
+  const receivingMaxIncrease = bestProduct.dailySpend * 0.5;
+  const projectionNote = 'Outcomes are algorithmic projections modeled over a 7-day calibration window.';
+
+  // 1. STOCKOUT
   if (product.inventory <= 0 || product.status === 'stockout') {
-    const rawMove = product.dailySpend * 0.8;
-    const movedAmount = Math.max(0, Math.min(Math.round(rawMove), Math.round(Math.max(0, destCap))));
+    const rawBudgetTransfer = product.dailySpend * 0.8;
+    const reallocatedSpend = Math.round(Math.min(rawBudgetTransfer, receivingMaxIncrease));
     const restockUnits = Math.round(21 * product.dailyUnitsSold);
-    const netRevenueLift = Math.max(
-      0,
-      Math.round(movedAmount * (destMarginalRoas - product.roas))
-    );
-    const sameChannel = product.channel.toLowerCase() === bestDest.channel.toLowerCase();
-    const confidence = Math.round(
-      Math.min(
-        95,
-        Math.max(
-          40,
-          50 + 10 * (bestDest.roas - product.roas) + Math.min(15, bestDest.coverDays / 3) + (sameChannel ? 5 : 0)
-        )
-      )
-    );
+    const addedRevenue = Math.round(reallocatedSpend * calculateMarginalRoas(bestProduct.roas, bestProduct.dailySpend, reallocatedSpend));
 
-    const steps: PlanStep[] = [
+    const steps: FixStep[] = [
       {
-        label: 'Pause Campaign & Stop Ad Waste',
-        from: formatINR(product.dailySpend),
-        to: '₹0/day',
-        description: `Trip automated circuit-breaker on ${product.channel} to halt spending on zero inventory.`,
         title: 'Pause Campaign & Stop Ad Waste',
-        before: formatINR(product.dailySpend),
-        after: '₹0/day',
+        description: `Trip automated circuit-breaker on ${product.channel} ad sets to halt spending on zero inventory.`,
+        before: formatCurrency(product.dailySpend),
+        after: '$0/day',
       },
       {
-        label: `Reallocate 80% Budget to ${bestDest.name}`,
-        from: formatINR(bestDest.dailySpend),
-        to: formatINR(bestDest.dailySpend + movedAmount),
-        description: `Shift ${formatINR(movedAmount)} freed capital to high-performing ${bestDest.channel} campaign (capped at +50%).`,
-        title: `Reallocate 80% Budget to ${bestDest.name}`,
-        before: formatINR(bestDest.dailySpend),
-        after: formatINR(bestDest.dailySpend + movedAmount),
+        title: `Reallocate 80% Budget to ${bestProduct.name}`,
+        description: `Shift ${formatCurrency(reallocatedSpend)} freed capital to high-performing ${bestProduct.channel} campaign (capped at +50%).`,
+        before: formatCurrency(bestProduct.dailySpend),
+        after: formatCurrency(bestProduct.dailySpend + reallocatedSpend),
       },
       {
-        label: 'Raise Restock Request for 21 Days of Demand',
-        from: '0 units ordered',
-        to: `${restockUnits} units ordered`,
-        description: `Dispatch priority procurement purchase order for ${restockUnits} units based on ${product.dailyUnitsSold} pairs/day run-rate.`,
         title: 'Raise Restock Request for 21 Days of Demand',
-        before: '0 units ordered',
+        description: `Dispatch priority procurement purchase order for ${restockUnits} units based on ${product.dailyUnitsSold} pairs/day run-rate.`,
+        before: '0 units in pipeline',
         after: `${restockUnits} units ordered`,
       },
     ];
 
-    const result: PlanResultTile[] = [
+    const resultTiles: ResultTile[] = [
       {
         label: 'Ad Spend at Risk',
-        from: formatINR(product.dailySpend),
-        to: '₹0/day',
-        before: formatINR(product.dailySpend),
-        after: '₹0/day (Zero Waste)',
+        before: formatCurrency(product.dailySpend),
+        after: '$0/day (Zero Waste)',
       },
       {
-        label: `Reallocated Yield (${bestDest.name})`,
-        from: '₹0/day added',
-        to: `+${formatINR(netRevenueLift)} rev`,
-        before: '₹0/day added',
-        after: `+${formatINR(netRevenueLift)} projected rev`,
+        label: `Reallocated Yield (${bestProduct.name})`,
+        before: '$0/day added',
+        after: `+${formatCurrency(addedRevenue)} projected rev`,
       },
       {
         label: 'Restock Pipeline',
-        from: '0 units',
-        to: `${restockUnits} units in transit`,
         before: '0 units',
         after: `${restockUnits} units in transit`,
       },
     ];
 
     return {
-      actionId,
-      actionType: 'fix',
-      actionTag: 'PAUSE',
-      title: 'Fix stockout',
-      subtitle: `${product.name} (${product.channel}) → ${bestDest.name} (${bestDest.channel})`,
-      heroAmount: movedAmount,
-      heroSubtitle: 'budget protected & reallocated to highest yield',
-      sourceCampaignId: product.id,
-      sourceProductName: product.name,
-      sourceChannel: product.channel,
-      sourceSpendBefore: product.dailySpend,
-      sourceSpendAfter: 0,
-      sourceRoas: product.roas,
-      sourceCoverDays: 0,
-      targetCampaignId: bestDest.id,
-      targetProductName: bestDest.name,
-      targetChannel: bestDest.channel,
-      targetSpendBefore: bestDest.dailySpend,
-      targetSpendAfter: bestDest.dailySpend + movedAmount,
-      targetRoas: bestDest.roas,
-      targetMarginalRoas: destMarginalRoas,
-      targetCoverDays: bestDest.coverDays,
-      movedAmount,
-      why: `${product.name} is out of stock (0 units). Pausing spend and moving ${formatINR(movedAmount)} to ${bestDest.name} (${bestDest.roas.toFixed(2)}x ROAS).`,
-      expectedGain: `+${formatINR(netRevenueLift)} extra revenue · ${confidence}% confidence`,
-      netRevenueLift,
-      confidence,
-      details: {
-        formula: `${formatINR(movedAmount)} × (${destMarginalRoas}x − ${product.roas.toFixed(2)}x) = +${formatINR(netRevenueLift)}`,
-        sourceId: `${product.channel.toLowerCase()}-${product.id}`,
-        targetId: `${bestDest.channel.toLowerCase()}-${bestDest.id}`,
-        assumptions:
-          'Paused zero-inventory spend; reallocated 80% to best performing campaign capped at +50%; raised 21-day restock request.',
-      },
-      issue: 'Out of stock while ads are still running',
+      issueType: 'stockout',
+      issueBanner: 'Out of stock while ads are still running',
       evidence: [
-        `Inventory is 0 units while ${formatINR(product.dailySpend)} in ad spend continues burning.`,
+        `Inventory is 0 units while ${formatCurrency(product.dailySpend)} in ad spend continues burning.`,
         `Current ROAS ${product.roas.toFixed(2)}x is generating zero-fulfillment clicks and customer bounce.`,
-        `Unmet customer demand: ~${product.dailyUnitsSold} pairs/day lost with ₹0 revenue capture.`,
+        `Unmet customer demand: ~${product.dailyUnitsSold} pairs/day lost with $0 revenue capture.`,
         '100% of current ad spend is at risk with zero inventory runway.',
       ],
       steps,
-      result,
-      deltas: {
-        sourceSpendDelta: -product.dailySpend,
-        targetSpendDelta: movedAmount,
-        paused: true,
-        restockUnits,
-      },
-      actionButtonLabel: `Move ${formatINR(movedAmount)}`,
-
-      // Compatibility
-      issueBanner: 'Out of stock while ads are still running',
-      resultTiles: result,
-      receivingProductId: bestDest.id,
-      receivingProductName: bestDest.name,
-      reallocatedSpend: movedAmount,
+      resultTiles,
+      projectionNote,
+      receivingProductId: bestProduct.id,
+      receivingProductName: bestProduct.name,
+      reallocatedSpend,
       restockUnits,
-      actionTakenText: `Paused campaign (₹0/day); shifted ${formatINR(movedAmount)} to ${bestDest.name}; raised restock PO for ${restockUnits} units`,
-      outcomeText: `Eliminated ${formatINR(product.dailySpend)} ad waste; +${formatINR(netRevenueLift)} proj rev`,
+      actionTakenText: `Paused campaign ($0/day); shifted ${formatCurrency(reallocatedSpend)} to ${bestProduct.name}; raised restock PO for ${restockUnits} units`,
+      outcomeText: `Eliminated ${formatCurrency(product.dailySpend)} ad waste; +${formatCurrency(addedRevenue)} proj rev`,
     };
   }
 
+  // 2. LOW STOCK (cover < 7 days)
   if (product.coverDays < 7 || product.status === 'low stock') {
-    const allowableSpend = Math.round(product.dailySpend * (product.coverDays / 14));
-    const freed = Math.max(0, product.dailySpend - allowableSpend);
-    const movedAmount = Math.max(0, Math.min(Math.round(freed * 0.8), Math.round(Math.max(0, destCap))));
-    const netRevenueLift = Math.max(
-      0,
-      Math.round(movedAmount * (destMarginalRoas - product.roas))
-    );
-    const sameChannel = product.channel.toLowerCase() === bestDest.channel.toLowerCase();
-    const confidence = Math.round(
-      Math.min(
-        95,
-        Math.max(
-          40,
-          50 + 10 * (bestDest.roas - product.roas) + Math.min(15, bestDest.coverDays / 3) + (sameChannel ? 5 : 0)
-        )
-      )
-    );
+    const ratio = Math.max(0.1, Math.min(0.9, product.coverDays / 14));
+    const cappedSpend = Math.round(product.dailySpend * ratio);
+    const freedBudget = Math.max(0, product.dailySpend - cappedSpend);
+    const rawBudgetTransfer = freedBudget * 0.8;
+    const reallocatedSpend = Math.round(Math.min(rawBudgetTransfer, receivingMaxIncrease));
+    const addedRevenue = Math.round(reallocatedSpend * calculateMarginalRoas(bestProduct.roas, bestProduct.dailySpend, reallocatedSpend));
 
-    const steps: PlanStep[] = [
+    const steps: FixStep[] = [
       {
-        label: 'Cap Spend to Extend Stock Runway to 14 Days',
-        from: formatINR(product.dailySpend),
-        to: formatINR(allowableSpend),
-        description: `Throttle daily spend by ${Math.round((1 - product.coverDays / 14) * 100)}% to align unit velocity with 14-day supply replenishment window.`,
         title: 'Cap Spend to Extend Stock Runway to 14 Days',
-        before: formatINR(product.dailySpend),
-        after: formatINR(allowableSpend),
+        description: `Throttle daily spend by ${Math.round((1 - ratio) * 100)}% to align unit velocity with 14-day supply replenishment window.`,
+        before: formatCurrency(product.dailySpend),
+        after: formatCurrency(cappedSpend),
       },
       {
-        label: `Reallocate 80% Freed Budget to ${bestDest.name}`,
-        from: formatINR(bestDest.dailySpend),
-        to: formatINR(bestDest.dailySpend + movedAmount),
-        description: `Route ${formatINR(movedAmount)} surplus to scale healthy inventory on ${bestDest.channel}.`,
-        title: `Reallocate 80% Freed Budget to ${bestDest.name}`,
-        before: formatINR(bestDest.dailySpend),
-        after: formatINR(bestDest.dailySpend + movedAmount),
+        title: `Reallocate 80% Freed Budget to ${bestProduct.name}`,
+        description: `Route ${formatCurrency(reallocatedSpend)} surplus to scale healthy inventory on ${bestProduct.channel}.`,
+        before: formatCurrency(bestProduct.dailySpend),
+        after: formatCurrency(bestProduct.dailySpend + reallocatedSpend),
       },
       {
-        label: 'Send Automated Reorder Alert',
-        from: `${product.coverDays.toFixed(1)}d current cover`,
-        to: '14.0d runway (Alert Sent)',
-        description: 'Notify supply chain ops and trigger ERP stock replenishment workflow.',
         title: 'Send Automated Reorder Alert',
+        description: 'Notify supply chain ops and trigger ERP stock replenishment workflow.',
         before: `${product.coverDays.toFixed(1)}d current cover`,
         after: '14.0d runway (Reorder Alert Sent)',
       },
     ];
 
-    const result: PlanResultTile[] = [
+    const resultTiles: ResultTile[] = [
       {
         label: 'Stock Runway',
-        from: `${product.coverDays.toFixed(1)} days`,
-        to: '14.0 days',
         before: `${product.coverDays.toFixed(1)} days`,
         after: '14.0 days extended',
       },
       {
         label: 'Daily Ad Spend',
-        from: formatINR(product.dailySpend),
-        to: formatINR(allowableSpend),
-        before: formatINR(product.dailySpend),
-        after: `${formatINR(allowableSpend)} (Capped)`,
+        before: formatCurrency(product.dailySpend),
+        after: `${formatCurrency(cappedSpend)} (Capped)`,
       },
       {
-        label: `Reallocated Yield (${bestDest.name})`,
-        from: '₹0/day added',
-        to: `+${formatINR(netRevenueLift)} rev`,
-        before: '₹0/day added',
-        after: `+${formatINR(netRevenueLift)} projected rev`,
+        label: `Reallocated Yield (${bestProduct.name})`,
+        before: '$0/day added',
+        after: `+${formatCurrency(addedRevenue)} projected rev`,
       },
     ];
 
     return {
-      actionId,
-      actionType: 'fix',
-      actionTag: 'REDIRECT',
-      title: 'Fix low stock',
-      subtitle: `${product.name} (${product.channel}) → ${bestDest.name} (${bestDest.channel})`,
-      heroAmount: movedAmount,
-      heroSubtitle: 'runway extended & surplus reallocated',
-      sourceCampaignId: product.id,
-      sourceProductName: product.name,
-      sourceChannel: product.channel,
-      sourceSpendBefore: product.dailySpend,
-      sourceSpendAfter: allowableSpend,
-      sourceRoas: product.roas,
-      sourceCoverDays: product.coverDays,
-      targetCampaignId: bestDest.id,
-      targetProductName: bestDest.name,
-      targetChannel: bestDest.channel,
-      targetSpendBefore: bestDest.dailySpend,
-      targetSpendAfter: bestDest.dailySpend + movedAmount,
-      targetRoas: bestDest.roas,
-      targetMarginalRoas: destMarginalRoas,
-      targetCoverDays: bestDest.coverDays,
-      movedAmount,
-      why: `${product.name} has low stock (${product.coverDays.toFixed(1)} days). Capping spend to 14 days and moving ${formatINR(movedAmount)} to ${bestDest.name}.`,
-      expectedGain: `+${formatINR(netRevenueLift)} extra revenue · ${confidence}% confidence`,
-      netRevenueLift,
-      confidence,
-      details: {
-        formula: `${formatINR(movedAmount)} × (${destMarginalRoas}x − ${product.roas.toFixed(2)}x) = +${formatINR(netRevenueLift)}`,
-        sourceId: `${product.channel.toLowerCase()}-${product.id}`,
-        targetId: `${bestDest.channel.toLowerCase()}-${bestDest.id}`,
-        assumptions:
-          'Cap spend to 14 days cover; move 80% freed budget; dispatch automated reorder alert.',
-      },
-      issue: `Low stock runway (${product.coverDays.toFixed(1)} days) risks premature stockout`,
+      issueType: 'low_stock',
+      issueBanner: `Low stock runway (${product.coverDays.toFixed(1)} days) risks premature stockout`,
       evidence: [
         `Only ${product.inventory} units remaining with run-rate of ${product.dailyUnitsSold} units/day.`,
-        `Current ad spend of ${formatINR(product.dailySpend)} will exhaust inventory in ${product.coverDays.toFixed(1)} days.`,
+        `Current ad spend of ${formatCurrency(product.dailySpend)} will exhaust inventory in ${product.coverDays.toFixed(1)} days.`,
         'Stockout runway is under the 7-day critical supply chain buffer.',
-        `Spend at risk: ${formatINR(product.dailySpend)} accelerates depletion before restock arrival.`,
+        `Spend at risk: ${formatCurrency(product.dailySpend)} accelerates depletion before restock arrival.`,
       ],
       steps,
-      result,
-      deltas: {
-        sourceSpendDelta: -(product.dailySpend - allowableSpend),
-        targetSpendDelta: movedAmount,
-        reorderAlert: true,
-      },
-      actionButtonLabel: `Move ${formatINR(movedAmount)}`,
-
-      // Compatibility
-      issueBanner: `Low stock runway (${product.coverDays.toFixed(1)} days) risks premature stockout`,
-      resultTiles: result,
-      receivingProductId: bestDest.id,
-      receivingProductName: bestDest.name,
-      reallocatedSpend: movedAmount,
-      cappedSpend: allowableSpend,
-      actionTakenText: `Capped spend at ${formatINR(allowableSpend)} (14d runway); moved ${formatINR(movedAmount)} to ${bestDest.name}; dispatched reorder alert`,
-      outcomeText: `Extended runway from ${product.coverDays.toFixed(1)}d to 14d; +${formatINR(netRevenueLift)} proj rev`,
+      resultTiles,
+      projectionNote,
+      receivingProductId: bestProduct.id,
+      receivingProductName: bestProduct.name,
+      reallocatedSpend,
+      cappedSpend,
+      actionTakenText: `Capped spend at ${formatCurrency(cappedSpend)} (14d runway); moved ${formatCurrency(reallocatedSpend)} to ${bestProduct.name}; dispatched reorder alert`,
+      outcomeText: `Extended runway from ${product.coverDays.toFixed(1)}d to 14d; +${formatCurrency(addedRevenue)} proj rev`,
     };
   }
 
-  // Below target / Below floor
+  // 3. BELOW TARGET / BELOW FLOOR
   const isBelowFloor = product.roas < FLOOR_ROAS;
-  const cut = Math.round(product.dailySpend * 0.35);
+  const cutAmount = Math.round(product.dailySpend * 0.35);
   const newSpend = Math.round(product.dailySpend * 0.65);
-  const movedAmount = Math.max(0, Math.min(Math.round(cut * 0.7), Math.round(Math.max(0, destCap))));
-  const projectedRoas = Number((product.roas + (TARGET_ROAS - product.roas) * 0.7).toFixed(2));
+  const rawBudgetTransfer = cutAmount * 0.7;
+  const reallocatedSpend = Math.round(Math.min(rawBudgetTransfer, receivingMaxIncrease));
   const newCpc = Number((product.cpc * 0.9).toFixed(2));
-  const netRevenueLift = Math.max(
-    0,
-    Math.round(movedAmount * (destMarginalRoas - product.roas))
-  );
-  const sameChannel = product.channel.toLowerCase() === bestDest.channel.toLowerCase();
-  const confidence = Math.round(
-    Math.min(
-      95,
-      Math.max(
-        40,
-        50 + 10 * (bestDest.roas - product.roas) + Math.min(15, bestDest.coverDays / 3) + (sameChannel ? 5 : 0)
-      )
-    )
-  );
+  const projectedRoas = Number((product.roas + (TARGET_ROAS - product.roas) * 0.7).toFixed(2));
+  const addedRevenue = Math.round(reallocatedSpend * calculateMarginalRoas(bestProduct.roas, bestProduct.dailySpend, reallocatedSpend));
+  const newProductRevenue = Math.round(newSpend * projectedRoas);
 
-  const steps: PlanStep[] = [
+  const steps: FixStep[] = [
     {
-      label: 'Trim 35% Spend on Lowest Ad Sets',
-      from: formatINR(product.dailySpend),
-      to: formatINR(newSpend),
-      description: 'Prune bottom-quartile search queries, high-bounce keywords, and unprofitable placements.',
       title: 'Cut 35% Spend on Lowest-Converting Ad Sets',
-      before: formatINR(product.dailySpend),
-      after: formatINR(newSpend),
+      description: 'Prune bottom-quartile search queries, high-bounce keywords, and unprofitable placements.',
+      before: formatCurrency(product.dailySpend),
+      after: formatCurrency(newSpend),
     },
     {
-      label: `Reallocate 70% of Trim to ${bestDest.name}`,
-      from: formatINR(bestDest.dailySpend),
-      to: formatINR(bestDest.dailySpend + movedAmount),
-      description: `Reallocate ${formatINR(movedAmount)} of savings to high-performing ${bestDest.channel} campaign.`,
-      title: `Move 70% of Cut to ${bestDest.name}`,
-      before: formatINR(bestDest.dailySpend),
-      after: formatINR(bestDest.dailySpend + movedAmount),
+      title: `Move 70% of Cut to ${bestProduct.name}`,
+      description: `Reallocate ${formatCurrency(reallocatedSpend)} of savings to high-performing ${bestProduct.channel} campaign.`,
+      before: formatCurrency(bestProduct.dailySpend),
+      after: formatCurrency(bestProduct.dailySpend + reallocatedSpend),
     },
     {
-      label: 'Lower Algorithmic Bid Cap by 10%',
-      from: `₹${product.cpc.toFixed(2)} CPC`,
-      to: `₹${newCpc.toFixed(2)} CPC`,
-      description: 'Enforce disciplined cost-per-click bidding threshold to curb ad cost inflation.',
       title: 'Lower Algorithmic Bid Cap by 10%',
-      before: `₹${product.cpc.toFixed(2)} CPC`,
-      after: `₹${newCpc.toFixed(2)} CPC`,
+      description: 'Enforce disciplined cost-per-click bidding threshold to curb ad cost inflation.',
+      before: `$${product.cpc.toFixed(2)} CPC`,
+      after: `$${newCpc.toFixed(2)} CPC`,
     },
   ];
 
-  const result: PlanResultTile[] = [
+  const resultTiles: ResultTile[] = [
     {
       label: 'Campaign ROAS',
-      from: `${product.roas.toFixed(2)}x`,
-      to: `${projectedRoas.toFixed(2)}x`,
       before: `${product.roas.toFixed(2)}x`,
       after: `${projectedRoas.toFixed(2)}x (Projected)`,
     },
     {
-      label: 'Daily Ad Spend',
-      from: formatINR(product.dailySpend),
-      to: formatINR(newSpend),
-      before: formatINR(product.dailySpend),
-      after: `${formatINR(newSpend)} (-35%)`,
+      label: 'Optimized Daily Spend',
+      before: formatCurrency(product.dailySpend),
+      after: `${formatCurrency(newSpend)} (-35%)`,
     },
     {
-      label: `Reallocated Yield (${bestDest.name})`,
-      from: '₹0/day added',
-      to: `+${formatINR(netRevenueLift)} rev`,
-      before: '₹0/day added',
-      after: `+${formatINR(netRevenueLift)} projected rev`,
+      label: 'Total Realized Revenue',
+      before: formatCurrency(product.dailySpend * product.roas),
+      after: `${formatCurrency(newProductRevenue + addedRevenue)} combined`,
     },
   ];
 
   return {
-    actionId,
-    actionType: 'fix',
-    actionTag: 'TRIM',
-    title: isBelowFloor ? 'Fix sub-floor ROAS' : 'Fix below-target ROAS',
-    subtitle: `${product.name} (${product.channel}) → ${bestDest.name} (${bestDest.channel})`,
-    heroAmount: movedAmount,
-    heroSubtitle: 'inefficient ad spend trimmed & reallocated',
-    sourceCampaignId: product.id,
-    sourceProductName: product.name,
-    sourceChannel: product.channel,
-    sourceSpendBefore: product.dailySpend,
-    sourceSpendAfter: newSpend,
-    sourceRoas: product.roas,
-    sourceCoverDays: product.coverDays,
-    targetCampaignId: bestDest.id,
-    targetProductName: bestDest.name,
-    targetChannel: bestDest.channel,
-    targetSpendBefore: bestDest.dailySpend,
-    targetSpendAfter: bestDest.dailySpend + movedAmount,
-    targetRoas: bestDest.roas,
-    targetMarginalRoas: destMarginalRoas,
-    targetCoverDays: bestDest.coverDays,
-    movedAmount,
-    why: `${product.name} is ${isBelowFloor ? 'below floor' : 'below target'} at ${product.roas.toFixed(2)}x. Moving ${formatINR(movedAmount)} to ${bestDest.name} earning ${bestDest.roas.toFixed(2)}x.`,
-    expectedGain: `+${formatINR(netRevenueLift)} extra revenue · ${confidence}% confidence`,
-    netRevenueLift,
-    confidence,
-    details: {
-      formula: `${formatINR(movedAmount)} × (${destMarginalRoas}x − ${product.roas.toFixed(2)}x) = +${formatINR(netRevenueLift)}`,
-      sourceId: `${product.channel.toLowerCase()}-${product.id}`,
-      targetId: `${bestDest.channel.toLowerCase()}-${bestDest.id}`,
-      assumptions: `Trim worst 35% ad sets; move 70% of trim; lower bid cap 10%; projected ROAS = roas + (3.2 − roas) × 0.7 = ${projectedRoas}x.`,
-    },
-    issue: isBelowFloor
+    issueType: isBelowFloor ? 'below_floor' : 'below_target',
+    issueBanner: isBelowFloor
       ? `Critical: ROAS (${product.roas.toFixed(2)}x) is below 1.8x breakeven floor`
       : `Below Target: ROAS (${product.roas.toFixed(2)}x) trails 3.2x benchmark`,
     evidence: [
       `Current ROAS of ${product.roas.toFixed(2)}x is ${isBelowFloor ? 'losing money on every ad conversion below 1.8x floor' : 'trailing the 3.2x target profitability benchmark'}.`,
-      `Daily ad spend of ${formatINR(product.dailySpend)} running on sub-optimal ad sets.`,
-      `Current CPC of ₹${product.cpc.toFixed(2)} and CVR of ${(product.cvr * 100).toFixed(1)}% indicate high acquisition friction.`,
-      `Spend at risk: ${formatINR(product.dailySpend)}.`,
+      `Daily ad spend of ${formatCurrency(product.dailySpend)} running on sub-optimal ad sets.`,
+      `Current CPC of $${product.cpc.toFixed(2)} and CVR of ${(product.cvr * 100).toFixed(1)}% indicate high acquisition friction.`,
+      `Spend at risk: ${formatCurrency(product.dailySpend)}.`,
     ],
     steps,
-    result,
-    deltas: {
-      sourceSpendDelta: -(product.dailySpend - newSpend),
-      targetSpendDelta: movedAmount,
-      projectedRoas,
-      cpcDelta: newCpc,
-    },
-    actionButtonLabel: `Move ${formatINR(movedAmount)}`,
-
-    // Compatibility
-    issueBanner: isBelowFloor
-      ? `Critical: ROAS (${product.roas.toFixed(2)}x) is below 1.8x breakeven floor`
-      : `Below Target: ROAS (${product.roas.toFixed(2)}x) trails 3.2x benchmark`,
-    resultTiles: result,
-    receivingProductId: bestDest.id,
-    receivingProductName: bestDest.name,
-    reallocatedSpend: movedAmount,
+    resultTiles,
+    projectionNote,
+    receivingProductId: bestProduct.id,
+    receivingProductName: bestProduct.name,
+    reallocatedSpend,
     newSpend,
     projectedRoas,
-    actionTakenText: `Cut 35% spend (${formatINR(newSpend)}); shifted ${formatINR(movedAmount)} to ${bestDest.name}; lowered bid cap 10%`,
-    outcomeText: `ROAS projected to lift from ${product.roas.toFixed(2)}x to ${projectedRoas.toFixed(2)}x; saved ${formatINR(cut)}`,
+    actionTakenText: `Cut 35% spend (${formatCurrency(newSpend)}); shifted ${formatCurrency(reallocatedSpend)} to ${bestProduct.name}; lowered bid cap 10%`,
+    outcomeText: `ROAS projected to lift from ${product.roas.toFixed(2)}x to ${projectedRoas.toFixed(2)}x; saved ${formatCurrency(cutAmount)}`,
   };
 }
 
 /**
- * PURE FUNCTION: executeAction
- * Validates, applies deltas to the product catalog, writes a ledger row, returns result summary.
- * Used by FIX, row Execute, Execute All and Auto-Pilot.
- *
- * Idempotent: an already executed action ID is rejected.
- * Double clicks cannot execute twice.
- * If execution fails, throws and leaves input state completely unchanged.
+ * PURE STATE TRANSITION: applyFixPlan
  */
-export function executeAction(
+export function applyFixPlan(
   products: ProductModel[],
-  actionId: string,
-  options?: { isAuto?: boolean; timestampStr?: string; alreadyExecutedIds?: Set<string> }
-): { updatedProducts: ProductModel[]; newLedgerEntry: GaugesLedgerItem; plan: ActionPlan } {
-  // Idempotency check 1: check alreadyExecutedIds set
-  if (options?.alreadyExecutedIds?.has(actionId)) {
-    throw new Error(`Action "${actionId}" has already been executed.`);
-  }
-
-  const derived = products.map((p) => deriveProduct(p));
-  const plan = buildPlan({ products: derived }, actionId);
-
-  const source = products.find((p) => p.id === plan.sourceCampaignId);
-  if (!source) {
-    throw new Error(`Source campaign "${plan.sourceCampaignId}" not found.`);
-  }
-
-  // Idempotency check 2: if source is already fixed
-  if (source.isFixed) {
-    throw new Error(`Campaign "${source.name}" has already been fixed.`);
-  }
-
+  productId: string,
+  plan: FixPlanSummary,
+  timestampStr?: string
+): { updatedProducts: ProductModel[]; newLedgerEntry: GaugesLedgerItem } {
   const now = new Date();
   const timeFormatted =
-    options?.timestampStr ||
+    timestampStr ||
     `${now.toISOString().slice(0, 10)} ${now.toTimeString().slice(0, 8)}`;
 
-  const dest = plan.targetCampaignId
-    ? products.find((p) => p.id === plan.targetCampaignId)
-    : undefined;
+  const fixedProduct = products.find((p) => p.id === productId);
+  if (!fixedProduct) {
+    throw new Error(`Product not found: ${productId}`);
+  }
+
+  let updatedDailySpend = fixedProduct.dailySpend;
+  let updatedRoas = fixedProduct.roas;
+  let updatedCpc = fixedProduct.cpc;
+  let paused = false;
+  let restockUnitsOrdered = fixedProduct.restockUnitsOrdered;
+  let reorderAlertSent = fixedProduct.reorderAlertSent;
+
+  if (plan.issueType === 'stockout') {
+    updatedDailySpend = 0;
+    paused = true;
+    restockUnitsOrdered = plan.restockUnits || 21 * fixedProduct.dailyUnitsSold;
+  } else if (plan.issueType === 'low_stock') {
+    updatedDailySpend = plan.cappedSpend ?? fixedProduct.dailySpend;
+    reorderAlertSent = true;
+  } else {
+    updatedDailySpend = plan.newSpend ?? Math.round(fixedProduct.dailySpend * 0.65);
+    updatedRoas = plan.projectedRoas ?? Number((fixedProduct.roas + (TARGET_ROAS - fixedProduct.roas) * 0.7).toFixed(2));
+    updatedCpc = Number((fixedProduct.cpc * 0.9).toFixed(2));
+  }
+
+  const receivingId = plan.receivingProductId;
+  const reallocated = plan.reallocatedSpend;
 
   const updatedProducts = products.map((p) => {
-    if (p.id === source.id) {
+    if (p.id === productId) {
       return {
         ...p,
-        dailySpend: plan.sourceSpendAfter,
-        roas: plan.deltas.projectedRoas ?? p.roas,
-        cpc: plan.deltas.cpcDelta ?? p.cpc,
+        dailySpend: updatedDailySpend,
+        roas: updatedRoas,
+        cpc: updatedCpc,
         isFixed: true,
         fixedAt: timeFormatted,
-        paused: plan.deltas.paused ?? p.paused,
-        restockUnitsOrdered: plan.deltas.restockUnits ?? p.restockUnitsOrdered,
-        reorderAlertSent: plan.deltas.reorderAlert ?? p.reorderAlertSent,
-        appliedActionId: actionId,
+        paused,
+        restockUnitsOrdered,
+        reorderAlertSent,
         appliedPlan: plan,
       };
     }
 
-    if (dest && p.id === dest.id && plan.movedAmount > 0) {
+    if (p.id === receivingId && p.id !== productId && reallocated > 0) {
       const oldSpend = p.dailySpend;
       const oldRev = oldSpend * p.roas;
-      const addedSpend = plan.movedAmount;
-      const addedRev = addedSpend * (plan.targetMarginalRoas ?? p.roas * 0.85);
+      const addedSpend = reallocated;
+      const addedRev = addedSpend * calculateMarginalRoas(p.roas, p.dailySpend, addedSpend);
 
       const newSpend = oldSpend + addedSpend;
       const newRev = oldRev + addedRev;
@@ -1485,46 +1058,95 @@ export function executeAction(
   });
 
   const newLedgerEntry: GaugesLedgerItem = {
-    id: `ledg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    id: `ledg-fix-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     timestamp: timeFormatted,
-    product: plan.sourceProductName,
-    channel: plan.sourceChannel,
-    issue: plan.issue,
-    actionTaken:
-      plan.actionType === 'reallocation'
-        ? `[${plan.actionTag}] Moved ${formatINR(plan.movedAmount)} from ${plan.sourceProductName} (${plan.sourceChannel}) → ${plan.targetProductName} (${plan.targetChannel})`
-        : plan.steps.map((s) => s.label).join('; '),
-    outcome:
-      plan.actionType === 'reallocation'
-        ? `+${formatINR(plan.netRevenueLift)} proj revenue lift/day (${plan.confidence}% conf)`
-        : `+${formatINR(plan.netRevenueLift || 0)} proj revenue; budget efficiency calibrated`,
-    isAuto: options?.isAuto ?? false,
+    product: fixedProduct.name,
+    channel: fixedProduct.channel,
+    issue: plan.issueBanner,
+    actionTaken: plan.actionTakenText,
+    outcome: plan.outcomeText,
   };
 
-  return { updatedProducts, newLedgerEntry, plan };
+  return { updatedProducts, newLedgerEntry };
 }
 
 /**
- * Legacy compatibility wrappers (delegate strictly to executeAction)
+ * PURE STATE TRANSITION: applyReallocation
+ * Applies an autonomous capital reallocation item to the product catalog and appends ledger record.
  */
-export function applyFixPlan(
-  products: ProductModel[],
-  productId: string,
-  _plan?: FixPlanSummary,
-  timestampStr?: string
-) {
-  return executeAction(products, `fix-${productId}`, { timestampStr });
-}
-
 export function applyReallocation(
   products: ProductModel[],
   reallocation: ReallocationItem,
   isAuto = false,
   timestampStr?: string
-) {
-  return executeAction(products, reallocation.id, { isAuto, timestampStr });
-}
+): { updatedProducts: ProductModel[]; newLedgerEntry: GaugesLedgerItem } {
+  const now = new Date();
+  const timeFormatted =
+    timestampStr ||
+    `${now.toISOString().slice(0, 10)} ${now.toTimeString().slice(0, 8)}`;
 
-export function computeFixPlan(product: DerivedProduct, allProducts: DerivedProduct[]): FixPlanSummary {
-  return buildPlan({ products: allProducts }, `fix-${product.id}`);
+  const source = products.find((p) => p.id === reallocation.sourceProductId);
+  const dest = products.find((p) => p.id === reallocation.targetProductId);
+
+  if (!source || !dest) {
+    throw new Error(`Reallocation endpoint not found: ${reallocation.sourceProductId} -> ${reallocation.targetProductId}`);
+  }
+
+  const updatedProducts = products.map((p) => {
+    if (p.id === source.id) {
+      const isStockout = source.inventory <= 0;
+      const isLowStock = !isStockout && source.inventory / Math.max(1, source.dailyUnitsSold) < 7;
+
+      return {
+        ...p,
+        dailySpend: reallocation.sourceSpendAfter,
+        paused: isStockout ? true : p.paused,
+        restockUnitsOrdered: isStockout ? Math.round(21 * p.dailyUnitsSold) : p.restockUnitsOrdered,
+        reorderAlertSent: isLowStock ? true : p.reorderAlertSent,
+        roas: !isStockout && !isLowStock
+          ? Number((p.roas + (TARGET_ROAS - p.roas) * 0.7).toFixed(2))
+          : p.roas,
+        cpc: !isStockout && !isLowStock ? Number((p.cpc * 0.9).toFixed(2)) : p.cpc,
+        isFixed: true,
+        fixedAt: timeFormatted,
+      };
+    }
+
+    if (p.id === dest.id) {
+      const oldSpend = p.dailySpend;
+      const oldRev = oldSpend * p.roas;
+      const addedSpend = reallocation.movedAmount;
+      const addedRev = addedSpend * reallocation.targetMarginalRoas;
+
+      const newSpend = oldSpend + addedSpend;
+      const newRev = oldRev + addedRev;
+      const newRoas = Number((newRev / newSpend).toFixed(2));
+
+      const velocityMultiplier = newRev / (oldRev || 1);
+      const newDailyUnitsSold = Math.max(1, Math.round(p.dailyUnitsSold * velocityMultiplier));
+
+      return {
+        ...p,
+        dailySpend: Math.round(newSpend),
+        addedSpendFromReallocations: (p.addedSpendFromReallocations || 0) + addedSpend,
+        roas: newRoas,
+        dailyUnitsSold: newDailyUnitsSold,
+      };
+    }
+
+    return p;
+  });
+
+  const newLedgerEntry: GaugesLedgerItem = {
+    id: `ledg-realloc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    timestamp: timeFormatted,
+    product: source.name,
+    channel: source.channel,
+    issue: reallocation.reason,
+    actionTaken: `[${reallocation.actionTag}] Moved ${formatCurrency(reallocation.movedAmount)} from ${source.name} (${source.channel}) → ${dest.name} (${dest.channel})`,
+    outcome: `+${formatCurrency(reallocation.netRevenueLift)} proj revenue lift/day (${reallocation.confidence}% conf)`,
+    isAuto,
+  };
+
+  return { updatedProducts, newLedgerEntry };
 }

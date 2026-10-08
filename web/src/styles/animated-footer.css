@@ -4,7 +4,7 @@
    ========================================================================== */
 
 :root {
-  --font-display: 'Ranade', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Orbitron', 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
   --footer-line: var(--border, #e2e8f0);
   --footer-line-2: var(--border, #cbd5e1);
   --footer-line-highlight: rgba(255, 255, 255, 0.8);

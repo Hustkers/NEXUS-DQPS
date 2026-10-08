@@ -83,13 +83,13 @@ export default function ProductForm({
       </CardHeader>
       <CardContent className='space-y-6'>
         {pageTitle === 'Create New Product' && (
-          <div className='flex items-center justify-between p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-xs font-mono text-foreground'>
+          <div className='flex items-center justify-between p-3.5 bg-[#39FF14]/10 border border-[#39FF14]/30 rounded-lg text-xs font-mono text-white'>
             <div className='flex items-center gap-2'>
-              <Icons.bot className='h-4 w-4 text-emerald-600 dark:text-[#39FF14]' />
+              <Icons.bot className='h-4 w-4 text-[#39FF14]' />
               <span>Looking for the <strong>AI Ad Campaign Optimization Engine</strong>?</span>
             </div>
             <Link href='/dashboard/strategy-engine'>
-              <Button size='sm' className='h-7 text-xs bg-emerald-600 dark:bg-[#39FF14] text-white dark:text-black hover:bg-emerald-700 dark:hover:bg-[#32e012] font-semibold'>
+              <Button size='sm' className='h-7 text-xs bg-[#39FF14] text-black hover:bg-[#32e012] font-semibold'>
                 Launch Engine &rarr;
               </Button>
             </Link>

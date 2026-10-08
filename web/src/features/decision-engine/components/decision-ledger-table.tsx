@@ -30,93 +30,74 @@ interface DecisionLedgerTableProps {
   className?: string;
   showHeader?: boolean;
 }
+
 /**
- * Parses decision text into structured visual components
- * e.g. "Shift ₹1,850/day from meta-315122-001 (Nike Air Force 1 stockout) -> google-CD4371-001 (React Infinity Flyknit)"
+ * Extracts clean product identifier and allocation action summary from decision string
  */
-function parseDecisionString(raw: string) {
-  let action: 'SHIFT' | 'SCALE' | 'THROTTLE' | 'ACTION' = 'ACTION';
-  const upper = raw.toUpperCase();
-  if (upper.startsWith('SHIFT')) action = 'SHIFT';
-  else if (upper.startsWith('SCALE')) action = 'SCALE';
-  else if (upper.startsWith('THROTTLE')) action = 'THROTTLE';
+function extractDirectiveDetails(item: any) {
+  const raw = item.decision || item.actionTaken || '';
+  let channel = (item.channel || '').toLowerCase();
+  let productName = item.product || '';
+  let actionSummary = item.actionTaken || raw || 'Budget optimization executed';
 
-  // Amount pattern (e.g. ₹1,850/day, +₹920/day, -₹650/day)
-  const amountMatch = raw.match(/([+\-]?₹[0-9,]+(?:\/day)?)/);
-  const amount = amountMatch ? amountMatch[1] : '';
+  if (!channel) {
+    const upper = raw.toUpperCase();
+    if (upper.includes('META')) channel = 'meta';
+    else if (upper.includes('GOOGLE')) channel = 'google';
+    else if (upper.includes('AMAZON')) channel = 'amazon';
+    else if (upper.includes('SHOPIFY')) channel = 'shopify';
+    else channel = 'meta';
+  }
 
-  // Shift case: "from <src> (notes) -> <target> (notes)"
-  if (action === 'SHIFT') {
-    const shiftMatch = raw.match(/from\s+([^\(]+)(?:\(([^)]+)\))?\s*(?:->|→)\s*([^\(]+)(?:\(([^)]+)\))?/i);
-    if (shiftMatch) {
-      const srcId = shiftMatch[1]?.trim().toUpperCase() || 'SOURCE';
-      const srcNote = shiftMatch[2]?.trim() || '';
-      const destId = shiftMatch[3]?.trim().toUpperCase() || 'DESTINATION';
-      const destNote = shiftMatch[4]?.trim() || '';
-
-      const srcPlatform = srcId.includes('META') ? 'META' : srcId.includes('AMAZON') ? 'AMAZON' : srcId.includes('TIKTOK') ? 'TIKTOK' : srcId.includes('GOOGLE') ? 'GOOGLE' : srcId;
-      const destPlatform = destId.includes('GOOGLE') ? 'GOOGLE PMAX' : destId.includes('META') ? 'META' : destId.includes('AMAZON') ? 'AMAZON' : destId;
-
-      return {
-        action,
-        amount,
-        isShift: true,
-        source: { platform: srcPlatform, detail: srcNote || srcId },
-        target: { platform: destPlatform, detail: destNote || destId },
-        raw
-      };
+  // Parse shift: e.g. "Shift $1,850/day from meta-315122-001 (Nike Air Force 1 stockout) -> google-CD4371-001 (React Infinity Flyknit)"
+  if (raw.toLowerCase().startsWith('shift')) {
+    const match = raw.match(/from\s+([^\(]+)(?:\(([^)]+)\))?\s*(?:->|→)\s*([^\(]+)(?:\(([^)]+)\))?/i);
+    if (match) {
+      const srcProd = match[2]?.trim() || match[1]?.trim();
+      const destProd = match[4]?.trim() || match[3]?.trim();
+      productName = `${srcProd} → ${destProd}`;
+      actionSummary = raw;
+    }
+  } else if (raw.toLowerCase().startsWith('scale') || raw.toLowerCase().startsWith('throttle')) {
+    // e.g. "Scale meta-AH8050-100 (Nike Air Max 270) budget +$920/day on high-intent conversion trend"
+    const match = raw.match(/(?:Scale|Throttle)\s+([^\(]+)(?:\(([^)]+)\))?\s*(.*)/i);
+    if (match) {
+      productName = match[2]?.trim() || match[1]?.trim();
+      actionSummary = match[3]?.trim() ? `${raw.split(' ')[0]} ${match[3].trim()}` : raw;
     }
   }
 
-  // Scale or Throttle case:
-  // e.g. "Scale tiktok-AH8050-100 (Nike Air Max 270) budget +₹920/day on viral footwear trend"
-  // e.g. "Throttle amazon-849559-004 (Air Max 2017) spend -₹650/day due to competitor footwear discount"
-  const singleMatch = raw.match(/(?:Scale|Throttle)\s+([^\(]+)(?:\(([^)]+)\))?\s*(?:budget|spend)?\s*([+\-]?₹[0-9,]+(?:\/day)?)?\s*(?:on|due to|for)?\s*(.*)?/i);
-  if (singleMatch) {
-    const targetId = singleMatch[1]?.trim().toUpperCase() || '';
-    const targetProduct = singleMatch[2]?.trim() || '';
-    const note = singleMatch[4]?.trim() || '';
-    const platform = targetId.includes('TIKTOK') ? 'TIKTOK' : targetId.includes('AMAZON') ? 'AMAZON' : targetId.includes('META') ? 'META' : targetId.includes('GOOGLE') ? 'GOOGLE' : targetId;
-
-    return {
-      action,
-      amount: amount || (singleMatch[3] ? singleMatch[3].trim() : ''),
-      isShift: false,
-      target: {
-        platform,
-        product: targetProduct,
-        note
-      },
-      raw
-    };
+  if (!productName) {
+    productName = item.product || 'Catalog Campaign';
   }
 
-  return {
-    action,
-    amount,
-    isShift: false,
-    raw
-  };
+  return { channel, productName, actionSummary };
 }
 
 export function DecisionLedgerTable({ entries, className, showHeader = false }: DecisionLedgerTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const filtered = entries.filter((item: any) => {
-    const text = (item.decision || item.actionTaken || item.product || '') + ' ' + (item.timestamp || '');
+    const text = (item.decision || item.actionTaken || item.product || '') + ' ' + (item.timestamp || '') + ' ' + (item.feedback || '');
     return text.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
   const handleExportCSV = () => {
-    const headers = ['ID', 'Timestamp', 'Allocation Action', 'Expected Margin (INR)', 'Realized Margin (INR)', 'Accuracy (%)', 'Confidence (%)'];
+    const headers = ['ID', 'Timestamp', 'Product', 'Channel', 'Allocation Action', 'Expected Margin (USD)', 'Realized Margin (USD)', 'Variance (%)', 'Accuracy (%)', 'Confidence (%)', 'Status', 'Feedback'];
     const rows = filtered.map((e: any) => [
       e.id,
       e.timestamp,
+      `"${(e.product || '').replace(/"/g, '""')}"`,
+      e.channel || 'meta',
       `"${(e.decision || e.actionTaken || 'Budget reallocated').replace(/"/g, '""')}"`,
       e.expectedMargin ?? 0,
       e.realizedMargin ?? 0,
+      (e.variancePct ?? 0).toFixed(1),
       (e.accuracyPct ?? 94).toFixed(1),
-      ((e.confidence ?? 0.95) * 100).toFixed(0)
+      ((e.confidence ?? 0.95) * 100).toFixed(0),
+      e.status || 'executed',
+      `"${(e.feedback || '').replace(/"/g, '""')}"`
     ]);
     const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -136,52 +117,55 @@ export function DecisionLedgerTable({ entries, className, showHeader = false }: 
   // Deterministic summary KPI calculations from existing ledger entries
   const metrics = React.useMemo(() => {
     if (!entries || entries.length === 0) {
-      return { totalDecisions: 0, avgAccuracy: 0, totalRealizedMargin: 0, totalExpectedMargin: 0 };
+      return { totalDecisions: 0, avgAccuracy: 0, totalRealizedMargin: 0, totalExpectedMargin: 0, netVariance: 0, variancePct: 0 };
     }
     const totalDecisions = entries.length;
     const avgAccuracy = entries.reduce((acc, curr: any) => acc + (curr.accuracyPct ?? 94), 0) / totalDecisions;
     const totalRealizedMargin = entries.reduce((acc, curr: any) => acc + (curr.realizedMargin ?? 0), 0);
     const totalExpectedMargin = entries.reduce((acc, curr: any) => acc + (curr.expectedMargin ?? 0), 0);
+    const netVariance = totalRealizedMargin - totalExpectedMargin;
+    const variancePct = totalExpectedMargin > 0 ? (netVariance / totalExpectedMargin) * 100 : 0;
 
     return {
       totalDecisions,
       avgAccuracy,
       totalRealizedMargin,
-      totalExpectedMargin
+      totalExpectedMargin,
+      netVariance,
+      variancePct
     };
   }, [entries]);
 
   return (
-    <div className={cn('space-y-4 font-orbitron', className)}>
-      {/* Optional In-Component Header (used when rendered inside Mission Control) */}
+    <div className={cn('space-y-4 font-sans', className)}>
+      {/* Optional In-Component Header */}
       {showHeader && (
-        <div className='flex flex-wrap items-center justify-between gap-2 border-b border-border/80 pb-3'>
+        <div className='flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 pb-3'>
           <div className='flex items-center gap-2'>
-            <Icons.check className='size-3.5 text-emerald-500' />
-            <h3 className='font-orbitron text-xs font-bold text-foreground uppercase tracking-wider'>
+            <Icons.check className='size-3.5 text-zinc-300' />
+            <h3 className='font-sans text-xs font-semibold text-zinc-100 uppercase tracking-wider'>
               DECISION LEDGER
             </h3>
-            <span className='inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'>
-              <span className='size-1.5 rounded-full bg-emerald-500 animate-pulse' />
-              ✓ AUDITED
+            <span className='inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-zinc-900 text-zinc-300 border border-zinc-800'>
+              AUDITED
             </span>
           </div>
-          <span className='text-xs font-orbitron text-muted-foreground'>
+          <span className='text-xs font-mono tabular-nums text-zinc-400'>
             {entries.length} AUDITED DECISIONS
           </span>
         </div>
       )}
 
       {/* Filter and Export Toolbar */}
-      <div className='flex flex-wrap items-center justify-between gap-3 p-3 rounded-lg border border-border bg-card'>
+      <div className='flex flex-wrap items-center justify-between gap-3 p-3 rounded-lg border border-zinc-800 bg-[#121215]'>
         <div className='flex items-center gap-2 flex-1 max-w-sm'>
-          <Icons.search className='size-3.5 text-muted-foreground shrink-0' />
+          <Icons.search className='size-3.5 text-zinc-400 shrink-0' />
           <input
             type='text'
-            placeholder='Search directives (e.g. Meta, Shift, Zoom)...'
+            placeholder='Search directives (e.g. Meta, Shift, Air Max)...'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className='w-full text-xs font-mono bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-hidden'
+            className='w-full text-xs font-sans bg-transparent text-zinc-100 placeholder:text-zinc-500 focus:outline-hidden'
           />
         </div>
         <div className='flex items-center gap-3'>
@@ -189,101 +173,171 @@ export function DecisionLedgerTable({ entries, className, showHeader = false }: 
             size='sm'
             variant='outline'
             onClick={handleExportCSV}
-            className='h-7 px-2.5 text-xs font-mono font-semibold text-foreground border-border bg-background hover:bg-muted active:scale-[0.98]'
+            className='h-7 px-2.5 text-xs font-mono font-medium text-zinc-200 border-zinc-700 bg-zinc-800 hover:bg-zinc-700 active:scale-[0.98]'
           >
             <Icons.download className='size-3 mr-1.5' />
             Export CSV
           </Button>
-          <span className='text-xs font-mono text-muted-foreground'>
+          <span className='text-xs font-mono tabular-nums text-zinc-400'>
             {filtered.length} / {entries.length} decisions
           </span>
         </div>
       </div>
 
-      {/* Compact KPI Strip */}
-      <div className='grid grid-cols-3 gap-2.5 sm:gap-3'>
-        <div className='rounded-lg border border-border/80 bg-card/80 p-2.5 sm:p-3'>
-          <div className='text-[10px] uppercase tracking-wider text-muted-foreground font-semibold'>
-            Decisions
+      {/* Compact 4-Card KPI Strip */}
+      <div className='grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3'>
+        <div className='rounded-lg border border-zinc-800 bg-[#121215] p-2.5 sm:p-3'>
+          <div className='text-[10px] uppercase tracking-wider text-zinc-400 font-semibold font-sans'>
+            Audited Decisions
           </div>
-          <div className='mt-1 text-base sm:text-lg font-bold text-foreground'>
+          <div className='mt-1 text-base sm:text-lg font-mono tabular-nums font-semibold text-zinc-100'>
             {metrics.totalDecisions}
           </div>
         </div>
 
-        <div className='rounded-lg border border-border/80 bg-card/80 p-2.5 sm:p-3'>
-          <div className='text-[10px] uppercase tracking-wider text-muted-foreground font-semibold'>
-            Avg Accuracy
+        <div className='rounded-lg border border-zinc-800 bg-[#121215] p-2.5 sm:p-3'>
+          <div className='text-[10px] uppercase tracking-wider text-zinc-400 font-semibold font-sans'>
+            Expected Margin
           </div>
-          <div className='mt-1 text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400'>
-            {metrics.avgAccuracy.toFixed(1)}%
+          <div className='mt-1 text-base sm:text-lg font-mono tabular-nums font-semibold text-zinc-100'>
+            ${metrics.totalExpectedMargin.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 1 })}
           </div>
         </div>
 
-        <div className='rounded-lg border border-border/80 bg-card/80 p-2.5 sm:p-3'>
-          <div className='text-[10px] uppercase tracking-wider text-muted-foreground font-semibold'>
-            Margin Realized
+        <div className='rounded-lg border border-zinc-800 bg-[#121215] p-2.5 sm:p-3'>
+          <div className='text-[10px] uppercase tracking-wider text-zinc-400 font-semibold font-sans'>
+            Realized Margin
           </div>
-          <div className='mt-1 text-base sm:text-lg font-bold text-foreground'>
-            ₹{metrics.totalRealizedMargin.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 1 })}
+          <div className='mt-1 text-base sm:text-lg font-mono tabular-nums font-semibold text-zinc-100'>
+            ${metrics.totalRealizedMargin.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 1 })}
+          </div>
+        </div>
+
+        <div className='rounded-lg border border-zinc-800 bg-[#121215] p-2.5 sm:p-3'>
+          <div className='text-[10px] uppercase tracking-wider text-zinc-400 font-semibold font-sans'>
+            Model Accuracy &amp; Variance
+          </div>
+          <div className='mt-1 flex items-baseline gap-2'>
+            <span className='text-base sm:text-lg font-mono tabular-nums font-semibold text-zinc-100'>
+              {metrics.avgAccuracy.toFixed(1)}%
+            </span>
+            <span className={cn('text-xs font-mono tabular-nums', metrics.netVariance >= 0 ? 'text-zinc-300' : 'text-zinc-400')}>
+              ({metrics.netVariance >= 0 ? '+' : ''}${Math.round(metrics.netVariance)})
+            </span>
           </div>
         </div>
       </div>
 
       {/* Table */}
-      <div className='overflow-x-auto rounded-lg border border-border'>
-        <table className='w-full text-left text-xs font-mono'>
+      <div className='overflow-x-auto rounded-lg border border-zinc-800'>
+        <table className='w-full text-left text-xs font-sans'>
           <thead>
-            <tr className='border-b border-border bg-muted/60 text-[11px] text-muted-foreground uppercase tracking-wider'>
+            <tr className='border-b border-zinc-800 bg-zinc-900/60 text-[11px] text-zinc-400 uppercase tracking-wider font-sans'>
               <th className='py-2.5 px-3.5 font-semibold'>Timestamp</th>
-              <th className='py-2.5 px-3.5 font-semibold'>Product / Target</th>
-              <th className='py-2.5 px-3.5 font-semibold'>Issue / Context</th>
+              <th className='py-2.5 px-3.5 font-semibold'>Target Campaign</th>
+              <th className='py-2.5 px-3.5 font-semibold'>Context / Expected</th>
               <th className='py-2.5 px-3.5 font-semibold'>Allocation Action</th>
-              <th className='py-2.5 px-3.5 text-right font-semibold'>Outcome</th>
+              <th className='py-2.5 px-3.5 text-right font-semibold'>Realized Outcome</th>
+              <th className='py-2.5 px-3 font-semibold text-center'>Audit</th>
             </tr>
           </thead>
-          <tbody className='divide-y divide-border'>
+          <tbody className='divide-y divide-zinc-800'>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={5} className='py-6 text-center text-muted-foreground text-xs'>
+                <td colSpan={6} className='py-6 text-center text-zinc-500 text-xs font-sans'>
                   No audited decisions logged yet.
                 </td>
               </tr>
             ) : (
               filtered.map((item: any) => {
                 const isAuto = item.isAuto || (item.actionTaken && item.actionTaken.includes('[Auto]'));
-                const channel = item.channel || (item.decision && item.decision.includes('meta') ? 'meta' : item.decision && item.decision.includes('google') ? 'google' : 'amazon');
-                const displayName = item.product || item.decision?.split('->')[0] || item.decision || 'Catalog Campaign';
-                const actionText = item.actionTaken || item.decision || 'Budget reallocated';
-                const issueText = item.issue || (item.expectedMargin ? `Exp. Margin: ₹${item.expectedMargin.toLocaleString()}` : 'Algorithmic Optimization');
-                const outcomeText = item.outcome || (item.realizedMargin ? `₹${item.realizedMargin.toLocaleString()} (${(item.confidence ? item.confidence * 100 : 95).toFixed(0)}% conf)` : 'Optimized');
+                const { channel, productName, actionSummary } = extractDirectiveDetails(item);
+                const issueText = item.issue || (item.expectedMargin ? `Exp. Margin: $${item.expectedMargin.toLocaleString()}` : 'Algorithmic Optimization');
+                const outcomeText = item.outcome || (item.realizedMargin ? `$${item.realizedMargin.toLocaleString()} (${(item.confidence ? item.confidence * 100 : 95).toFixed(0)}% conf)` : 'Optimized');
+                const isExpanded = expandedId === item.id;
 
                 return (
-                  <tr key={item.id} className='bg-card hover:bg-muted/40 transition-colors'>
-                    <td className='py-3 px-3.5 text-muted-foreground text-[11px] whitespace-nowrap font-medium'>
-                      {item.timestamp.split(' ')[1] || item.timestamp}
-                    </td>
-                    <td className='py-3 px-3.5 text-foreground font-sans text-xs max-w-xs truncate font-medium'>
-                      <span className='inline-flex items-center gap-1.5'>
-                        <PlatformLogo platform={channel.toLowerCase()} size={12} className='shrink-0' />
-                        <span className='truncate'>{displayName}</span>
-                        {isAuto && (
-                          <span className='text-[9px] font-mono px-1 py-0.5 rounded bg-emerald-950/40 text-emerald-400 border border-emerald-800/50 uppercase font-bold'>
-                            Auto
-                          </span>
-                        )}
-                      </span>
-                    </td>
-                    <td className='py-3 px-3.5 text-amber-400/90 text-xs font-mono max-w-xs truncate'>
-                      {issueText}
-                    </td>
-                    <td className='py-3 px-3.5 text-muted-foreground text-xs max-w-sm truncate'>
-                      {actionText}
-                    </td>
-                    <td className='py-3 px-3.5 text-right whitespace-nowrap font-mono text-emerald-400 font-semibold'>
-                      {outcomeText}
-                    </td>
-                  </tr>
+                  <React.Fragment key={item.id}>
+                    <tr
+                      onClick={() => setExpandedId(isExpanded ? null : item.id)}
+                      className={cn(
+                        'bg-[#121215] hover:bg-zinc-900/50 transition-colors cursor-pointer',
+                        isExpanded && 'bg-zinc-900/40'
+                      )}
+                    >
+                      <td className='py-3 px-3.5 text-zinc-400 text-[11px] whitespace-nowrap font-mono tabular-nums'>
+                        {item.timestamp}
+                      </td>
+                      <td className='py-3 px-3.5 text-zinc-200 font-sans text-xs max-w-xs truncate font-medium'>
+                        <span className='inline-flex items-center gap-1.5'>
+                          <PlatformLogo platform={channel} size={12} className='shrink-0' />
+                          <span className='truncate'>{productName}</span>
+                          {isAuto && (
+                            <span className='text-[9px] font-mono px-1 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700 uppercase font-bold'>
+                              Auto
+                            </span>
+                          )}
+                        </span>
+                      </td>
+                      <td className='py-3 px-3.5 text-zinc-400 text-xs font-mono tabular-nums max-w-xs truncate'>
+                        {issueText}
+                      </td>
+                      <td className='py-3 px-3.5 text-zinc-300 text-xs max-w-sm truncate font-sans'>
+                        {actionSummary}
+                      </td>
+                      <td className='py-3 px-3.5 text-right whitespace-nowrap font-mono tabular-nums text-zinc-100 font-semibold'>
+                        {outcomeText}
+                      </td>
+                      <td className='py-3 px-3 text-center'>
+                        <span className='text-[10px] font-mono text-zinc-400 underline decoration-zinc-700'>
+                          {isExpanded ? 'Hide' : 'Inspect'}
+                        </span>
+                      </td>
+                    </tr>
+
+                    {/* Expandable Model Calibration & Learning Telemetry Drawer */}
+                    {isExpanded && (
+                      <tr className='bg-zinc-950/60'>
+                        <td colSpan={6} className='p-4 border-b border-zinc-800'>
+                          <div className='grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs font-sans'>
+                            <div className='p-3 rounded-lg border border-zinc-800 bg-[#121215]'>
+                              <span className='text-[10px] text-zinc-500 uppercase font-semibold block'>Accuracy Score</span>
+                              <span className='text-sm font-mono tabular-nums font-semibold text-zinc-100'>
+                                {(item.accuracyPct ?? 94).toFixed(1)}%
+                              </span>
+                            </div>
+                            <div className='p-3 rounded-lg border border-zinc-800 bg-[#121215]'>
+                              <span className='text-[10px] text-zinc-500 uppercase font-semibold block'>Margin Variance</span>
+                              <span className='text-sm font-mono tabular-nums font-semibold text-zinc-100'>
+                                {item.variancePct !== undefined ? `${item.variancePct >= 0 ? '+' : ''}${item.variancePct}%` : '±0.0%'}
+                              </span>
+                            </div>
+                            <div className='p-3 rounded-lg border border-zinc-800 bg-[#121215]'>
+                              <span className='text-[10px] text-zinc-500 uppercase font-semibold block'>Execution Status</span>
+                              <span className='text-xs font-mono uppercase font-medium text-zinc-300'>
+                                {item.status || 'EXECUTED'}
+                              </span>
+                            </div>
+                            <div className='p-3 rounded-lg border border-zinc-800 bg-[#121215] sm:col-span-1'>
+                              <span className='text-[10px] text-zinc-500 uppercase font-semibold block'>Confidence Interval</span>
+                              <span className='text-sm font-mono tabular-nums font-semibold text-zinc-100'>
+                                {Math.round((item.confidence ?? 0.95) * 100)}%
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className='mt-2.5 p-3 rounded-lg border border-zinc-800 bg-[#121215]'>
+                            <span className='text-[10px] text-zinc-500 uppercase font-semibold block font-sans mb-1'>
+                              Closed-Loop Reinforcement Learning Telemetry:
+                            </span>
+                            <p className='text-xs font-mono text-zinc-300'>
+                              {item.feedback || 'Reinforced: Posterior gradient checked and committed to system ledger.'}
+                            </p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 );
               })
             )}

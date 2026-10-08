@@ -2,7 +2,7 @@ import { NavGroup } from '@/types';
 
 export const navGroups: NavGroup[] = [
   {
-    label: 'Autonomous Decision Engine',
+    label: 'Decision Engine',
     items: [
       {
         title: 'Mission Control',
@@ -13,7 +13,7 @@ export const navGroups: NavGroup[] = [
         items: []
       },
       {
-        title: 'Autonomous Ad Learning Engine',
+        title: 'Learning Engine',
         url: '/dashboard/autonomous-engine',
         icon: 'sparkles',
         isActive: false,
@@ -21,7 +21,7 @@ export const navGroups: NavGroup[] = [
         items: []
       },
       {
-        title: 'AI Strategy Engine',
+        title: 'Strategy Engine',
         url: '/dashboard/strategy-engine',
         icon: 'bot',
         isActive: false,
@@ -29,7 +29,7 @@ export const navGroups: NavGroup[] = [
         items: []
       },
       {
-        title: '3D Global Intelligence',
+        title: 'Global Telemetry',
         url: '/dashboard/globe',
         icon: 'globe',
         isActive: false,
@@ -37,7 +37,7 @@ export const navGroups: NavGroup[] = [
         items: []
       },
       {
-        title: 'Diagnostic Anomalies & RCA',
+        title: 'Anomalies & RCA',
         url: '/dashboard/anomalies',
         icon: 'warning',
         isActive: false,
@@ -45,7 +45,7 @@ export const navGroups: NavGroup[] = [
         items: []
       },
       {
-        title: 'ROAS & Health Gauges',
+        title: 'Performance Gauges',
         url: '/dashboard/gauges',
         icon: 'trendingUp',
         isActive: false,
@@ -53,7 +53,7 @@ export const navGroups: NavGroup[] = [
         items: []
       },
       {
-        title: 'Budget Reallocation Feed',
+        title: 'Reallocations',
         url: '/dashboard/reallocations',
         icon: 'adjustments',
         isActive: false,
@@ -69,7 +69,7 @@ export const navGroups: NavGroup[] = [
         items: []
       },
       {
-        title: 'Decision Ledger & Learning',
+        title: 'Decision Ledger',
         url: '/dashboard/ledger',
         icon: 'check',
         isActive: false,
@@ -77,7 +77,7 @@ export const navGroups: NavGroup[] = [
         items: []
       },
       {
-        title: 'Visitor Tracking & Attribution',
+        title: 'Visitor Attribution',
         url: '/dashboard/tracking',
         icon: 'search',
         isActive: false,
@@ -90,7 +90,7 @@ export const navGroups: NavGroup[] = [
     label: 'Simulation & Catalog',
     items: [
       {
-        title: 'Fingerprint Identity Tracker',
+        title: 'Identity Graph',
         url: '/dashboard/fingerprint',
         icon: 'fingerprint',
         isActive: false,
@@ -98,7 +98,7 @@ export const navGroups: NavGroup[] = [
         items: []
       },
       {
-        title: 'Scenario Shock Sandbox',
+        title: 'Scenario Simulator',
         url: '/dashboard/simulator',
         icon: 'sparkles',
         isActive: false,
@@ -106,7 +106,7 @@ export const navGroups: NavGroup[] = [
         items: []
       },
       {
-        title: 'Nike Footwear Catalog',
+        title: 'Product Catalog',
         url: '/dashboard/product',
         icon: 'kanban',
         isActive: false,
@@ -114,7 +114,7 @@ export const navGroups: NavGroup[] = [
         items: []
       },
       {
-        title: 'SKU & Channel Matrix',
+        title: 'SKU Matrix',
         url: '/dashboard/matrix',
         icon: 'product',
         isActive: false,
@@ -122,7 +122,7 @@ export const navGroups: NavGroup[] = [
         items: []
       },
       {
-        title: 'Live Schema Normalizer',
+        title: 'Schema Normalizer',
         url: '/dashboard/normalization',
         icon: 'normalization',
         isActive: false,

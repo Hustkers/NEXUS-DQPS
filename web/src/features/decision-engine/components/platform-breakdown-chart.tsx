@@ -43,14 +43,14 @@ export function PlatformBreakdownChart({
         <div className='relative z-10'>
           <div className='flex items-center justify-between border-b border-border pb-3 mb-4'>
             <div>
-              <h3 className='font-orbitron text-xs font-bold text-foreground uppercase tracking-wider'>
+              <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
                 30-Day Financial Telemetry
               </h3>
-              <p className='text-xs text-muted-foreground font-orbitron mt-0.5'>
+              <p className='text-xs text-muted-foreground font-mono mt-0.5'>
                 Spend vs Gross Revenue vs Contribution Margin (₹)
               </p>
             </div>
-            <div className='flex items-center gap-3 text-xs font-orbitron'>
+            <div className='flex items-center gap-3 text-xs font-mono'>
               <span className='text-foreground text-[11px] font-semibold'>— Revenue</span>
               <span className='text-muted-foreground text-[11px] font-semibold'>-- Margin</span>
               <span className='text-muted-foreground/70 text-[11px] font-semibold'>·· Spend</span>
@@ -160,10 +160,10 @@ export function PlatformBreakdownChart({
       <div className='rounded border border-border bg-card p-5 shadow-none text-card-foreground flex flex-col justify-between min-w-0'>
         <div>
           <div className='border-b border-border pb-3 mb-4'>
-            <h3 className='font-orbitron text-xs font-bold text-foreground uppercase tracking-wider'>
+            <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
               Cross-Platform Economics
             </h3>
-            <p className='text-xs text-muted-foreground font-orbitron mt-0.5'>
+            <p className='text-xs text-muted-foreground font-mono mt-0.5'>
               Capital Allocation &amp; Efficiency by Ad Network
             </p>
           </div>

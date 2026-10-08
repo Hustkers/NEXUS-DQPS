@@ -17,10 +17,8 @@ import {
   SidebarMenuItem
 } from '@/components/ui/sidebar';
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 export function OrgSwitcher() {
-  const router = useRouter();
   const [activeBrand, setActiveBrand] = useState('Nike Direct');
   const brands = [
     { name: 'Nike Direct', category: 'Footwear & Performance', channels: 'Meta • Google • Amazon • Shopify', status: 'Live' },
@@ -37,14 +35,14 @@ export function OrgSwitcher() {
               <SidebarMenuButton
                 size='lg'
                 tooltip='NEXUS D2C • Nike Catalog'
-                className='h-12 rounded-xl border border-border/50 bg-background/60 hover:bg-muted/50 hover:border-border/80 text-foreground transition-all duration-200 shadow-2xs group data-popup-open:bg-muted/60 data-popup-open:border-border'
+                className='h-11 rounded-xl border border-border/60 bg-background/70 hover:bg-muted/60 hover:border-border/80 text-foreground transition-all duration-150 active:scale-[0.97] shadow-2xs group data-popup-open:bg-muted/70 data-popup-open:border-border relative overflow-hidden before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/35 dark:before:via-white/10 before:to-transparent'
               />
             }
           >
             {/* Sleek Aceternity-style Logo Icon */}
-            <div className='relative flex aspect-square size-8.5 shrink-0 items-center justify-center rounded-lg border border-border/80 bg-neutral-900 dark:bg-neutral-950 text-white shadow-xs group-hover:border-primary/40 transition-colors'>
-              <Icons.dashboard className='size-4 text-emerald-400 dark:text-emerald-400 group-hover:scale-105 transition-transform' />
-              <span className='absolute -top-0.5 -right-0.5 size-2 rounded-full bg-emerald-500 ring-2 ring-background animate-pulse' />
+            <div className='relative flex aspect-square size-7 shrink-0 items-center justify-center rounded-lg border border-border/80 bg-neutral-900 dark:bg-neutral-950 text-white shadow-xs group-hover:border-primary/40 transition-colors'>
+              <Icons.dashboard className='size-3.5 text-emerald-400 dark:text-emerald-400 group-hover:scale-105 transition-transform' />
+              <span className='absolute -top-0.5 -right-0.5 size-1.5 rounded-full bg-emerald-500 ring-2 ring-background animate-pulse' />
             </div>
 
             {/* Typography & Brand Info */}
@@ -69,7 +67,7 @@ export function OrgSwitcher() {
           </DropdownMenuTrigger>
 
           <DropdownMenuContent
-            className='w-(--anchor-width) min-w-60 rounded-xl bg-popover/95 backdrop-blur-md border-border/80 shadow-xl p-1.5'
+            className='w-(--anchor-width) min-w-60 rounded-2xl bg-popover/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-border/70 shadow-2xl p-1.5 overflow-hidden before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/35 dark:before:via-white/10 before:to-transparent'
             align='start'
             side='bottom'
             sideOffset={6}
@@ -104,17 +102,7 @@ export function OrgSwitcher() {
             ))}
 
             <DropdownMenuSeparator className='bg-border/60 my-1' />
-            <DropdownMenuItem
-              onClick={() => router.push('/')}
-              className='cursor-pointer rounded-lg p-2 hover:bg-muted/80 text-xs font-mono text-muted-foreground hover:text-foreground flex items-center justify-between'
-            >
-              <div className='flex items-center gap-2'>
-                <Icons.externalLink className='size-3.5 text-muted-foreground' />
-                <span>Return to Landing Page</span>
-              </div>
-              <span className='text-[10px] text-muted-foreground/60 font-mono'>/</span>
-            </DropdownMenuItem>
-            <div className='px-2 py-1 text-[10px] text-muted-foreground font-mono flex items-center justify-between border-t border-border/40 pt-1.5 mt-0.5'>
+            <div className='px-2 py-1 text-[10px] text-muted-foreground font-mono flex items-center justify-between'>
               <span>ENGINE: SCIPY CONVEX</span>
               <span className='text-emerald-600 dark:text-emerald-400 font-semibold'>ACTIVE (CYC-9482)</span>
             </div>

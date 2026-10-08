@@ -2,12 +2,14 @@
 
 import React, { useState } from 'react';
 import {
+  IconSparkles,
   IconCheck,
   IconChevronDown,
   IconChevronUp,
   IconArrowsExchange,
   IconAlertTriangle,
-  IconX
+  IconX,
+  IconScale
 } from '@tabler/icons-react';
 import { PlatformLogo } from '@/components/icons/platform-logos';
 import type { CandidateAdConfig, AdPlaygroundResult } from '../../types/ad-playground-types';
@@ -32,18 +34,18 @@ export function PlaygroundRecommendationView({
   const visibleCandidates = showAllCandidates ? candidates : candidates.slice(0, 3);
 
   return (
-    <div className='space-y-4 font-mono'>
+    <div className='space-y-4 font-sans'>
       {/* 1. BEST CAMPAIGN HERO CARD */}
-      <div className='rounded-2xl border border-emerald-500/40 bg-card p-5 relative overflow-hidden shadow-xs'>
-        <div className='flex items-center justify-between pb-3 border-b border-border/60 mb-4'>
+      <div className='rounded-2xl border border-zinc-800 bg-[#121215] p-5 relative overflow-hidden shadow-xs'>
+        <div className='flex items-center justify-between pb-3 border-b border-zinc-800 mb-4'>
           <div className='flex items-center gap-2'>
-            <span className='size-2 rounded-full bg-emerald-400 animate-pulse' />
-            <span className='text-[10px] uppercase font-bold tracking-widest text-emerald-600 dark:text-emerald-400'>
+            <span className='size-2 rounded-full bg-zinc-400' />
+            <span className='text-[10px] uppercase font-semibold tracking-wider text-zinc-300 font-sans'>
               RECOMMENDED CAMPAIGN
             </span>
           </div>
 
-          <span className='text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-400'>
+          <span className='text-[10px] font-mono font-medium uppercase tracking-wider px-2 py-0.5 rounded border border-zinc-700 bg-zinc-800 text-zinc-200'>
             {isStockout
               ? 'PAUSE SPEND'
               : !isProfitable
@@ -57,54 +59,54 @@ export function PlaygroundRecommendationView({
             {/* Title & Core Meta */}
             <div className='flex flex-col sm:flex-row sm:items-baseline justify-between gap-2'>
               <div>
-                <h3 className='text-base sm:text-lg font-bold text-foreground flex items-center gap-2'>
+                <h3 className='text-base sm:text-lg font-semibold text-zinc-100 flex items-center gap-2'>
                   <PlatformLogo platform={bestCandidate.platform} size={16} />
                   <span>{bestCandidate.creative_format || 'UGC Video'} • {bestCandidate.audience_type?.toUpperCase() || 'BROAD'} • {bestCandidate.placement || 'AUTO'}</span>
                 </h3>
-                <p className='text-xs text-muted-foreground mt-0.5'>
+                <p className='text-xs text-zinc-400 mt-0.5 font-sans'>
                   {bestCandidate.title}
                 </p>
               </div>
 
               <div className='text-left sm:text-right shrink-0'>
-                <span className='text-lg font-black text-foreground'>
-                  ₹{isStockout ? '0' : bestCandidate.daily_budget.toLocaleString()}
-                  <span className='text-xs font-normal text-muted-foreground'>/day</span>
+                <span className='text-lg font-mono tabular-nums font-bold text-zinc-100'>
+                  ${bestCandidate.daily_budget.toLocaleString()}
+                  <span className='text-xs font-normal text-zinc-500 font-sans ml-1'>/day</span>
                 </span>
-                <div className='text-[11px] text-muted-foreground mt-0.5'>
-                  {isStockout ? 'Spend paused due to zero warehouse inventory' : `Total horizon spend: ₹${bestCandidate.expected_spend.toLocaleString()}`}
+                <div className='text-[11px] text-zinc-400 mt-0.5 font-mono tabular-nums'>
+                  Total horizon spend: ${bestCandidate.expected_spend.toLocaleString()}
                 </div>
               </div>
             </div>
 
             {/* Financial Telemetry Banner */}
-            <div className='grid grid-cols-2 sm:grid-cols-3 gap-3 p-3 rounded-xl bg-muted/20 border border-border/60'>
+            <div className='grid grid-cols-2 sm:grid-cols-3 gap-3 p-3 rounded-xl bg-zinc-900/40 border border-zinc-800 font-sans'>
               <div>
-                <span className='text-[10px] text-muted-foreground uppercase font-bold'>Predicted ROAS</span>
-                <div className='text-xl font-bold text-cyan-400 mt-0.5'>
+                <span className='text-[10px] text-zinc-400 uppercase font-semibold font-sans'>Predicted ROAS</span>
+                <div className='text-xl font-mono tabular-nums font-bold text-zinc-100 mt-0.5'>
                   {isStockout ? '0.00x' : `${bestCandidate.predicted_roas.toFixed(2)}x`}
                 </div>
               </div>
 
               <div>
-                <span className='text-[10px] text-muted-foreground uppercase font-bold'>Expected Profit</span>
+                <span className='text-[10px] text-zinc-400 uppercase font-semibold font-sans'>Expected Profit</span>
                 <div
                   className={cn(
-                    'text-xl font-bold mt-0.5',
-                    isStockout || bestCandidate.predicted_net_profit < 0 ? 'text-rose-400' : 'text-emerald-400'
+                    'text-xl font-mono tabular-nums font-bold mt-0.5',
+                    isStockout || bestCandidate.predicted_net_profit < 0 ? 'text-rose-400' : 'text-zinc-100'
                   )}
                 >
                   {isStockout
-                    ? '₹0'
+                    ? '$0'
                     : bestCandidate.predicted_net_profit < 0
-                      ? `-₹${Math.abs(bestCandidate.predicted_net_profit).toLocaleString()}`
-                      : `₹${bestCandidate.predicted_net_profit.toLocaleString()}`}
+                      ? `-$${Math.abs(bestCandidate.predicted_net_profit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                      : `$${bestCandidate.predicted_net_profit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                 </div>
               </div>
 
               <div className='col-span-2 sm:col-span-1'>
-                <span className='text-[10px] text-muted-foreground uppercase font-bold'>Confidence Score</span>
-                <div className='text-xl font-bold text-foreground mt-0.5'>
+                <span className='text-[10px] text-zinc-400 uppercase font-semibold font-sans'>Confidence Score</span>
+                <div className='text-xl font-mono tabular-nums font-bold text-zinc-100 mt-0.5'>
                   {Math.round(bestCandidate.confidence_score * 100)}%
                 </div>
               </div>
@@ -148,13 +150,11 @@ export function PlaygroundRecommendationView({
             const isTop = cand.rank === 1;
 
             return (
-              <button
+              <div
                 key={cand.config_id}
-                type='button'
                 onClick={() => setComparedCandidate(cand)}
-                aria-label={`Compare candidate ${cand.title}`}
                 className={cn(
-                  'w-full flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer group text-xs text-left',
+                  'flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer group text-xs',
                   isTop
                     ? 'border-emerald-500/50 bg-emerald-950/10 hover:border-emerald-500'
                     : 'border-border/60 bg-muted/20 hover:border-border hover:bg-muted/40'
@@ -178,23 +178,23 @@ export function PlaygroundRecommendationView({
                   </div>
                 </div>
 
-                <div className='flex items-center gap-4 shrink-0 font-mono'>
-                  <span className='text-muted-foreground hidden sm:block'>
-                    ₹{cand.daily_budget.toLocaleString()}/day
+                <div className='flex items-center gap-4 shrink-0 font-mono tabular-nums'>
+                  <span className='text-zinc-500 hidden sm:block font-sans'>
+                    ${cand.daily_budget.toLocaleString()}/day
                   </span>
-                  <span className='font-bold text-cyan-400'>
+                  <span className='font-semibold text-zinc-100'>
                     {cand.predicted_roas.toFixed(2)}x
                   </span>
                   <span
                     className={cn(
-                      'font-bold w-20 text-right',
-                      cand.predicted_net_profit < 0 ? 'text-rose-400' : 'text-emerald-400'
+                      'font-semibold w-24 text-right',
+                      cand.predicted_net_profit < 0 ? 'text-rose-400' : 'text-zinc-200'
                     )}
                   >
-                    {cand.predicted_net_profit < 0 ? '-' : ''}₹{Math.abs(cand.predicted_net_profit).toLocaleString()}
+                    {cand.predicted_net_profit < 0 ? '-' : ''}${Math.abs(cand.predicted_net_profit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>
@@ -257,64 +257,64 @@ export function PlaygroundRecommendationView({
                 </div>
                 <div className='space-y-1.5 pt-2 border-t border-border/40 text-muted-foreground'>
                   <div className='flex justify-between'>
-                    <span>ROAS:</span>
-                    <span className='font-bold text-cyan-400'>{bestCandidate.predicted_roas.toFixed(2)}x</span>
+                    <span className='font-sans text-zinc-400'>ROAS:</span>
+                    <span className='font-mono tabular-nums font-semibold text-zinc-100'>{bestCandidate.predicted_roas.toFixed(2)}x</span>
                   </div>
                   <div className='flex justify-between'>
-                    <span>Net Profit:</span>
-                    <span className='font-bold text-emerald-400'>₹{bestCandidate.predicted_net_profit.toLocaleString()}</span>
+                    <span className='font-sans text-zinc-400'>Net Profit:</span>
+                    <span className='font-mono tabular-nums font-semibold text-zinc-100'>${bestCandidate.predicted_net_profit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                   <div className='flex justify-between'>
-                    <span>Daily Budget:</span>
-                    <span className='font-bold text-foreground'>₹{bestCandidate.daily_budget.toLocaleString()}</span>
+                    <span className='font-sans text-zinc-400'>Daily Budget:</span>
+                    <span className='font-mono tabular-nums font-semibold text-zinc-100'>${bestCandidate.daily_budget.toLocaleString()}</span>
                   </div>
                   <div className='flex justify-between'>
-                    <span>Confidence:</span>
-                    <span className='font-bold text-foreground'>{Math.round(bestCandidate.confidence_score * 100)}%</span>
+                    <span className='font-sans text-zinc-400'>Confidence:</span>
+                    <span className='font-mono tabular-nums font-semibold text-zinc-100'>{Math.round(bestCandidate.confidence_score * 100)}%</span>
                   </div>
                 </div>
               </div>
 
               {/* Right Column: Selected Alternative Candidate */}
-              <div className='p-4 rounded-xl border border-border/80 bg-muted/20 space-y-3'>
+              <div className='p-4 rounded-xl border border-zinc-800 bg-zinc-900/40 space-y-3 font-sans'>
                 <div className='flex items-center justify-between'>
-                  <span className='font-bold text-muted-foreground uppercase text-[10px]'>
+                  <span className='font-semibold text-zinc-400 uppercase text-[10px] font-sans'>
                     #{comparedCandidate.rank} CANDIDATE
                   </span>
                   <PlatformLogo platform={comparedCandidate.platform} size={14} />
                 </div>
-                <div className='font-bold text-foreground text-sm truncate'>
+                <div className='font-semibold text-zinc-100 text-sm truncate'>
                   {comparedCandidate.title}
                 </div>
-                <div className='space-y-1.5 pt-2 border-t border-border/40 text-muted-foreground'>
+                <div className='space-y-1.5 pt-2 border-t border-zinc-800 text-zinc-400'>
                   <div className='flex justify-between'>
-                    <span>ROAS:</span>
-                    <span className='font-bold text-cyan-400'>{comparedCandidate.predicted_roas.toFixed(2)}x</span>
+                    <span className='font-sans text-zinc-400'>ROAS:</span>
+                    <span className='font-mono tabular-nums font-semibold text-zinc-100'>{comparedCandidate.predicted_roas.toFixed(2)}x</span>
                   </div>
                   <div className='flex justify-between'>
-                    <span>Net Profit:</span>
-                    <span className='font-bold text-emerald-400'>₹{comparedCandidate.predicted_net_profit.toLocaleString()}</span>
+                    <span className='font-sans text-zinc-400'>Net Profit:</span>
+                    <span className='font-mono tabular-nums font-semibold text-zinc-100'>${comparedCandidate.predicted_net_profit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                   <div className='flex justify-between'>
-                    <span>Daily Budget:</span>
-                    <span className='font-bold text-foreground'>₹{comparedCandidate.daily_budget.toLocaleString()}</span>
+                    <span className='font-sans text-zinc-400'>Daily Budget:</span>
+                    <span className='font-mono tabular-nums font-semibold text-zinc-100'>${comparedCandidate.daily_budget.toLocaleString()}</span>
                   </div>
                   <div className='flex justify-between'>
-                    <span>Confidence:</span>
-                    <span className='font-bold text-foreground'>{Math.round(comparedCandidate.confidence_score * 100)}%</span>
+                    <span className='font-sans text-zinc-400'>Confidence:</span>
+                    <span className='font-mono tabular-nums font-semibold text-zinc-100'>{Math.round(comparedCandidate.confidence_score * 100)}%</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Delta Banner */}
-            <div className='mt-4 p-3.5 rounded-xl border border-border/80 bg-muted/40 flex items-center justify-between text-xs'>
-              <span className='text-muted-foreground'>Incremental Advantage of #1:</span>
-              <div className='flex items-center gap-3'>
-                <span className='font-bold text-emerald-400'>
-                  +₹{(bestCandidate.predicted_net_profit - comparedCandidate.predicted_net_profit).toLocaleString()} expected profit
+            <div className='mt-4 p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/60 flex items-center justify-between text-xs font-sans'>
+              <span className='text-zinc-400'>Incremental Advantage of #1:</span>
+              <div className='flex items-center gap-3 font-mono tabular-nums'>
+                <span className='font-semibold text-zinc-100'>
+                  +${(bestCandidate.predicted_net_profit - comparedCandidate.predicted_net_profit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} expected profit
                 </span>
-                <span className='font-bold text-cyan-400'>
+                <span className='font-semibold text-zinc-300'>
                   +{(bestCandidate.predicted_roas - comparedCandidate.predicted_roas).toFixed(2)}x ROAS
                 </span>
               </div>

@@ -23,17 +23,18 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useChannel, AdChannel } from '@/context/channel-context';
-import { ActionDrawer } from './action-drawer';
 import { useDecisionEngine } from '@/context/decision-engine-store';
-import type { DerivedProduct } from '@/lib/gauges-engine';
+import { FixProtocolModal } from './fix-protocol-modal';
+import { computeFixPlan, type DerivedProduct, type FixPlanSummary } from '@/lib/gauges-engine';
 
 export function MissionControlConsole() {
   const [state, setState] = useState(initialEngineState);
-  const { products, ledger } = useDecisionEngine();
+  const { products, ledger, executeFix } = useDecisionEngine();
   const [analyzingProduct, setAnalyzingProduct] = useState<ProductAnalysisTarget | null>(null);
-  const [fixingActionId, setFixingActionId] = useState<string | null>(null);
-  const [fixingInitialState, setFixingInitialState] = useState<'review' | 'done'>('review');
-  const [isFixDrawerOpen, setIsFixDrawerOpen] = useState(false);
+  const [fixingProduct, setFixingProduct] = useState<DerivedProduct | null>(null);
+  const [fixingPlan, setFixingPlan] = useState<FixPlanSummary | null>(null);
+  const [isFixModalOpen, setIsFixModalOpen] = useState(false);
+  const [isSummaryOnly, setIsSummaryOnly] = useState(false);
   const [consoleGlobeMode, setConsoleGlobeMode] = useState<'arcs' | 'pulse'>('pulse');
   const [selectedGlobeMarker, setSelectedGlobeMarker] = useState<PulseMarker | null>(null);
   const { channel, setChannel } = useChannel();
@@ -130,15 +131,28 @@ export function MissionControlConsole() {
     });
   };
 
-  const filteredCampaigns = state.campaigns.filter((c: any) =>
-    activeTab === 'all' ? true : c.platform === activeTab
-  );
-
   return (
     <div className='relative flex flex-1 min-w-0 max-w-full flex-col gap-6 md:gap-8 p-3.5 sm:p-5 md:p-8 bg-background text-foreground min-h-screen selection:bg-primary/20 selection:text-foreground'>
 
-      {/* Flagship Product Feature Banner */}
-      <div className='rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 via-card to-card p-5 font-orbitron shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4'>
+      {/* 1. Page Header */}
+      <div className='flex flex-col gap-1 border-b border-border/50 pb-4'>
+        <div className='flex items-center justify-between gap-4'>
+          <div className='flex items-center gap-2.5'>
+            <h1 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground font-sans'>
+              Mission Control
+            </h1>
+            <span className='font-mono text-[10px] uppercase px-1.5 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold'>
+              Autonomous Loop Live
+            </span>
+          </div>
+        </div>
+        <p className='text-xs sm:text-sm text-muted-foreground max-w-2xl leading-normal'>
+          Real-time omnichannel telemetry, active anomaly detection, and autonomous capital allocation.
+        </p>
+      </div>
+
+      {/* Flagship Product Feature Banner: Autonomous Learning & Live What-If Simulator */}
+      <div className='rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 via-card to-card p-5 font-mono shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4'>
         <div className='space-y-1 max-w-2xl'>
           <div className='flex items-center gap-2'>
             <span className='size-2 rounded-full bg-emerald-500 animate-pulse' />
@@ -170,235 +184,266 @@ export function MissionControlConsole() {
         channel={channel}
       />
 
-      {/* 3. Scenario Controller (Operational Shock Simulator) */}
+      {/* 4. Scenario Controller (Operational Shock Simulator) */}
       <ScenarioController
         scenarios={state.scenarios}
         onTriggerScenario={handleTriggerScenario}
         onResetBaseline={handleResetBaseline}
       />
 
-      {/* 4. Global Ad & Sales Telemetry */}
-      <div className='rounded-xl border border-border bg-card p-5 sm:p-6 shadow-none text-card-foreground flex flex-col 2xl:flex-row items-start justify-between gap-6 relative min-h-[440px] min-w-0 max-w-full overflow-hidden'>
-        {/* Left Column: Controls, Regions, Active Products */}
-        <div className='flex-1 space-y-3.5 w-full min-w-0'>
-          <div className='flex flex-wrap items-center justify-between gap-2 border-b border-border/70 pb-2.5'>
-            <div className='flex items-center gap-2'>
-              <Icons.globe className='size-4 text-foreground' />
-              <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
-                GLOBAL SALES PULSE
+      {/* 3.5. Live 3D Global Telemetry & Heatmap Command Center */}
+      <div className='rounded border border-[#1A1A1A] bg-[#1A1A1A] p-6 shadow-none text-white flex flex-col gap-5 relative min-h-[520px]'>
+        {/* Header: Telemetry info, live status badge, mode switcher */}
+        <div className='flex flex-wrap items-center justify-between gap-3 border-b border-[#000000] pb-3'>
+          <div className='flex items-center gap-2.5'>
+            <Icons.globe className='size-5 text-white' />
+            <div className='flex flex-wrap items-center gap-2'>
+              <h3 className='font-mono text-sm font-bold text-white uppercase tracking-tight'>
+                Live 3D Global Ad &amp; Sales Telemetry
               </h3>
-            </div>
-            <div className='flex items-center gap-2'>
-              {/* Globe Switcher */}
-              <div className='flex items-center bg-muted/60 rounded border border-border p-0.5 text-xs font-mono'>
-                <button
-                  type='button'
-                  onClick={() => setConsoleGlobeMode('pulse')}
-                  className={cn(
-                    'px-2.5 py-0.5 rounded font-semibold transition-all text-[11px]',
-                    consoleGlobeMode === 'pulse'
-                      ? 'bg-background text-foreground shadow-2xs font-bold'
-                      : 'text-muted-foreground hover:text-foreground'
-                  )}
-                >
-                  Sales Pulse
-                </button>
-                <button
-                  type='button'
-                  onClick={() => setConsoleGlobeMode('arcs')}
-                  className={cn(
-                    'px-2.5 py-0.5 rounded font-semibold transition-all text-[11px]',
-                    consoleGlobeMode === 'arcs'
-                      ? 'bg-background text-foreground shadow-2xs font-bold'
-                      : 'text-muted-foreground hover:text-foreground'
-                  )}
-                >
-                  Analyzing Arcs
-                </button>
-              </div>
-
-              <Link
-                href='/dashboard/globe'
-                className='px-2.5 py-0.5 rounded bg-background border border-border text-[11px] font-mono text-foreground hover:bg-muted transition-colors flex items-center gap-1.5'
-              >
-                <span>Full Globe Hub</span>
-                <Icons.arrowRight className='size-3' />
-              </Link>
+              <span className='inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono font-semibold text-white border border-[#8A8A8A] bg-[#000000]'>
+                <span className='size-1.5 rounded-full bg-white animate-pulse' />
+                LIVE
+              </span>
             </div>
           </div>
 
-          {/* Region Cards Prioritizing: REGION / STATUS / % */}
-          <div className='grid grid-cols-2 lg:grid-cols-4 gap-2 pt-1 font-mono text-xs'>
-            {/* Tile 1: US-EAST / WEST */}
-            <button
-              type='button'
-              onClick={() => {
-                const match = GLOBE_REGIONS.find((m) => m.id === 'us-east');
-                if (match) setSelectedGlobeMarker((prev) => (prev?.id === 'us-east' ? null : match));
-              }}
-              className={cn(
-                'p-2.5 rounded-lg bg-muted/20 border transition-all text-left cursor-pointer group space-y-0.5',
-                selectedGlobeMarker?.id === 'us-east'
-                  ? 'border-red-500 ring-1 ring-red-500/50 bg-red-500/10'
-                  : 'border-border hover:border-foreground/40'
-              )}
-            >
-              <div className='text-[10px] text-muted-foreground font-semibold truncate'>US-EAST / WEST</div>
-              <div className='flex items-center justify-between text-xs font-bold text-foreground'>
-                <span className='flex items-center gap-1 text-red-500'>
-                  ● HIGH
-                </span>
-                <span>78%</span>
-              </div>
-            </button>
-
-            {/* Tile 2: WESTERN EUROPE */}
-            <button
-              type='button'
-              onClick={() => {
-                const match = GLOBE_REGIONS.find((m) => m.id === 'eu-west');
-                if (match) setSelectedGlobeMarker((prev) => (prev?.id === 'eu-west' ? null : match));
-              }}
-              className={cn(
-                'p-2.5 rounded-lg bg-muted/20 border transition-all text-left cursor-pointer group space-y-0.5',
-                selectedGlobeMarker?.id === 'eu-west'
-                  ? 'border-amber-500 ring-1 ring-amber-500/50 bg-amber-500/10'
-                  : 'border-border hover:border-foreground/40'
-              )}
-            >
-              <div className='text-[10px] text-muted-foreground font-semibold truncate'>WESTERN EUROPE</div>
-              <div className='flex items-center justify-between text-xs font-bold text-foreground'>
-                <span className='flex items-center gap-1 text-amber-400'>
-                  ● STRONG
-                </span>
-                <span>56%</span>
-              </div>
-            </button>
-
-            {/* Tile 3: ASIA-PACIFIC */}
-            <button
-              type='button'
-              onClick={() => {
-                const match = GLOBE_REGIONS.find((m) => m.id === 'apac');
-                if (match) setSelectedGlobeMarker((prev) => (prev?.id === 'apac' ? null : match));
-              }}
-              className={cn(
-                'p-2.5 rounded-lg bg-muted/20 border transition-all text-left cursor-pointer group space-y-0.5',
-                selectedGlobeMarker?.id === 'apac'
-                  ? 'border-amber-500 ring-1 ring-amber-500/50 bg-amber-500/10'
-                  : 'border-border hover:border-foreground/40'
-              )}
-            >
-              <div className='text-[10px] text-muted-foreground font-semibold truncate'>ASIA-PACIFIC</div>
-              <div className='flex items-center justify-between text-xs font-bold text-foreground'>
-                <span className='flex items-center gap-1 text-amber-400'>
-                  ● MODERATE
-                </span>
-                <span>44%</span>
-              </div>
-            </button>
-
-            {/* Tile 4: LATAM & SEA */}
-            <button
-              type='button'
-              onClick={() => {
-                const match = GLOBE_REGIONS.find((m) => m.id === 'latam');
-                if (match) setSelectedGlobeMarker((prev) => (prev?.id === 'latam' ? null : match));
-              }}
-              className={cn(
-                'p-2.5 rounded-lg bg-muted/20 border transition-all text-left cursor-pointer group space-y-0.5',
-                selectedGlobeMarker?.id === 'latam'
-                  ? 'border-zinc-400 ring-1 ring-zinc-400/50 bg-muted/60'
-                  : 'border-border hover:border-foreground/40'
-              )}
-            >
-              <div className='text-[10px] text-muted-foreground font-semibold truncate'>LATAM &amp; SEA</div>
-              <div className='flex items-center justify-between text-xs font-bold text-muted-foreground'>
-                <span className='flex items-center gap-1 text-muted-foreground'>
-                  ● SUPPRESSED
-                </span>
-                <span>12%</span>
-              </div>
-            </button>
-          </div>
-
-          {/* Active Products List */}
-          <div className='pt-1 flex flex-wrap items-center gap-2'>
-            <span className='text-[10px] font-mono text-muted-foreground uppercase font-bold'>Active Products:</span>
-            {state.campaigns.slice(0, 3).map((c: any) => (
+          <div className='flex items-center gap-2'>
+            {/* Globe Switcher */}
+            <div className='flex items-center bg-[#000000] rounded border border-[#1A1A1A] p-0.5 text-xs font-mono'>
               <button
-                key={c.campaign}
                 type='button'
-                onClick={() => {
-                  setAnalyzingProduct({
-                    productName: c.productName || c.sku,
-                    sku: c.sku,
-                    photoUrl: c.photoUrl,
-                    platform: c.platform,
-                    campaign: c.campaign,
-                    inventory: c.inventory,
-                    roas: c.roas,
-                    spend: c.currentDailySpend,
-                    severity: c.inventory === 0 ? 'CRITICAL' : 'HEALTHY'
-                  });
-                }}
-                className='px-2.5 py-0.5 rounded bg-muted/40 border border-border hover:border-foreground/40 text-xs font-mono text-foreground transition-colors flex items-center gap-1.5'
+                onClick={() => setConsoleGlobeMode('pulse')}
+                className={cn(
+                  'px-3 py-1 rounded font-semibold transition-all',
+                  consoleGlobeMode === 'pulse'
+                    ? 'bg-white text-black font-bold'
+                    : 'text-[#8A8A8A] hover:text-white'
+                )}
               >
-                <PlatformLogo platform={c.platform} size={12} className='shrink-0' />
-                <span>{c.productName || c.sku}</span>
+                Sales Pulse
               </button>
-            ))}
+              <button
+                type='button'
+                onClick={() => setConsoleGlobeMode('arcs')}
+                className={cn(
+                  'px-3 py-1 rounded font-semibold transition-all',
+                  consoleGlobeMode === 'arcs'
+                    ? 'bg-white text-black font-bold'
+                    : 'text-[#8A8A8A] hover:text-white'
+                )}
+              >
+                Analysing Arcs
+              </button>
+            </div>
+
+            <Link
+              href='/dashboard/globe'
+              className='px-3 py-1 rounded bg-[#000000] border border-[#1A1A1A] text-xs font-mono text-white hover:bg-white hover:text-black transition-colors flex items-center gap-1.5'
+            >
+              <span>Full Globe Hub</span>
+              <Icons.arrowRight className='size-3' />
+            </Link>
           </div>
         </div>
 
-        {/* Right Column: 3D Globe Visualizer */}
-        <div className='w-full xl:w-[420px] 2xl:w-[440px] shrink-0 flex items-center justify-center relative min-h-[340px]'>
-          <div className='size-[340px] flex items-center justify-center shrink-0 relative'>
-            {consoleGlobeMode === 'arcs' ? (
-              <GithubGlobe
-                size={340}
-                activeSku='315122-001'
-                activePlatform='meta'
-                accentColor={[1, 1, 1]}
-              />
-            ) : (
-              <GlobePulse
-                size={340}
-                speed={0.0035}
-                selectedMarkerId={selectedGlobeMarker?.id}
-                onSelectMarker={setSelectedGlobeMarker}
-                renderDetailPanel={false}
-              />
-            )}
+        {/* Command Grid: Regions on Left, Enlarged 3D Globe with Recent Purchases on Right */}
+        <div className='flex flex-col 2xl:flex-row items-center 2xl:items-start justify-between gap-6 2xl:gap-8 w-full'>
+          {/* Left Column: Regions on the Left side of the globe */}
+          <div className='w-full 2xl:w-[360px] flex flex-col gap-3.5 shrink-0'>
+            <p className='text-xs font-mono text-[#8A8A8A] leading-relaxed'>
+              {consoleGlobeMode === 'pulse'
+                ? 'Real-time regional telemetry matrix: Grounded in DATASET.md Nike catalog economics. Powered by amCharts 5 3D Orthographic Globe.'
+                : 'WebGL ad delivery vectors across Meta, Google, Amazon & Shopify. Visualizing network latency and delivery hops via NEXUS 3D WebGL engine.'}
+            </p>
+
+            {/* Telemetry Density Legend Bar */}
+            <div className='flex flex-wrap items-center justify-between gap-2 pt-1 pb-0.5 font-mono text-[11px] text-[#8A8A8A] border-t border-[#000000]'>
+              <div className='flex items-center gap-1.5'>
+                <Icons.globe className='size-3.5 text-white' />
+                <span className='text-white font-semibold tracking-wider uppercase text-[10px]'>
+                  Regional Telemetry Matrix
+                </span>
+                <span className='text-[10px] text-[#8A8A8A] hidden sm:inline'>• Click to inspect</span>
+              </div>
+              <div className='flex items-center gap-2 text-[10px]'>
+                <span className='text-[#8A8A8A] font-mono'>16%</span>
+                <div className='w-24 sm:w-28 h-1 rounded-full bg-[#000000] overflow-hidden flex border border-[#1A1A1A]'>
+                  <div className='h-full bg-[#8A8A8A]/40 w-1/4' />
+                  <div className='h-full bg-[#8A8A8A] w-1/4' />
+                  <div className='h-full bg-white/70 w-1/4' />
+                  <div className='h-full bg-white w-1/4' />
+                </div>
+                <span className='text-white font-bold font-mono'>88% Max</span>
+              </div>
+            </div>
+
+            {/* Region Status Tiles (Stacked vertically on the left) */}
+            <div className='grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-1 gap-2 font-mono text-xs max-h-[460px] overflow-y-auto pr-1 [scrollbar-width:thin]'>
+              {GLOBE_REGIONS.map((reg) => {
+                const isSelected = selectedGlobeMarker?.id === reg.id;
+                const dotType = (reg.heatPct ?? 0) >= 75 ? 'solid' : (reg.heatPct ?? 0) >= 45 ? 'hollow' : 'dimmed';
+                const meterBarClass =
+                  (reg.heatPct ?? 0) >= 80
+                    ? 'bg-white'
+                    : (reg.heatPct ?? 0) >= 60
+                    ? 'bg-white/80'
+                    : (reg.heatPct ?? 0) >= 40
+                    ? 'bg-[#8A8A8A]'
+                    : 'bg-[#8A8A8A]/40';
+
+                return (
+                  <button
+                    key={reg.id}
+                    type='button'
+                    onClick={() => {
+                      setSelectedGlobeMarker((prev) => (prev?.id === reg.id ? null : reg));
+                    }}
+                    className={cn(
+                      'group relative p-2.5 rounded bg-[#000000] border text-left cursor-pointer transition-all duration-150 flex flex-col justify-between min-h-[82px]',
+                      isSelected
+                        ? 'border-white ring-1 ring-white bg-[#1A1A1A]'
+                        : 'border-[#1A1A1A] hover:border-[#8A8A8A]'
+                    )}
+                  >
+                    {/* Header row: Zone name + Status Dot + Level Tag */}
+                    <div className='flex items-center justify-between gap-1 text-[10px]'>
+                      <div className='flex items-center gap-1.5 truncate'>
+                        {dotType === 'solid' ? (
+                          <span className='size-2 rounded-full bg-white shrink-0' />
+                        ) : dotType === 'hollow' ? (
+                          <span className='size-2 rounded-full border border-white shrink-0' />
+                        ) : (
+                          <span className='size-2 rounded-full border border-[#8A8A8A] shrink-0' />
+                        )}
+                        <span className='font-mono font-semibold text-white truncate'>
+                          {reg.shortName || reg.name}
+                        </span>
+                      </div>
+                      <span className='text-[9px] px-1 py-0.5 rounded border border-[#1A1A1A] text-[#8A8A8A] font-mono font-medium shrink-0 bg-[#1A1A1A]'>
+                        {reg.velocityLabel || reg.volume}
+                      </span>
+                    </div>
+
+                    {/* Status label and key metrics */}
+                    <div className='my-1'>
+                      <div className='font-mono font-bold text-xs text-white tracking-tight'>
+                        {reg.statusLabel || reg.name}
+                      </div>
+                      <div className='text-[10px] text-[#8A8A8A] flex items-center justify-between gap-1 mt-0.5 font-mono'>
+                        <span className='truncate'>{reg.metricsSummary || reg.label}</span>
+                        <span className='text-white font-bold text-[9px] shrink-0'>
+                          {reg.roas ? `${reg.roas} ROAS` : ''}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Bottom Intensity Bar */}
+                    <div className='w-full pt-0.5'>
+                      <div className='h-1 w-full rounded-full bg-[#1A1A1A] overflow-hidden'>
+                        <div
+                          className={cn('h-full rounded-full transition-all duration-300', meterBarClass)}
+                          style={{ width: `${reg.heatPct ?? 50}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Selected Indicator */}
+                    {isSelected && (
+                      <div className='absolute bottom-1 right-2 text-[8px] font-mono font-bold uppercase text-black bg-white px-1 py-0.2 rounded'>
+                        ACTIVE
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* SKU Quick Select Strip Grounded in DATASET.md */}
+            <div className='pt-2 flex flex-wrap items-center gap-2 border-t border-[#000000]'>
+              <span className='text-[10px] font-mono text-[#8A8A8A]'>Active SKU Telemetry:</span>
+              {state.campaigns.slice(0, 3).map((c: any) => (
+                <button
+                  key={c.campaign}
+                  type='button'
+                  onClick={() => {
+                    setAnalyzingProduct({
+                      productName: c.productName || c.sku,
+                      sku: c.sku,
+                      photoUrl: c.photoUrl,
+                      platform: c.platform,
+                      campaign: c.campaign,
+                      inventory: c.inventory,
+                      roas: c.roas,
+                      spend: c.currentDailySpend,
+                      severity: c.inventory === 0 ? 'CRITICAL' : 'HEALTHY'
+                    });
+                  }}
+                  className='px-2.5 py-1 rounded bg-[#000000] border border-[#1A1A1A] hover:border-white text-xs font-mono text-white transition-colors flex items-center gap-2'
+                >
+                  <PlatformLogo platform={c.platform} size={11} className='shrink-0' />
+                  <span>{c.productName || c.sku}</span>
+                  <span className='text-[10px] text-[#8A8A8A]'>${c.currentDailySpend?.toFixed(0)}/d</span>
+                  <span className='text-[10px] font-mono text-white font-bold'>{c.roas}x</span>
+                </button>
+              ))}
+            </div>
           </div>
 
-          {/* Non-Disruptive Region Detail Drawer Panel */}
-          {selectedGlobeMarker && (
-            <div className='absolute top-0 right-0 z-50 w-full max-w-[340px] sm:max-w-[380px] shadow-2xl transition-all duration-200 animate-in fade-in-0 slide-in-from-right-4'>
-              <RegionDetailPanel
-                marker={selectedGlobeMarker}
-                isOpen={Boolean(selectedGlobeMarker)}
-                onClose={() => setSelectedGlobeMarker(null)}
-              />
+          {/* Right Column: Enlarged 3D Globe with Recent Purchases & Dynamic Connecting Lines */}
+          <div className='flex-1 w-full flex flex-col items-center justify-center relative min-h-[580px]'>
+            <div className='flex items-center justify-center relative transition-all duration-300 w-full'>
+              {consoleGlobeMode === 'arcs' ? (
+                <GithubGlobe
+                  size={580}
+                  activeSku='315122-001'
+                  activePlatform='meta'
+                  accentColor={[1, 1, 1]}
+                />
+              ) : (
+                <GlobePulse
+                  size={580}
+                  selectedRegionId={selectedGlobeMarker?.id}
+                  selectedMarkerId={selectedGlobeMarker?.id}
+                  onSelectRegion={setSelectedGlobeMarker}
+                  onSelectMarker={setSelectedGlobeMarker}
+                  renderDetailPanel={false}
+                  showRecentPurchases={true}
+                  maxOrders={4}
+                />
+              )}
             </div>
-          )}
+
+            <div className='text-[10px] font-mono text-[#8A8A8A] tracking-wider text-center mt-3'>
+              DRAG TO ROTATE 3D GLOBE • CLICK RECENT PURCHASES OR HEATMAP DOTS TO INSPECT TELEMETRY
+            </div>
+
+            {/* Regional Telemetry Detail Overlay Panel */}
+            {selectedGlobeMarker && (
+              <div className='absolute top-0 right-0 z-50 w-full max-w-[340px] sm:max-w-[380px] shadow-none transition-all duration-200 animate-in fade-in-0 slide-in-from-right-4'>
+                <RegionDetailPanel
+                  marker={selectedGlobeMarker}
+                  isOpen={Boolean(selectedGlobeMarker)}
+                  onClose={() => setSelectedGlobeMarker(null)}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* 5. Causal DAG Visualizer & RCA Waterfall Decomposition */}
-      <div className='grid grid-cols-1 2xl:grid-cols-2 gap-4 min-w-0 max-w-full'>
+      <div className='grid grid-cols-1 xl:grid-cols-2 gap-4 min-w-0 max-w-full'>
         <CausalDagVisualizer activeAnomaly={hasCriticalAnomaly} />
         <RcaWaterfallChart
           totalLoss={hasCriticalAnomaly ? 3008.25 : 0}
           items={hasCriticalAnomaly ? undefined : [
-            { driver: 'Baseline Equilibrium', category: 'Nominal Operations', dollarImpact: 0, percentageShare: 100, color: 'bg-emerald-500' }
+            { driver: 'Baseline Equilibrium', category: 'Nominal Operations', dollarImpact: 0, percentageShare: 100, color: 'bg-white' }
           ]}
         />
       </div>
-
-      {/* 6. Active Diagnostic Anomalies */}
-      <div className='space-y-3'>
-        <div className='flex items-center justify-between border-b border-border/70 pb-2.5'>
+      <div className='space-y-3.5'>
+        <div className='flex items-center justify-between border-b border-border pb-2.5'>
           <div className='flex items-center gap-2'>
             <Icons.warning className='size-3.5 text-foreground' />
             <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
@@ -413,9 +458,8 @@ export function MissionControlConsole() {
           </span>
         </div>
 
-        {/* 6-Card Quick Scan Grid */}
-        <div className='grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-3.5'>
-          {state.anomalies.slice(0, 6).map((anom: any) => (
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+          {state.anomalies.slice(0, 3).map((anom: any) => (
             <AnomalyCard
               key={anom.id}
               anomaly={anom}
@@ -448,29 +492,8 @@ export function MissionControlConsole() {
       {/* 7. Interactive What-If Scenario Sandbox */}
       <ScenarioSandbox
         onApplyReallocation={(alloc) => {
-          setState((prev: any) => ({
-            ...prev,
-            platforms: prev.platforms.map((p: any) => {
-              if (p.platform === 'meta') {
-                return { ...p, spend: alloc.meta * 30, revenue: alloc.metaRev * 30 };
-              }
-              if (p.platform === 'google') {
-                return { ...p, spend: alloc.google * 30, revenue: alloc.googleRev * 30 };
-              }
-              if (p.platform === 'amazon') {
-                return { ...p, spend: alloc.amazon * 30, revenue: alloc.amazonRev * 30 };
-              }
-              return p;
-            }),
-            telemetry: {
-              ...prev.telemetry,
-              totalManagedBudget: alloc.totalSpend * 30,
-              blendedRoas30d: +alloc.blendedRoas.toFixed(2),
-              projectedMarginUplift: Math.round(alloc.netContribution * 30)
-            }
-          }));
-          toast.success('What-If Scenario Vector Applied To Mission Control', {
-            description: `Meta: ₹${alloc.meta}/d | Google: ₹${alloc.google}/d | Amazon: ₹${alloc.amazon}/d. Blended ROAS: ${alloc.blendedRoas.toFixed(2)}x.`
+          toast.success('What-If Scenario Vector Applied', {
+            description: `Meta: $${alloc.meta}/d | Google: $${alloc.google}/d | Amazon: $${alloc.amazon}/d`
           });
         }}
       />
@@ -518,11 +541,11 @@ export function MissionControlConsole() {
         </div>
 
         {/* Gauges Grid */}
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-4 gap-4'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4'>
           {products
-            .filter((p: DerivedProduct) => (activeTab === 'all' ? true : p.channel.toLowerCase() === activeTab.toLowerCase()))
+            .filter((p) => (activeTab === 'all' ? true : p.channel.toLowerCase() === activeTab.toLowerCase()))
             .slice(0, 8)
-            .map((p: DerivedProduct) => (
+            .map((p) => (
               <RoasGauge
                 key={p.id}
                 productName={p.name}
@@ -543,14 +566,18 @@ export function MissionControlConsole() {
                 photoUrl={p.photoUrl}
                 compact
                 onFix={() => {
-                  setFixingActionId(`fix-${p.id}`);
-                  setFixingInitialState('review');
-                  setIsFixDrawerOpen(true);
+                  const plan = computeFixPlan(p, products);
+                  setFixingProduct(p);
+                  setFixingPlan(plan);
+                  setIsSummaryOnly(false);
+                  setIsFixModalOpen(true);
                 }}
                 onViewFix={() => {
-                  setFixingActionId(`fix-${p.id}`);
-                  setFixingInitialState('done');
-                  setIsFixDrawerOpen(true);
+                  const plan = p.appliedPlan || computeFixPlan(p, products);
+                  setFixingProduct(p);
+                  setFixingPlan(plan);
+                  setIsSummaryOnly(true);
+                  setIsFixModalOpen(true);
                 }}
                 onAnalyze={() => {
                   setAnalyzingProduct({
@@ -577,7 +604,7 @@ export function MissionControlConsole() {
       {/* 11. Closed-Loop Decision Ledger & Audit Trail */}
       <DecisionLedgerTable entries={ledger} />
 
-      {/* Product Analysis Modal */}
+      {/* 9. Analysing Phase Modal featuring 3D GitHub Globe */}
       <ProductAnalysisModal
         product={analyzingProduct}
         isOpen={!!analyzingProduct}
@@ -587,12 +614,18 @@ export function MissionControlConsole() {
         }}
       />
 
-      {/* Action Drawer for Overview Gauges */}
-      <ActionDrawer
-        actionId={fixingActionId}
-        isOpen={isFixDrawerOpen}
-        initialState={fixingInitialState}
-        onClose={() => setIsFixDrawerOpen(false)}
+      {/* Fix Protocol Modal for Overview Gauges */}
+      <FixProtocolModal
+        product={fixingProduct}
+        plan={fixingPlan}
+        isOpen={isFixModalOpen}
+        isSummaryOnly={isSummaryOnly}
+        onClose={() => setIsFixModalOpen(false)}
+        onExecute={(plan) => {
+          if (fixingProduct) {
+            executeFix(fixingProduct.id, plan);
+          }
+        }}
       />
     </div>
   );

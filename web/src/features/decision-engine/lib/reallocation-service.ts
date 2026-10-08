@@ -102,41 +102,10 @@ class ReallocationEngineService {
     if (anomaly.isReallocated) {
       // Find existing ledger entry or reallocation item if available
       const existingLedger = this.state.ledger.find((l) => l.id === anomaly.reallocationId);
-      
-      // Locate source & target campaigns to reconstruct receipt details
-      const sourceCamp = this.state.campaigns.find(
-        (c) => c.campaign === anomaly.campaign || (c.sku && c.sku === anomaly.sku && c.platform === anomaly.platform)
-      );
-      const existingRealloc = this.state.reallocations.find(
-        (r) => r.sourceCampaign === anomaly.campaign
-      );
-      const targetCamp = existingRealloc
-        ? this.state.campaigns.find((c) => c.campaign === existingRealloc.targetCampaign)
-        : this.state.campaigns.find((c) => c.campaign !== anomaly.campaign && (c.inventory ?? 0) > 50);
-
-      let details: ReallocationExecutionDetails | undefined;
-      if (existingRealloc) {
-        details = buildReallocationExecutionDetails(
-          existingRealloc,
-          this.state.campaigns,
-          anomaly.reallocationId || existingLedger?.id || `ledg-archived-${anomaly.id}`,
-          {
-            id: anomaly.id,
-            campaign: anomaly.campaign,
-            productName: anomaly.productName || sourceCamp?.productName,
-            severity: anomaly.severity,
-            zScore: anomaly.zScore,
-            rootCause: 'Reallocated Anomaly',
-            explanation: anomaly.explanation
-          }
-        );
-      }
-
       return {
         success: false,
         code: 'ALREADY_REALLOCATED',
-        message: `Anomaly on ${anomaly.campaign} has already been reallocated (${existingLedger?.timestamp || anomaly.reallocatedAt || 'completed'}). Decision ID: ${anomaly.reallocationId || 'ledg-archived'}`,
-        details
+        message: `Anomaly on ${anomaly.campaign} has already been reallocated (${existingLedger?.timestamp || anomaly.reallocatedAt || 'completed'}). Decision ID: ${anomaly.reallocationId || 'ledg-archived'}`
       };
     }
 
@@ -150,7 +119,7 @@ class ReallocationEngineService {
       return {
         success: false,
         code: 'INSUFFICIENT_BUDGET',
-        message: `Source campaign '${anomaly.campaign}' has zero or insufficient daily budget (₹0/day). No capital is available to reallocate.`
+        message: `Source campaign '${anomaly.campaign}' has zero or insufficient daily budget ($0/day). No capital is available to reallocate.`
       };
     }
 
@@ -202,7 +171,7 @@ class ReallocationEngineService {
     } else if (anomaly.severity === 'CRITICAL') {
       deltaSpend = Math.round(sourceSpend * 0.45);
       actionType = 'TRIM_BUDGET';
-      reason = `Critical ROAS Degradation: Channel efficiency deteriorated (|Z| = ${Math.abs(anomaly.zScore)}). Redirecting ₹${deltaSpend}/day to superior marginal response curve on ${targetCamp.productName}.`;
+      reason = `Critical ROAS Degradation: Channel efficiency deteriorated (|Z| = ${Math.abs(anomaly.zScore)}). Redirecting $${deltaSpend}/day to superior marginal response curve on ${targetCamp.productName}.`;
     } else {
       deltaSpend = Math.round(sourceSpend * 0.35);
       actionType = 'TRIM_BUDGET';
@@ -232,7 +201,7 @@ class ReallocationEngineService {
       reason,
       status: 'READY_FOR_EXECUTION',
       stockoutKill: isStockout
-    } as unknown as ReallocationItem;
+    };
 
     const details = buildReallocationExecutionDetails(
       reallocItem,
@@ -291,7 +260,7 @@ class ReallocationEngineService {
       return {
         success: false,
         code: 'INSUFFICIENT_BUDGET',
-        message: `Source campaign '${sourceCampName}' has insufficient spend (₹${sourceCamp.currentDailySpend}/day) to transfer ₹${delta}/day.`
+        message: `Source campaign '${sourceCampName}' has insufficient spend ($${sourceCamp.currentDailySpend}/day) to transfer $${delta}/day.`
       };
     }
 
@@ -315,7 +284,7 @@ class ReallocationEngineService {
     const ledgerEntry: LedgerItem = {
       id: ledgerId,
       timestamp,
-      decision: `Shift ₹${Math.round(delta).toLocaleString('en-IN')}/day from ${sourceCamp.campaign} (${details.anomaly?.rootCause ? details.anomaly.rootCause.split(':')[0] : 'Anomaly'}) -> ${targetCamp.campaign} (${targetCamp.productName})`,
+      decision: `Shift $${Math.round(delta).toLocaleString('en-US')}/day from ${sourceCamp.campaign} (${details.anomaly?.rootCause ? details.anomaly.rootCause.split(':')[0] : 'Anomaly'}) -> ${targetCamp.campaign} (${targetCamp.productName})`,
       expectedMargin: Math.round(details.expectedDailyLift),
       realizedMargin: Math.round(details.expectedDailyLift * 0.96),
       variancePct: -4.0,

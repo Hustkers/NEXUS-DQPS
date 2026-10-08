@@ -11,68 +11,8 @@
 @custom-variant data-horizontal (&[data-orientation='horizontal']);
 @custom-variant data-vertical (&[data-orientation='vertical']);
 
-/* ==========================================================================
-   Ranade Fontshare Typography System
-   Clean, modern, humanist/geometric sans-serif for NEXUS-D2C
-   ========================================================================== */
-
-@font-face {
-  font-family: 'Ranade';
-  src: url('/fonts/ranade/Ranade-Variable.woff2') format('woff2-variations'),
-       url('/fonts/ranade/Ranade-Variable.woff2') format('woff2'),
-       url('https://cdn.fontshare.com/wf/4I3GQ5RKI7INEN77JLE5K6MUGH3Q6XBQ/OE2GKODT24OQXFQ3ANDXIPBDXBQU4CTJ/4ISE7PRDMUTRGIOEEJAQ6FWTTIGY35CA.woff2') format('woff2');
-  font-weight: 100 900;
-  font-display: swap;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Ranade';
-  src: url('/fonts/ranade/Ranade-VariableItalic.woff2') format('woff2-variations'),
-       url('/fonts/ranade/Ranade-VariableItalic.woff2') format('woff2'),
-       url('https://cdn.fontshare.com/wf/QN7LKEQOYA5STN563TMUFXBD3K5JFPXM/4SSBT3UGWZ5VT2MUMU4AMQRL4F67YPTW/TATVWUXMC5VRJJCIQ6G5V5QV74Y64R6O.woff2') format('woff2');
-  font-weight: 100 900;
-  font-display: swap;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: 'Ranade';
-  src: url('/fonts/ranade/Ranade-Light.woff2') format('woff2'),
-       url('https://cdn.fontshare.com/wf/L5FIDTVUREF47ZIMK4SAWFIM3RQHGDRR/DDQOLYOU6G7WW4V2YVREV3FNKPCID7UW/L5RECMN3L4DWXPPVTDJQP3FAU32IQIX5.woff2') format('woff2');
-  font-weight: 300;
-  font-display: swap;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Ranade';
-  src: url('/fonts/ranade/Ranade-Regular.woff2') format('woff2'),
-       url('https://cdn.fontshare.com/wf/VTABUNXESC35DOCRFNLIWPSTHJEOCY4Q/GIHU5SZ7WYPXDURVYYYDCWYCQVT4M3H6/RXZ46KOEDGXL7HVIXMJIAZICDYUR5QZJ.woff2') format('woff2');
-  font-weight: 400;
-  font-display: swap;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Ranade';
-  src: url('/fonts/ranade/Ranade-Medium.woff2') format('woff2'),
-       url('https://cdn.fontshare.com/wf/L2AEEUUCQUY3W76W527KO7I3IN7WDYKB/BLGYO6PMF754OJLYL5JD33PPYVDHNGZ5/7BXN3ORLQXOR6A3D5ZRM4EDMGISGKSZ2.woff2') format('woff2');
-  font-weight: 500;
-  font-display: swap;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Ranade';
-  src: url('/fonts/ranade/Ranade-Bold.woff2') format('woff2'),
-       url('https://cdn.fontshare.com/wf/ITSXUDO4IWX6YYU2XBSXOPG7LUR2PVYM/3EDCKJF5I5VL64ADFO7DBMCCYZ2CJC27/SK34EB5SQXXEEW5G524TDELGL3JO5HHF.woff2') format('woff2');
-  font-weight: 700;
-  font-display: swap;
-  font-style: normal;
-}
-
 @theme inline {
+<<<<<<< HEAD
   --font-ranade: 'Ranade', ranade, var(--font-ranade, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
   --font-sans: 'Ranade', ranade, var(--font-ranade, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
   --font-orbitron: 'Ranade', ranade, var(--font-ranade, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
@@ -94,13 +34,23 @@
 
 @utility font-clash-display {
   font-family: 'Ranade', ranade, var(--font-ranade), sans-serif;
+=======
+  --font-orbitron: var(--font-orbitron, 'Orbitron', sans-serif);
+}
+
+@utility font-orbitron {
+  font-family: var(--font-orbitron, 'Orbitron', sans-serif);
+>>>>>>> origin/main
 }
 
 @import './theme.css';
 @import './animated-footer.css';
 
 /* ==========================================================================
-   Clean, intuitive typography across NEXUS-D2C
+   Vengence UI Typography Integration for NEXUS-D2C Dashboard
+   Signature high-tech Orbitron display styling across the entire dashboard shell,
+   views, cards, navigation, and Radix portals while preserving pure monospace
+   for raw code blocks and telemetry data tables.
    ========================================================================== */
 
 :root {
@@ -137,29 +87,26 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Badges, pill tags, and uppercase labels */
-.vengence-dashboard :where([data-slot="badge"], .badge),
-body.vengence-dashboard-active :where([data-slot="badge"], .badge) {
-  font-family: 'Ranade', sans-serif;
+:where([data-slot="badge"], .badge) {
+  font-family: 'Ranade', ranade, var(--font-ranade), sans-serif;
   letter-spacing: 0.01em;
 }
 
 /* Buttons, tabs, and menu triggers */
-.vengence-dashboard :where(button, [role="tab"], [role="menuitem"], [data-slot="sidebar-menu-button"]),
-body.vengence-dashboard-active :where(button, [role="tab"], [role="menuitem"], [data-slot="sidebar-menu-button"]) {
-  font-family: 'Ranade', sans-serif;
+:where(button, [role="tab"], [role="menuitem"], [data-slot="sidebar-menu-button"]) {
+  font-family: 'Ranade', ranade, var(--font-ranade), sans-serif;
 }
 
 /* Table cells, metrics, KPI counters */
-.vengence-dashboard :where(td, th, [data-metric], .tabular-nums),
-body.vengence-dashboard-active :where(td, th, [data-metric], .tabular-nums) {
-  font-family: 'Ranade', sans-serif;
+:where(td, th, [data-metric], .tabular-nums) {
+  font-family: 'Ranade', ranade, var(--font-ranade), sans-serif;
 }
 
 /* KBar command search palette */
-body.vengence-dashboard-active [data-kbar-animator],
-body.vengence-dashboard-active .kbar-positioner,
-body.vengence-dashboard-active [role="combobox"] {
-  font-family: 'Ranade', sans-serif;
+[data-kbar-animator],
+.kbar-positioner,
+[role="combobox"] {
+  font-family: 'Ranade', ranade, var(--font-ranade), sans-serif;
 }
 
 /* Strict monospace protection for raw code blocks, SQL logs, json payload, kbd */

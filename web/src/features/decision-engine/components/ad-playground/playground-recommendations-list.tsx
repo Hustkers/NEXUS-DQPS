@@ -24,11 +24,12 @@ export function PlaygroundRecommendationsList({
   candidates,
   onInspectConfig
 }: PlaygroundRecommendationsListProps) {
-  const platformMeta = {
+  const platformMeta: Record<string, { name: string; color: string; bg: string }> = {
     meta: { name: 'Meta Ads', color: '#3b82f6', bg: 'bg-blue-500/10 text-blue-500 border-blue-500/30' },
     google: { name: 'Google Ads', color: '#10b981', bg: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30' },
     amazon: { name: 'Amazon Ads', color: '#f59e0b', bg: 'bg-amber-500/10 text-amber-500 border-amber-500/30' },
-    tiktok: { name: 'TikTok Shop', color: '#ec4899', bg: 'bg-pink-500/10 text-pink-500 border-pink-500/30' }
+    tiktok: { name: 'TikTok Shop', color: '#ec4899', bg: 'bg-pink-500/10 text-pink-500 border-pink-500/30' },
+    shopify: { name: 'Shopify D2C', color: '#10b981', bg: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30' }
   };
 
   return (

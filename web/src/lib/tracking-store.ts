@@ -349,7 +349,7 @@ class TrackingStore {
           session_id: event.session_id,
           product_id: event.product_id || null,
           amount: orderAmount,
-          currency: 'USD',
+          currency: 'INR',
           status: 'completed',
           created_at: now
         };

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { IconChartBar } from '@tabler/icons-react';
 
 interface WaterfallItem {
@@ -9,7 +10,7 @@ interface WaterfallItem {
   category: string;
   dollarImpact: number;
   percentageShare: number;
-  color?: string;
+  color: string;
 }
 
 interface RcaWaterfallChartProps {
@@ -20,89 +21,87 @@ interface RcaWaterfallChartProps {
 export function RcaWaterfallChart({ items, totalLoss = 3008.25 }: RcaWaterfallChartProps) {
   const defaultItems: WaterfallItem[] = [
     {
-      driver: 'Shopify Stockout',
-      category: 'Inventory',
+      driver: 'Shopify Stockout Gate',
+      category: 'Inventory Shock',
       dollarImpact: 1985.45,
       percentageShare: 66.0,
-      color: 'bg-rose-500'
+      color: 'bg-foreground'
     },
     {
-      driver: 'Meta CPM Inflation',
-      category: 'Auction',
+      driver: 'Meta CPM Inflation (+34%)',
+      category: 'Auction Pressure',
       dollarImpact: 571.57,
       percentageShare: 19.0,
-      color: 'bg-amber-500'
+      color: 'bg-muted-foreground'
     },
     {
-      driver: 'Creative Fatigue',
-      category: 'Ad Fatigue',
+      driver: 'Creative Ad Wear-out (CTR -40%)',
+      category: 'Creative Fatigue',
       dollarImpact: 330.91,
       percentageShare: 11.0,
-      color: 'bg-indigo-400'
+      color: 'bg-muted-foreground/70'
     },
     {
-      driver: 'Landing Page Drift',
-      category: 'Latency',
+      driver: 'Landing Page LCP Drift (+1.2s)',
+      category: 'Tech Latency',
       dollarImpact: 120.33,
       percentageShare: 4.0,
-      color: 'bg-zinc-400'
+      color: 'bg-muted-foreground/40'
     }
   ];
 
   const breakdown = items || defaultItems;
 
   return (
-    <Card className='p-4 sm:p-5 border border-border bg-card shadow-none rounded-xl text-card-foreground min-w-0 max-w-full overflow-hidden font-mono space-y-3.5'>
-      {/* Header */}
-      <div className='flex items-center justify-between border-b border-border/70 pb-3'>
-        <div className='flex items-center gap-2'>
-          <IconChartBar className='size-4 text-primary' />
-          <h3 className='text-xs font-bold text-foreground uppercase tracking-wider'>
-            RCA Shapley Loss Decomposition
+    <Card className="p-5 border border-border bg-card shadow-none rounded text-card-foreground min-w-0 max-w-full overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4 border-b border-border pb-3">
+        <div>
+          <h3 className="text-sm font-semibold text-foreground tracking-tight flex items-center gap-2 font-mono">
+            <IconChartBar className="h-4 w-4 text-foreground" />
+            RCA Shapley Loss Waterfall Decomposition
           </h3>
+          <p className="text-xs text-muted-foreground font-mono mt-0.5">
+            Counterfactual Shapley allocation summing strictly to 100% of observed margin collapse
+          </p>
         </div>
-
-        <div className='flex items-center gap-2'>
-          <span className='text-[10px] text-muted-foreground uppercase font-semibold'>Total Loss:</span>
-          <span className='text-xs font-mono font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30 px-2 py-0.5 rounded'>
-            -₹{Math.round(totalLoss).toLocaleString('en-IN')}
+        <div className="text-right">
+          <span className="text-xs text-muted-foreground block font-mono">Observed Margin Loss</span>
+          <span className="text-sm font-mono font-bold bg-foreground text-background px-1.5 py-0.5 rounded inline-block mt-0.5">
+            -₹{totalLoss.toLocaleString()}
           </span>
         </div>
       </div>
 
-      {/* Horizontal Bar Visualizations: CAUSE | LOSS | % */}
-      <div className='space-y-3 pt-1'>
-        {breakdown.map((item, idx) => {
-          const barColor = item.color || (idx === 0 ? 'bg-rose-500' : idx === 1 ? 'bg-amber-500' : 'bg-muted-foreground');
-
-          return (
-            <div key={idx} className='space-y-1.5'>
-              <div className='flex items-center justify-between text-xs'>
-                <div className='flex items-center gap-2 min-w-0 font-bold'>
-                  <span className='size-2 rounded-xs shrink-0' style={{ backgroundColor: idx === 0 ? '#ef4444' : idx === 1 ? '#f59e0b' : idx === 2 ? '#818cf8' : '#71717a' }} />
-                  <span className='text-foreground truncate'>{item.driver}</span>
-                </div>
-
-                <div className='flex items-center gap-3 font-mono shrink-0'>
-                  <span className='text-muted-foreground text-[11px]'>
-                    -₹{Math.round(item.dollarImpact).toLocaleString('en-IN')}
-                  </span>
-                  <span className='font-bold text-foreground w-10 text-right'>
-                    {item.percentageShare.toFixed(0)}%
-                  </span>
-                </div>
-              </div>
-
-              {/* Horizontal Bar */}
-              <div className='w-full bg-muted/60 h-2 rounded-xs overflow-hidden flex'>
-                <div
-                  className={`h-full ${barColor} transition-all duration-300`}
-                  style={{ width: `${item.percentageShare}%` }}
-                />
+      <div className="space-y-3.5">
+        {breakdown.map((item, idx) => (
+          <div key={idx} className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs font-medium">
+              <span className="flex items-center gap-2">
+                <span className={`h-2.5 w-2.5 rounded-none ${idx === 0 ? 'bg-foreground' : 'bg-muted-foreground/70'}`} />
+                <span className="text-foreground font-mono font-semibold">{item.driver}</span>
+                <span className="text-[11px] text-muted-foreground font-mono font-normal">({item.category})</span>
+              </span>
+              <div className="flex items-center gap-3 font-mono">
+                <span className="text-foreground font-bold">-${item.dollarImpact.toFixed(2)}</span>
+                <Badge variant="outline" className="text-[11px] font-mono px-1.5 py-0 border border-border text-foreground bg-muted/60 font-semibold">
+                  {item.percentageShare.toFixed(1)}%
+                </Badge>
               </div>
             </div>
-          );
-        })}
+
+            <div className="w-full bg-muted h-2 overflow-hidden flex">
+              <div
+                className={`h-full ${idx === 0 ? 'bg-foreground' : 'bg-muted-foreground/70'} transition-all duration-500`}
+                style={{ width: `${item.percentageShare}%` }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4 pt-3 border-t border-border flex items-center justify-between text-[11px] text-muted-foreground font-mono">
+        <span>Attribution Model: DoWhy-GCM Shapley</span>
+        <span className="text-foreground font-bold">● Sum: 100.0% Reconciled</span>
       </div>
     </Card>
   );

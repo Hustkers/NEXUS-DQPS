@@ -46,7 +46,7 @@ export interface CampaignLearningProfile {
   expectedRevenue: number;
   expectedProfit: number;
   expectedProfitRoas: number;
-  marginalProfitRoas: number; // dProfit / dSpend for the next ₹1,000
+  marginalProfitRoas: number; // dProfit / dSpend for incremental $1,000 spend
   trendPct: number;
   confidenceScore: number; // 0.0 to 1.0
   historicalEfficiencyIndex: number;
@@ -54,7 +54,7 @@ export interface CampaignLearningProfile {
 }
 
 export interface WhatIfScenarioInputs {
-  totalBudget: number; // Default: 1000000 (₹10,00,000)
+  totalBudget: number; // Total portfolio spend in USD (e.g. $145,000)
   cpcShiftPct: number; // -40 to +80%
   cvrShiftPct: number; // -50 to +50%
   aovShiftPct: number; // -30 to +30%

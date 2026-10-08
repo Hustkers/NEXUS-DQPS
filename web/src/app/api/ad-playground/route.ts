@@ -22,9 +22,9 @@ export async function GET(request: NextRequest) {
     const target_roas_floor = searchParams.get('target_roas_floor') ? Number(searchParams.get('target_roas_floor')) : 1.8;
     const stratParam = searchParams.get('strategy_focus');
     const strategy_focus = (stratParam === 'BALANCED' || stratParam === 'SCALE_VOLUME') ? stratParam : 'MAX_PROFIT';
-    const audience = searchParams.get('audience') as AdPlaygroundConstraints['audience'];
-    const creative = searchParams.get('creative') as AdPlaygroundConstraints['creative'];
-    const placement = searchParams.get('placement') as AdPlaygroundConstraints['placement'];
+    const audience = searchParams.get('audience') as any;
+    const creative = searchParams.get('creative') as any;
+    const placement = searchParams.get('placement') as any;
 
     const result = computePlaygroundRecommendations({
       sku,
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
           creative: body.creative,
           placement: body.placement
         }),
-        signal: AbortSignal.timeout(300)
+        signal: AbortSignal.timeout(1500)
       });
 
       if (pyRes.ok) {
@@ -82,15 +82,11 @@ export async function POST(request: NextRequest) {
 
     const result = computePlaygroundRecommendations({
       sku: body.sku || '310805-137',
-      daily_budget: body.daily_budget ? Number(body.daily_budget) : undefined,
-      total_budget: body.total_budget ? Number(body.total_budget) : 14000,
-      duration_days: Number(body.duration_days) || 7,
+      total_budget: Number(body.total_budget) || 5000,
+      duration_days: Number(body.duration_days) || 14,
       target_roas_floor: Number(body.target_roas_floor) || 1.8,
       platforms: body.platforms,
-      strategy_focus: body.strategy_focus || 'MAX_PROFIT',
-      audience: body.audience,
-      creative: body.creative,
-      placement: body.placement
+      strategy_focus: body.strategy_focus || 'MAX_PROFIT'
     });
 
     return NextResponse.json(result);

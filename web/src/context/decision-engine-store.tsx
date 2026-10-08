@@ -1,29 +1,19 @@
 'use client';
 
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useMemo,
-  useCallback,
-  useRef,
-} from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import {
   INITIAL_PRODUCTS,
   INITIAL_LEDGER,
   deriveProduct,
   generateReallocations,
-  buildPlan as buildPlanEngine,
-  executeAction as executeActionEngine,
+  applyFixPlan,
+  applyReallocation,
   type ProductModel,
   type DerivedProduct,
+  type FixPlanSummary,
   type ReallocationItem,
   type GaugesLedgerItem,
-  type ActionPlan,
-  type FixPlanSummary,
 } from '@/lib/gauges-engine';
-import { toast } from 'sonner';
 
 export interface DecisionEngineStoreState {
   products: DerivedProduct[];
@@ -36,17 +26,11 @@ export interface DecisionEngineStoreState {
     openIssuesCount: number;
     spendAtRisk: number;
   };
-  buildPlan: (actionId: string) => ActionPlan;
-  executeAction: (
-    actionId: string,
-    options?: { isAuto?: boolean }
-  ) => Promise<{ success: boolean; plan: ActionPlan; ledgerEntry: GaugesLedgerItem }>;
+  executeFix: (productId: string, plan: FixPlanSummary) => void;
+  executeReallocation: (reallocation: ReallocationItem, isAuto?: boolean) => void;
   executeAllReallocations: () => Promise<{ count: number; totalMoved: number; totalLift: number }>;
   toggleAutoPilot: (enabled: boolean) => void;
   resetToDefaults: () => void;
-  // Compatibility methods
-  executeFix: (productId: string, plan?: FixPlanSummary) => Promise<{ success: boolean }>;
-  executeReallocation: (reallocation: ReallocationItem, isAuto?: boolean) => Promise<{ success: boolean }>;
 }
 
 const LOCAL_STORAGE_KEY_PRODUCTS = 'nexus_shared_products_v4';
@@ -60,10 +44,6 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
   const [ledger, setLedger] = useState<GaugesLedgerItem[]>(INITIAL_LEDGER);
   const [autoPilot, setAutoPilotState] = useState<boolean>(false);
   const [isHydrated, setIsHydrated] = useState<boolean>(false);
-  const [executedActionIds, setExecutedActionIds] = useState<Set<string>>(new Set());
-
-  // Concurrency guard ref to prevent synchronous double-clicks
-  const inFlightActionsRef = useRef<Set<string>>(new Set());
 
   // Hydrate from localStorage on client mount
   useEffect(() => {
@@ -110,7 +90,7 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
     }
   }, [rawProducts, ledger, autoPilot, isHydrated]);
 
-  // Cross-tab synchronization
+  // Listen for storage events across tabs
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === LOCAL_STORAGE_KEY_PRODUCTS && e.newValue) {
@@ -131,17 +111,17 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // Compute derived products dynamically from single source of truth
+  // Compute derived products dynamically
   const products = useMemo(() => {
     return rawProducts.map((p) => deriveProduct(p));
   }, [rawProducts]);
 
-  // Compute live reallocations stream dynamically from derived products
+  // Compute live reallocations feed dynamically from real product state
   const reallocations = useMemo(() => {
     return generateReallocations(products);
   }, [products]);
 
-  // Top dynamic KPIs computed from current state
+  // Top dynamic KPIs
   const topKpis = useMemo(() => {
     let totalSpend = 0;
     let totalRev = 0;
@@ -168,54 +148,25 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
     };
   }, [products]);
 
-  // PURE FUNCTION 1: buildPlan (looks up from current state)
-  const buildPlan = useCallback(
-    (actionId: string): ActionPlan => {
-      return buildPlanEngine({ products }, actionId);
-    },
-    [products]
-  );
+  // Action: Execute Fix from card
+  const executeFix = useCallback((productId: string, plan: FixPlanSummary) => {
+    setRawProducts((prev) => {
+      const { updatedProducts, newLedgerEntry } = applyFixPlan(prev, productId, plan);
+      setLedger((currLedger) => [newLedgerEntry, ...currLedger]);
+      return updatedProducts;
+    });
+  }, []);
 
-  // PURE FUNCTION 2: executeAction (validates, applies deltas, writes ledger row)
-  const executeAction = useCallback(
-    async (
-      actionId: string,
-      options?: { isAuto?: boolean }
-    ): Promise<{ success: boolean; plan: ActionPlan; ledgerEntry: GaugesLedgerItem }> => {
-      // Idempotency: Reject duplicate executions immediately
-      if (inFlightActionsRef.current.has(actionId) || executedActionIds.has(actionId)) {
-        throw new Error(`Action "${actionId}" is already executed or in progress.`);
-      }
+  // Action: Execute single Reallocation from stream
+  const executeReallocation = useCallback((item: ReallocationItem, isAuto = false) => {
+    setRawProducts((prev) => {
+      const { updatedProducts, newLedgerEntry } = applyReallocation(prev, item, isAuto);
+      setLedger((currLedger) => [newLedgerEntry, ...currLedger]);
+      return updatedProducts;
+    });
+  }, []);
 
-      inFlightActionsRef.current.add(actionId);
-
-      try {
-        // Execute pure state transition
-        const { updatedProducts, newLedgerEntry, plan } = executeActionEngine(
-          rawProducts,
-          actionId,
-          {
-            isAuto: options?.isAuto,
-            alreadyExecutedIds: executedActionIds,
-          }
-        );
-
-        // Apply changes atomically to the store
-        setRawProducts(updatedProducts);
-        setLedger((currLedger) => [newLedgerEntry, ...currLedger]);
-        setExecutedActionIds((prev) => new Set([...prev, actionId]));
-
-        return { success: true, plan, ledgerEntry: newLedgerEntry };
-      } catch (err) {
-        inFlightActionsRef.current.delete(actionId);
-        // Leave store completely unchanged
-        throw err;
-      }
-    },
-    [rawProducts, executedActionIds]
-  );
-
-  // Execute All: runs recommendations sequentially via executeActionEngine
+  // Action: Execute All pending Reallocations
   const executeAllReallocations = useCallback(async () => {
     let currentCatalog = [...rawProducts];
     const newEntries: GaugesLedgerItem[] = [];
@@ -223,48 +174,35 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
     let totalMoved = 0;
     let totalLift = 0;
 
+    // Continuously generate and apply until no more pending reallocations exist
     while (true) {
       const currentDerived = currentCatalog.map((p) => deriveProduct(p));
       const currentList = generateReallocations(currentDerived);
       if (currentList.length === 0) break;
 
       const item = currentList[0];
-      try {
-        const { updatedProducts, newLedgerEntry, plan } = executeActionEngine(
-          currentCatalog,
-          item.id,
-          { isAuto: false, alreadyExecutedIds: inFlightActionsRef.current }
-        );
-
-        currentCatalog = updatedProducts;
-        newEntries.unshift(newLedgerEntry);
-        inFlightActionsRef.current.add(item.id);
-        count += 1;
-        totalMoved += plan.movedAmount;
-        totalLift += plan.netRevenueLift;
-      } catch {
-        break;
-      }
+      const { updatedProducts, newLedgerEntry } = applyReallocation(currentCatalog, item, false);
+      currentCatalog = updatedProducts;
+      newEntries.unshift(newLedgerEntry);
+      count += 1;
+      totalMoved += item.movedAmount;
+      totalLift += item.netRevenueLift;
     }
 
-    if (count > 0) {
-      setRawProducts(currentCatalog);
-      setLedger((currLedger) => [...newEntries, ...currLedger]);
-      setExecutedActionIds((prev) => new Set([...prev, ...newEntries.map((e) => e.id)]));
-    }
-
+    setRawProducts(currentCatalog);
+    setLedger((currLedger) => [...newEntries, ...currLedger]);
     return { count, totalMoved, totalLift };
   }, [rawProducts]);
 
-  // Toggle Auto-Pilot: when on, executes confidence >= 80% through the same engine
-  const toggleAutoPilot = useCallback(
-    (enabled: boolean) => {
-      setAutoPilotState(enabled);
+  // Action: Toggle Auto-Pilot
+  const toggleAutoPilot = useCallback((enabled: boolean) => {
+    setAutoPilotState(enabled);
 
-      if (enabled) {
-        let currentCatalog = [...rawProducts];
+    // If enabled, immediately execute all recommendations with confidence >= 80%
+    if (enabled) {
+      setRawProducts((prev) => {
+        let currentCatalog = [...prev];
         const newEntries: GaugesLedgerItem[] = [];
-        let count = 0;
 
         while (true) {
           const currentDerived = currentCatalog.map((p) => deriveProduct(p));
@@ -273,63 +211,30 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
           if (autoCandidates.length === 0) break;
 
           const item = autoCandidates[0];
-          try {
-            const { updatedProducts, newLedgerEntry } = executeActionEngine(
-              currentCatalog,
-              item.id,
-              { isAuto: true, alreadyExecutedIds: inFlightActionsRef.current }
-            );
-
-            currentCatalog = updatedProducts;
-            newEntries.unshift(newLedgerEntry);
-            inFlightActionsRef.current.add(item.id);
-            count += 1;
-          } catch {
-            break;
-          }
+          const { updatedProducts, newLedgerEntry } = applyReallocation(currentCatalog, item, true);
+          currentCatalog = updatedProducts;
+          newEntries.unshift(newLedgerEntry);
         }
 
-        if (count > 0) {
-          setRawProducts(currentCatalog);
+        if (newEntries.length > 0) {
           setLedger((currLedger) => [...newEntries, ...currLedger]);
-          setExecutedActionIds((prev) => new Set([...prev, ...newEntries.map((e) => e.id)]));
-          toast.success(`Auto-Pilot moved ${count} budget${count > 1 ? 's' : ''}`);
         }
-      }
-    },
-    [rawProducts]
-  );
+        return currentCatalog;
+      });
+    }
+  }, []);
 
-  // Reset to default seed state
+  // Action: Reset to defaults
   const resetToDefaults = useCallback(() => {
     setRawProducts(INITIAL_PRODUCTS);
     setLedger(INITIAL_LEDGER);
     setAutoPilotState(false);
-    inFlightActionsRef.current.clear();
-    setExecutedActionIds(new Set());
     try {
       localStorage.removeItem(LOCAL_STORAGE_KEY_PRODUCTS);
       localStorage.removeItem(LOCAL_STORAGE_KEY_LEDGER);
       localStorage.removeItem(LOCAL_STORAGE_KEY_AUTOPILOT);
     } catch {}
   }, []);
-
-  // Backward compatibility handlers
-  const executeFix = useCallback(
-    async (productId: string) => {
-      const res = await executeAction(`fix-${productId}`);
-      return { success: res.success };
-    },
-    [executeAction]
-  );
-
-  const executeReallocation = useCallback(
-    async (item: ReallocationItem, isAuto = false) => {
-      const res = await executeAction(item.id, { isAuto });
-      return { success: res.success };
-    },
-    [executeAction]
-  );
 
   const value = useMemo(
     () => ({
@@ -338,13 +243,11 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
       reallocations,
       autoPilot,
       topKpis,
-      buildPlan,
-      executeAction,
+      executeFix,
+      executeReallocation,
       executeAllReallocations,
       toggleAutoPilot,
       resetToDefaults,
-      executeFix,
-      executeReallocation,
     }),
     [
       products,
@@ -352,13 +255,11 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
       reallocations,
       autoPilot,
       topKpis,
-      buildPlan,
-      executeAction,
+      executeFix,
+      executeReallocation,
       executeAllReallocations,
       toggleAutoPilot,
       resetToDefaults,
-      executeFix,
-      executeReallocation,
     ]
   );
 
@@ -370,9 +271,9 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
 }
 
 export function useDecisionEngine(): DecisionEngineStoreState {
-  const context = useContext(DecisionEngineContext);
-  if (!context) {
+  const ctx = useContext(DecisionEngineContext);
+  if (!ctx) {
     throw new Error('useDecisionEngine must be used within a DecisionEngineProvider');
   }
-  return context;
+  return ctx;
 }

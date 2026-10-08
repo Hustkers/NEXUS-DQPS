@@ -41,18 +41,17 @@ export function evaluateStrategy(
   let baseCtr = archMatch.baseCtr * platformCtrMult;
 
   // 2. Base CPC calibration
-  const isINR = config.totalBudget > 20000;
-  const baseUnitCpc = isINR ? 18.50 : 1.20;
+  const baseUnitCpc = 1.95;
 
   let platformCpcMult = 1.0;
   if (platform === 'google') {
-    platformCpcMult = strategy.adFormat.toLowerCase().includes('search') ? 1.30 : 0.90;
+    platformCpcMult = strategy.adFormat.toLowerCase().includes('search') ? 1.25 : 0.90;
   } else if (platform === 'meta') {
     platformCpcMult = 0.95;
   } else if (platform === 'amazon') {
-    platformCpcMult = 1.45;
+    platformCpcMult = 1.25;
   } else if (platform === 'tiktok') {
-    platformCpcMult = 0.60;
+    platformCpcMult = 0.85;
   }
   let baseCpc = baseUnitCpc * archMatch.baseCpcRatio * platformCpcMult;
 
@@ -96,10 +95,8 @@ export function evaluateStrategy(
   let aov: number;
   if (config.productPrice && config.productPrice > 0) {
     aov = config.productPrice;
-  } else if (isINR) {
-    aov = 4250.0;
   } else {
-    aov = 135.0;
+    aov = 168.61; // Canonical baseline MSRP from DATASET.md (Nike Air Max 270 / React Infinity)
   }
 
   // 6. Projections
@@ -113,22 +110,6 @@ export function evaluateStrategy(
   const expectedCpa = Math.round((allocatedBudget / expectedConversions) * 100) / 100;
   const expectedRevenue = Math.round(expectedConversions * aov * 100) / 100;
   const expectedRoas = Math.round((expectedRevenue / allocatedBudget) * 100) / 100;
-
-  // Profitability & Marginal Return Analysis
-  const grossMarginPct = config.constraints?.grossMarginPct ?? 62.0;
-  const expectedGrossProfit = Math.round(expectedRevenue * (grossMarginPct / 100) * 100) / 100;
-  const expectedNetProfit = Math.round((expectedGrossProfit - allocatedBudget) * 100) / 100;
-  const expectedProfitRoas = allocatedBudget > 0 ? Math.round((expectedGrossProfit / allocatedBudget) * 100) / 100 : 0;
-  const breakevenRoas = Math.round((100 / grossMarginPct) * 100) / 100;
-  const isProfitable = expectedNetProfit > 0;
-
-  // Marginal ROAS & Marginal Profit Headroom for incremental budget Δ = ₹1,000
-  const deltaSpend = 1000.0;
-  const elasticity = 0.79;
-  const nextSpend = allocatedBudget + deltaSpend;
-  const nextRevenue = expectedRevenue * Math.pow(nextSpend / allocatedBudget, elasticity);
-  const marginalRoas = Math.round(((nextRevenue - expectedRevenue) / deltaSpend) * 100) / 100;
-  const marginalProfit = Math.round((marginalRoas * (grossMarginPct / 100) - 1.0) * 100) / 100;
 
   // 7. Risk Score Modeling (0–100, higher is riskier)
   const funnelRiskMap: Record<string, number> = { BOFU: -10, RETENTION: -15, MOFU: 5, TOFU: 18 };
@@ -201,13 +182,13 @@ export function evaluateStrategy(
       ? 'Empirical Bayesian Multi-Channel Response Model (2026.1)'
       : 'Platform Prior Benchmark Model (Insufficient Historical Precedent)',
     historicalCalibrated: precedent.similarCount > 0,
-    currency: isINR ? ('INR' as const) : ('USD' as const)
+    currency: 'INR' as const
   };
 
   const marketEvidenceText = platform === 'google'
     ? 'Verified active commercial intent surge (+18.4% query volume) on footwear search SERPs.'
     : platform === 'amazon'
-    ? 'Amazon category benchmark shows 9.8% conversion rate and stable ₹4.45 ROAS for sponsored listings.'
+    ? 'Amazon category benchmark shows 9.8% conversion rate and stable 4.45x ROAS for sponsored listings.'
     : platform === 'meta'
     ? 'Meta broad CPMs inflated +14.2%; retargeting and lookalike pools remain profitable.'
     : 'TikTok presents strong initial view-through rates with lower checkout completion.';
@@ -220,14 +201,6 @@ export function evaluateStrategy(
     expectedCpa,
     expectedRevenue,
     expectedRoas,
-    grossMarginPct,
-    expectedGrossProfit,
-    expectedNetProfit,
-    expectedProfitRoas,
-    marginalRoas,
-    marginalProfit,
-    isProfitable,
-    breakevenRoas,
     riskScore: calculatedRisk,
     confidenceScore: confidence,
     audienceFitScore: fitScore,

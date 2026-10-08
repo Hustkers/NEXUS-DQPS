@@ -7,6 +7,15 @@ import { PlatformLogo } from '@/components/icons/platform-logos';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
+// ============================================================================
+// MINIMALIST-UI DESIGN TOKENS (Protocol Compliant)
+// Warm Monochrome + Specific Desaturated Pastels:
+// - Pale Red:    #FDEBEC (Text: #9F2F2D)
+// - Pale Blue:   #E1F3FE (Text: #1F6C9F)
+// - Pale Green:  #EDF3EC (Text: #346538)
+// - Pale Yellow: #FBF3DB (Text: #956400)
+// ============================================================================
+
 export interface CampaignData {
   id?: number;
   campaign: string;
@@ -66,37 +75,123 @@ interface ProductGroup {
   blendedRoas: number;
 }
 
-// Subtle, professional brand definitions (not neon badges)
+// Clean Minimalist SVG Primitives (Standardized 1.5px stroke, no generic lucide)
+function SvgDatabase({ className = 'size-3.5' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'>
+      <ellipse cx='12' cy='5' rx='9' ry='3' />
+      <path d='M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5' />
+      <path d='M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3' />
+    </svg>
+  );
+}
+
+function SvgSearch({ className = 'size-3.5' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'>
+      <circle cx='11' cy='11' r='8' />
+      <line x1='21' y1='21' x2='16.65' y2='16.65' />
+    </svg>
+  );
+}
+
+function SvgRefresh({ className = 'size-3.5' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'>
+      <polyline points='23 4 23 10 17 10' />
+      <polyline points='1 20 1 14 7 14' />
+      <path d='M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15' />
+    </svg>
+  );
+}
+
+function SvgChevronDown({ className = 'size-3.5' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'>
+      <polyline points='6 9 12 15 18 9' />
+    </svg>
+  );
+}
+
+function SvgChevronUp({ className = 'size-3.5' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'>
+      <polyline points='18 15 12 9 6 15' />
+    </svg>
+  );
+}
+
+function SvgCheck({ className = 'size-3.5' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.75' strokeLinecap='round' strokeLinejoin='round'>
+      <polyline points='20 6 9 17 4 12' />
+    </svg>
+  );
+}
+
+function SvgSliders({ className = 'size-3.5' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'>
+      <line x1='4' y1='21' x2='4' y2='14' />
+      <line x1='4' y1='10' x2='4' y2='3' />
+      <line x1='12' y1='21' x2='12' y2='12' />
+      <line x1='12' y1='8' x2='12' y2='3' />
+      <line x1='20' y1='21' x2='20' y2='16' />
+      <line x1='20' y1='12' x2='20' y2='3' />
+      <line x1='1' y1='14' x2='7' y2='14' />
+      <line x1='9' y1='8' x2='15' y2='8' />
+      <line x1='17' y1='16' x2='23' y2='16' />
+    </svg>
+  );
+}
+
+function SvgDownload({ className = 'size-3.5' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'>
+      <path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4' />
+      <polyline points='7 10 12 15 17 10' />
+      <line x1='12' y1='15' x2='12' y2='3' />
+    </svg>
+  );
+}
+
+// Minimalist pastel channel configs
 const CHANNEL_PRESETS: Record<string, {
   name: string;
   code: string;
-  accent: string;
+  badgeStyle: string;
+  dotColor: string;
 }> = {
   tiktok: {
     name: 'TikTok Ads',
     code: 'TT',
-    accent: '#FE2C55'
+    badgeStyle: 'bg-[#FDEBEC] text-[#9F2F2D] border-[#F9D6D8]',
+    dotColor: '#9F2F2D',
   },
   amazon: {
     name: 'Amazon Sponsored',
     code: 'AMZ',
-    accent: '#FF9900'
+    badgeStyle: 'bg-[#FBF3DB] text-[#956400] border-[#F5E6BF]',
+    dotColor: '#956400',
   },
   meta: {
     name: 'Meta Advantage+',
     code: 'META',
-    accent: '#0668E1'
+    badgeStyle: 'bg-[#E1F3FE] text-[#1F6C9F] border-[#CDEBFC]',
+    dotColor: '#1F6C9F',
   },
   google: {
     name: 'Google Shopping',
     code: 'GGL',
-    accent: '#4285F4'
+    badgeStyle: 'bg-[#EDF3EC] text-[#346538] border-[#DCEAD9]',
+    dotColor: '#346538',
   },
   shopify: {
     name: 'Shopify Storefront',
-    code: 'SHOP',
-    accent: '#96BF48'
-  }
+    code: 'SHPF',
+    badgeStyle: 'bg-[#EDF3EC] text-[#346538] border-[#DCEAD9]',
+    dotColor: '#346538',
+  },
 };
 
 export default function SkuChannelMatrixPage() {
@@ -126,7 +221,7 @@ export default function SkuChannelMatrixPage() {
     if (isManualRefresh) setIsRefreshing(true);
     try {
       const res = await fetch('/api/matrix', {
-        headers: { 'Cache-Control': 'no-cache' }
+        headers: { 'Cache-Control': 'no-cache' },
       });
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}: Failed to query PostgreSQL`);
@@ -200,7 +295,7 @@ export default function SkuChannelMatrixPage() {
           availablePlatforms: [],
           totalSpend: 0,
           totalRevenue: 0,
-          blendedRoas: 0
+          blendedRoas: 0,
         };
       }
       map[sku].marketplaces[c.platform] = c;
@@ -233,7 +328,7 @@ export default function SkuChannelMatrixPage() {
   const toggleExpand = (sku: string) => {
     setExpandedSkus((prev) => ({
       ...prev,
-      [sku]: !prev[sku]
+      [sku]: !prev[sku],
     }));
   };
 
@@ -249,7 +344,7 @@ export default function SkuChannelMatrixPage() {
   const handleSelectPlatform = (sku: string, platform: string) => {
     setSelectedPlatforms((prev) => ({
       ...prev,
-      [sku]: platform
+      [sku]: platform,
     }));
     setOpenDropdownSku(null);
   };
@@ -261,18 +356,16 @@ export default function SkuChannelMatrixPage() {
       const res = await fetch('/api/matrix', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ campaignName, targetRoas })
+        body: JSON.stringify({ campaignName, targetRoas }),
       });
       if (res.ok) {
         await fetchMatrixData(false);
         setEditingCampaign(null);
-        toast.success('Target ROAS updated successfully');
       } else {
-        toast.error('Failed to update target ROAS');
+        alert('Failed to update campaign in database');
       }
     } catch (err) {
       console.error('Save error:', err);
-      toast.error('Connection error while saving');
     } finally {
       setIsSavingEdit(false);
     }
@@ -281,17 +374,17 @@ export default function SkuChannelMatrixPage() {
   const handleExportCsv = () => {
     const headers = [
       'SKU',
-      'Product Name',
+      'Shoe Name',
       'Category',
-      'Channel',
+      'Marketplace',
       'Unit Price',
       'Gross Margin (%)',
-      'Inventory',
+      'ERP Stock',
       'Daily Spend',
       'Daily Revenue',
       'Current ROAS',
       'Target ROAS',
-      'Status'
+      'ROAS Status'
     ];
 
     const rows: string[][] = [];
@@ -324,8 +417,8 @@ export default function SkuChannelMatrixPage() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    toast.success('Matrix exported to CSV', {
-      description: `Exported ${rows.length} product-channel rows.`
+    toast.success('SKU Economics Matrix exported to CSV', {
+      description: `Exported ${rows.length} marketplace SKU campaigns.`
     });
   };
 
@@ -350,267 +443,258 @@ export default function SkuChannelMatrixPage() {
     totalRevenue: 0,
     blendedRoas: 0,
     stockoutCount: 0,
-    averageHealth: 0
+    averageHealth: 0,
   };
 
-  const isConnected = data?.source === 'postgresql_live';
-
   return (
-    <div className='flex flex-1 flex-col w-full min-w-0 max-w-full min-h-screen bg-[#090A0C] text-[#E4E4E7] font-sans p-4 sm:p-6 lg:p-8 space-y-6'>
-      {/* 1. CLEAN PRODUCT HEADER & SUBTLE STATUS */}
-      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1F2023] pb-5'>
-        <div>
-          <h1 className='text-xl sm:text-2xl font-semibold tracking-tight text-white'>
-            SKU &amp; Channel Matrix
-          </h1>
-          <p className='text-xs text-[#8E8F94] mt-1'>
-            Inventory, spend and channel performance across your catalog.
-          </p>
-        </div>
-
-        {/* Subtle Database Connection / Sync Indicator */}
+    <div className='relative flex flex-1 flex-col w-full min-w-0 min-h-screen bg-[#FBFBFA] dark:bg-[#0C0D0E] text-[#111111] dark:text-[#EEEEEE] font-sans p-4 sm:p-6 md:p-8 space-y-6'>
+      
+      {/* 1. FAUX-OS WINDOW CHROME & METADATA BAR (Technical Document Header) */}
+      <div className='w-full border border-[#EAEAEA] dark:border-[#262626] bg-[#FFFFFF] dark:bg-[#141517] rounded-[8px] p-4 flex flex-col md:flex-row md:items-center justify-between gap-4'>
         <div className='flex items-center gap-3'>
-          <div className='flex items-center gap-2 text-xs text-[#8E8F94]'>
-            <span
-              className={cn(
-                'size-2 rounded-full',
-                isConnected ? 'bg-emerald-400' : 'bg-amber-400'
-              )}
-            />
-            <span className='font-medium text-[#C4C4C8]'>
-              {isConnected ? 'PostgreSQL' : 'Cached Store'}
-            </span>
-            <span className='text-[#4B4C52]'>•</span>
-            <span>{data?.totalSkus ?? productGroups.length} SKUs</span>
-            <span className='text-[#4B4C52]'>•</span>
-            <span className='tabular-nums'>
-              {data?.timestamp
-                ? new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                : 'Synced'}
+          {/* macOS window control primitives */}
+          <div className='flex items-center gap-1.5'>
+            <span className='size-2.5 rounded-full bg-[#E5E5E5] dark:bg-[#333333]' />
+            <span className='size-2.5 rounded-full bg-[#E5E5E5] dark:bg-[#333333]' />
+            <span className='size-2.5 rounded-full bg-[#E5E5E5] dark:bg-[#333333]' />
+          </div>
+          <div className='h-4 w-px bg-[#EAEAEA] dark:bg-[#262626]' />
+          <div className='flex items-center gap-2'>
+            <SvgDatabase className='size-3.5 text-[#787774]' />
+            <span className='font-mono text-xs text-[#787774]'>
+              NODE: <strong className='text-[#111111] dark:text-[#EEEEEE]'>{data?.database || 'Connecting...'}</strong>
             </span>
           </div>
+        </div>
+
+        {/* Real Backend Connection Badge & Latency */}
+        <div className='flex items-center gap-3 flex-wrap'>
+          <span
+            className={cn(
+              'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono tracking-wider border',
+              data?.source === 'postgresql_live'
+                ? 'bg-[#EDF3EC] text-[#346538] border-[#DCEAD9]'
+                : 'bg-[#FBF3DB] text-[#956400] border-[#F5E6BF]'
+            )}
+          >
+            <span
+              className={cn(
+                'size-1.5 rounded-full',
+                data?.source === 'postgresql_live' ? 'bg-[#346538]' : 'bg-[#956400]'
+              )}
+            />
+            {data?.source === 'postgresql_live' ? 'POSTGRESQL 16 LIVE' : 'OFFLINE BUFFER'}
+          </span>
+
+          <span className='font-mono text-xs text-[#787774]'>
+            RTT: <strong className='text-[#111111] dark:text-[#EEEEEE]'>{data?.latencyMs ?? 0}ms</strong>
+          </span>
+
+          <span className='font-mono text-xs text-[#787774]'>
+            ROWS: <strong className='text-[#111111] dark:text-[#EEEEEE]'>{data?.totalCampaigns ?? 0}</strong>
+          </span>
 
           <button
-            type='button'
             onClick={() => fetchMatrixData(true)}
             disabled={isRefreshing}
-            className='inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#27282D] bg-[#141518] hover:bg-[#1D1E22] hover:text-white text-xs text-[#C4C4C8] font-medium transition-colors disabled:opacity-50'
-            title='Sync latest data (R)'
+            className='inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] bg-[#111111] dark:bg-[#EEEEEE] text-[#FFFFFF] dark:text-[#111111] text-xs font-mono transition-transform active:scale-[0.98] disabled:opacity-50'
+            title='Refresh database connection (Key: R)'
           >
-            <svg
-              className={cn('size-3.5', isRefreshing && 'animate-spin')}
-              viewBox='0 0 24 24'
-              fill='none'
-              stroke='currentColor'
-              strokeWidth='2'
-              strokeLinecap='round'
-              strokeLinejoin='round'
-            >
-              <polyline points='23 4 23 10 17 10' />
-              <polyline points='1 20 1 14 7 14' />
-              <path d='M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15' />
-            </svg>
+            <SvgRefresh className={cn('size-3', isRefreshing && 'animate-spin')} />
             <span>Sync</span>
+            <kbd className='px-1 py-0.2 text-[9px] font-mono bg-white/20 rounded border border-white/30'>R</kbd>
           </button>
         </div>
       </div>
 
-      {/* 2. REFINED PERFORMANCE STRIP (Quiet, Horizontal, ROAS Emphasized) */}
-      <div className='grid grid-cols-2 lg:grid-cols-4 gap-3 bg-[#111215] border border-[#1F2023] rounded-xl p-4 sm:p-5'>
-        <div className='space-y-1 pr-4 border-r border-[#1F2023]/60'>
-          <div className='text-[11px] font-medium uppercase tracking-wider text-[#7A7B82]'>
-            Daily Spend
+      {/* 2. SECTION HEADER (Clean Sans + Disciplined Scale) */}
+      <div className='space-y-1.5 border-b border-[#EAEAEA] dark:border-[#262626] pb-4 w-full'>
+        <div className='flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-[#787774]'>
+          <span>Allocation Ledger</span>
+          <span>/</span>
+          <span>Footwear Analytics</span>
+        </div>
+        <h1 className='text-xl sm:text-2xl font-semibold text-[#111111] dark:text-[#FFFFFF] tracking-tight'>
+          SKU Allocation Matrix
+        </h1>
+        <p className='text-xs sm:text-sm text-[#787774] max-w-3xl leading-normal'>
+          Unit economics and daily ad spend reconciled across Meta, Google, Amazon, and Shopify.
+        </p>
+      </div>
+
+      {/* 3. BENTO BOX SUMMARY CARDS (Ultra-flat, 1px solid #EAEAEA, Crisp 8px radius) */}
+      <div className='grid grid-cols-2 md:grid-cols-4 gap-4 w-full'>
+        <div className='border border-[#EAEAEA] dark:border-[#262626] bg-[#FFFFFF] dark:bg-[#141517] rounded-[8px] p-5 space-y-1.5'>
+          <div className='text-[11px] font-mono uppercase tracking-wider text-[#787774]'>
+            Total Daily Spend
           </div>
-          <div className='text-2xl font-semibold tracking-tight text-white font-mono tabular-nums'>
+          <div className='text-2xl font-mono font-semibold tracking-tight text-[#111111] dark:text-[#FFFFFF]'>
             ${summary.totalSpend.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
-          <div className='text-[11px] text-[#6E6F76]'>
-            Across {data?.totalCampaigns ?? rawCampaigns.length} active channels
+          <div className='text-[10px] font-mono text-[#787774]'>
+            Across {data?.totalCampaigns ?? 0} active channels
           </div>
         </div>
 
-        <div className='space-y-1 px-0 sm:px-4 lg:border-r border-[#1F2023]/60'>
-          <div className='text-[11px] font-medium uppercase tracking-wider text-[#7A7B82]'>
+        <div className='border border-[#EAEAEA] dark:border-[#262626] bg-[#FFFFFF] dark:bg-[#141517] rounded-[8px] p-5 space-y-1.5'>
+          <div className='text-[11px] font-mono uppercase tracking-wider text-[#787774]'>
             Attributed Revenue
           </div>
-          <div className='text-2xl font-semibold tracking-tight text-white font-mono tabular-nums'>
+          <div className='text-2xl font-mono font-semibold tracking-tight text-[#111111] dark:text-[#FFFFFF]'>
             ${summary.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
-          <div className='text-[11px] text-[#6E6F76]'>
+          <div className='text-[10px] font-mono text-[#346538]'>
             Trailing 24h reconciled
           </div>
         </div>
 
-        <div className='space-y-1 pr-4 lg:px-4 border-r border-[#1F2023]/60'>
-          <div className='text-[11px] font-medium uppercase tracking-wider text-[#7A7B82]'>
+        <div className='border border-[#EAEAEA] dark:border-[#262626] bg-[#FFFFFF] dark:bg-[#141517] rounded-[8px] p-5 space-y-1.5'>
+          <div className='text-[11px] font-mono uppercase tracking-wider text-[#787774]'>
             Blended ROAS
           </div>
-          <div className='text-2xl font-bold tracking-tight text-emerald-400 font-mono tabular-nums flex items-baseline gap-1.5'>
-            <span>{summary.blendedRoas.toFixed(2)}x</span>
-            <span className='text-[11px] font-normal text-[#6E6F76] font-sans'>target 3.20x</span>
+          <div className='text-2xl font-mono font-semibold tracking-tight text-[#111111] dark:text-[#FFFFFF]'>
+            {summary.blendedRoas.toFixed(2)}x
           </div>
-          <div className='text-[11px] text-[#6E6F76]'>
-            Catalog-wide return ratio
+          <div className='text-[10px] font-mono text-[#787774]'>
+            Target benchmark: 3.20x
           </div>
         </div>
 
-        <div className='space-y-1 pl-0 sm:pl-4'>
-          <div className='text-[11px] font-medium uppercase tracking-wider text-[#7A7B82]'>
-            Stockouts
+        <div className='border border-[#EAEAEA] dark:border-[#262626] bg-[#FFFFFF] dark:bg-[#141517] rounded-[8px] p-5 space-y-1.5'>
+          <div className='text-[11px] font-mono uppercase tracking-wider text-[#787774]'>
+            Stockout Alerts
           </div>
-          <div className={cn(
-            'text-2xl font-semibold tracking-tight font-mono tabular-nums',
-            summary.stockoutCount > 0 ? 'text-amber-400' : 'text-[#8E8F94]'
-          )}>
-            {summary.stockoutCount}
-            <span className='text-xs font-normal text-[#6E6F76] font-sans ml-1'>SKUs affected</span>
+          <div className='text-2xl font-mono font-semibold tracking-tight text-[#9F2F2D]'>
+            {summary.stockoutCount} <span className='text-xs font-normal text-[#787774]'>SKUs</span>
           </div>
-          <div className='text-[11px] text-[#6E6F76]'>
-            {summary.stockoutCount > 0 ? 'Ad pausing recommended' : 'Inventory healthy'}
+          <div className='text-[10px] font-mono text-[#9F2F2D]'>
+            Requires ad pause
           </div>
         </div>
       </div>
 
-      {/* 3. COMPACT PROFESSIONAL FILTER TOOLBAR */}
-      <div className='flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3'>
-        {/* Search */}
-        <div className='relative flex-1 max-w-sm'>
-          <span className='absolute left-3 top-1/2 -translate-y-1/2 text-[#6E6F76]'>
-            <svg className='size-3.5' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
-              <circle cx='11' cy='11' r='8' />
-              <line x1='21' y1='21' x2='16.65' y2='16.65' />
-            </svg>
+      {/* 4. FILTER BAR & KEYSTROKE SHORTCUTS */}
+      <div className='w-full border border-[#EAEAEA] dark:border-[#262626] bg-[#FFFFFF] dark:bg-[#141517] rounded-[8px] p-3 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3'>
+        {/* Search Input with Keyboard shortcut [/] */}
+        <div className='relative flex-1 max-w-md'>
+          <span className='absolute left-3 top-1/2 -translate-y-1/2 text-[#787774]'>
+            <SvgSearch className='size-3.5' />
           </span>
           <input
             ref={searchInputRef}
             type='text'
-            placeholder='Search product or SKU...'
+            placeholder='Filter by shoe model or SKU code...'
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className='w-full pl-9 pr-8 py-2 text-xs rounded-lg border border-[#27282D] bg-[#111215] text-white placeholder-[#6E6F76] focus:outline-hidden focus:border-[#4B4C52] transition-colors'
+            className='w-full pl-9 pr-14 py-1.5 text-xs font-mono rounded-[6px] border border-[#EAEAEA] dark:border-[#262626] bg-[#FBFBFA] dark:bg-[#0C0D0E] text-[#111111] dark:text-[#EEEEEE] focus:outline-hidden focus:border-[#111111] dark:focus:border-[#EEEEEE]'
           />
-          <kbd className='absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[9px] font-mono rounded border border-[#27282D] bg-[#18191D] text-[#8E8F94]'>
+          <kbd className='absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[9px] font-mono rounded border border-[#EAEAEA] dark:border-[#262626] bg-[#FFFFFF] dark:bg-[#141517] text-[#787774]'>
             /
           </kbd>
         </div>
 
-        {/* Filter Channels & Actions */}
-        <div className='flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0'>
-          {/* Channel Filters */}
-          <div className='inline-flex items-center p-1 rounded-lg border border-[#1F2023] bg-[#111215] gap-1'>
-            <button
-              type='button'
-              onClick={() => setPlatformFilter('all')}
-              className={cn(
-                'px-2.5 py-1 text-xs rounded-md font-medium transition-colors whitespace-nowrap',
-                platformFilter === 'all'
-                  ? 'bg-[#27282D] text-white shadow-xs'
-                  : 'text-[#8E8F94] hover:text-[#C4C4C8]'
-              )}
-            >
-              All Channels
-            </button>
-
-            {(['tiktok', 'amazon', 'meta', 'google', 'shopify'] as const).map((plat) => {
-              const cfg = CHANNEL_PRESETS[plat];
-              const isActive = platformFilter === plat;
-              return (
-                <button
-                  key={plat}
-                  type='button'
-                  onClick={() => setPlatformFilter(plat)}
-                  className={cn(
-                    'inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-md font-medium transition-colors whitespace-nowrap',
-                    isActive
-                      ? 'bg-[#27282D] text-white shadow-xs'
-                      : 'text-[#8E8F94] hover:text-[#C4C4C8]'
-                  )}
-                >
-                  <PlatformLogo platform={plat} size={12} className='shrink-0' />
-                  <span>{cfg.name.split(' ')[0]}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className='h-5 w-px bg-[#1F2023] mx-1 shrink-0' />
-
-          {/* Expand All */}
+        {/* Marketplace Selection Pills (Warm Monochrome + Spot Pastels) */}
+        <div className='flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0'>
           <button
-            type='button'
+            onClick={() => setPlatformFilter('all')}
+            className={cn(
+              'px-2.5 py-1 text-xs font-mono rounded-[4px] border transition-colors',
+              platformFilter === 'all'
+                ? 'bg-[#111111] text-[#FFFFFF] dark:bg-[#EEEEEE] dark:text-[#111111] border-transparent font-medium'
+                : 'bg-transparent text-[#787774] border-[#EAEAEA] dark:border-[#262626] hover:text-[#111111] dark:hover:text-[#FFFFFF]'
+            )}
+          >
+            All Channels
+          </button>
+
+          {(['tiktok', 'amazon', 'meta', 'google', 'shopify'] as const).map((plat) => {
+            const cfg = CHANNEL_PRESETS[plat];
+            const isActive = platformFilter === plat;
+            return (
+              <button
+                key={plat}
+                onClick={() => setPlatformFilter(plat)}
+                className={cn(
+                  'px-2.5 py-1 text-xs font-mono rounded-[4px] border flex items-center gap-2 transition-colors',
+                  isActive
+                    ? 'border-[#111111] dark:border-[#EEEEEE] bg-[#F7F6F3] dark:bg-[#1E1F21] text-[#111111] dark:text-[#FFFFFF] font-medium'
+                    : 'border-[#EAEAEA] dark:border-[#262626] text-[#787774] hover:text-[#111111] dark:hover:text-[#FFFFFF]'
+                )}
+              >
+                <PlatformLogo platform={plat} size={13} className='shrink-0' />
+                <span>{cfg.name}</span>
+              </button>
+            );
+          })}
+
+          <button
             onClick={toggleExpandAll}
-            className='inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#27282D] bg-[#111215] hover:bg-[#18191D] hover:text-white text-xs font-medium text-[#C4C4C8] transition-colors whitespace-nowrap'
-            title='Toggle expand all rows (E)'
+            className='ml-auto px-2.5 py-1 text-xs font-mono rounded-[4px] border border-[#EAEAEA] dark:border-[#262626] bg-[#F7F6F3] dark:bg-[#1E1F21] text-[#111111] dark:text-[#EEEEEE] hover:bg-[#EAEAEA] dark:hover:bg-[#262626] flex items-center gap-1.5 transition-colors'
+            title='Toggle expand all marketplaces (Key: E)'
           >
             <span>
               {productGroups.length > 0 && productGroups.every((p) => expandedSkus[p.sku])
                 ? 'Collapse All'
                 : 'Expand All'}
             </span>
+            <kbd className='px-1 py-0.2 text-[9px] font-mono rounded border border-[#EAEAEA] dark:border-[#262626] bg-[#FFFFFF] dark:bg-[#141517] text-[#787774]'>
+              E
+            </kbd>
           </button>
 
-          {/* Export CSV */}
           <button
-            type='button'
             onClick={handleExportCsv}
-            className='inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#27282D] bg-[#111215] hover:bg-[#18191D] hover:text-white text-xs font-medium text-[#C4C4C8] transition-colors whitespace-nowrap'
-            title='Export to CSV'
+            className='px-2.5 py-1 text-xs font-mono rounded-[4px] border border-[#EAEAEA] dark:border-[#262626] bg-[#F7F6F3] dark:bg-[#1E1F21] text-[#111111] dark:text-[#EEEEEE] hover:bg-[#EAEAEA] dark:hover:bg-[#262626] flex items-center gap-1.5 transition-colors'
+            title='Export filtered matrix to CSV'
           >
-            <svg className='size-3.5 text-[#8E8F94]' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
-              <path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4' />
-              <polyline points='7 10 12 15 17 10' />
-              <line x1='12' y1='15' x2='12' y2='3' />
-            </svg>
-            <span>Export</span>
+            <SvgDownload className='size-3 text-[#787774]' />
+            <span>Export CSV</span>
           </button>
         </div>
       </div>
 
-      {/* 4. MAIN PERFORMANCE TABLE */}
+      {/* 5. MAIN TABULAR MATRIX (Clean 1px border, generous cell padding, strict monospace numbers) */}
       <div
-        className='w-full border border-[#1F2023] bg-[#111215] rounded-xl overflow-hidden'
+        className='w-full border border-[#EAEAEA] dark:border-[#262626] bg-[#FFFFFF] dark:bg-[#141517] rounded-[8px] overflow-hidden'
         ref={dropdownRef}
       >
         {isLoading ? (
-          <div className='p-16 text-center space-y-3 text-xs text-[#8E8F94]'>
-            <svg className='size-5 animate-spin mx-auto text-white' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
-              <circle cx='12' cy='12' r='10' strokeOpacity='0.2' />
-              <path d='M12 2a10 10 0 0 1 10 10' />
-            </svg>
-            <p>Loading catalog performance telemetry...</p>
+          <div className='p-12 text-center space-y-3 font-mono text-xs text-[#787774]'>
+            <SvgRefresh className='size-5 animate-spin mx-auto text-[#111111] dark:text-[#EEEEEE]' />
+            <p>Querying PostgreSQL 16 database cluster...</p>
           </div>
         ) : error ? (
-          <div className='p-8 text-center space-y-3 text-xs text-rose-300 bg-rose-950/20 border border-rose-900/40 rounded-lg m-4'>
-            <p>Database Connection Error: {error}</p>
+          <div className='p-8 text-center space-y-3 font-mono text-xs text-[#9F2F2D] bg-[#FDEBEC] border border-[#F9D6D8] rounded-[6px] m-4'>
+            <p>Database Error: {error}</p>
             <button
               onClick={() => fetchMatrixData(true)}
-              className='px-3 py-1.5 bg-white text-black font-medium rounded-md text-xs'
+              className='px-3 py-1 bg-[#111111] text-[#FFFFFF] rounded-[4px] text-xs'
             >
               Retry Connection
             </button>
           </div>
         ) : filteredProducts.length === 0 ? (
-          <div className='p-16 text-center text-xs text-[#8E8F94]'>
-            No products match &quot;{searchQuery}&quot;
+          <div className='p-12 text-center space-y-2 font-mono text-xs text-[#787774]'>
+            <p>No products match query &quot;{searchQuery}&quot;.</p>
           </div>
         ) : (
           <div className='overflow-x-auto w-full'>
-            <table className='w-full min-w-[960px] text-left text-xs'>
+            <table className='w-full min-w-full text-left text-xs font-mono'>
               <thead>
-                <tr className='border-b border-[#1F2023] text-[11px] font-medium text-[#7A7B82] uppercase tracking-wider bg-[#0E0F12]'>
-                  <th className='py-3.5 px-4 font-medium'>Product</th>
-                  <th className='py-3.5 px-3 font-medium'>Channel</th>
-                  <th className='py-3.5 px-3 text-right font-medium'>Price</th>
-                  <th className='py-3.5 px-3 text-right font-medium'>Margin</th>
-                  <th className='py-3.5 px-3 text-right font-medium'>Inventory</th>
-                  <th className='py-3.5 px-3 text-right font-medium'>Spend</th>
-                  <th className='py-3.5 px-3 text-right font-medium'>ROAS</th>
-                  <th className='py-3.5 px-3 text-center font-medium'>Target</th>
-                  <th className='py-3.5 px-3 text-center font-medium'>Health</th>
-                  <th className='py-3.5 px-4 text-center font-medium'>Status</th>
+                <tr className='border-b border-[#EAEAEA] dark:border-[#262626] text-[11px] text-[#787774] uppercase tracking-wider bg-[#FBFBFA] dark:bg-[#111214]'>
+                  <th className='py-3.5 px-4'>Shoe &amp; SKU</th>
+                  <th className='py-3.5 px-3'>Active Channel</th>
+                  <th className='py-3.5 px-3 text-right'>Unit Price</th>
+                  <th className='py-3.5 px-3 text-right'>Gross Margin</th>
+                  <th className='py-3.5 px-3 text-right'>ERP Stock</th>
+                  <th className='py-3.5 px-3 text-right'>Daily Spend</th>
+                  <th className='py-3.5 px-3 text-right'>Current ROAS</th>
+                  <th className='py-3.5 px-3 text-center'>Target ROAS</th>
+                  <th className='py-3.5 px-3 text-center'>Health</th>
+                  <th className='py-3.5 px-4 text-center'>Channel Status</th>
                 </tr>
               </thead>
-              <tbody className='divide-y divide-[#18191C]'>
+              <tbody className='divide-y divide-[#EAEAEA] dark:divide-[#262626]'>
                 {filteredProducts.map((p) => {
                   const activePlatform = selectedPlatforms[p.sku] || p.availablePlatforms[0] || 'meta';
                   const activeCampaign = p.marketplaces[activePlatform] || Object.values(p.marketplaces)[0];
@@ -624,37 +708,27 @@ export default function SkuChannelMatrixPage() {
                       {/* Main Product Row */}
                       <tr
                         className={cn(
-                          'transition-colors group',
-                          isStockout
-                            ? 'bg-amber-950/5 hover:bg-amber-950/10'
-                            : 'hover:bg-[#141518]',
-                          isExpanded && 'bg-[#141518]'
+                          'hover:bg-[#F9F9F8] dark:hover:bg-[#18191B] transition-colors',
+                          isExpanded && 'bg-[#F7F6F3]/50 dark:bg-[#18191B]/40'
                         )}
                       >
-                        {/* PRODUCT: Dominant Name, Subtle SKU */}
+                        {/* Shoe & SKU */}
                         <td className='py-3 px-4'>
                           <div className='flex items-center gap-3'>
                             <button
-                              type='button'
                               onClick={() => toggleExpand(p.sku)}
-                              aria-label={`Toggle details for ${p.productName}`}
-                              className='size-6 rounded-md border border-[#27282D] flex items-center justify-center text-[#8E8F94] hover:text-white hover:bg-[#1F2023] transition-colors shrink-0'
+                              aria-label={`Toggle marketplace breakdown for ${p.productName}`}
+                              className='size-5 rounded-[4px] border border-[#EAEAEA] dark:border-[#262626] flex items-center justify-center text-[#787774] hover:text-[#111111] dark:hover:text-[#FFFFFF] transition-colors shrink-0'
                             >
-                              <svg
-                                className={cn('size-3.5 transition-transform duration-150', isExpanded && 'rotate-180')}
-                                viewBox='0 0 24 24'
-                                fill='none'
-                                stroke='currentColor'
-                                strokeWidth='2'
-                                strokeLinecap='round'
-                                strokeLinejoin='round'
-                              >
-                                <polyline points='6 9 12 15 18 9' />
-                              </svg>
+                              {isExpanded ? (
+                                <SvgChevronUp className='size-3' />
+                              ) : (
+                                <SvgChevronDown className='size-3' />
+                              )}
                             </button>
 
                             {p.photoUrl ? (
-                              <div className='relative size-9 rounded-lg border border-[#27282D] bg-[#18191D] overflow-hidden shrink-0'>
+                              <div className='relative size-9 rounded-[6px] border border-[#EAEAEA] dark:border-[#262626] bg-[#FFFFFF] dark:bg-[#141517] overflow-hidden shrink-0'>
                                 <Image
                                   src={p.photoUrl}
                                   alt={p.productName}
@@ -664,25 +738,25 @@ export default function SkuChannelMatrixPage() {
                                 />
                               </div>
                             ) : (
-                              <div className='size-9 rounded-lg border border-[#27282D] bg-[#18191D] flex items-center justify-center text-[10px] font-mono text-[#6E6F76] shrink-0'>
-                                SKU
+                              <div className='size-9 rounded-[6px] border border-[#EAEAEA] dark:border-[#262626] bg-[#F7F6F3] dark:bg-[#1E1F21] flex items-center justify-center text-[9px] font-mono text-[#787774] shrink-0'>
+                                NIKE
                               </div>
                             )}
 
-                            <div className='min-w-0'>
-                              <div className='font-medium text-white text-[13px] leading-snug truncate group-hover:text-emerald-300 transition-colors'>
+                            <div>
+                              <div className='font-sans font-medium text-[#111111] dark:text-[#FFFFFF] leading-tight'>
                                 {p.productName}
                               </div>
-                              <div className='flex items-center gap-1.5 mt-0.5 text-[11px] text-[#7A7B82]'>
-                                <span className='font-mono'>{p.sku}</span>
-                                <span>•</span>
-                                <span>{p.category}</span>
+                              <div className='flex items-center gap-2 mt-0.5'>
+                                <span className='text-[10px] text-[#787774] font-mono'>{p.sku}</span>
+                                <span className='text-[10px] text-[#787774]'>•</span>
+                                <span className='text-[10px] text-[#787774]'>{p.category}</span>
                               </div>
                             </div>
                           </div>
                         </td>
 
-                        {/* CHANNEL: Compact Identity & Dropdown */}
+                        {/* Interactive Marketplace Dropdown */}
                         <td className='py-3 px-3 relative'>
                           <div className='inline-block'>
                             <button
@@ -691,112 +765,113 @@ export default function SkuChannelMatrixPage() {
                                 e.stopPropagation();
                                 setOpenDropdownSku(isDropdownOpen ? null : p.sku);
                               }}
-                              className='inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-[#27282D] bg-[#16171B] hover:bg-[#1E1F24] text-xs font-medium text-[#C4C4C8] hover:text-white transition-colors cursor-pointer'
+                              className={cn(
+                                'px-2.5 py-1 rounded-[4px] text-[10px] font-mono border flex items-center gap-1.5 transition-colors cursor-pointer',
+                                currentCfg.badgeStyle
+                              )}
                             >
                               <PlatformLogo platform={activePlatform} size={13} className='shrink-0' />
-                              <span>{currentCfg.name.split(' ')[0]}</span>
-                              <svg
-                                className={cn('size-3 text-[#6E6F76] transition-transform', isDropdownOpen && 'rotate-180')}
-                                viewBox='0 0 24 24'
-                                fill='none'
-                                stroke='currentColor'
-                                strokeWidth='2'
-                              >
-                                <polyline points='6 9 12 15 18 9' />
-                              </svg>
+                              <span>{currentCfg.name}</span>
+                              <SvgChevronDown className={cn('size-2.5 transition-transform', isDropdownOpen && 'rotate-180')} />
                             </button>
 
-                            {/* Dropdown Menu */}
+                            {/* Dropdown Menu Panel */}
                             {isDropdownOpen && (
                               <div
-                                className='absolute left-0 top-full mt-1.5 z-50 w-60 rounded-xl border border-[#27282D] bg-[#141518] p-1.5 shadow-2xl space-y-0.5'
+                                className='absolute left-0 top-full mt-1.5 z-50 w-64 rounded-[6px] border border-[#EAEAEA] dark:border-[#262626] bg-[#FFFFFF] dark:bg-[#141517] p-1.5 shadow-sm'
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                <div className='px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-[#6E6F76] border-b border-[#1F2023] mb-1'>
+                                <div className='px-2 py-1 text-[9px] font-mono uppercase tracking-wider text-[#787774] border-b border-[#EAEAEA] dark:border-[#262626] mb-1'>
                                   Available Channels ({p.availablePlatforms.length})
                                 </div>
 
-                                {p.availablePlatforms.map((plat) => {
-                                  const cData = p.marketplaces[plat];
-                                  const cfg = CHANNEL_PRESETS[plat] || CHANNEL_PRESETS['meta'];
-                                  const isSelected = plat === activePlatform;
+                                <div className='space-y-0.5'>
+                                  {p.availablePlatforms.map((plat) => {
+                                    const cData = p.marketplaces[plat];
+                                    const cfg = CHANNEL_PRESETS[plat] || CHANNEL_PRESETS['meta'];
+                                    const isSelected = plat === activePlatform;
 
-                                  return (
-                                    <button
-                                      key={plat}
-                                      type='button'
-                                      onClick={() => handleSelectPlatform(p.sku, plat)}
-                                      className={cn(
-                                        'w-full text-left px-2.5 py-2 rounded-lg text-xs flex items-center justify-between transition-colors',
-                                        isSelected
-                                          ? 'bg-[#1E1F24] text-white font-medium'
-                                          : 'text-[#8E8F94] hover:text-white hover:bg-[#18191D]'
-                                      )}
-                                    >
-                                      <div className='flex items-center gap-2'>
-                                        <PlatformLogo platform={plat} size={14} className='shrink-0' />
-                                        <div>
-                                          <div className='text-xs text-white font-medium'>
-                                            {cfg.name}
+                                    return (
+                                      <button
+                                        key={plat}
+                                        type='button'
+                                        onClick={() => handleSelectPlatform(p.sku, plat)}
+                                        className={cn(
+                                          'w-full text-left px-2 py-1.5 rounded-[4px] text-xs font-mono flex items-center justify-between transition-colors',
+                                          isSelected
+                                            ? 'bg-[#F7F6F3] dark:bg-[#1E1F21] text-[#111111] dark:text-[#FFFFFF] font-medium'
+                                            : 'hover:bg-[#F9F9F8] dark:hover:bg-[#18191B] text-[#787774] hover:text-[#111111]'
+                                        )}
+                                      >
+                                        <div className='flex items-center gap-2'>
+                                          <div className='size-5 rounded-[3px] border border-[#EAEAEA] dark:border-[#262626] bg-[#FFFFFF] dark:bg-[#141517] flex items-center justify-center shrink-0 p-0.5'>
+                                            <PlatformLogo platform={plat} size={12} className='shrink-0' />
                                           </div>
-                                          {cData && (
-                                            <div className='text-[10px] text-[#6E6F76] font-mono'>
-                                              ${cData.currentDailySpend.toFixed(0)}/d • {cData.roas.toFixed(2)}x
+                                          <div>
+                                            <div className='text-[10px] font-medium text-[#111111] dark:text-[#FFFFFF] flex items-center gap-1.5'>
+                                              <span>{cfg.name}</span>
+                                              <span className='text-[8px] text-[#787774] font-mono px-1 py-0.2 rounded bg-[#F7F6F3] dark:bg-[#1E1F21] border border-[#EAEAEA] dark:border-[#262626]'>
+                                                {cfg.code}
+                                              </span>
                                             </div>
-                                          )}
+                                            {cData && (
+                                              <div className='text-[9px] text-[#787774]'>
+                                                ${cData.currentDailySpend.toFixed(0)}/d • {cData.roas.toFixed(2)}x ROAS
+                                              </div>
+                                            )}
+                                          </div>
                                         </div>
-                                      </div>
 
-                                      {isSelected && (
-                                        <span className='size-1.5 rounded-full bg-emerald-400 shrink-0' />
-                                      )}
-                                    </button>
-                                  );
-                                })}
+                                        {isSelected && (
+                                          <SvgCheck className='size-3 text-[#346538] shrink-0 ml-2' />
+                                        )}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
                               </div>
                             )}
                           </div>
                         </td>
 
-                        {/* PRICE: Clean Financial Numeral */}
-                        <td className='py-3 px-3 text-right font-mono tabular-nums text-white'>
+                        {/* Unit Price */}
+                        <td className='py-3 px-3 text-right tabular-nums text-[#111111] dark:text-[#FFFFFF]'>
                           ${p.price.toFixed(2)}
                         </td>
 
-                        {/* MARGIN: Aligned Percentage */}
-                        <td className='py-3 px-3 text-right font-mono tabular-nums text-emerald-400 font-medium'>
+                        {/* Gross Margin */}
+                        <td className='py-3 px-3 text-right tabular-nums text-[#346538] font-medium'>
                           {activeCampaign ? activeCampaign.marginPct.toFixed(1) : '50.0'}%
                         </td>
 
-                        {/* INVENTORY: Clear Stockout Distinction */}
-                        <td className='py-3 px-3 text-right font-mono tabular-nums'>
+                        {/* ERP Stock */}
+                        <td className='py-3 px-3 text-right tabular-nums'>
                           {isStockout ? (
-                            <span className='inline-flex items-center gap-1 text-amber-400 font-medium font-sans text-xs'>
-                              <span>0</span>
-                              <span className='text-[10px] text-amber-500/80 uppercase font-semibold'>out</span>
+                            <span className='inline-block px-1.5 py-0.5 rounded-[3px] text-[10px] font-mono bg-[#FDEBEC] text-[#9F2F2D] border border-[#F9D6D8]'>
+                              0 (OUT)
                             </span>
                           ) : (
-                            <span className='text-white'>
-                              {p.inventory.toLocaleString()} <span className='text-[11px] text-[#6E6F76] font-sans'>units</span>
+                            <span className='text-[#111111] dark:text-[#FFFFFF]'>
+                              {p.inventory.toLocaleString()} u
                             </span>
                           )}
                         </td>
 
-                        {/* DAILY SPEND */}
-                        <td className='py-3 px-3 text-right font-mono tabular-nums text-white'>
+                        {/* Daily Spend */}
+                        <td className='py-3 px-3 text-right tabular-nums text-[#111111] dark:text-[#FFFFFF]'>
                           ${activeCampaign ? activeCampaign.currentDailySpend.toFixed(0) : '0'}
                         </td>
 
-                        {/* ROAS: Visually Emphasized */}
-                        <td className='py-3 px-3 text-right font-mono tabular-nums text-[13px] font-semibold'>
+                        {/* Current ROAS */}
+                        <td className='py-3 px-3 text-right tabular-nums font-semibold'>
                           {activeCampaign ? (
                             <span
                               className={cn(
                                 activeCampaign.roas < 1.8
-                                  ? 'text-rose-400'
+                                  ? 'text-[#9F2F2D]'
                                   : activeCampaign.roas < 3.2
-                                  ? 'text-amber-400'
-                                  : 'text-emerald-400'
+                                  ? 'text-[#956400]'
+                                  : 'text-[#346538]'
                               )}
                             >
                               {activeCampaign.roas.toFixed(2)}x
@@ -806,8 +881,8 @@ export default function SkuChannelMatrixPage() {
                           )}
                         </td>
 
-                        {/* TARGET ROAS (Inline Edit) */}
-                        <td className='py-3 px-3 text-center font-mono tabular-nums'>
+                        {/* Target ROAS (Interactive Inline Edit) */}
+                        <td className='py-3 px-3 text-center'>
                           {editingCampaign?.name === activeCampaign?.campaign ? (
                             <div className='inline-flex items-center gap-1'>
                               <input
@@ -817,17 +892,17 @@ export default function SkuChannelMatrixPage() {
                                 onChange={(e) =>
                                   setEditingCampaign({
                                     ...editingCampaign,
-                                    roas: parseFloat(e.target.value) || 0
+                                    roas: parseFloat(e.target.value) || 0,
                                   })
                                 }
-                                className='w-14 px-1 py-0.5 text-xs font-mono rounded border border-[#3E4048] bg-black text-center text-white'
+                                className='w-14 px-1 py-0.5 text-xs font-mono rounded border border-[#111111] dark:border-[#EEEEEE] bg-transparent text-center'
                               />
                               <button
                                 onClick={() =>
                                   handleSaveTargetRoas(activeCampaign.campaign, editingCampaign.roas)
                                 }
                                 disabled={isSavingEdit}
-                                className='px-1.5 py-0.5 rounded bg-white text-black font-medium text-[10px]'
+                                className='px-1.5 py-0.5 rounded bg-[#111111] dark:bg-[#EEEEEE] text-[#FFFFFF] dark:text-[#111111] text-[10px]'
                               >
                                 {isSavingEdit ? '...' : 'Save'}
                               </button>
@@ -837,110 +912,83 @@ export default function SkuChannelMatrixPage() {
                               onClick={() =>
                                 setEditingCampaign({
                                   name: activeCampaign.campaign,
-                                  roas: activeCampaign.targetRoas
+                                  roas: activeCampaign.targetRoas,
                                 })
                               }
-                              className='text-[#8E8F94] hover:text-white underline decoration-dotted decoration-[#3E4048] transition-colors'
-                              title='Click to edit target ROAS'
+                              className='text-[11px] font-mono text-[#787774] hover:text-[#111111] dark:hover:text-[#FFFFFF] underline decoration-dotted decoration-[#787774]'
+                              title='Click to edit target in PostgreSQL'
                             >
                               {activeCampaign?.targetRoas.toFixed(2)}x
                             </button>
                           )}
                         </td>
 
-                        {/* HEALTH: Compact Visual Meter */}
+                        {/* Health Score */}
                         <td className='py-3 px-3 text-center'>
-                          {activeCampaign ? (
-                            <div className='inline-flex items-center gap-2'>
-                              <div className='w-12 h-1.5 bg-[#1F2023] rounded-full overflow-hidden'>
-                                <div
-                                  className={cn(
-                                    'h-full rounded-full',
-                                    activeCampaign.healthScore >= 80
-                                      ? 'bg-emerald-400'
-                                      : activeCampaign.healthScore >= 60
-                                      ? 'bg-amber-400'
-                                      : 'bg-rose-400'
-                                  )}
-                                  style={{ width: `${Math.min(100, activeCampaign.healthScore)}%` }}
-                                />
-                              </div>
-                              <span className='font-mono tabular-nums text-xs text-[#8E8F94]'>
-                                {activeCampaign.healthScore}
-                              </span>
-                            </div>
-                          ) : (
-                            <span className='text-[#6E6F76]'>—</span>
-                          )}
+                          <span className='inline-block px-1.5 py-0.5 rounded-[3px] text-[10px] font-mono bg-[#F7F6F3] dark:bg-[#1E1F21] border border-[#EAEAEA] dark:border-[#262626] text-[#787774]'>
+                            {activeCampaign ? activeCampaign.healthScore : 75}/100
+                          </span>
                         </td>
 
-                        {/* STATUS: Subtle & Clean */}
+                        {/* Status Badge */}
                         <td className='py-3 px-4 text-center'>
-                          {isStockout ? (
-                            <span className='inline-block text-[11px] font-semibold text-amber-400 uppercase tracking-wider'>
-                              Stockout
-                            </span>
-                          ) : activeCampaign?.roasStatus === 'ABOVE_TARGET' ? (
-                            <span className='inline-block text-[11px] font-medium text-emerald-400 capitalize'>
-                              Above target
-                            </span>
-                          ) : activeCampaign?.roasStatus === 'BELOW_BREAKEVEN' ? (
-                            <span className='inline-block text-[11px] font-medium text-rose-400 capitalize'>
-                              Below breakeven
-                            </span>
-                          ) : (
-                            <span className='inline-block text-[11px] font-medium text-[#8E8F94] capitalize'>
-                              Optimal
-                            </span>
-                          )}
+                          <span
+                            className={cn(
+                              'inline-block px-2 py-0.5 rounded-full text-[10px] font-mono tracking-wider border',
+                              isStockout
+                                ? 'bg-[#FDEBEC] text-[#9F2F2D] border-[#F9D6D8]'
+                                : activeCampaign?.roasStatus === 'ABOVE_TARGET'
+                                ? 'bg-[#EDF3EC] text-[#346538] border-[#DCEAD9]'
+                                : activeCampaign?.roasStatus === 'BELOW_BREAKEVEN'
+                                ? 'bg-[#FDEBEC] text-[#9F2F2D] border-[#F9D6D8]'
+                                : 'bg-[#FBF3DB] text-[#956400] border-[#F5E6BF]'
+                            )}
+                          >
+                            {isStockout ? 'STOCKOUT' : activeCampaign?.roasStatus || 'OPTIMAL'}
+                          </span>
                         </td>
                       </tr>
 
-                      {/* 6. EXPANDED DETAIL BREAKDOWN ROW */}
+                      {/* Drop-Down Expanded Sub-Table: Cross-Platform Side-by-Side Breakdown */}
                       {isExpanded && (
-                        <tr className='bg-[#0E0F12] border-b border-[#1F2023]'>
+                        <tr className='bg-[#FBFBFA] dark:bg-[#111214] border-b border-[#EAEAEA] dark:border-[#262626]'>
                           <td colSpan={10} className='p-0'>
-                            <div className='p-6 pl-14 space-y-4'>
-                              {/* Summary Strip */}
-                              <div className='flex flex-wrap items-center justify-between gap-4 border-b border-[#1F2023] pb-3'>
-                                <div>
-                                  <div className='text-xs font-semibold text-white'>
-                                    Performance Breakdown: {p.productName}
-                                  </div>
-                                  <div className='text-[11px] text-[#7A7B82] mt-0.5'>
-                                    {p.sku} • {p.availablePlatforms.length} connected channel{p.availablePlatforms.length > 1 ? 's' : ''}
-                                  </div>
+                            <div className='p-5 pl-12 border-l-2 border-[#111111] dark:border-[#EEEEEE] space-y-3'>
+                              <div className='flex items-center justify-between flex-wrap gap-2 pb-2 border-b border-[#EAEAEA] dark:border-[#262626]'>
+                                <div className='font-mono text-xs uppercase tracking-wider text-[#111111] dark:text-[#FFFFFF]'>
+                                  Marketplace Breakdown: {p.productName} ({p.sku})
                                 </div>
-
-                                <div className='flex items-center gap-4 text-xs font-mono tabular-nums'>
-                                  <div>
-                                    <span className='text-[#6E6F76]'>Combined Daily Spend:</span>{' '}
-                                    <span className='text-white font-medium'>${p.totalSpend.toFixed(2)}</span>
-                                  </div>
-                                  <div>
-                                    <span className='text-[#6E6F76]'>Blended ROAS:</span>{' '}
-                                    <span className='text-emerald-400 font-bold'>{p.blendedRoas.toFixed(2)}x</span>
-                                  </div>
+                                <div className='flex items-center gap-3 text-[11px] font-mono text-[#787774]'>
+                                  <span>
+                                    Combined Spend: <strong className='text-[#111111] dark:text-[#FFFFFF]'>${p.totalSpend.toFixed(0)}</strong>
+                                  </span>
+                                  <span>•</span>
+                                  <span>
+                                    Blended ROAS:{' '}
+                                    <strong className='text-[#346538]'>
+                                      {p.blendedRoas.toFixed(2)}x
+                                    </strong>
+                                  </span>
                                 </div>
                               </div>
 
-                              {/* Multi-Channel Comparison Grid */}
-                              <div className='border border-[#1F2023] rounded-lg overflow-hidden bg-[#111215]'>
-                                <table className='w-full text-left text-xs'>
+                              <div className='border border-[#EAEAEA] dark:border-[#262626] rounded-[6px] overflow-hidden bg-[#FFFFFF] dark:bg-[#141517]'>
+                                <table className='w-full text-left text-xs font-mono'>
                                   <thead>
-                                    <tr className='border-b border-[#1F2023] text-[10px] font-medium text-[#7A7B82] uppercase tracking-wider bg-[#0C0D0F]'>
-                                      <th className='py-2.5 px-3 font-medium'>Channel</th>
-                                      <th className='py-2.5 px-3 font-medium'>Campaign</th>
-                                      <th className='py-2.5 px-3 text-right font-medium'>Daily Spend</th>
-                                      <th className='py-2.5 px-3 text-right font-medium'>Share</th>
-                                      <th className='py-2.5 px-3 text-right font-medium'>ROAS</th>
-                                      <th className='py-2.5 px-3 text-right font-medium'>Margin</th>
-                                      <th className='py-2.5 px-3 text-center font-medium'>Health</th>
-                                      <th className='py-2.5 px-3 text-center font-medium'>Status</th>
-                                      <th className='py-2.5 px-3 text-right font-medium'>View</th>
+                                    <tr className='border-b border-[#EAEAEA] dark:border-[#262626] text-[10px] text-[#787774] uppercase tracking-wider bg-[#FBFBFA] dark:bg-[#111214]'>
+                                      <th className='py-2 px-3'>Marketplace</th>
+                                      <th className='py-2 px-3'>Campaign Key</th>
+                                      <th className='py-2 px-3 text-right'>Daily Spend</th>
+                                      <th className='py-2 px-3 text-right'>Spend Share</th>
+                                      <th className='py-2 px-3 text-right'>ROAS</th>
+                                      <th className='py-2 px-3 text-right'>Margin %</th>
+                                      <th className='py-2 px-3 text-right'>ERP Stock</th>
+                                      <th className='py-2 px-3 text-center'>Health</th>
+                                      <th className='py-2 px-3 text-center'>Status</th>
+                                      <th className='py-2 px-3 text-right'>Row Action</th>
                                     </tr>
                                   </thead>
-                                  <tbody className='divide-y divide-[#18191C]'>
+                                  <tbody className='divide-y divide-[#EAEAEA] dark:divide-[#262626]'>
                                     {p.availablePlatforms.map((plat) => {
                                       const c = p.marketplaces[plat];
                                       const cfg = CHANNEL_PRESETS[plat] || CHANNEL_PRESETS['meta'];
@@ -952,72 +1000,91 @@ export default function SkuChannelMatrixPage() {
                                           key={plat}
                                           className={cn(
                                             'transition-colors',
-                                            isCurrentActive ? 'bg-[#18191E]' : 'hover:bg-[#15161A]'
+                                            isCurrentActive ? 'bg-[#F7F6F3] dark:bg-[#1E1F21]' : 'hover:bg-[#F9F9F8] dark:hover:bg-[#18191B]'
                                           )}
                                         >
-                                          <td className='py-2 px-3 font-medium'>
+                                          <td className='py-2 px-3'>
                                             <div className='flex items-center gap-2'>
-                                              <PlatformLogo platform={plat} size={13} className='shrink-0' />
-                                              <span className='text-white'>{cfg.name}</span>
+                                              <div className='size-5 rounded-[3px] border border-[#EAEAEA] dark:border-[#262626] bg-[#FFFFFF] dark:bg-[#141517] flex items-center justify-center shrink-0 p-0.5'>
+                                                <PlatformLogo platform={plat} size={12} className='shrink-0' />
+                                              </div>
+                                              <span className={cn('px-2 py-0.5 rounded-[3px] text-[10px] font-mono border font-medium', cfg.badgeStyle)}>
+                                                {cfg.name}
+                                              </span>
                                             </div>
                                           </td>
 
-                                          <td className='py-2 px-3 text-[11px] text-[#7A7B82] truncate max-w-xs'>
+                                          <td className='py-2 px-3 text-[10px] text-[#787774]'>
                                             {c.campaign}
                                           </td>
 
-                                          <td className='py-2 px-3 text-right font-mono tabular-nums text-white'>
+                                          <td className='py-2 px-3 text-right tabular-nums text-[#111111] dark:text-[#FFFFFF]'>
                                             ${c.currentDailySpend.toFixed(0)}
                                           </td>
 
-                                          <td className='py-2 px-3 text-right font-mono tabular-nums text-[#7A7B82] text-[11px]'>
+                                          <td className='py-2 px-3 text-right tabular-nums text-[#787774] text-[11px]'>
                                             {spendShare.toFixed(1)}%
                                           </td>
 
-                                          <td className='py-2 px-3 text-right font-mono tabular-nums font-semibold'>
+                                          <td className='py-2 px-3 text-right tabular-nums font-semibold'>
                                             <span
                                               className={cn(
                                                 c.roas < 1.8
-                                                  ? 'text-rose-400'
+                                                  ? 'text-[#9F2F2D]'
                                                   : c.roas < 3.2
-                                                  ? 'text-amber-400'
-                                                  : 'text-emerald-400'
+                                                  ? 'text-[#956400]'
+                                                  : 'text-[#346538]'
                                               )}
                                             >
                                               {c.roas.toFixed(2)}x
                                             </span>
                                           </td>
 
-                                          <td className='py-2 px-3 text-right font-mono tabular-nums text-emerald-400'>
+                                          <td className='py-2 px-3 text-right tabular-nums text-[#346538]'>
                                             {c.marginPct.toFixed(1)}%
                                           </td>
 
-                                          <td className='py-2 px-3 text-center font-mono tabular-nums text-[#8E8F94]'>
-                                            {c.healthScore}
+                                          <td className='py-2 px-3 text-right tabular-nums'>
+                                            {isStockout ? (
+                                              <span className='text-[#9F2F2D] text-[10px]'>0 (OUT)</span>
+                                            ) : (
+                                              <span>{c.inventory.toLocaleString()} u</span>
+                                            )}
                                           </td>
 
                                           <td className='py-2 px-3 text-center'>
-                                            {isStockout ? (
-                                              <span className='text-[10px] text-amber-400 font-medium'>Stockout</span>
-                                            ) : (
-                                              <span className='text-[10px] text-[#8E8F94] capitalize'>
-                                                {c.roasStatus.replace('_', ' ').toLowerCase()}
-                                              </span>
-                                            )}
+                                            <span className='text-[10px] text-[#787774]'>
+                                              {c.healthScore}/100
+                                            </span>
+                                          </td>
+
+                                          <td className='py-2 px-3 text-center'>
+                                            <span
+                                              className={cn(
+                                                'inline-block px-1.5 py-0.2 rounded-full text-[9px] font-mono tracking-wider border',
+                                                isStockout
+                                                  ? 'bg-[#FDEBEC] text-[#9F2F2D] border-[#F9D6D8]'
+                                                  : c.roasStatus === 'ABOVE_TARGET'
+                                                  ? 'bg-[#EDF3EC] text-[#346538] border-[#DCEAD9]'
+                                                  : 'bg-[#FBF3DB] text-[#956400] border-[#F5E6BF]'
+                                              )}
+                                            >
+                                              {isStockout ? 'OUT' : c.roasStatus}
+                                            </span>
                                           </td>
 
                                           <td className='py-2 px-3 text-right'>
                                             {isCurrentActive ? (
-                                              <span className='text-[11px] text-emerald-400 font-medium'>
-                                                Active
+                                              <span className='text-[10px] font-mono text-[#346538] font-medium flex items-center justify-end gap-1'>
+                                                <SvgCheck className='size-3' /> Active
                                               </span>
                                             ) : (
                                               <button
                                                 type='button'
                                                 onClick={() => handleSelectPlatform(p.sku, plat)}
-                                                className='px-2 py-0.5 text-[11px] rounded border border-[#27282D] hover:bg-[#1E1F24] text-[#C4C4C8] hover:text-white transition-colors'
+                                                className='px-2 py-0.5 text-[10px] font-mono rounded-[3px] border border-[#EAEAEA] dark:border-[#262626] hover:bg-[#EAEAEA] dark:hover:bg-[#262626] transition-colors'
                                               >
-                                                Select
+                                                Switch View
                                               </button>
                                             )}
                                           </td>
@@ -1040,18 +1107,26 @@ export default function SkuChannelMatrixPage() {
         )}
       </div>
 
-      {/* 5. MINIMAL BOTTOM META */}
-      <div className='flex flex-col sm:flex-row items-center justify-between text-xs text-[#6E6F76] pt-2 gap-2 border-t border-[#1F2023]'>
-        <div>
-          Showing {filteredProducts.length} of {productGroups.length} products
-        </div>
+      {/* 6. TECHNICAL AUDIT FOOTER & KEYSTROKE REFERENCE */}
+      <div className='w-full border-t border-[#EAEAEA] dark:border-[#262626] pt-4 flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-[#787774] gap-2'>
         <div className='flex items-center gap-3'>
+          <span>STORAGE: DuckDB + PostgreSQL 16</span>
+          <span>•</span>
+          <span>SCHEMA: v_daily_unit_economics</span>
+          <span>•</span>
+          <span>UPDATED: {data?.timestamp ? new Date(data.timestamp).toLocaleTimeString() : 'Pending'}</span>
+        </div>
+        <div className='flex items-center gap-2'>
           <span>Shortcuts:</span>
-          <span><kbd className='px-1 py-0.5 rounded border border-[#27282D] bg-[#141518] text-[#8E8F94]'>/</kbd> Search</span>
-          <span><kbd className='px-1 py-0.5 rounded border border-[#27282D] bg-[#141518] text-[#8E8F94]'>R</kbd> Sync</span>
-          <span><kbd className='px-1 py-0.5 rounded border border-[#27282D] bg-[#141518] text-[#8E8F94]'>E</kbd> Expand</span>
+          <kbd className='px-1.5 py-0.5 rounded border border-[#EAEAEA] dark:border-[#262626] bg-[#FFFFFF] dark:bg-[#141517]'>/</kbd>
+          <span>Search</span>
+          <kbd className='px-1.5 py-0.5 rounded border border-[#EAEAEA] dark:border-[#262626] bg-[#FFFFFF] dark:bg-[#141517]'>R</kbd>
+          <span>Sync</span>
+          <kbd className='px-1.5 py-0.5 rounded border border-[#EAEAEA] dark:border-[#262626] bg-[#FFFFFF] dark:bg-[#141517]'>E</kbd>
+          <span>Expand</span>
         </div>
       </div>
+
     </div>
   );
 }

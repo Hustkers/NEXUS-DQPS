@@ -98,10 +98,17 @@ def sync_nike_products_to_db(conn):
 
 
 def generate_state():
-    # Build simulated world with Nike catalog
-    world = build_world(seed=42, days=90)
-    df = world["metrics"]
-    events = world["events"]
+    # Prefer pre-synthesized omnichannel dataset in metrics.csv if available
+    metrics_csv = Path("data/metrics.csv")
+    if metrics_csv.exists():
+        df = pd.read_csv(metrics_csv)
+        df["date"] = pd.to_datetime(df["date"])
+        events = []
+    else:
+        # Build simulated world with Nike catalog
+        world = build_world(seed=42, days=90)
+        df = world["metrics"]
+        events = world["events"]
 
     # Compute ROAS & CVR
     df["roas"] = np.where(df["spend"] > 0, df["revenue"] / df["spend"], 0.0)
@@ -232,7 +239,7 @@ def generate_state():
             "inventory": c_inv,
             "price": round(c_price, 2),
             "marginPct": round(c_margin_pct * 100, 1),
-            "pacingPct": int(np.clip((c_spend / 2500) * 100, 40, 110)),
+            "pacingPct": int(np.clip((c_spend / 30000) * 100, 40, 110)),
             "sparkline": sparkline
         })
 
@@ -384,9 +391,9 @@ def generate_state():
         {
             "id": "ledg-1",
             "timestamp": "2026-10-06 14:32:10",
-            "decision": "Shift ₹1,850/day from meta-315122-001 (Nike Air Force 1 stockout) -> google-CD4371-001 (React Infinity Flyknit)",
-            "expectedMargin": 3450.0,
-            "realizedMargin": 3610.5,
+            "decision": "Shift ₹1,55,400/day from meta-315122-001 (Nike Air Force 1 stockout) -> google-CD4371-001 (React Infinity Flyknit)",
+            "expectedMargin": 289800.0,
+            "realizedMargin": 303282.0,
             "variancePct": 4.7,
             "accuracyPct": 95.3,
             "confidence": 0.94,
@@ -396,9 +403,9 @@ def generate_state():
         {
             "id": "ledg-2",
             "timestamp": "2026-10-05 09:15:00",
-            "decision": "Scale tiktok-AH8050-100 (Nike Air Max 270) budget +₹920/day on viral footwear trend",
-            "expectedMargin": 6800.0,
-            "realizedMargin": 6590.0,
+            "decision": "Scale tiktok-AH8050-100 (Nike Air Max 270) budget +₹77,280/day on viral footwear trend",
+            "expectedMargin": 571200.0,
+            "realizedMargin": 553560.0,
             "variancePct": -3.1,
             "accuracyPct": 96.9,
             "confidence": 0.88,
@@ -408,9 +415,9 @@ def generate_state():
         {
             "id": "ledg-3",
             "timestamp": "2026-10-04 18:45:22",
-            "decision": "Throttle amazon-849559-004 (Air Max 2017) spend -₹650/day due to competitor footwear discount",
-            "expectedMargin": 1400.0,
-            "realizedMargin": 1375.0,
+            "decision": "Throttle amazon-849559-004 (Air Max 2017) spend -₹54,600/day due to competitor footwear discount",
+            "expectedMargin": 117600.0,
+            "realizedMargin": 115500.0,
             "variancePct": -1.8,
             "accuracyPct": 98.2,
             "confidence": 0.91,
@@ -426,17 +433,17 @@ def generate_state():
             "name": "Hero Air Force 1 '07 Stockout Shock",
             "description": "Top-selling hero shoe (Nike Air Force 1 '07, 65% gross margin) runs out of warehouse inventory. Ad spend keeps driving traffic to an empty product page.",
             "injectedEvent": "ERP inventory reaches 0 on SKU 315122-001",
-            "autonomousResponse": "Stockout Kill-Switch activates in <15 mins. Spend throttled -₹2,200/day and diverted to Google Shopping React Infinity Flyknit (+3.6x ROAS).",
-            "expectedSavedWaste": "₹15,400 / week",
+            "autonomousResponse": "Stockout Kill-Switch activates in <15 mins. Spend throttled -₹1,84,800/day and diverted to Google Shopping React Infinity Flyknit (+3.6x ROAS).",
+            "expectedSavedWaste": "₹12,93,600 / week",
             "severity": "CRITICAL"
         },
         {
             "id": "scenario-cpm-spike",
             "name": "Meta Footwear Auction CPM Surge (+45%)",
-            "description": "Holiday sneaker flash sales drive Meta Advantage+ CPM from ₹9.50 to ₹14.20, compressing ROAS below the 1.8x break-even floor.",
+            "description": "Holiday sneaker flash sales drive Meta Advantage+ CPM from ₹798 to ₹1,192, compressing ROAS below the 1.8x break-even floor.",
             "injectedEvent": "Meta network sneaker auction inflation +45%",
-            "autonomousResponse": "ROAS drops below break-even. Engine pulls ₹3,500/day from Meta and redistributes to Amazon Sponsored Products & Google PMax.",
-            "expectedSavedWaste": "₹9,200 / week",
+            "autonomousResponse": "ROAS drops below break-even. Engine pulls ₹2,94,000/day from Meta and redistributes to Amazon Sponsored Products & Google PMax.",
+            "expectedSavedWaste": "₹7,72,800 / week",
             "severity": "HIGH"
         },
         {
@@ -445,7 +452,7 @@ def generate_state():
             "description": "Hero sneaker UGC video frequency exceeds 5.2. Hook rate collapses, CTR drops 60%, and customer acquisition cost (CAC) doubles.",
             "injectedEvent": "Creative fatigue wear-out on TikTok UGC batch #4",
             "autonomousResponse": "Auto-pauses exhausted ad set, triggers creative refresh alert to Nike design studio, and reroutes spend to high-vitality Meta Reels.",
-            "expectedSavedWaste": "₹5,200 / week",
+            "expectedSavedWaste": "₹4,36,800 / week",
             "severity": "MEDIUM"
         },
         {
@@ -454,7 +461,7 @@ def generate_state():
             "description": "Rival footwear seller launches aggressive 25% price drop on Amazon, lowering Nike Zoom Fly conversion rate from 4.8% to 2.8%.",
             "injectedEvent": "Marketplace conversion rate drops -35%",
             "autonomousResponse": "Optimizer re-solves scipy convex problem: shifts capital to Nike Direct Brand Search where gross margins are preserved at 68%.",
-            "expectedSavedWaste": "₹6,800 / week",
+            "expectedSavedWaste": "₹5,71,200 / week",
             "severity": "MEDIUM"
         }
     ]
@@ -483,11 +490,11 @@ def generate_state():
             "targetRoas": 3.20,
             "breakevenRoas": 1.80,
             "roasDelta30d": "+14.8%",
-            "totalManagedBudget": 145000,
+            "totalManagedBudget": 12180000.0,
             "activeAnomaliesCount": len(anomalies_feed),
             "reallocationsCount": len(reallocations),
-            "reallocationCapitalMoved": 19850.0,
-            "projectedMarginUplift": 35200.0
+            "reallocationCapitalMoved": 1667400.0,
+            "projectedMarginUplift": 2956800.0
         },
         "platforms": platform_data,
         "dailyTrend": daily_trend,

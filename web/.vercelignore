@@ -1,7 +1,2 @@
 # Exclude cleanup/reference files from Vercel build
 __CLEANUP__
-
-# Exclude Bun configuration to ensure Vercel uses Node.js / pnpm
-bun.lock
-bunfig.toml
-Dockerfile.bun

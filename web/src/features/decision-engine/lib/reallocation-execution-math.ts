@@ -58,14 +58,15 @@ export function buildReallocationExecutionDetails(
 
   // 5. Why better rationale
   const roasDifference = +(destNewRoas - sourceRoas).toFixed(2);
-  const liftPerRupee = absDelta > 0 ? +(expectedDailyMargin / absDelta).toFixed(2) : 0;
+  const liftPerDollar = absDelta > 0 ? +(expectedDailyMargin / absDelta).toFixed(2) : 0;
 
   const whyBetter = {
     sourceRoas,
     destinationRoas: destNewRoas,
     roasDifference,
-    liftPerRupee,
-    summary: `Source campaign operates at ${sourceRoas.toFixed(2)}x ROAS, while ${item.targetProductName || item.targetCampaign} operates along an escalating marginal return curve targeting ${destNewRoas.toFixed(2)}x ROAS (+₹${liftPerRupee} margin generated per ₹1 shifted).`
+    liftPerDollar,
+    liftPerRupee: liftPerDollar,
+    summary: `Source campaign operates at ${sourceRoas.toFixed(2)}x ROAS, while ${item.targetProductName || item.targetCampaign} operates along an escalating marginal return curve targeting ${destNewRoas.toFixed(2)}x ROAS (+$${liftPerDollar} margin generated per $1 shifted).`
   };
 
   // 6. Metrics comparison array
@@ -73,9 +74,9 @@ export function buildReallocationExecutionDetails(
     {
       key: 'spend',
       label: 'Target Daily Spend',
-      beforeFormatted: `₹${Math.round(destOldSpend).toLocaleString('en-IN')}`,
-      afterFormatted: `₹${Math.round(destNewSpend).toLocaleString('en-IN')}`,
-      changeFormatted: `+₹${Math.round(absDelta).toLocaleString('en-IN')}`,
+      beforeFormatted: `$${Math.round(destOldSpend).toLocaleString('en-US')}`,
+      afterFormatted: `$${Math.round(destNewSpend).toLocaleString('en-US')}`,
+      changeFormatted: `+$${Math.round(absDelta).toLocaleString('en-US')}`,
       pctChangeFormatted: `+${spendDeltaPct.toFixed(1)}%`,
       isPositive: true,
       beforeValue: Math.round(destOldSpend),
@@ -95,9 +96,9 @@ export function buildReallocationExecutionDetails(
     {
       key: 'lift',
       label: 'Expected Daily Lift',
-      beforeFormatted: '₹0',
-      afterFormatted: `+₹${Math.round(expectedDailyMargin).toLocaleString('en-IN')}`,
-      changeFormatted: `+₹${Math.round(expectedDailyMargin).toLocaleString('en-IN')}`,
+      beforeFormatted: '$0',
+      afterFormatted: `+$${Math.round(expectedDailyMargin).toLocaleString('en-US')}`,
+      changeFormatted: `+$${Math.round(expectedDailyMargin).toLocaleString('en-US')}`,
       pctChangeFormatted: `+100%`,
       isPositive: true,
       beforeValue: 0,
@@ -106,9 +107,9 @@ export function buildReallocationExecutionDetails(
     {
       key: 'revenue',
       label: 'Target Daily Revenue',
-      beforeFormatted: `₹${Math.round(destOldRevenue).toLocaleString('en-IN')}`,
-      afterFormatted: `₹${Math.round(destNewRevenue).toLocaleString('en-IN')}`,
-      changeFormatted: `+₹${Math.round(revenueDelta).toLocaleString('en-IN')}`,
+      beforeFormatted: `$${Math.round(destOldRevenue).toLocaleString('en-US')}`,
+      afterFormatted: `$${Math.round(destNewRevenue).toLocaleString('en-US')}`,
+      changeFormatted: `+$${Math.round(revenueDelta).toLocaleString('en-US')}`,
       pctChangeFormatted: `+${revenueDeltaPct.toFixed(1)}%`,
       isPositive: true,
       beforeValue: Math.round(destOldRevenue),
@@ -119,22 +120,22 @@ export function buildReallocationExecutionDetails(
   // 7. Grouped Chart data for Recharts (scaled metrics)
   const chartData = [
     {
-      metric: 'Daily Spend (₹)',
+      metric: 'Daily Spend ($)',
       Before: Math.round(destOldSpend),
       After: Math.round(destNewSpend),
-      unit: '₹'
+      unit: '$'
     },
     {
-      metric: 'Gross Revenue (₹)',
+      metric: 'Gross Revenue ($)',
       Before: Math.round(destOldRevenue),
       After: Math.round(destNewRevenue),
-      unit: '₹'
+      unit: '$'
     },
     {
-      metric: 'Expected Lift (₹)',
+      metric: 'Expected Lift ($)',
       Before: 0,
       After: Math.round(expectedDailyMargin),
-      unit: '₹'
+      unit: '$'
     }
   ];
 
@@ -206,6 +207,6 @@ export function buildReallocationExecutionDetails(
       statusText: 'Audited & Recorded in Decision Ledger'
     },
     anomaly: anomalyMeta,
-    recommendedAction: `REDUCE ₹${Math.round(absDelta).toLocaleString('en-IN')}/day`
+    recommendedAction: `REDUCE $${Math.round(absDelta).toLocaleString('en-US')}/day`
   };
 }

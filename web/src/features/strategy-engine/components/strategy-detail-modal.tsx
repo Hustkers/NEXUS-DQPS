@@ -129,12 +129,12 @@ export function StrategyDetailModal({
               <div className='p-3 rounded-xl border border-border/80 bg-muted/20'>
                 <span className='text-[10px] text-muted-foreground block'>Expected Revenue</span>
                 <span className='text-base font-bold text-foreground'>
-                  ₹{ev?.expectedRevenue.toLocaleString()}
+                  ${ev?.expectedRevenue.toLocaleString()}
                 </span>
               </div>
               <div className='p-3 rounded-xl border border-border/80 bg-muted/20'>
                 <span className='text-[10px] text-muted-foreground block'>Expected CPA</span>
-                <span className='text-base font-bold text-foreground'>₹{ev?.expectedCpa.toLocaleString()}</span>
+                <span className='text-base font-bold text-foreground'>${ev?.expectedCpa.toLocaleString()}</span>
               </div>
               <div className='p-3 rounded-xl border border-border/80 bg-muted/20'>
                 <span className='text-[10px] text-muted-foreground block'>Expected Conversions</span>
@@ -148,7 +148,7 @@ export function StrategyDetailModal({
               </div>
               <div className='p-3 rounded-xl border border-border/80 bg-muted/20'>
                 <span className='text-[10px] text-muted-foreground block'>Expected CPC</span>
-                <span className='text-sm font-bold text-foreground'>₹{ev?.expectedCpc.toFixed(2)}</span>
+                <span className='text-sm font-bold text-foreground'>${ev?.expectedCpc.toFixed(2)}</span>
               </div>
               <div className='p-3 rounded-xl border border-border/80 bg-muted/20'>
                 <span className='text-[10px] text-muted-foreground block'>Risk Score</span>
@@ -209,7 +209,7 @@ export function StrategyDetailModal({
               <div>
                 <span className='text-[10px] text-muted-foreground block'>Budget Allocation</span>
                 <p className='text-[11px] text-foreground font-bold mt-0.5'>
-                  ₹{strategy.budgetAllocation.toLocaleString()} ({strategy.campaignDuration} Days)
+                  ${strategy.budgetAllocation.toLocaleString()} ({strategy.campaignDuration} Days)
                 </p>
               </div>
 
@@ -236,23 +236,23 @@ export function StrategyDetailModal({
               <div className='grid grid-cols-1 md:grid-cols-3 gap-3'>
                 <div className='p-3 rounded-lg border border-border/60 bg-muted/20 space-y-1'>
                   <span className='text-[10px] uppercase font-bold text-muted-foreground block'>Conservative Case</span>
-                  <span className='text-base font-bold text-foreground block'>₹{strategy.forecast.conservative.revenue.toLocaleString()}</span>
+                  <span className='text-base font-bold text-foreground block'>${strategy.forecast.conservative.revenue.toLocaleString()}</span>
                   <span className='text-[11px] text-amber-400 block'>{strategy.forecast.conservative.roas.toFixed(2)}x ROAS • {strategy.forecast.conservative.conversions} Orders</span>
-                  <span className='text-[10px] text-muted-foreground block'>CPA: ₹{strategy.forecast.conservative.cpa.toLocaleString()}</span>
+                  <span className='text-[10px] text-muted-foreground block'>CPA: ${strategy.forecast.conservative.cpa.toLocaleString()}</span>
                 </div>
 
                 <div className='p-3 rounded-lg border border-cyan-500/40 bg-cyan-500/10 space-y-1'>
                   <span className='text-[10px] uppercase font-bold text-cyan-400 block'>Expected Case (Base)</span>
-                  <span className='text-base font-bold text-foreground block'>₹{strategy.forecast.expected.revenue.toLocaleString()}</span>
+                  <span className='text-base font-bold text-foreground block'>${strategy.forecast.expected.revenue.toLocaleString()}</span>
                   <span className='text-[11px] text-emerald-400 block'>{strategy.forecast.expected.roas.toFixed(2)}x ROAS • {strategy.forecast.expected.conversions} Orders</span>
-                  <span className='text-[10px] text-muted-foreground block'>CPA: ₹{strategy.forecast.expected.cpa.toLocaleString()}</span>
+                  <span className='text-[10px] text-muted-foreground block'>CPA: ${strategy.forecast.expected.cpa.toLocaleString()}</span>
                 </div>
 
                 <div className='p-3 rounded-lg border border-border/60 bg-muted/20 space-y-1'>
                   <span className='text-[10px] uppercase font-bold text-emerald-400 block'>Optimistic Case</span>
-                  <span className='text-base font-bold text-foreground block'>₹{strategy.forecast.optimistic.revenue.toLocaleString()}</span>
+                  <span className='text-base font-bold text-foreground block'>${strategy.forecast.optimistic.revenue.toLocaleString()}</span>
                   <span className='text-[11px] text-emerald-400 block'>{strategy.forecast.optimistic.roas.toFixed(2)}x ROAS • {strategy.forecast.optimistic.conversions} Orders</span>
-                  <span className='text-[10px] text-muted-foreground block'>CPA: ₹{strategy.forecast.optimistic.cpa.toLocaleString()}</span>
+                  <span className='text-[10px] text-muted-foreground block'>CPA: ${strategy.forecast.optimistic.cpa.toLocaleString()}</span>
                 </div>
               </div>
               <p className='text-[10px] text-muted-foreground'>{strategy.forecast.explanation}</p>

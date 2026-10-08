@@ -1,39 +1,31 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Icons } from '@/components/icons';
+import React, { useState, useMemo } from 'react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  BarChart,
-  Bar
-} from 'recharts';
-import {
-  IconShare,
+  IconFingerprint,
   IconShieldCheck,
-  IconMathFunction,
-  IconTerminal
+  IconNetwork,
+  IconArrowRight,
+  IconCopy,
+  IconCheck,
+  IconDeviceDesktop,
+  IconDeviceMobile,
+  IconCpu,
+  IconScale,
+  IconBrandGoogle,
+  IconBrandMeta,
+  IconBrandTiktok,
+  IconShoppingCart,
+  IconCode,
+  IconCalculator,
+  IconInfoCircle,
+  IconLock,
+  IconServer
 } from '@tabler/icons-react';
-import { FingerprintNetworkGraph } from './fingerprint-network-graph';
-import { FingerprintEntropyLab } from './fingerprint-entropy-lab';
-import { FingerprintDefenseSimulator } from './fingerprint-defense-simulator';
-import { FingerprintStudentCodeLab } from './fingerprint-student-code-lab';
 
-/**
- * 1. DETERMINISTIC HARDWARE SIGNATURES
- * A hardware profile only provides entropy signals for deterministic matching.
- * It does NOT dictate financial transactions.
- */
-export interface DeviceProfile {
+export interface DeviceEntropyProfile {
   id: string;
   name: string;
   deviceType: 'desktop' | 'mobile';
@@ -47,11 +39,13 @@ export interface DeviceProfile {
   hardwareConcurrency: number;
   deviceMemoryGb: number;
   ipSubnet: string;
+  edgePop: string;
+  edgeLatencyMs: number;
   fingerprintId: string;
   confidenceScore: number;
 }
 
-export const SAMPLE_DEVICES: DeviceProfile[] = [
+export const SAMPLE_DEVICES: DeviceEntropyProfile[] = [
   {
     id: 'macbook-m3',
     name: 'MacBook Pro 16" (M3 Max)',
@@ -65,7 +59,9 @@ export const SAMPLE_DEVICES: DeviceProfile[] = [
     colorDepth: '30-bit (P3 Wide Gamut)',
     hardwareConcurrency: 16,
     deviceMemoryGb: 36,
-    ipSubnet: '198.51.100.0/24 (Comcast Cable)',
+    ipSubnet: '198.51.100.0/24 (Comcast Anycast)',
+    edgePop: 'EWR (Newark, NJ)',
+    edgeLatencyMs: 14,
     fingerprintId: 'FP-8F92-A74B-M3MAX',
     confidenceScore: 99.8
   },
@@ -82,7 +78,9 @@ export const SAMPLE_DEVICES: DeviceProfile[] = [
     colorDepth: '24-bit (Display P3)',
     hardwareConcurrency: 6,
     deviceMemoryGb: 8,
-    ipSubnet: '172.56.21.0/24 (T-Mobile 5G)',
+    ipSubnet: '172.56.21.0/24 (T-Mobile 5G Edge)',
+    edgePop: 'SFO (San Francisco, CA)',
+    edgeLatencyMs: 22,
     fingerprintId: 'FP-3C81-992F-A18PRO',
     confidenceScore: 99.4
   },
@@ -91,7 +89,7 @@ export const SAMPLE_DEVICES: DeviceProfile[] = [
     name: 'ThinkPad X1 Carbon Gen 12',
     deviceType: 'desktop',
     os: 'Windows 11 Pro 24H2',
-    browser: 'Chrome 131.0.6778 (Blink)',
+    browser: 'Chrome 131.0.6778 (Blink Engine)',
     gpuRenderer: 'Intel Arc Graphics (Direct3D11)',
     canvasHash: 'cv2_d489b0151f88',
     audioHash: 'au_0.00015920a3',
@@ -99,1477 +97,842 @@ export const SAMPLE_DEVICES: DeviceProfile[] = [
     colorDepth: '24-bit (sRGB)',
     hardwareConcurrency: 16,
     deviceMemoryGb: 32,
-    ipSubnet: '108.162.193.0/24 (AT&T Fiber)',
+    ipSubnet: '108.162.193.0/24 (AT&T Fiber Catchment)',
+    edgePop: 'ORD (Chicago, IL)',
+    edgeLatencyMs: 18,
     fingerprintId: 'FP-D489-B015-INTEL',
     confidenceScore: 99.1
   }
 ];
 
-/**
- * 2. DETERMINISTIC TRANSACTION & AD EVENT FIXTURE
- * Consistent e-commerce transaction across cross-channel attribution tests.
- * Financial metrics stem from the actual purchase event and campaign ledger,
- * NOT the hardware platform.
- */
-export interface TransactionFixture {
-  orderId: string;
-  productTitle: string;
+export interface MultiTouchJourney {
+  id: string;
+  visitorId: string;
   sku: string;
-  asin: string;
-  itemPrice: number;
-  quantity: number;
-  grossRevenue: number;
-  cogs: number;
-  realizedGrossMargin: number;
-  grossMarginPct: number;
-  youtubeImpressionCpmCost: number; // CPM ₹24 / 1000 = ₹0.024
-  youtubeClickCpcCost: number;      // CPC ₹0.850
-  totalAttributedAdSpend: number;   // ₹0.024 + ₹0.850 = ₹0.874
-  assistedRoas: number;             // Gross Revenue / Total Ad Spend = 170.00 / 0.874 = 194.51
+  productName: string;
+  retailPrice: number;
+  unitCogs: number;
+  gstPct: number;
+  freightCost: number;
+  freightZone: string;
+  steps: {
+    stage: 'Discovery' | 'Intent' | 'Retargeting' | 'Conversion';
+    platform: 'tiktok' | 'google' | 'meta' | 'shopify';
+    platformLabel: string;
+    tokenType: string;
+    tokenValue: string;
+    campaign: string;
+    costInr: number;
+    timestamp: string;
+    description: string;
+  }[];
+  shapleyWeights: {
+    tiktok: number;
+    google: number;
+    meta: number;
+  };
 }
 
-export const DETERMINISTIC_TRANSACTION: TransactionFixture = {
-  orderId: 'AMZ-9482-DN77',
-  productTitle: "Nike Men's Air Max Dn Running & Street Shoes (Triple Black)",
-  sku: 'AH8050-100',
-  asin: 'B0CWV8N21K',
-  itemPrice: 170.0,
-  quantity: 1,
-  grossRevenue: 170.0,
-  cogs: 76.5,
-  realizedGrossMargin: 93.5, // 170.00 - 76.50 = 93.50 (55.0% margin)
-  grossMarginPct: 55.0,
-  youtubeImpressionCpmCost: 0.024,
-  youtubeClickCpcCost: 0.85,
-  totalAttributedAdSpend: 0.874,
-  assistedRoas: 194.5 // Explicitly: ₹170.00 revenue ÷ ₹0.874 ad spend = 194.5x
-};
-
-export interface JourneyStepDef {
-  stepNumber: number;
-  title: string;
-  platform: 'youtube' | 'amazon' | 'nexus';
-  shortStage: string;
-  badgeLabel: string;
-  summary: string;
-  timestamp: string;
-  details: string[];
-  eventPayload: Record<string, unknown>;
-}
+export const SAMPLE_JOURNEYS: MultiTouchJourney[] = [
+  {
+    id: 'journey-jordan',
+    visitorId: '6ec1bd17-e30a-4d1d-a5ba-e8043bf8507a',
+    sku: '310805-137',
+    productName: 'Air Jordan 10 Retro',
+    retailPrice: 15995,
+    unitCogs: 5800,
+    gstPct: 18,
+    freightCost: 180,
+    freightZone: 'Zone 2 (Intra-Regional Express)',
+    steps: [
+      {
+        stage: 'Discovery',
+        platform: 'tiktok',
+        platformLabel: 'TikTok Ads',
+        tokenType: 'ttclid',
+        tokenValue: 'tt_cl_f7916968be29_jordan',
+        campaign: 'tiktok-jordan-trend',
+        costInr: 420.0,
+        timestamp: '2026-10-01 19:15:45 UTC',
+        description: 'Preroll 15s video ad impression and hook interaction. First touch discovery.'
+      },
+      {
+        stage: 'Intent',
+        platform: 'google',
+        platformLabel: 'Google Search Ads',
+        tokenType: 'gclid',
+        tokenValue: 'CjwKCAiA2b163dba9bd5_gclid_search',
+        campaign: 'google-search-footwear',
+        costInr: 650.0,
+        timestamp: '2026-10-02 08:30:12 UTC',
+        description: 'High-intent search query for Air Jordan 10 Retro colorways on Google SERP.'
+      },
+      {
+        stage: 'Retargeting',
+        platform: 'meta',
+        platformLabel: 'Meta Advantage+',
+        tokenType: 'fbclid',
+        tokenValue: 'fb.1.1791373540.82b9c0f599c0_reels',
+        campaign: 'meta-retargeting-catalog',
+        costInr: 880.0,
+        timestamp: '2026-10-04 18:45:22 UTC',
+        description: 'Dynamic Product Ad (DPA) carousel click on Instagram Feed with urgency trigger.'
+      },
+      {
+        stage: 'Conversion',
+        platform: 'shopify',
+        platformLabel: 'Shopify D2C Storefront',
+        tokenType: 'order_id',
+        tokenValue: 'ORD-EAE822C3',
+        campaign: 'store.niked2c.com/checkout',
+        costInr: 0,
+        timestamp: '2026-10-04 20:00:53 UTC',
+        description: 'Completed checkout for 1 pair of Air Jordan 10 Retro via UPI/Card.'
+      }
+    ],
+    shapleyWeights: {
+      tiktok: 0.30,
+      google: 0.25,
+      meta: 0.45
+    }
+  },
+  {
+    id: 'journey-airmax',
+    visitorId: 'e1049977-1952-475f-93bb-0743c6d3f482',
+    sku: 'AH8050-100',
+    productName: 'Nike Air Max 270',
+    retailPrice: 13995,
+    unitCogs: 4800,
+    gstPct: 18,
+    freightCost: 180,
+    freightZone: 'Zone 2 (Intra-Regional Express)',
+    steps: [
+      {
+        stage: 'Discovery',
+        platform: 'tiktok',
+        platformLabel: 'TikTok Shop / Spark Ad',
+        tokenType: 'ttclid',
+        tokenValue: 'tt_cl_8914b1c20f11_am270',
+        campaign: 'tiktok-airmax-lifestyle',
+        costInr: 380.0,
+        timestamp: '2026-09-27 20:46:43 UTC',
+        description: 'UGC creator styling video click. User browses sizing and closes browser.'
+      },
+      {
+        stage: 'Intent',
+        platform: 'google',
+        platformLabel: 'Google Performance Max',
+        tokenType: 'gclid',
+        tokenValue: 'CjwKCAiB5p284cca7ef1_gclid_pmax',
+        campaign: 'google-react-intent',
+        costInr: 590.0,
+        timestamp: '2026-09-29 11:15:30 UTC',
+        description: 'Shopping tab comparison click with price parity check against retail.'
+      },
+      {
+        stage: 'Retargeting',
+        platform: 'meta',
+        platformLabel: 'Meta Instagram Stories',
+        tokenType: 'fbclid',
+        tokenValue: 'fb.1.1802947115.34f8a12e88d1_story',
+        campaign: 'meta-airmax-viral',
+        costInr: 740.0,
+        timestamp: '2026-10-04 07:42:10 UTC',
+        description: 'Personalized footwear size alert story ad click driving direct cart recovery.'
+      },
+      {
+        stage: 'Conversion',
+        platform: 'shopify',
+        platformLabel: 'Shopify D2C Storefront',
+        tokenType: 'order_id',
+        tokenValue: 'ORD-B094B65A',
+        campaign: 'store.niked2c.com/checkout',
+        costInr: 0,
+        timestamp: '2026-10-04 09:16:16 UTC',
+        description: 'Verified checkout for 1 pair of Nike Air Max 270 (Triple Black).'
+      }
+    ],
+    shapleyWeights: {
+      tiktok: 0.28,
+      google: 0.32,
+      meta: 0.40
+    }
+  },
+  {
+    id: 'journey-airforce',
+    visitorId: 'c99a1dbb-4f4d-4944-84fe-4aca2e81969b',
+    sku: '315122-001',
+    productName: "Nike Air Force 1 '07",
+    retailPrice: 7495,
+    unitCogs: 3150,
+    gstPct: 18,
+    freightCost: 180,
+    freightZone: 'Zone 2 (Intra-Regional Express)',
+    steps: [
+      {
+        stage: 'Discovery',
+        platform: 'meta',
+        platformLabel: 'Meta Reels Ad',
+        tokenType: 'fbclid',
+        tokenValue: 'fb.1.1788291044.55c192f00a89_reels',
+        campaign: 'meta-315122-001',
+        costInr: 290.0,
+        timestamp: '2026-09-30 11:55:20 UTC',
+        description: 'Hero classic sneaker video ad on Instagram Reels. User explores color options.'
+      },
+      {
+        stage: 'Intent',
+        platform: 'google',
+        platformLabel: 'Google Brand Search',
+        tokenType: 'gclid',
+        tokenValue: 'CjwKCAiC1938fdd19aa2_gclid_brand',
+        campaign: 'google-brand-airforce',
+        costInr: 340.0,
+        timestamp: '2026-10-02 14:10:05 UTC',
+        description: 'Direct search for "Nike Air Force 1 07 White official site" on Google.'
+      },
+      {
+        stage: 'Retargeting',
+        platform: 'tiktok',
+        platformLabel: 'TikTok Retargeting',
+        tokenType: 'ttclid',
+        tokenValue: 'tt_cl_1904fa88bc31_af1',
+        campaign: 'tiktok-retarget-shoes',
+        costInr: 410.0,
+        timestamp: '2026-10-05 16:30:19 UTC',
+        description: 'Exclusive member discount ad on TikTok feed driving instant order placement.'
+      },
+      {
+        stage: 'Conversion',
+        platform: 'shopify',
+        platformLabel: 'Shopify D2C Storefront',
+        tokenType: 'order_id',
+        tokenValue: 'ORD-74D7CB68',
+        campaign: 'store.niked2c.com/checkout',
+        costInr: 0,
+        timestamp: '2026-10-05 18:12:40 UTC',
+        description: 'Completed purchase for 1 pair of Air Force 1 07 White with free Zone 2 delivery.'
+      }
+    ],
+    shapleyWeights: {
+      tiktok: 0.35,
+      google: 0.30,
+      meta: 0.35
+    }
+  }
+];
 
 export function FingerprintTrackerDemo() {
-  const [selectedDevice, setSelectedDevice] = useState<DeviceProfile>(SAMPLE_DEVICES[0]);
-  const [currentStep, setCurrentStep] = useState<number>(5); // Default to full confirmed journey on load
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [showTechnicalSignals, setShowTechnicalSignals] = useState<boolean>(false);
-  const [showDataLineage, setShowDataLineage] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<
-    'ngraph' | 'entropy_lab' | 'defense' | 'journey' | 'code_lab' | 'telemetry' | 'code'
-  >('ngraph');
-  const [copiedFp, setCopiedFp] = useState<boolean>(false);
+  const [selectedDevice, setSelectedDevice] = useState<DeviceEntropyProfile>(SAMPLE_DEVICES[0]);
+  const [selectedJourney, setSelectedJourney] = useState<MultiTouchJourney>(SAMPLE_JOURNEYS[0]);
+  const [copiedToken, setCopiedToken] = useState<string | null>(null);
 
-  // Exact deterministic financial derivations from transaction fixture
-  const txn = DETERMINISTIC_TRANSACTION;
-  const realizedRoas = Number((txn.grossRevenue / txn.totalAttributedAdSpend).toFixed(1)); // 194.5
+  const handleCopy = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedToken(label);
+    toast.success(`Copied ${label} to clipboard`);
+    setTimeout(() => setCopiedToken(null), 2000);
+  };
 
-  // Derive timeline steps dynamically bound to active fingerprint identity and transaction fixture
-  const journeySteps: JourneyStepDef[] = useMemo(() => [
-    {
-      stepNumber: 1,
-      title: 'YouTube Ad Impression: Cookieless Tag Execution',
-      platform: 'youtube',
-      shortStage: 'Impression',
-      badgeLabel: 'STAGE 1: AD IMPRESSION',
-      summary: 'User watches a YouTube video. A 15-second Nike preroll video ad plays with zero 3rd-party cookies.',
-      timestamp: 'Today, 10:14:02 AM',
-      details: [
-        `Client hardware & canvas entropy evaluated on YouTube page via NEXUS cookieless pixel.`,
-        `Deterministic device fingerprint generated: ${selectedDevice.fingerprintId}`,
-        `Impression logged: Campaign "YT_Brand_AirMaxDn_Q4", Cost CPM ₹${txn.youtubeImpressionCpmCost.toFixed(3)}`,
-        `Zero reliance on 3rd-party tracking cookies (bypasses browser cookie blocking & Safari ITP).`
-      ],
-      eventPayload: {
-        event_id: 'evt_yt_imp_9921',
-        event_type: 'AD_IMPRESSION',
-        platform: 'youtube',
-        timestamp: '2026-10-07T10:14:02.194Z',
-        fingerprint_id: selectedDevice.fingerprintId,
-        entropy_match_score: `${selectedDevice.confidenceScore}%`,
-        ad_campaign: 'YT_Brand_AirMaxDn_Q4',
-        creative: 'Nike_AirMaxDn_FeelTheUnreal_15s.mp4',
-        sku_promoted: txn.sku,
-        cost_usd: txn.youtubeImpressionCpmCost,
-        device_meta: {
-          os: selectedDevice.os,
-          gpu: selectedDevice.gpuRenderer,
-          canvas_hash: selectedDevice.canvasHash,
-          resolution: selectedDevice.screenResolution
-        }
-      }
-    },
-    {
-      stepNumber: 2,
-      title: 'YouTube Ad Click: High-Intent Engagement',
-      platform: 'youtube',
-      shortStage: 'Engagement',
-      badgeLabel: 'STAGE 2: AD ENGAGEMENT',
-      summary: 'User gets hooked and clicks "Explore". User views product details but leaves without buying.',
-      timestamp: 'Today, 10:14:18 AM',
-      details: [
-        `Click event registered with matching Fingerprint ID: ${selectedDevice.fingerprintId}`,
-        `Ad interaction logged: Cost CPC ₹${txn.youtubeClickCpcCost.toFixed(3)}`,
-        `User lands on campaign landing page, explores colorways, but closes browser tab.`,
-        `Cumulative ad spend: ₹${txn.totalAttributedAdSpend.toFixed(3)} (CPM + CPC).`,
-        `Traditional ad networks classify this user as "bounced" with 0.0x ROAS.`
-      ],
-      eventPayload: {
-        event_id: 'evt_yt_clk_4810',
-        event_type: 'AD_CLICK',
-        platform: 'youtube',
-        timestamp: '2026-10-07T10:14:18.012Z',
-        fingerprint_id: selectedDevice.fingerprintId,
-        ad_campaign: 'YT_Brand_AirMaxDn_Q4',
-        cost_usd: txn.youtubeClickCpcCost,
-        cumulative_spend_usd: txn.totalAttributedAdSpend,
-        click_target: 'https://nike.com/campaign/airmax-dn?utm_source=youtube',
-        dwell_time_seconds: 14.2,
-        action_outcome: 'TAB_CLOSED_NO_CONVERSION'
-      }
-    },
-    {
-      stepNumber: 3,
-      title: 'Independent Amazon Visit: Walled-Garden Gap Crossed',
-      platform: 'amazon',
-      shortStage: 'Amazon Visit',
-      badgeLabel: 'STAGE 3: WALLED-GARDEN GAP',
-      summary: 'Hours later, user independently opens Amazon.com on the same device and searches for the sneaker.',
-      timestamp: 'Today, 04:32:45 PM (+6h 18m)',
-      details: [
-        `Crucial Gap: User did NOT click a referral link or ad. They typed "amazon.com" directly into their browser.`,
-        `Zero UTM parameters. Zero referral headers. Zero 3rd-party cookies (blocked by Chrome/Safari/Brave).`,
-        `NEXUS Amazon Storefront Tag executes client-side WebGL + Canvas + Audio fingerprinting.`,
-        `IDENTICAL Fingerprint ID computed: ${selectedDevice.fingerprintId} (${selectedDevice.confidenceScore}% confidence match)!`,
-        `NEXUS Identity Graph stitches the independent Amazon session directly to the YouTube ad exposure!`
-      ],
-      eventPayload: {
-        event_id: 'evt_amz_pdp_1092',
-        event_type: 'MARKETPLACE_PRODUCT_VIEW',
-        platform: 'amazon',
-        timestamp: '2026-10-07T16:32:45.890Z',
-        fingerprint_id: selectedDevice.fingerprintId,
-        cross_channel_stitched_to: 'evt_yt_imp_9921',
-        referrer_type: 'DIRECT_ORGANIC_SEARCH',
-        sku_viewed: txn.sku,
-        product_title: txn.productTitle,
-        marketplace_price_usd: txn.itemPrice,
-        graph_identity_confidence: `${selectedDevice.confidenceScore}% (DETERMINISTIC_HARDWARE_MATCH)`
-      }
-    },
-    {
-      stepNumber: 4,
-      title: 'Amazon Checkout: Complete Purchase Conversion',
-      platform: 'amazon',
-      shortStage: 'Purchase',
-      badgeLabel: 'STAGE 4: PURCHASE CONVERSION',
-      summary: `User completes 1-Click Buy on Amazon for Order #${txn.orderId} (₹${txn.grossRevenue.toFixed(2)}).`,
-      timestamp: 'Today, 04:35:10 PM',
-      details: [
-        `Order confirmed: Order #${txn.orderId} for ₹${txn.grossRevenue.toFixed(2)}.`,
-        `Conversion telemetry sent to NEXUS Ingestion Engine with Fingerprint ID: ${selectedDevice.fingerprintId}`,
-        `Amazon internal seller analytics attributes this as: "Direct Amazon Organic Search / Unpaid Traffic".`,
-        `NEXUS Identity Graph unlocks the full truth: YouTube Ad generated the demand!`
-      ],
-      eventPayload: {
-        event_id: 'evt_amz_ord_8831',
-        event_type: 'PURCHASE_CONVERSION',
-        platform: 'amazon',
-        timestamp: '2026-10-07T16:35:10.420Z',
-        fingerprint_id: selectedDevice.fingerprintId,
-        order_id: txn.orderId,
-        sku: txn.sku,
-        revenue_usd: txn.grossRevenue,
-        estimated_gross_margin_usd: txn.realizedGrossMargin,
-        payment_method: 'Amazon Pay (1-Click)'
-      }
-    },
-    {
-      stepNumber: 5,
-      title: 'NEXUS Attribution & ROI Confirmed: Closed-Loop Graph',
-      platform: 'nexus',
-      shortStage: 'Attributed ROI',
-      badgeLabel: 'STAGE 5: ATTRIBUTION RESOLVED',
-      summary: `The deterministic Fingerprint links the siloed platforms: YouTube ROAS jumps to ${realizedRoas}x!`,
-      timestamp: 'Real-Time Sync • Just Now',
-      details: [
-        `Without Fingerprint: Marketer sees ₹${txn.totalAttributedAdSpend.toFixed(3)} YouTube spend with ₹0 revenue -> Cuts YouTube budget!`,
-        `With NEXUS Single Fingerprint: Full cross-channel journey proven (YouTube View -> YouTube Click -> Amazon Buy).`,
-        `Assisted ROAS calculated: ₹${txn.grossRevenue.toFixed(2)} revenue ÷ ₹${txn.totalAttributedAdSpend.toFixed(3)} total ad spend = ${realizedRoas}x ROAS!`,
-        `Realized Gross Margin: ₹${txn.realizedGrossMargin.toFixed(2)} (${txn.grossMarginPct}%).`,
-        `NEXUS SLSQP Optimizer Recommendation: Scale YouTube campaign budget by +25% (₹4,500/day shift).`
-      ],
-      eventPayload: {
-        identity_graph_match: {
-          fingerprint_id: selectedDevice.fingerprintId,
-          touchpoints_count: 4,
-          first_touch: 'YOUTUBE_AD_IMPRESSION (10:14:02 AM)',
-          last_touch: 'AMAZON_CHECKOUT (04:35:10 PM)',
-          time_lag_hours: 6.35
-        },
-        attribution_models: {
-          siloed_last_touch_roas: {
-            youtube: '0.00x (Misleading: looks unprofitable)',
-            amazon_organic: '100% credited (Misleading: looks purely organic)'
-          },
-          nexus_fingerprint_stitched_roas: {
-            formula: 'attributed_revenue / attributed_ad_spend',
-            youtube_assisted_roas: `${realizedRoas}x`,
-            attributed_revenue: `₹${txn.grossRevenue.toFixed(2)}`,
-            attributed_ad_spend: `₹${txn.totalAttributedAdSpend.toFixed(3)}`,
-            gross_margin: `₹${txn.realizedGrossMargin.toFixed(2)}`,
-            actionable_decision: 'PRESERVE & SCALE YOUTUBE AD SPEND'
-          }
-        }
-      }
-    }
-  ], [selectedDevice, txn, realizedRoas]);
+  // Financial calculations
+  const totalIncurredSpend = useMemo(() => {
+    return selectedJourney.steps.reduce((acc, step) => acc + step.costInr, 0);
+  }, [selectedJourney]);
 
-  // Chart data reflecting exact step progression
-  const journeyTimelineChartData = useMemo(() => {
+  // Double-counting trap calculation:
+  // Both Google and Meta claim 100% of the sale value
+  const doubleCountedRevenue = selectedJourney.retailPrice * 2;
+  const doubleCountedInflationPct = 100.0;
+  const doubleCountedRoas = Number((doubleCountedRevenue / totalIncurredSpend).toFixed(2));
+
+  // True GAAP Cash Bank calculation:
+  const actualBankReceipts = selectedJourney.retailPrice;
+  const deduplicatedRoas = Number((actualBankReceipts / totalIncurredSpend).toFixed(2));
+  const netContributionMargin = actualBankReceipts - selectedJourney.unitCogs - selectedJourney.freightCost - (actualBankReceipts * 0.02 + 3);
+  const deduplicatedPoas = Number((netContributionMargin / totalIncurredSpend).toFixed(2));
+
+  // Shapley fair-share attributions
+  const shapleyAttributions = useMemo(() => {
     return [
       {
-        stage: '1. Ad View',
-        adSpend: currentStep >= 1 ? txn.youtubeImpressionCpmCost : 0,
-        unattributedRevenue: 0,
-        attributedRevenue: 0
+        platform: 'TikTok Ads',
+        stage: 'Discovery',
+        weight: selectedJourney.shapleyWeights.tiktok,
+        attributedRevenue: selectedJourney.retailPrice * selectedJourney.shapleyWeights.tiktok,
+        spend: selectedJourney.steps.find((s) => s.platform === 'tiktok')?.costInr || 400,
+        badgeStyle: 'bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800'
       },
       {
-        stage: '2. Click',
-        adSpend: currentStep >= 2 ? txn.totalAttributedAdSpend : 0,
-        unattributedRevenue: 0,
-        attributedRevenue: 0
+        platform: 'Google Ads',
+        stage: 'Search Intent',
+        weight: selectedJourney.shapleyWeights.google,
+        attributedRevenue: selectedJourney.retailPrice * selectedJourney.shapleyWeights.google,
+        spend: selectedJourney.steps.find((s) => s.platform === 'google')?.costInr || 600,
+        badgeStyle: 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800'
       },
       {
-        stage: '3. Amazon Search',
-        adSpend: currentStep >= 3 ? txn.totalAttributedAdSpend : 0,
-        unattributedRevenue: 0,
-        attributedRevenue: 0
-      },
-      {
-        stage: '4. Buy Box',
-        adSpend: currentStep >= 4 ? txn.totalAttributedAdSpend : 0,
-        unattributedRevenue: 0,
-        attributedRevenue: currentStep >= 4 ? txn.grossRevenue : 0
-      },
-      {
-        stage: '5. Attributed',
-        adSpend: currentStep >= 5 ? txn.totalAttributedAdSpend : 0,
-        unattributedRevenue: 0,
-        attributedRevenue: currentStep >= 5 ? txn.grossRevenue : 0
+        platform: 'Meta Ads',
+        stage: 'Retargeting',
+        weight: selectedJourney.shapleyWeights.meta,
+        attributedRevenue: selectedJourney.retailPrice * selectedJourney.shapleyWeights.meta,
+        spend: selectedJourney.steps.find((s) => s.platform === 'meta')?.costInr || 800,
+        badgeStyle: 'bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800'
       }
     ];
-  }, [currentStep, txn]);
-
-  const comparisonChartData = useMemo(() => [
-    {
-      category: 'Siloed (Last-Touch)',
-      adSpend: txn.totalAttributedAdSpend,
-      recognizedRevenue: 0,
-      realRoas: 0
-    },
-    {
-      category: 'NEXUS Stitched',
-      adSpend: txn.totalAttributedAdSpend,
-      recognizedRevenue: currentStep >= 4 ? txn.grossRevenue : 0,
-      realRoas: currentStep >= 5 ? realizedRoas : 0
-    }
-  ], [currentStep, txn, realizedRoas]);
-
-  // Auto-play timer for interactive journey demo
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isPlaying) {
-      timer = setTimeout(() => {
-        if (currentStep < 5) {
-          setCurrentStep((prev) => prev + 1);
-        } else {
-          setIsPlaying(false);
-          toast.success('Journey Complete!', {
-            description: `Attributed ₹${txn.grossRevenue.toFixed(2)} revenue with ${selectedDevice.confidenceScore}% device match.`
-          });
-        }
-      }, 1000);
-    }
-    return () => clearTimeout(timer);
-  }, [isPlaying, currentStep, selectedDevice, txn]);
-
-  const handleCopyFp = () => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(selectedDevice.fingerprintId);
-    }
-    setCopiedFp(true);
-    toast.success('Fingerprint ID Copied', {
-      description: selectedDevice.fingerprintId
-    });
-    setTimeout(() => setCopiedFp(false), 2000);
-  };
-
-  const handlePlay = () => {
-    if (currentStep >= 5) {
-      setCurrentStep(1);
-    }
-    setIsPlaying(true);
-  };
-
-  const handleReset = () => {
-    setIsPlaying(false);
-    setCurrentStep(1);
-    toast.info('Journey Reset', {
-      description: 'Restarted at Stage 1: YouTube Ad Impression.'
-    });
-  };
-
-  const handlePrevStep = () => {
-    setIsPlaying(false);
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  const handleNextStep = () => {
-    setIsPlaying(false);
-    if (currentStep < 5) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const handleFastForward = () => {
-    setIsPlaying(false);
-    setCurrentStep(5);
-    toast.success('Attribution Resolved', {
-      description: 'Viewing complete closed-loop cross-channel attribution state.'
-    });
-  };
-
-  const currentStepData = journeySteps[currentStep - 1] || journeySteps[4];
+  }, [selectedJourney]);
 
   return (
-    <div className='flex flex-col gap-6 text-[#FFFFFF] max-w-7xl mx-auto w-full'>
-      {/* 1. VISUAL HERO (Compact, High-Impact, 5-Second Comprehension) */}
-      <div className='relative overflow-hidden rounded-xl border border-[#8A8A8A]/50 bg-[#000000] p-6 shadow-2xl'>
-        {/* Ambient subtle glow background */}
-        <div className='absolute -top-24 -left-24 size-72 bg-[#FFFFFF]/5 rounded-full blur-3xl pointer-events-none' />
-        <div className='absolute -bottom-24 -right-24 size-72 bg-[#FFFFFF]/5 rounded-full blur-3xl pointer-events-none' />
-
-        <div className='relative z-10 flex flex-col gap-6'>
-          {/* Top row: Title + Device Profile Selector */}
-          <div className='flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-[#8A8A8A]/30'>
-            <div>
-              <div className='flex items-center gap-2 mb-1.5'>
-                <span className='px-2 py-0.5 rounded bg-[#1A1A1A] border border-[#8A8A8A]/60 text-[10px] font-mono font-bold uppercase tracking-wider text-[#FFFFFF] flex items-center gap-1.5'>
-                  <span className='size-1.5 rounded-full bg-[#FFFFFF] animate-pulse' />
-                  Autonomous Identity Graph
-                </span>
-                <span className='text-[10px] font-mono text-[#8A8A8A] uppercase tracking-wider'>
-                  Zero 3rd-Party Cookies • Zero UTM Dependency
-                </span>
-              </div>
-              <h1 className='text-2xl md:text-3xl font-mono font-black text-[#FFFFFF] tracking-tight uppercase'>
-                Cookieless Attribution
-              </h1>
-              <p className='text-xs md:text-sm font-mono text-[#8A8A8A] mt-0.5 tracking-wide'>
-                ONE DEVICE. ONE JOURNEY. REAL ROI.
-              </p>
+    <div className='flex flex-col gap-8 w-full font-sans text-zinc-900 dark:text-zinc-100'>
+      {/* 1. EDITORIAL HEADER & TELEMETRY STRIP */}
+      <div className='flex flex-col gap-3 pb-6 border-b border-zinc-200 dark:border-zinc-800'>
+        <div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
+          <div>
+            <div className='flex items-center gap-2 mb-1.5'>
+              <span className='text-[11px] font-mono font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400'>
+                Section 5.4 Specification • First-Party Ingestion
+              </span>
+              <span className='size-1.5 rounded-full bg-emerald-500' />
+              <span className='text-[11px] font-mono text-emerald-600 dark:text-emerald-400'>
+                Edge Online
+              </span>
             </div>
-
-            {/* Device Switcher HUD */}
-            <div className='flex items-center gap-3 bg-[#1A1A1A] border border-[#8A8A8A]/60 rounded-lg p-2.5 self-start lg:self-auto'>
-              <div className='size-9 rounded bg-[#000000] border border-[#8A8A8A]/50 flex items-center justify-center shrink-0'>
-                <Icons.laptop className='size-4 text-[#FFFFFF]' />
-              </div>
-              <div className='flex flex-col'>
-                <span className='text-[9px] font-mono text-[#8A8A8A] uppercase tracking-wider'>
-                  Active Hardware Entropy Signature
-                </span>
-                <select
-                  aria-label='Select Device Profile'
-                  value={selectedDevice.id}
-                  onChange={(e) => {
-                    const dev = SAMPLE_DEVICES.find((d) => d.id === e.target.value);
-                    if (dev) {
-                      setSelectedDevice(dev);
-                      toast.info(`Device Identity Changed: ${dev.name}`, {
-                        description: `Fingerprint ${dev.fingerprintId} (${dev.confidenceScore}% match)`
-                      });
-                    }
-                  }}
-                  className='h-7 text-xs font-mono font-bold bg-[#000000] border border-[#8A8A8A]/50 rounded px-2 text-[#FFFFFF] focus:outline-none focus:border-[#FFFFFF]'
-                >
-                  {SAMPLE_DEVICES.map((d) => (
-                    <option key={d.id} value={d.id} className='bg-[#000000] text-[#FFFFFF]'>
-                      {d.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+            <h1 className='text-xl sm:text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50'>
+              Identity Graph
+            </h1>
+            <p className='text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 max-w-2xl mt-1 leading-normal'>
+              First-party edge resolution, cross-domain session stitching, and Shapley attribution.
+            </p>
           </div>
 
-          {/* Centerpiece: Flagship Visual 4-Node Flow + Fingerprint Anchor */}
-          <div className='grid grid-cols-1 md:grid-cols-4 gap-4 relative py-2'>
-            {/* Step 1 Node: Fingerprint Anchor */}
-            <div
-              className={cn(
-                'relative rounded-lg border p-4 bg-[#0A0A0A] flex flex-col justify-between transition-all duration-300',
-                currentStep >= 1
-                  ? 'border-[#FFFFFF] shadow-[0_0_15px_rgba(255,255,255,0.15)] ring-1 ring-[#FFFFFF]/50'
-                  : 'border-[#8A8A8A]/30 opacity-60'
-              )}
-            >
-              <div className='flex items-center justify-between mb-3'>
-                <span className='text-[10px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#1A1A1A] text-[#FFFFFF] border border-[#8A8A8A]/40'>
-                  01 • IDENTITY ANCHOR
-                </span>
-                <span className='size-2 rounded-full bg-[#FFFFFF]' />
-              </div>
+          <div className='flex items-center gap-2 shrink-0'>
+            <div className='p-2.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 flex flex-col items-end'>
+              <span className='text-[10px] font-mono text-zinc-500 dark:text-zinc-400 uppercase tracking-wider'>
+                Lakehouse Ground Truth
+              </span>
+              <span className='text-xs font-mono font-semibold text-zinc-900 dark:text-zinc-100'>
+                362 Sessions • 1,259 Events
+              </span>
+            </div>
+          </div>
+        </div>
 
-              <div className='flex items-center gap-3 my-2'>
-                <div className='relative size-12 rounded-full bg-[#1A1A1A] border border-[#FFFFFF] flex items-center justify-center shrink-0'>
-                  <Icons.fingerprint className='size-6 text-[#FFFFFF]' />
-                  <div className='absolute -inset-1 rounded-full border border-[#FFFFFF]/40 animate-ping opacity-40' />
-                </div>
-                <div className='flex flex-col min-w-0'>
-                  <span className='text-[11px] font-mono text-[#8A8A8A] uppercase truncate'>
-                    Hardware Match {selectedDevice.confidenceScore}%
-                  </span>
-                  <div className='flex items-center gap-1.5'>
-                    <code className='text-xs font-mono font-bold text-[#FFFFFF] truncate'>
-                      {selectedDevice.fingerprintId}
-                    </code>
-                    <button
-                      onClick={handleCopyFp}
-                      title='Copy Fingerprint'
-                      className='text-[#8A8A8A] hover:text-[#FFFFFF] transition-colors p-0.5'
-                    >
-                      {copiedFp ? <Icons.check className='size-3 text-[#FFFFFF]' /> : <Icons.post className='size-3' />}
-                    </button>
+        {/* Global Compliance Bar */}
+        <div className='grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2'>
+          <div className='p-2.5 rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60'>
+            <div className='text-[10px] font-mono text-zinc-500 dark:text-zinc-400 uppercase'>Privacy Standard</div>
+            <div className='text-xs font-mono font-semibold text-emerald-600 dark:text-emerald-400 mt-0.5 flex items-center gap-1'>
+              <IconShieldCheck className='size-3.5' />
+              Zero-GPS (GDPR Rec. 30)
+            </div>
+          </div>
+          <div className='p-2.5 rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60'>
+            <div className='text-[10px] font-mono text-zinc-500 dark:text-zinc-400 uppercase'>Subnet Anonymity</div>
+            <div className='text-xs font-mono font-semibold text-zinc-800 dark:text-zinc-200 mt-0.5 flex items-center gap-1'>
+              <IconNetwork className='size-3.5' />
+              100% Masked /24 CIDR
+            </div>
+          </div>
+          <div className='p-2.5 rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60'>
+            <div className='text-[10px] font-mono text-zinc-500 dark:text-zinc-400 uppercase'>Asymmetric Ingestion</div>
+            <div className='text-xs font-mono font-semibold text-zinc-800 dark:text-zinc-200 mt-0.5 flex items-center gap-1'>
+              <IconLock className='size-3.5' />
+              gclid • fbclid • ttclid
+            </div>
+          </div>
+          <div className='p-2.5 rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60'>
+            <div className='text-[10px] font-mono text-zinc-500 dark:text-zinc-400 uppercase'>Attribution Engine</div>
+            <div className='text-xs font-mono font-semibold text-zinc-800 dark:text-zinc-200 mt-0.5 flex items-center gap-1'>
+              <IconScale className='size-3.5' />
+              Shapley Deduplication
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. BENTO ROW 1: WALLED GARDEN TOKENS & HARDWARE ENTROPY */}
+      <div className='grid grid-cols-1 lg:grid-cols-12 gap-6'>
+        {/* BENTO CARD 1: WALLED GARDEN ASYMMETRIC CRYPTOGRAPHY (7 Cols) */}
+        <div className='lg:col-span-7 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 p-6 flex flex-col justify-between'>
+          <div>
+            <div className='flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800 mb-4'>
+              <div className='flex items-center gap-2'>
+                <IconLock className='size-4 text-zinc-700 dark:text-zinc-300' />
+                <h2 className='text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100'>
+                  Walled Garden Click Token Isolation (§5.4.1)
+                </h2>
+              </div>
+              <span className='text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700'>
+                Asymmetric Cryptography
+              </span>
+            </div>
+
+            <p className='text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4'>
+              Ad platforms encrypt click tokens with proprietary private keys. Google cannot decrypt a Meta <code className='text-zinc-800 dark:text-zinc-200 font-mono'>fbclid</code>, Meta cannot decrypt a Google <code className='text-zinc-800 dark:text-zinc-200 font-mono'>gclid</code>, and networks never expose raw IP addresses or user IDs. NEXUS intercepts and pairs tokens at the <strong className='text-zinc-900 dark:text-zinc-100 font-medium'>First-Party Storefront Edge</strong> (<code className='font-mono'>store.niked2c.com</code>).
+            </p>
+
+            <div className='space-y-2.5'>
+              <div className='p-3 rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950/50 flex flex-col gap-1.5'>
+                <div className='flex items-center justify-between text-xs'>
+                  <div className='flex items-center gap-1.5 font-medium text-zinc-800 dark:text-zinc-200'>
+                    <IconBrandGoogle className='size-3.5 text-emerald-600' />
+                    Google Ads / YouTube Click Identifier
                   </div>
+                  <button
+                    onClick={() => handleCopy('CjwKCAiA2b163dba9bd5_gclid_search', 'gclid')}
+                    className='text-[11px] font-mono text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 flex items-center gap-1'
+                  >
+                    {copiedToken === 'gclid' ? <IconCheck className='size-3 text-emerald-600' /> : <IconCopy className='size-3' />}
+                    Copy
+                  </button>
                 </div>
-              </div>
-
-              <div className='text-[10px] font-mono text-[#8A8A8A] mt-2 pt-2 border-t border-[#8A8A8A]/30 flex items-center justify-between'>
-                <span>Canvas + GPU + Audio</span>
-                <span className='text-[#FFFFFF] font-bold'>VERIFIED</span>
-              </div>
-            </div>
-
-            {/* Step 2 Node: YouTube Ad */}
-            <div
-              className={cn(
-                'relative rounded-lg border p-4 bg-[#0A0A0A] flex flex-col justify-between transition-all duration-300',
-                currentStep >= 2
-                  ? 'border-[#FFFFFF] shadow-[0_0_15px_rgba(255,255,255,0.15)] ring-1 ring-[#FFFFFF]/50'
-                  : 'border-[#8A8A8A]/30 opacity-60'
-              )}
-            >
-              <div className='flex items-center justify-between mb-3'>
-                <span className='text-[10px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#1A1A1A] text-[#FFFFFF] border border-[#8A8A8A]/40'>
-                  02 • YOUTUBE AD
+                <div className='flex items-center gap-2'>
+                  <kbd className='font-mono text-xs px-2 py-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 break-all select-all'>
+                    gclid=CjwKCAiA2b163dba9bd5_gclid_search
+                  </kbd>
+                </div>
+                <span className='text-[10px] font-mono text-zinc-500 dark:text-zinc-400'>
+                  Payload: Encrypted with Google KMS private key • Zero PII exposed to merchant
                 </span>
-                {currentStep >= 2 && <span className='size-2 rounded-full bg-[#FFFFFF]' />}
               </div>
 
-              <div className='flex items-center gap-3 my-2'>
-                <div className='size-12 rounded-full bg-[#1A1A1A] border border-[#8A8A8A]/60 flex items-center justify-center shrink-0'>
-                  <Icons.youtube className='size-6 text-[#FFFFFF]' />
+              <div className='p-3 rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950/50 flex flex-col gap-1.5'>
+                <div className='flex items-center justify-between text-xs'>
+                  <div className='flex items-center gap-1.5 font-medium text-zinc-800 dark:text-zinc-200'>
+                    <IconBrandMeta className='size-3.5 text-blue-600' />
+                    Meta Advantage+ (FB/IG) Click Identifier
+                  </div>
+                  <button
+                    onClick={() => handleCopy('fb.1.1791373540.82b9c0f599c0_reels', 'fbclid')}
+                    className='text-[11px] font-mono text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 flex items-center gap-1'
+                  >
+                    {copiedToken === 'fbclid' ? <IconCheck className='size-3 text-emerald-600' /> : <IconCopy className='size-3' />}
+                    Copy
+                  </button>
                 </div>
-                <div className='flex flex-col'>
-                  <span className='text-xs font-mono font-bold text-[#FFFFFF]'>
-                    Preroll Video Click
-                  </span>
-                  <span className='text-[11px] font-mono text-[#8A8A8A]'>
-                    Cost: ₹{txn.totalAttributedAdSpend.toFixed(3)}
-                  </span>
+                <div className='flex items-center gap-2'>
+                  <kbd className='font-mono text-xs px-2 py-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 break-all select-all'>
+                    fbclid=fb.1.1791373540.82b9c0f599c0_reels
+                  </kbd>
                 </div>
-              </div>
-
-              <div className='text-[10px] font-mono text-[#8A8A8A] mt-2 pt-2 border-t border-[#8A8A8A]/30 flex items-center justify-between'>
-                <span>Ad Clicked</span>
-                <span className='text-[#8A8A8A] font-medium'>Tab Closed</span>
-              </div>
-            </div>
-
-            {/* Step 3 Node: Amazon Visit */}
-            <div
-              className={cn(
-                'relative rounded-lg border p-4 bg-[#0A0A0A] flex flex-col justify-between transition-all duration-300',
-                currentStep >= 3
-                  ? 'border-[#FFFFFF] shadow-[0_0_15px_rgba(255,255,255,0.15)] ring-1 ring-[#FFFFFF]/50'
-                  : 'border-[#8A8A8A]/30 opacity-60'
-              )}
-            >
-              <div className='flex items-center justify-between mb-3'>
-                <span className='text-[10px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#1A1A1A] text-[#FFFFFF] border border-[#8A8A8A]/40'>
-                  03 • AMAZON VISIT
+                <span className='text-[10px] font-mono text-zinc-500 dark:text-zinc-400'>
+                  Payload: Format v1 epoch timestamp + cryptographic hash HMAC-SHA256
                 </span>
-                {currentStep >= 3 && <span className='size-2 rounded-full bg-[#FFFFFF]' />}
               </div>
 
-              <div className='flex items-center gap-3 my-2'>
-                <div className='size-12 rounded-full bg-[#1A1A1A] border border-[#8A8A8A]/60 flex items-center justify-center shrink-0'>
-                  <Icons.amazon className='size-6 text-[#FFFFFF]' />
+              <div className='p-3 rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950/50 flex flex-col gap-1.5'>
+                <div className='flex items-center justify-between text-xs'>
+                  <div className='flex items-center gap-1.5 font-medium text-zinc-800 dark:text-zinc-200'>
+                    <IconBrandTiktok className='size-3.5 text-rose-600' />
+                    TikTok Ads Click Identifier
+                  </div>
+                  <button
+                    onClick={() => handleCopy('tt_cl_f7916968be29_jordan', 'ttclid')}
+                    className='text-[11px] font-mono text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 flex items-center gap-1'
+                  >
+                    {copiedToken === 'ttclid' ? <IconCheck className='size-3 text-emerald-600' /> : <IconCopy className='size-3' />}
+                    Copy
+                  </button>
                 </div>
-                <div className='flex flex-col'>
-                  <span className='text-xs font-mono font-bold text-[#FFFFFF]'>
-                    Organic Direct Visit
-                  </span>
-                  <span className='text-[11px] font-mono text-[#8A8A8A]'>
-                    6h 18m Latency Gap
-                  </span>
+                <div className='flex items-center gap-2'>
+                  <kbd className='font-mono text-xs px-2 py-1 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 break-all select-all'>
+                    ttclid=tt_cl_f7916968be29_jordan
+                  </kbd>
                 </div>
-              </div>
-
-              <div className='text-[10px] font-mono text-[#8A8A8A] mt-2 pt-2 border-t border-[#8A8A8A]/30 flex items-center justify-between'>
-                <span>Zero UTMs / Cookies</span>
-                <span className='text-[#FFFFFF] font-bold'>MATCH 100%</span>
-              </div>
-            </div>
-
-            {/* Step 4 Node: Attributed ROI */}
-            <div
-              className={cn(
-                'relative rounded-lg border p-4 bg-[#0A0A0A] flex flex-col justify-between transition-all duration-300',
-                currentStep >= 5
-                  ? 'border-[#FFFFFF] bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A] shadow-[0_0_20px_rgba(255,255,255,0.25)] ring-2 ring-[#FFFFFF]'
-                  : currentStep === 4
-                  ? 'border-[#FFFFFF] shadow-[0_0_15px_rgba(255,255,255,0.15)]'
-                  : 'border-[#8A8A8A]/30 opacity-60'
-              )}
-            >
-              <div className='flex items-center justify-between mb-3'>
-                <span className='text-[10px] font-mono font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#FFFFFF] text-[#000000]'>
-                  04 • REALIZED ROI
+                <span className='text-[10px] font-mono text-zinc-500 dark:text-zinc-400'>
+                  Payload: ByteDance short-lived session token passed via TikTok Pixel SDK
                 </span>
-                {currentStep >= 5 ? (
-                  <span className='text-[10px] font-mono font-bold text-[#FFFFFF] flex items-center gap-1'>
-                    <Icons.circleCheck className='size-3 text-[#FFFFFF]' />
-                    CONFIRMED
-                  </span>
-                ) : currentStep === 4 ? (
-                  <span className='text-[10px] font-mono font-bold text-[#8A8A8A]'>PURCHASED</span>
-                ) : null}
-              </div>
-
-              <div className='flex items-center gap-3 my-2'>
-                <div className='size-12 rounded-full bg-[#FFFFFF] text-[#000000] flex items-center justify-center shrink-0 font-mono font-black text-lg'>
-                  ₹
-                </div>
-                <div className='flex flex-col'>
-                  <span className='text-sm font-mono font-black text-[#FFFFFF]'>
-                    {currentStep >= 4 ? `₹${txn.grossRevenue.toFixed(2)} Revenue` : 'Pending Checkout'}
-                  </span>
-                  <span className='text-xs font-mono font-bold text-[#FFFFFF]'>
-                    {currentStep >= 5 ? `${realizedRoas}x ROAS Lift` : currentStep === 4 ? 'Resolving ROAS...' : '0.0x ROAS (Siloed)'}
-                  </span>
-                </div>
-              </div>
-
-              <div className='text-[10px] font-mono text-[#8A8A8A] mt-2 pt-2 border-t border-[#8A8A8A]/30 flex items-center justify-between'>
-                <span>Margin: ₹{currentStep >= 4 ? txn.realizedGrossMargin.toFixed(2) : '0.00'}</span>
-                <span className='text-[#FFFFFF] font-bold'>{currentStep >= 5 ? 'CLOSED-LOOP' : 'IN PROGRESS'}</span>
               </div>
             </div>
           </div>
 
-          {/* Interactive Player Controls Strip */}
-          <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-[#8A8A8A]/30 font-mono'>
-            <div className='flex items-center gap-2'>
-              <Button
-                size='sm'
-                onClick={isPlaying ? () => setIsPlaying(false) : handlePlay}
-                className='h-8 px-4 text-xs font-mono font-bold bg-[#FFFFFF] hover:bg-[#CCCCCC] text-[#000000] border-none active:scale-[0.98]'
-              >
-                {isPlaying ? (
-                  <>
-                    <Icons.eyeOff className='mr-1.5 size-3.5' />
-                    Pause Journey
-                  </>
-                ) : (
-                  <>
-                    <Icons.play className='mr-1.5 size-3.5' />
-                    {currentStep >= 5 ? 'Replay Journey (3s)' : 'Play Journey (3s)'}
-                  </>
-                )}
-              </Button>
+          <div className='mt-4 pt-3 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between text-[11px] font-mono text-zinc-500 dark:text-zinc-400'>
+            <span>Reverse Proxy: <code className='text-zinc-800 dark:text-zinc-200'>CF Anycast Worker</code></span>
+            <span>Edge Query Parameter Interception: <strong className='text-emerald-600 dark:text-emerald-400'>Active (0ms latency)</strong></span>
+          </div>
+        </div>
 
-              <Button
-                size='sm'
-                variant='outline'
-                onClick={handlePrevStep}
-                disabled={currentStep === 1}
-                className='h-8 text-xs font-mono border border-[#8A8A8A]/60 bg-[#1A1A1A] hover:bg-[#000000] text-[#FFFFFF] disabled:opacity-40'
-              >
-                <Icons.chevronLeft className='size-3.5 mr-1 text-[#FFFFFF]' />
-                Prev
-              </Button>
-
-              <Button
-                size='sm'
-                variant='outline'
-                onClick={handleNextStep}
-                disabled={currentStep === 5}
-                className='h-8 text-xs font-mono border border-[#8A8A8A]/60 bg-[#1A1A1A] hover:bg-[#000000] text-[#FFFFFF] disabled:opacity-40'
-              >
-                Next
-                <Icons.chevronRight className='size-3.5 ml-1 text-[#FFFFFF]' />
-              </Button>
-
-              <Button
-                size='sm'
-                variant='outline'
-                onClick={handleFastForward}
-                disabled={currentStep === 5}
-                className='h-8 text-xs font-mono border border-[#8A8A8A]/60 bg-[#1A1A1A] hover:bg-[#000000] text-[#FFFFFF] disabled:opacity-40'
-              >
-                <Icons.circleCheck className='size-3.5 mr-1 text-[#FFFFFF]' />
-                Show Full Attribution
-              </Button>
-
-              <Button
-                size='sm'
-                variant='ghost'
-                onClick={handleReset}
-                className='h-8 text-xs font-mono text-[#8A8A8A] hover:text-[#FFFFFF] hover:bg-[#1A1A1A]'
-              >
-                <Icons.clock className='size-3.5 mr-1' />
-                Reset
-              </Button>
+        {/* BENTO CARD 2: HARDWARE ENTROPY & /24 SUBNET RESOLUTION (5 Cols) */}
+        <div className='lg:col-span-5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 p-6 flex flex-col justify-between'>
+          <div>
+            <div className='flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800 mb-4'>
+              <div className='flex items-center gap-2'>
+                <IconFingerprint className='size-4 text-zinc-700 dark:text-zinc-300' />
+                <h2 className='text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100'>
+                  Hardware Entropy &amp; /24 Subnet (§5.3)
+                </h2>
+              </div>
+              <span className='text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700'>
+                Zero-GPS
+              </span>
             </div>
 
-            {/* Quick Step Indicators */}
-            <div className='flex items-center gap-1.5'>
-              {journeySteps.map((step) => (
+            {/* Device Switcher */}
+            <div className='flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-md mb-4 text-xs font-mono'>
+              {SAMPLE_DEVICES.map((dev) => (
                 <button
-                  key={step.stepNumber}
-                  onClick={() => {
-                    setIsPlaying(false);
-                    setCurrentStep(step.stepNumber);
-                  }}
-                  title={step.title}
+                  key={dev.id}
+                  onClick={() => setSelectedDevice(dev)}
                   className={cn(
-                    'h-7 px-2.5 rounded text-[11px] font-mono transition-all flex items-center gap-1 border',
-                    currentStep === step.stepNumber
-                      ? 'bg-[#FFFFFF] text-[#000000] border-[#FFFFFF] font-bold'
-                      : currentStep > step.stepNumber
-                      ? 'bg-[#1A1A1A] text-[#FFFFFF] border-[#8A8A8A]/60'
-                      : 'bg-[#000000] text-[#8A8A8A] border-[#8A8A8A]/30 opacity-60'
+                    'flex-1 py-1.5 px-2 rounded text-center transition-colors truncate',
+                    selectedDevice.id === dev.id
+                      ? 'bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 font-semibold shadow-xs'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
                   )}
                 >
-                  <span>{step.stepNumber}.</span>
-                  <span>{step.shortStage}</span>
+                  {dev.deviceType === 'desktop' ? (
+                    <IconDeviceDesktop className='size-3 inline mr-1' />
+                  ) : (
+                    <IconDeviceMobile className='size-3 inline mr-1' />
+                  )}
+                  {dev.name.split(' ')[0]}
                 </button>
               ))}
             </div>
-          </div>
-        </div>
-      </div>
 
-      {/* 2. TECHNICAL SIGNALS DRAWER (Collapsed by Default) */}
-      <div className='rounded-xl border border-[#8A8A8A]/50 bg-[#141414] overflow-hidden'>
-        <button
-          onClick={() => setShowTechnicalSignals(!showTechnicalSignals)}
-          className='w-full px-5 py-3.5 flex items-center justify-between text-left hover:bg-[#1A1A1A] transition-colors font-mono'
-        >
-          <div className='flex items-center gap-2.5'>
-            <Icons.code className='size-4 text-[#FFFFFF]' />
-            <span className='text-xs font-bold uppercase tracking-wider text-[#FFFFFF]'>
-              Technical Hardware Signals &amp; Entropy Vector
+            {/* Entropy Telemetry Table */}
+            <div className='space-y-2 text-xs font-mono'>
+              <div className='flex items-center justify-between py-1.5 border-b border-zinc-100 dark:border-zinc-800/60'>
+                <span className='text-zinc-500 dark:text-zinc-400'>Cluster ID:</span>
+                <kbd className='px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700'>
+                  {selectedDevice.fingerprintId}
+                </kbd>
+              </div>
+              <div className='flex items-center justify-between py-1.5 border-b border-zinc-100 dark:border-zinc-800/60'>
+                <span className='text-zinc-500 dark:text-zinc-400'>Canvas Hash:</span>
+                <kbd className='px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700'>
+                  {selectedDevice.canvasHash}
+                </kbd>
+              </div>
+              <div className='flex items-center justify-between py-1.5 border-b border-zinc-100 dark:border-zinc-800/60'>
+                <span className='text-zinc-500 dark:text-zinc-400'>Audio Buffer:</span>
+                <kbd className='px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700'>
+                  {selectedDevice.audioHash}
+                </kbd>
+              </div>
+              <div className='flex items-center justify-between py-1.5 border-b border-zinc-100 dark:border-zinc-800/60'>
+                <span className='text-zinc-500 dark:text-zinc-400'>GPU Architecture:</span>
+                <span className='text-zinc-800 dark:text-zinc-200 truncate max-w-[180px]'>
+                  {selectedDevice.gpuRenderer}
+                </span>
+              </div>
+              <div className='flex items-center justify-between py-1.5 border-b border-zinc-100 dark:border-zinc-800/60'>
+                <span className='text-zinc-500 dark:text-zinc-400'>IPv4 Subnet:</span>
+                <kbd className='px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-semibold'>
+                  {selectedDevice.ipSubnet.split(' ')[0]}
+                </kbd>
+              </div>
+              <div className='flex items-center justify-between py-1.5'>
+                <span className='text-zinc-500 dark:text-zinc-400'>Edge PoP / Latency:</span>
+                <span className='text-zinc-800 dark:text-zinc-200'>
+                  {selectedDevice.edgePop} • {selectedDevice.edgeLatencyMs}ms
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className='mt-4 p-2.5 rounded bg-zinc-50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 text-[11px] text-zinc-600 dark:text-zinc-400 flex items-start gap-2'>
+            <IconInfoCircle className='size-3.5 shrink-0 mt-0.5 text-zinc-500' />
+            <span>
+              <strong className='text-zinc-900 dark:text-zinc-100'>k-Anonymity Guard:</strong> Grouped across 256 hosts. Zero GPS coordinates recorded to eliminate privacy prompt drop-off and ensure GDPR Recital 30 compliance.
             </span>
-            <Badge variant='outline' className='border-[#8A8A8A]/60 bg-[#000000] text-[#8A8A8A] text-[10px] font-mono'>
-              {selectedDevice.confidenceScore}% Match Certainty • 6 Vectors
-            </Badge>
           </div>
-          <div className='flex items-center gap-2 text-xs text-[#8A8A8A]'>
-            <span>{showTechnicalSignals ? 'Collapse Details' : 'View Signals'}</span>
-            <Icons.chevronDown
-              className={cn('size-4 text-[#FFFFFF] transition-transform duration-200', showTechnicalSignals && 'rotate-180')}
-            />
-          </div>
-        </button>
-
-        {showTechnicalSignals && (
-          <div className='px-5 pb-5 pt-2 border-t border-[#8A8A8A]/30 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs font-mono'>
-            <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded-lg p-3'>
-              <span className='text-[#8A8A8A] block text-[10px] uppercase'>Canvas 2D Hash</span>
-              <span className='text-[#FFFFFF] font-bold truncate block mt-0.5'>{selectedDevice.canvasHash}</span>
-              <span className='text-[9px] text-[#8A8A8A] block mt-1'>Subpixel text raster</span>
-            </div>
-
-            <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded-lg p-3'>
-              <span className='text-[#8A8A8A] block text-[10px] uppercase'>WebGL GPU Renderer</span>
-              <span className='text-[#FFFFFF] font-bold truncate block mt-0.5' title={selectedDevice.gpuRenderer}>
-                {selectedDevice.gpuRenderer.split('(')[0]}
-              </span>
-              <span className='text-[9px] text-[#8A8A8A] block mt-1'>Shader precision vector</span>
-            </div>
-
-            <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded-lg p-3'>
-              <span className='text-[#8A8A8A] block text-[10px] uppercase'>Audio Oscillator</span>
-              <span className='text-[#FFFFFF] font-bold truncate block mt-0.5'>{selectedDevice.audioHash}</span>
-              <span className='text-[9px] text-[#8A8A8A] block mt-1'>DynamicsCompressor node</span>
-            </div>
-
-            <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded-lg p-3'>
-              <span className='text-[#8A8A8A] block text-[10px] uppercase'>Display &amp; Color</span>
-              <span className='text-[#FFFFFF] font-bold truncate block mt-0.5'>{selectedDevice.screenResolution}</span>
-              <span className='text-[9px] text-[#8A8A8A] block mt-1'>{selectedDevice.colorDepth}</span>
-            </div>
-
-            <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded-lg p-3'>
-              <span className='text-[#8A8A8A] block text-[10px] uppercase'>CPU Cores &amp; RAM</span>
-              <span className='text-[#FFFFFF] font-bold truncate block mt-0.5'>
-                {selectedDevice.hardwareConcurrency} Cores • {selectedDevice.deviceMemoryGb}GB
-              </span>
-              <span className='text-[9px] text-[#8A8A8A] block mt-1'>Hardware concurrency</span>
-            </div>
-
-            <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded-lg p-3'>
-              <span className='text-[#8A8A8A] block text-[10px] uppercase'>Subnet Geohash</span>
-              <span className='text-[#FFFFFF] font-bold truncate block mt-0.5'>{selectedDevice.ipSubnet.split(' ')[0]}</span>
-              <span className='text-[9px] text-[#8A8A8A] block mt-1'>ISP BGP routing cluster</span>
-            </div>
-          </div>
-        )}
+        </div>
       </div>
 
-      {/* 3. DATA LINEAGE SECTION (Explicit Financial Traceability) */}
-      <div className='rounded-xl border border-[#8A8A8A]/50 bg-[#141414] overflow-hidden'>
-        <button
-          onClick={() => setShowDataLineage(!showDataLineage)}
-          className='w-full px-5 py-3.5 flex items-center justify-between text-left hover:bg-[#1A1A1A] transition-colors font-mono'
-        >
-          <div className='flex items-center gap-2.5'>
-            <Icons.topology className='size-4 text-[#FFFFFF]' />
-            <span className='text-xs font-bold uppercase tracking-wider text-[#FFFFFF]'>
-              Data Lineage &amp; Financial Formula Trace
-            </span>
-            <Badge variant='outline' className='border-[#8A8A8A]/60 bg-[#000000] text-[#8A8A8A] text-[10px] font-mono'>
-              ROAS Formula: Revenue ÷ Ad Spend = 194.5x
-            </Badge>
-          </div>
-          <div className='flex items-center gap-2 text-xs text-[#8A8A8A]'>
-            <span>{showDataLineage ? 'Collapse Lineage' : 'View Lineage ▾'}</span>
-            <Icons.chevronDown
-              className={cn('size-4 text-[#FFFFFF] transition-transform duration-200', showDataLineage && 'rotate-180')}
-            />
-          </div>
-        </button>
-
-        {showDataLineage && (
-          <div className='px-5 pb-5 pt-3 border-t border-[#8A8A8A]/30 font-mono text-xs'>
-            {/* Visual Lineage Chain Flow */}
-            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-2.5 items-stretch'>
-              <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded-lg p-2.5 flex flex-col justify-between'>
-                <span className='text-[9px] text-[#8A8A8A] uppercase font-bold'>1. Source Ad</span>
-                <span className='text-xs font-bold text-[#FFFFFF] mt-1'>YouTube Video</span>
-                <span className='text-[10px] text-[#8A8A8A] mt-0.5'>CPM ₹{txn.youtubeImpressionCpmCost.toFixed(3)} + CPC ₹{txn.youtubeClickCpcCost.toFixed(3)}</span>
-              </div>
-
-              <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded-lg p-2.5 flex flex-col justify-between'>
-                <span className='text-[9px] text-[#8A8A8A] uppercase font-bold'>2. Hardware Hash</span>
-                <span className='text-xs font-bold text-[#FFFFFF] mt-1 truncate'>{selectedDevice.fingerprintId}</span>
-                <span className='text-[10px] text-[#8A8A8A] mt-0.5'>{selectedDevice.confidenceScore}% certainty</span>
-              </div>
-
-              <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded-lg p-2.5 flex flex-col justify-between'>
-                <span className='text-[9px] text-[#8A8A8A] uppercase font-bold'>3. Marketplace</span>
-                <span className='text-xs font-bold text-[#FFFFFF] mt-1'>Amazon Direct</span>
-                <span className='text-[10px] text-[#8A8A8A] mt-0.5'>Zero UTM / Cookieless</span>
-              </div>
-
-              <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded-lg p-2.5 flex flex-col justify-between'>
-                <span className='text-[9px] text-[#8A8A8A] uppercase font-bold'>4. Order Event</span>
-                <span className='text-xs font-bold text-[#FFFFFF] mt-1'>#{txn.orderId}</span>
-                <span className='text-[10px] text-[#8A8A8A] mt-0.5'>ASIN: {txn.asin}</span>
-              </div>
-
-              <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded-lg p-2.5 flex flex-col justify-between'>
-                <span className='text-[9px] text-[#8A8A8A] uppercase font-bold'>5. Transaction Rev</span>
-                <span className='text-xs font-bold text-[#FFFFFF] mt-1'>₹{txn.grossRevenue.toFixed(2)}</span>
-                <span className='text-[10px] text-[#8A8A8A] mt-0.5'>COGS ₹{txn.cogs.toFixed(2)}</span>
-              </div>
-
-              <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded-lg p-2.5 flex flex-col justify-between'>
-                <span className='text-[9px] text-[#8A8A8A] uppercase font-bold'>6. Realized Margin</span>
-                <span className='text-xs font-bold text-[#FFFFFF] mt-1'>₹{txn.realizedGrossMargin.toFixed(2)}</span>
-                <span className='text-[10px] text-[#8A8A8A] mt-0.5'>{txn.grossMarginPct}% margin</span>
-              </div>
-
-              <div className='bg-[#000000] border border-[#FFFFFF]/60 rounded-lg p-2.5 flex flex-col justify-between bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A]'>
-                <span className='text-[9px] text-[#FFFFFF] uppercase font-bold'>7. Assisted ROAS</span>
-                <span className='text-xs font-black text-[#FFFFFF] mt-1'>{realizedRoas}x</span>
-                <span className='text-[10px] text-[#FFFFFF] mt-0.5'>₹170.00 ÷ ₹0.874</span>
-              </div>
-            </div>
-
-            <div className='mt-3 pt-2.5 border-t border-[#8A8A8A]/30 flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-[#8A8A8A] gap-2'>
-              <div>
-                <strong className='text-[#FFFFFF]'>Attribution Lineage Rule: </strong>
-                Device signals determine the <em>identity match</em>. The marketplace transaction determines <em>revenue &amp; margin</em>. ROAS is derived strictly as: <code className='text-[#FFFFFF]'>Attributed Revenue ÷ Attributed Ad Spend</code>.
-              </div>
-              <Badge variant='outline' className='text-[10px] border-[#8A8A8A]/40 text-[#FFFFFF] self-start sm:self-auto shrink-0'>
-                Deterministic Lineage Verified
-              </Badge>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* 4. CONFIRMED ATTRIBUTION HERO PANEL */}
-      <div className='rounded-xl border border-[#FFFFFF]/40 bg-gradient-to-r from-[#111111] via-[#1A1A1A] to-[#111111] p-6 shadow-xl'>
-        <div className='flex flex-col lg:flex-row lg:items-center justify-between gap-6'>
+      {/* 3. BENTO CARD 3: MULTI-TOUCH SEQUENTIAL PATHING */}
+      <div className='rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 p-6 flex flex-col gap-6'>
+        <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-200 dark:border-zinc-800'>
           <div>
-            <div className='flex items-center gap-2 mb-2'>
-              <Badge className='bg-[#FFFFFF] text-[#000000] font-mono text-xs font-bold border-none uppercase px-2.5 py-0.5'>
-                {currentStep >= 5 ? '✓ ATTRIBUTION CONFIRMED' : currentStep >= 4 ? '● ORDER DETECTED' : '○ SIMULATION IN PROGRESS'}
-              </Badge>
-              <span className='text-xs font-mono text-[#8A8A8A]'>
-                {currentStep >= 4 ? 'Cross-channel conversion resolved in 6h 21m' : 'Awaiting conversion touchpoint'}
-              </span>
+            <div className='flex items-center gap-2 mb-1'>
+              <IconNetwork className='size-4 text-zinc-700 dark:text-zinc-300' />
+              <h2 className='text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-100'>
+                Multi-Touch Sequential Pathing (§5.4.3)
+              </h2>
             </div>
-            <h2 className='text-2xl md:text-3xl font-mono font-black text-[#FFFFFF] tracking-tight'>
-              {currentStep >= 5
-                ? `₹${txn.grossRevenue.toFixed(2)} Revenue • ${realizedRoas}x Assisted ROAS`
-                : currentStep === 4
-                ? `₹${txn.grossRevenue.toFixed(2)} Revenue • Resolving ROAS...`
-                : `₹0.00 Revenue (Siloed 0.0x ROAS)`}
-            </h2>
-            <p className='text-xs font-mono text-[#8A8A8A] mt-1 max-w-2xl leading-relaxed'>
-              YouTube Ad Spend of <span className='text-[#FFFFFF] font-bold'>₹{txn.totalAttributedAdSpend.toFixed(3)}</span> yielded{' '}
-              <span className='text-[#FFFFFF] font-bold'>₹{txn.grossRevenue.toFixed(2)}</span> Amazon checkout.
-              Formula: <span className='text-[#FFFFFF] font-bold'>Attributed revenue ÷ Attributed ad spend</span> = {realizedRoas}x.
+            <p className='text-xs text-zinc-600 dark:text-zinc-400'>
+              Stitching anonymous customer journey across disparate ad network impressions and first-party checkout.
             </p>
           </div>
 
-          {/* Quick Metrics Cluster */}
-          <div className='grid grid-cols-2 sm:grid-cols-3 gap-3 font-mono shrink-0'>
-            <div className='bg-[#000000] border border-[#8A8A8A]/50 rounded-lg p-3 text-center'>
-              <span className='text-[10px] text-[#8A8A8A] uppercase tracking-wider block'>Realized Margin</span>
-              <span className='text-base font-bold text-[#FFFFFF] mt-0.5 block'>
-                {currentStep >= 4 ? `₹${txn.realizedGrossMargin.toFixed(2)}` : '₹0.00'}
-              </span>
-            </div>
-            <div className='bg-[#000000] border border-[#8A8A8A]/50 rounded-lg p-3 text-center'>
-              <span className='text-[10px] text-[#8A8A8A] uppercase tracking-wider block'>Match Certainty</span>
-              <span className='text-base font-bold text-[#FFFFFF] mt-0.5 block'>{selectedDevice.confidenceScore}%</span>
-            </div>
-            <div className='bg-[#000000] border border-[#8A8A8A]/50 rounded-lg p-3 text-center col-span-2 sm:col-span-1'>
-              <span className='text-[10px] text-[#8A8A8A] uppercase tracking-wider block'>Cross-Channel Link</span>
-              <span className='text-base font-bold text-[#FFFFFF] mt-0.5 block'>YouTube &rarr; Amazon</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 5. ROI RECHARTS VISUALIZATION & COMPARISON */}
-      <div className='grid grid-cols-1 lg:grid-cols-12 gap-6'>
-        {/* Left: Journey Accumulation Area Chart */}
-        <div className='lg:col-span-7 rounded-xl border border-[#8A8A8A]/50 bg-[#141414] p-5 flex flex-col justify-between'>
-          <div>
-            <div className='flex items-center justify-between pb-3 border-b border-[#8A8A8A]/30 mb-4'>
-              <div className='flex items-center gap-2'>
-                <Icons.barChart className='size-4 text-[#FFFFFF]' />
-                <h3 className='text-xs font-mono font-bold uppercase tracking-wider text-[#FFFFFF]'>
-                  Attributed Value vs Ad Spend Across Touchpoints
-                </h3>
-              </div>
-              <Badge variant='outline' className='text-[10px] font-mono text-[#8A8A8A] border-[#8A8A8A]/40 bg-[#000000]'>
-                Values in ₹
-              </Badge>
-            </div>
-            <p className='text-[11px] font-mono text-[#8A8A8A] mb-4'>
-              Tracks ad spend deployed at top-of-funnel on YouTube against the resulting revenue captured at Amazon checkout.
-            </p>
-
-            <div className='h-60 w-full'>
-              <ResponsiveContainer width='100%' height='100%'>
-                <AreaChart data={journeyTimelineChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id='gradRevenue' x1='0' y1='0' x2='0' y2='1'>
-                      <stop offset='5%' stopColor='#FFFFFF' stopOpacity={0.4} />
-                      <stop offset='95%' stopColor='#FFFFFF' stopOpacity={0.0} />
-                    </linearGradient>
-                    <linearGradient id='gradSpend' x1='0' y1='0' x2='0' y2='1'>
-                      <stop offset='5%' stopColor='#8A8A8A' stopOpacity={0.4} />
-                      <stop offset='95%' stopColor='#8A8A8A' stopOpacity={0.0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid stroke='#2A2A2A' strokeDasharray='3 3' vertical={false} />
-                  <XAxis
-                    dataKey='stage'
-                    stroke='#8A8A8A'
-                    tick={{ fill: '#8A8A8A', fontSize: 11, fontFamily: 'monospace' }}
-                    axisLine={{ stroke: '#333333' }}
-                  />
-                  <YAxis
-                    stroke='#8A8A8A'
-                    tick={{ fill: '#8A8A8A', fontSize: 11, fontFamily: 'monospace' }}
-                    axisLine={{ stroke: '#333333' }}
-                    tickFormatter={(v) => `₹${v}`}
-                  />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: '#000000', borderColor: '#8A8A8A', borderRadius: '6px', fontFamily: 'monospace', fontSize: '11px', color: '#FFFFFF' }}
-                    formatter={(val: any, name: any) => [`₹${Number(val).toFixed(2)}`, name === 'attributedRevenue' ? 'Attributed Revenue' : 'Ad Spend']}
-                  />
-                  <Area
-                    type='monotone'
-                    dataKey='attributedRevenue'
-                    name='Attributed Revenue'
-                    stroke='#FFFFFF'
-                    strokeWidth={2}
-                    fillOpacity={1}
-                    fill='url(#gradRevenue)'
-                  />
-                  <Area
-                    type='monotone'
-                    dataKey='adSpend'
-                    name='Ad Spend'
-                    stroke='#8A8A8A'
-                    strokeWidth={1.5}
-                    fillOpacity={1}
-                    fill='url(#gradSpend)'
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          <div className='mt-4 pt-3 border-t border-[#8A8A8A]/30 flex items-center justify-between text-[11px] font-mono text-[#8A8A8A]'>
-            <span>Initial YouTube Cost: <strong className='text-[#FFFFFF]'>₹{txn.totalAttributedAdSpend.toFixed(3)}</strong></span>
-            <span>Final Conversion Yield: <strong className='text-[#FFFFFF]'>₹{currentStep >= 4 ? txn.grossRevenue.toFixed(2) : '0.00'}</strong></span>
+          {/* Journey Selector */}
+          <div className='flex items-center gap-1.5 text-xs font-mono'>
+            <span className='text-zinc-500 dark:text-zinc-400 mr-1'>Catalog Target:</span>
+            {SAMPLE_JOURNEYS.map((j) => (
+              <button
+                key={j.id}
+                onClick={() => setSelectedJourney(j)}
+                className={cn(
+                  'px-2.5 py-1 rounded border text-xs transition-colors',
+                  selectedJourney.id === j.id
+                    ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 border-zinc-900 dark:border-zinc-100 font-semibold'
+                    : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700'
+                )}
+              >
+                {j.productName} (₹{j.retailPrice.toLocaleString('en-IN')})
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Right: Unattributed vs Attributed Comparison Bar Chart */}
-        <div className='lg:col-span-5 rounded-xl border border-[#8A8A8A]/50 bg-[#141414] p-5 flex flex-col justify-between'>
-          <div>
-            <div className='flex items-center justify-between pb-3 border-b border-[#8A8A8A]/30 mb-4'>
-              <div className='flex items-center gap-2'>
-                <Icons.normalization className='size-4 text-[#FFFFFF]' />
-                <h3 className='text-xs font-mono font-bold uppercase tracking-wider text-[#FFFFFF]'>
-                  Attribution Blindspot Comparison
-                </h3>
-              </div>
-              <Badge variant='outline' className='text-[10px] font-mono text-[#8A8A8A] border-[#8A8A8A]/40 bg-[#000000]'>
-                Siloed vs Stitched
-              </Badge>
-            </div>
-            <p className='text-[11px] font-mono text-[#8A8A8A] mb-4'>
-              Legacy siloed analytics reports YouTube as a cost center (₹0 revenue). NEXUS reveals true cross-channel halo revenue.
-            </p>
-
-            <div className='h-60 w-full'>
-              <ResponsiveContainer width='100%' height='100%'>
-                <BarChart data={comparisonChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <CartesianGrid stroke='#2A2A2A' strokeDasharray='3 3' vertical={false} />
-                  <XAxis
-                    dataKey='category'
-                    stroke='#8A8A8A'
-                    tick={{ fill: '#8A8A8A', fontSize: 10, fontFamily: 'monospace' }}
-                    axisLine={{ stroke: '#333333' }}
-                  />
-                  <YAxis
-                    stroke='#8A8A8A'
-                    tick={{ fill: '#8A8A8A', fontSize: 11, fontFamily: 'monospace' }}
-                    axisLine={{ stroke: '#333333' }}
-                    tickFormatter={(v) => `₹${v}`}
-                  />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: '#000000', borderColor: '#8A8A8A', borderRadius: '6px', fontFamily: 'monospace', fontSize: '11px', color: '#FFFFFF' }}
-                    formatter={(val: any, name: any) => [`₹${Number(val).toFixed(2)}`, name === 'recognizedRevenue' ? 'Recognized Revenue' : 'Ad Spend']}
-                  />
-                  <Bar dataKey='adSpend' fill='#555555' radius={[4, 4, 0, 0]} name='Ad Spend' />
-                  <Bar dataKey='recognizedRevenue' fill='#FFFFFF' radius={[4, 4, 0, 0]} name='Recognized Revenue' />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          <div className='mt-4 pt-3 border-t border-[#8A8A8A]/30 flex items-center justify-between text-[11px] font-mono'>
-            <span className='text-[#8A8A8A]'>Siloed: <strong className='text-[#8A8A8A]'>0.0x ROAS</strong></span>
-            <span className='text-[#FFFFFF]'>NEXUS: <strong className='text-[#FFFFFF]'>{currentStep >= 5 ? `${realizedRoas}x ROAS` : 'Evaluating'}</strong></span>
-          </div>
-        </div>
-      </div>
-
-      {/* 6. DEEP DIVE TABS (Visual Journey Mock, Identity Graph, DuckDB Telemetry, SDK) */}
-      <div className='rounded-xl border border-[#8A8A8A]/50 bg-[#141414] overflow-hidden'>
-        {/* Tab navigation headers */}
-        <div className='flex items-center gap-1 p-2 bg-[#000000] border-b border-[#8A8A8A]/30 text-xs font-mono overflow-x-auto'>
-          <button
-            onClick={() => setActiveTab('ngraph')}
-            className={cn(
-              'px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 shrink-0 font-bold',
-              activeTab === 'ngraph'
-                ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20'
-                : 'text-[#8A8A8A] hover:text-[#FFFFFF] hover:bg-[#1A1A1A]'
-            )}
-          >
-            <IconShare className='size-3.5 text-purple-300' />
-            1. Interactive N-Graph (DAG Topology)
-          </button>
-          <button
-            onClick={() => setActiveTab('entropy_lab')}
-            className={cn(
-              'px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 shrink-0 font-bold',
-              activeTab === 'entropy_lab'
-                ? 'bg-amber-600 text-white shadow-lg shadow-amber-500/20'
-                : 'text-[#8A8A8A] hover:text-[#FFFFFF] hover:bg-[#1A1A1A]'
-            )}
-          >
-            <IconMathFunction className='size-3.5 text-amber-300' />
-            2. Student Entropy Lab (Live Browser Test)
-          </button>
-          <button
-            onClick={() => setActiveTab('defense')}
-            className={cn(
-              'px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 shrink-0 font-bold',
-              activeTab === 'defense'
-                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                : 'text-[#8A8A8A] hover:text-[#FFFFFF] hover:bg-[#1A1A1A]'
-            )}
-          >
-            <IconShieldCheck className='size-3.5 text-emerald-300' />
-            3. Privacy Defense Sandbox (Brave/Firefox/Tor)
-          </button>
-          <button
-            onClick={() => setActiveTab('journey')}
-            className={cn(
-              'px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 shrink-0 font-bold',
-              activeTab === 'journey'
-                ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/20'
-                : 'text-[#8A8A8A] hover:text-[#FFFFFF] hover:bg-[#1A1A1A]'
-            )}
-          >
-            <Icons.laptop className='size-3.5 text-cyan-300' />
-            4. Closed-Loop Journey ({currentStepData.shortStage})
-          </button>
-          <button
-            onClick={() => setActiveTab('code_lab')}
-            className={cn(
-              'px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 shrink-0 font-bold',
-              activeTab === 'code_lab'
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
-                : 'text-[#8A8A8A] hover:text-[#FFFFFF] hover:bg-[#1A1A1A]'
-            )}
-          >
-            <IconTerminal className='size-3.5 text-indigo-300' />
-            5. Student Code &amp; Math Reference
-          </button>
-          <button
-            onClick={() => setActiveTab('telemetry')}
-            className={cn(
-              'px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 shrink-0 font-bold',
-              activeTab === 'telemetry'
-                ? 'bg-[#FFFFFF] text-[#000000]'
-                : 'text-[#8A8A8A] hover:text-[#FFFFFF] hover:bg-[#1A1A1A]'
-            )}
-          >
-            <Icons.code className='size-3.5' />
-            6. DuckDB Telemetry
-          </button>
-          <button
-            onClick={() => setActiveTab('code')}
-            className={cn(
-              'px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 shrink-0 font-bold',
-              activeTab === 'code'
-                ? 'bg-[#FFFFFF] text-[#000000]'
-                : 'text-[#8A8A8A] hover:text-[#FFFFFF] hover:bg-[#1A1A1A]'
-            )}
-          >
-            <Icons.file className='size-3.5' />
-            7. Cookieless SDK &amp; SQL
-          </button>
-        </div>
-
-        {/* TAB 1: INTERACTIVE MULTI-NODE N-GRAPH */}
-        {activeTab === 'ngraph' && (
-          <div className='p-5'>
-            <FingerprintNetworkGraph />
-          </div>
-        )}
-
-        {/* TAB 2: STUDENT ENTROPY LAB & LIVE IN-BROWSER EXTRACTOR */}
-        {activeTab === 'entropy_lab' && (
-          <div className='p-5'>
-            <FingerprintEntropyLab />
-          </div>
-        )}
-
-        {/* TAB 3: PRIVACY DEFENSE SIMULATOR (BRAVE/FIREFOX/TOR) */}
-        {activeTab === 'defense' && (
-          <div className='p-5'>
-            <FingerprintDefenseSimulator />
-          </div>
-        )}
-
-        {/* TAB 4: CLOSED-LOOP JOURNEY SIMULATION */}
-        {activeTab === 'journey' && (
-          <div className='p-5 grid grid-cols-1 lg:grid-cols-12 gap-6'>
-            {/* Screen Mock Container */}
-            <div className='lg:col-span-7 flex flex-col gap-3'>
-              <div className='rounded-lg border border-[#8A8A8A]/50 bg-[#000000] overflow-hidden'>
-                {/* Browser top-bar */}
-                <div className='bg-[#111111] border-b border-[#8A8A8A]/30 px-3.5 py-2 flex items-center justify-between'>
-                  <div className='flex items-center gap-1.5'>
-                    <span className='size-2.5 rounded-full bg-[#FFFFFF]/70 inline-block' />
-                    <span className='size-2.5 rounded-full bg-[#8A8A8A]/60 inline-block' />
-                    <span className='size-2.5 rounded-full bg-[#8A8A8A]/30 inline-block' />
-                    <span className='ml-2 text-xs font-mono text-[#8A8A8A] truncate max-w-[220px]'>
-                      {currentStep <= 2 ? 'youtube.com/watch?v=tech-gear-2026' : 'amazon.com/s?k=nike+shoes'}
+        {/* 4-Stage Step Cards */}
+        <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
+          {selectedJourney.steps.map((step, idx) => {
+            const isLast = idx === selectedJourney.steps.length - 1;
+            return (
+              <div
+                key={step.stage}
+                className={cn(
+                  'p-4 rounded-lg border flex flex-col justify-between gap-3 transition-all',
+                  isLast
+                    ? 'border-emerald-300 dark:border-emerald-800 bg-emerald-50/30 dark:bg-emerald-950/20'
+                    : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950/40'
+                )}
+              >
+                <div>
+                  <div className='flex items-center justify-between text-xs font-mono mb-2'>
+                    <span className='font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400'>
+                      0{idx + 1} • {step.stage}
                     </span>
+                    {step.costInr > 0 ? (
+                      <span className='text-zinc-700 dark:text-zinc-300 font-semibold'>
+                        ₹{step.costInr.toFixed(2)}
+                      </span>
+                    ) : (
+                      <span className='text-emerald-600 dark:text-emerald-400 font-semibold'>
+                        Order Confirmed
+                      </span>
+                    )}
                   </div>
-                  <Badge variant='outline' className='border-[#8A8A8A]/50 bg-[#000000] text-[#FFFFFF] text-[10px] font-mono px-2 py-0.5 flex items-center gap-1'>
-                    <Icons.fingerprint className='size-3' />
-                    {selectedDevice.fingerprintId}
-                  </Badge>
+
+                  <h3 className='text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-1 flex items-center gap-1.5'>
+                    {step.platform === 'tiktok' && <IconBrandTiktok className='size-3.5 text-rose-600' />}
+                    {step.platform === 'google' && <IconBrandGoogle className='size-3.5 text-emerald-600' />}
+                    {step.platform === 'meta' && <IconBrandMeta className='size-3.5 text-blue-600' />}
+                    {step.platform === 'shopify' && <IconShoppingCart className='size-3.5 text-emerald-600' />}
+                    {step.platformLabel}
+                  </h3>
+
+                  <p className='text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed mb-3'>
+                    {step.description}
+                  </p>
                 </div>
 
-                {/* Browser window body */}
-                <div className='p-4 min-h-[360px] flex flex-col justify-between bg-[#0A0A0A]'>
-                  {/* Stages 1 & 2: YouTube view */}
-                  {currentStep <= 2 && (
-                    <div className='flex flex-col gap-3'>
-                      <div className='relative aspect-video rounded-lg overflow-hidden bg-[#000000] border border-[#8A8A8A]/50 flex flex-col justify-between p-4'>
-                        <div className='flex items-center justify-between z-10'>
-                          <div className='flex items-center gap-2 bg-[#1A1A1A]/80 border border-[#8A8A8A]/40 px-2.5 py-1 rounded text-xs font-mono text-[#FFFFFF]'>
-                            <Icons.youtube className='size-4 text-[#FFFFFF]' />
-                            YouTube Preroll Video
-                          </div>
-                          <Badge className='bg-[#FFFFFF] text-[#000000] font-bold text-[10px] uppercase font-mono border-none'>
-                            Ad 1 of 1 • 0:08 / 0:15
-                          </Badge>
-                        </div>
-
-                        <div className='my-auto flex flex-col items-center justify-center text-center p-3 z-10'>
-                          <div className='size-12 rounded-full bg-[#1A1A1A] border border-[#8A8A8A] flex items-center justify-center mb-2'>
-                            <Icons.play className='size-6 text-[#FFFFFF] ml-0.5' />
-                          </div>
-                          <span className='text-[10px] font-mono uppercase text-[#8A8A8A] tracking-wider font-semibold'>
-                            Nike Sponsored Preroll Ad
-                          </span>
-                          <h4 className='text-lg md:text-xl font-black text-[#FFFFFF] tracking-tight mt-0.5'>
-                            {txn.productTitle}
-                          </h4>
-                          <p className='text-xs text-[#8A8A8A] max-w-sm mt-0.5'>
-                            Dynamic dual-chamber air cushioning delivers responsive bounce with every stride.
-                          </p>
-                        </div>
-
-                        <div className='flex items-center justify-between z-10 bg-[#000000]/90 -mx-4 -mb-4 p-2.5 border-t border-[#8A8A8A]/40'>
-                          <div className='flex items-center gap-2'>
-                            <Button
-                              size='sm'
-                              onClick={() => {
-                                setCurrentStep(2);
-                                toast.info('Ad Clicked!', {
-                                  description: `Engagement recorded with Fingerprint ID ${selectedDevice.fingerprintId}`
-                                });
-                              }}
-                              className={cn(
-                                'h-7 font-mono text-xs font-bold transition-all border-none',
-                                currentStep === 2
-                                  ? 'bg-[#FFFFFF] text-[#000000]'
-                                  : 'bg-[#1A1A1A] text-[#FFFFFF] hover:bg-[#333333] border border-[#8A8A8A]'
-                              )}
-                            >
-                              <Icons.externalLink className='size-3 mr-1' />
-                              {currentStep === 2 ? 'Ad Clicked (Engaged)' : 'Shop Now (Click Ad)'}
-                            </Button>
-                            <span className='text-[10px] font-mono text-[#8A8A8A] hidden sm:inline'>
-                              CPC Cost: ₹{txn.youtubeClickCpcCost.toFixed(3)}
-                            </span>
-                          </div>
-                          <span className='text-[10px] font-mono text-[#8A8A8A]'>Skip Ad in 5s</span>
-                        </div>
-                      </div>
-
-                      <div className='rounded border border-[#8A8A8A]/40 bg-[#111111] p-2.5 flex items-start gap-2.5 text-xs font-mono text-[#FFFFFF]'>
-                        <Icons.info className='size-4 text-[#FFFFFF] shrink-0 mt-0.5' />
-                        <div>
-                          <strong className='text-[#FFFFFF]'>Entropy Hash Recorded: </strong>
-                          NEXUS tag captured WebGL + Canvas + Audio characteristics silently. Fingerprint{' '}
-                          <code className='text-[#FFFFFF] underline'>{selectedDevice.fingerprintId}</code> registered.
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Stages 3 & 4: Amazon view */}
-                  {(currentStep === 3 || currentStep === 4) && (
-                    <div className='flex flex-col gap-3'>
-                      <div className='bg-[#111111] rounded-lg p-3 border border-[#8A8A8A]/50 flex items-center justify-between gap-3'>
-                        <div className='flex items-center gap-1.5'>
-                          <span className='font-bold text-base text-[#FFFFFF] font-sans'>
-                            amazon<span className='text-[#8A8A8A]'>.com</span>
-                          </span>
-                        </div>
-                        <div className='flex-1 max-w-sm bg-[#000000] border border-[#8A8A8A]/40 rounded px-2.5 py-1 text-xs font-mono text-[#FFFFFF] flex items-center'>
-                          <Icons.search className='size-3 text-[#8A8A8A] mr-2' />
-                          <span className='truncate'>{txn.sku}</span>
-                        </div>
-                        <span className='text-xs font-mono font-bold text-[#FFFFFF]'>Prime 1-Day</span>
-                      </div>
-
-                      <div className='rounded-lg border border-[#8A8A8A]/50 bg-[#111111] p-4 flex flex-col sm:flex-row items-center gap-4'>
-                        <div className='w-full sm:w-36 h-28 rounded bg-[#000000] border border-[#8A8A8A]/30 flex items-center justify-center p-2 shrink-0'>
-                          <Icons.product className='size-12 text-[#FFFFFF]' />
-                        </div>
-
-                        <div className='flex-1 flex flex-col justify-between'>
-                          <div>
-                            <div className='flex items-center justify-between text-[11px] font-mono text-[#8A8A8A]'>
-                              <span>ASIN: {txn.asin}</span>
-                              <span className='text-[#FFFFFF] font-bold'>★★★★★ 4.9</span>
-                            </div>
-                            <h4 className='text-sm font-bold text-[#FFFFFF] mt-1 line-clamp-2'>
-                              {txn.productTitle}
-                            </h4>
-                            <div className='text-base font-mono font-bold text-[#FFFFFF] mt-1'>
-                              ₹{txn.grossRevenue.toFixed(2)}
-                            </div>
-                          </div>
-
-                          <div className='mt-3'>
-                            {currentStep === 3 ? (
-                              <Button
-                                size='sm'
-                                onClick={() => {
-                                  setCurrentStep(4);
-                                  toast.success('Order Placed on Amazon!', {
-                                    description: `Conversion tagged with Fingerprint ${selectedDevice.fingerprintId}`
-                                  });
-                                }}
-                                className='bg-[#FFFFFF] hover:bg-[#CCCCCC] text-[#000000] font-bold text-xs h-7 px-4 w-full border-none'
-                              >
-                                <Icons.cart className='size-3.5 mr-1.5' />
-                                Buy Now (1-Click Checkout ₹{txn.grossRevenue.toFixed(2)})
-                              </Button>
-                            ) : (
-                              <div className='rounded bg-[#000000] border border-[#8A8A8A] p-2 flex items-center justify-between text-xs font-mono text-[#FFFFFF]'>
-                                <span className='font-bold flex items-center gap-1.5'>
-                                  <Icons.circleCheck className='size-4 text-[#FFFFFF]' />
-                                  Order Confirmed: #{txn.orderId}
-                                </span>
-                                <span className='font-bold'>₹{txn.grossRevenue.toFixed(2)}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className='rounded border border-[#8A8A8A]/40 bg-[#111111] p-2.5 flex items-start gap-2.5 text-xs font-mono text-[#FFFFFF]'>
-                        <Icons.shieldCheck className='size-4 text-[#FFFFFF] shrink-0 mt-0.5' />
-                        <div>
-                          <strong className='text-[#FFFFFF]'>Walled Garden Bridged: </strong>
-                          User arrived organically with zero UTMs, yet Fingerprint{' '}
-                          <code className='text-[#FFFFFF] underline'>{selectedDevice.fingerprintId}</code> matched with{' '}
-                          {selectedDevice.confidenceScore}% certainty!
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Stage 5: Closed-Loop Resolved view */}
-                  {currentStep === 5 && (
-                    <div className='flex flex-col gap-3'>
-                      <div className='rounded-lg border border-[#FFFFFF]/60 bg-[#111111] p-4 flex flex-col gap-3'>
-                        <div className='flex items-center justify-between'>
-                          <span className='text-xs font-mono font-bold uppercase tracking-wider text-[#FFFFFF] flex items-center gap-1.5'>
-                            <Icons.shieldCheck className='size-4 text-[#FFFFFF]' />
-                            Attribution Complete
-                          </span>
-                          <Badge className='bg-[#FFFFFF] text-[#000000] font-mono text-xs font-bold border-none'>
-                            {realizedRoas}x Assisted ROAS
-                          </Badge>
-                        </div>
-
-                        <div className='grid grid-cols-2 gap-3 text-xs font-mono'>
-                          <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded p-2.5'>
-                            <span className='text-[#8A8A8A] block text-[10px] uppercase'>Siloed View (Flawed)</span>
-                            <span className='text-[#8A8A8A] block font-bold mt-0.5'>0.0x ROAS (₹0 Rev)</span>
-                            <span className='text-[10px] text-[#8A8A8A] block mt-1'>Recommendation: Kill ad</span>
-                          </div>
-                          <div className='bg-[#000000] border border-[#FFFFFF]/60 rounded p-2.5'>
-                            <span className='text-[#FFFFFF] block text-[10px] uppercase font-bold'>NEXUS View (Real)</span>
-                            <span className='text-[#FFFFFF] block font-black mt-0.5'>{realizedRoas}x ROAS (₹{txn.grossRevenue.toFixed(2)})</span>
-                            <span className='text-[10px] text-[#FFFFFF] block mt-1 font-semibold'>Recommendation: Scale ad +25%</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className='rounded border border-[#8A8A8A]/40 bg-[#111111] p-2.5 flex items-start gap-2.5 text-xs font-mono text-[#FFFFFF]'>
-                        <Icons.sparkles className='size-4 text-[#FFFFFF] shrink-0 mt-0.5' />
-                        <div>
-                          <strong className='text-[#FFFFFF]'>Autonomous SLSQP Engine Action: </strong>
-                          Budget optimizer shifts <strong className='text-[#FFFFFF]'>₹4,500/day</strong> into YouTube top-of-funnel campaigns to feed downstream Amazon marketplace checkout loops.
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                <div className='pt-2.5 border-t border-zinc-200 dark:border-zinc-800/80 flex flex-col gap-1 text-[11px] font-mono'>
+                  <div className='flex items-center justify-between'>
+                    <span className='text-zinc-500 dark:text-zinc-400'>{step.tokenType}:</span>
+                    <kbd className='px-1 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 truncate max-w-[130px]'>
+                      {step.tokenValue}
+                    </kbd>
+                  </div>
+                  <div className='text-[10px] text-zinc-400 dark:text-zinc-500 truncate'>
+                    {step.timestamp}
+                  </div>
                 </div>
               </div>
-            </div>
+            );
+          })}
+        </div>
 
-            {/* Deep-dive details on active stage */}
-            <div className='lg:col-span-5 flex flex-col justify-between rounded-lg border border-[#8A8A8A]/50 bg-[#000000] p-4 font-mono'>
-              <div>
-                <div className='flex items-center justify-between pb-2.5 border-b border-[#8A8A8A]/30 mb-3'>
-                  <span className='text-[10px] font-bold uppercase tracking-wider text-[#FFFFFF] px-2 py-0.5 rounded bg-[#1A1A1A] border border-[#8A8A8A]/40'>
-                    {currentStepData.badgeLabel}
-                  </span>
-                  <span className='text-[10px] text-[#8A8A8A]'>{currentStepData.timestamp}</span>
-                </div>
-
-                <h3 className='text-sm font-bold text-[#FFFFFF] mb-1.5'>{currentStepData.title}</h3>
-                <p className='text-xs text-[#8A8A8A] font-sans leading-relaxed mb-3'>{currentStepData.summary}</p>
-
-                <div className='space-y-1.5 mb-4'>
-                  <span className='text-[10px] uppercase text-[#8A8A8A] tracking-wider block font-semibold'>
-                    Telemetry &amp; Decision Logs:
-                  </span>
-                  {currentStepData.details.map((detail, idx) => (
-                    <div key={idx} className='flex items-start gap-1.5 text-xs text-[#FFFFFF]'>
-                      <Icons.arrowRight className='size-3 text-[#FFFFFF] shrink-0 mt-0.5' />
-                      <span className='leading-tight'>{detail}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Confidence rating strip */}
-              <div className='rounded border border-[#8A8A8A]/40 bg-[#111111] p-2.5 mt-2'>
-                <div className='flex items-center justify-between text-[11px] mb-1.5'>
-                  <span className='text-[#8A8A8A] uppercase'>Entropy Confidence</span>
-                  <span className='text-[#FFFFFF] font-bold'>{selectedDevice.confidenceScore}% Certainty</span>
-                </div>
-                <div className='w-full bg-[#000000] border border-[#8A8A8A]/30 h-1.5 rounded-full overflow-hidden'>
-                  <div className='bg-[#FFFFFF] h-full transition-all duration-300' style={{ width: `${selectedDevice.confidenceScore}%` }} />
-                </div>
-                <div className='flex items-center justify-between text-[10px] text-[#8A8A8A] mt-1.5'>
-                  <span>Active Hash: <code className='text-[#FFFFFF]'>{selectedDevice.fingerprintId}</code></span>
-                  <span>Deterministic (No AI hallucination)</span>
-                </div>
-              </div>
-            </div>
+        {/* Journey Unit Economics Footer */}
+        <div className='p-3.5 rounded-lg bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono'>
+          <div className='flex items-center gap-4'>
+            <span>Visitor ID: <code className='text-zinc-800 dark:text-zinc-200'>{selectedJourney.visitorId.slice(0, 18)}...</code></span>
+            <span>SKU: <strong className='text-zinc-900 dark:text-zinc-100'>{selectedJourney.sku}</strong></span>
+            <span>MSRP: <strong className='text-zinc-900 dark:text-zinc-100'>₹{selectedJourney.retailPrice.toLocaleString('en-IN')}</strong></span>
           </div>
-        )}
-
-        {/* TAB 5: STUDENT CODE & MATHEMATICAL REFERENCE */}
-        {activeTab === 'code_lab' && (
-          <div className='p-5'>
-            <FingerprintStudentCodeLab />
+          <div className='flex items-center gap-4 text-zinc-600 dark:text-zinc-400'>
+            <span>Incurred Ad Spend: <strong className='text-zinc-900 dark:text-zinc-100'>₹{totalIncurredSpend.toFixed(2)}</strong></span>
+            <span>Fulfillment: <strong className='text-zinc-900 dark:text-zinc-100'>{selectedJourney.freightZone}</strong></span>
           </div>
-        )}
+        </div>
+      </div>
 
-        {/* TAB 3: TELEMETRY JSON STREAM */}
-        {activeTab === 'telemetry' && (
-          <div className='p-5 font-mono'>
-            <div className='flex items-center justify-between pb-3 border-b border-[#8A8A8A]/30 mb-3'>
+      {/* 4. BENTO ROW 4: THE 200% DOUBLE-COUNTING TRAP VS SHAPLEY GAAP DEDUPLICATION */}
+      <div className='grid grid-cols-1 lg:grid-cols-12 gap-6'>
+        {/* LEFT: THE PLATFORM DOUBLE-COUNTING TRAP (6 Cols) */}
+        <div className='lg:col-span-6 rounded-lg border border-rose-200 dark:border-rose-900/60 bg-rose-50/20 dark:bg-rose-950/10 p-6 flex flex-col justify-between'>
+          <div>
+            <div className='flex items-center justify-between pb-3 border-b border-rose-200 dark:border-rose-900/60 mb-4'>
               <div className='flex items-center gap-2'>
-                <Icons.code className='size-4 text-[#FFFFFF]' />
-                <h3 className='text-xs font-bold text-[#FFFFFF] uppercase tracking-wider'>
-                  DuckDB Ingestion Telemetry Payload
-                </h3>
+                <IconScale className='size-4 text-rose-700 dark:text-rose-400' />
+                <h2 className='text-sm font-semibold tracking-tight text-rose-950 dark:text-rose-200'>
+                  The Platform Double-Counting Trap (§5.4.2)
+                </h2>
               </div>
-              <Badge variant='outline' className='border-[#8A8A8A]/50 text-[#FFFFFF] bg-[#000000] text-[10px] font-bold'>
-                ● HTTP 200 INGESTED
-              </Badge>
+              <span className='text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-300 dark:bg-rose-950 dark:text-rose-300 dark:border-rose-800 font-semibold'>
+                +100% Phantom Revenue
+              </span>
             </div>
 
-            <pre className='bg-[#000000] text-[#FFFFFF] border border-[#8A8A8A]/40 rounded-lg p-4 text-xs overflow-x-auto leading-relaxed max-h-96'>
-              {JSON.stringify(currentStepData.eventPayload, null, 2)}
-            </pre>
+            <p className='text-xs text-rose-900/80 dark:text-rose-200/80 leading-relaxed mb-4'>
+              Because walled gardens are isolated, each network assumes full 100% conversion credit for the same shoe purchase:
+            </p>
+
+            <div className='space-y-2.5 font-mono text-xs'>
+              <div className='p-3 rounded-md bg-white dark:bg-zinc-900 border border-rose-200 dark:border-rose-900/50 flex items-center justify-between'>
+                <div className='flex items-center gap-2'>
+                  <IconBrandGoogle className='size-3.5 text-emerald-600' />
+                  <span>Google Ads Tag Claim:</span>
+                </div>
+                <strong className='text-rose-700 dark:text-rose-300 font-semibold'>
+                  ₹{selectedJourney.retailPrice.toLocaleString('en-IN')} (100% Credit)
+                </strong>
+              </div>
+
+              <div className='p-3 rounded-md bg-white dark:bg-zinc-900 border border-rose-200 dark:border-rose-900/50 flex items-center justify-between'>
+                <div className='flex items-center gap-2'>
+                  <IconBrandMeta className='size-3.5 text-blue-600' />
+                  <span>Meta Pixel / CAPI Claim:</span>
+                </div>
+                <strong className='text-rose-700 dark:text-rose-300 font-semibold'>
+                  ₹{selectedJourney.retailPrice.toLocaleString('en-IN')} (100% Credit)
+                </strong>
+              </div>
+
+              <div className='p-3.5 rounded-md bg-rose-100/60 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-800 flex flex-col gap-2'>
+                <div className='flex items-center justify-between text-rose-950 dark:text-rose-100 font-bold'>
+                  <span>Total Platform-Claimed Revenue:</span>
+                  <span>₹{doubleCountedRevenue.toLocaleString('en-IN')}</span>
+                </div>
+                <div className='flex items-center justify-between text-zinc-700 dark:text-zinc-300 text-[11px] pt-1.5 border-t border-rose-200 dark:border-rose-800'>
+                  <span>Actual Cash in Bank (GAAP Receipts):</span>
+                  <span className='font-semibold text-zinc-900 dark:text-zinc-100'>
+                    ₹{actualBankReceipts.toLocaleString('en-IN')}
+                  </span>
+                </div>
+                <div className='flex items-center justify-between text-rose-800 dark:text-rose-300 text-[11px] font-semibold'>
+                  <span>Reported Network ROAS:</span>
+                  <span>{doubleCountedRoas}x (Artificially Inflated)</span>
+                </div>
+              </div>
+            </div>
           </div>
-        )}
 
-        {/* TAB 4: SDK CODE & SQL */}
-        {activeTab === 'code' && (
-          <div className='p-5 grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs'>
-            {/* SDK Code */}
-            <div className='rounded-lg border border-[#8A8A8A]/40 bg-[#000000] p-4'>
-              <div className='flex items-center justify-between pb-2.5 border-b border-[#8A8A8A]/30 mb-3'>
-                <span className='font-bold text-[#FFFFFF] text-xs flex items-center gap-1.5'>
-                  <Icons.code className='size-3.5 text-[#FFFFFF]' />
-                  Client Cookieless Generator (`nexus-fp.js`)
-                </span>
-                <Badge variant='outline' className='text-[10px] border-[#8A8A8A] text-[#8A8A8A] bg-[#111111]'>
-                  1.4 kB • Zero Cookies
-                </Badge>
+          <div className='mt-4 pt-3 border-t border-rose-200 dark:border-rose-900/60 text-[11px] text-rose-900/70 dark:text-rose-300/70'>
+            Result: Marketers believe ad spend is twice as productive as reality, leading to over-bidding and capital burn.
+          </div>
+        </div>
+
+        {/* RIGHT: NEXUS SHAPLEY GAAP DEDUPLICATION ENGINE (6 Cols) */}
+        <div className='lg:col-span-6 rounded-lg border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/20 dark:bg-emerald-950/10 p-6 flex flex-col justify-between'>
+          <div>
+            <div className='flex items-center justify-between pb-3 border-b border-emerald-200 dark:border-emerald-900/60 mb-4'>
+              <div className='flex items-center gap-2'>
+                <IconCalculator className='size-4 text-emerald-700 dark:text-emerald-400' />
+                <h2 className='text-sm font-semibold tracking-tight text-emerald-950 dark:text-emerald-200'>
+                  NEXUS Shapley Counterfactual GAAP Engine (§5.4.4)
+                </h2>
               </div>
-              <pre className='bg-[#111111] text-[#FFFFFF] p-3 rounded text-[11px] overflow-x-auto leading-relaxed border border-[#8A8A8A]/30'>
-{`// NEXUS Deterministic Hardware Fingerprint Engine
-async function computeNexusFingerprint() {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  ctx.textBaseline = 'top';
-  ctx.font = '14px Arial';
-  ctx.fillText('NEXUS_FP_ENTROPY_VECTOR', 2, 2);
-  const canvasHash = sha256(canvas.toDataURL());
-
-  const gl = canvas.getContext('webgl');
-  const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-  const gpu = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const osc = audioCtx.createOscillator();
-  const audioHash = osc.frequency.value.toFixed(8);
-
-  const entropyPayload = {
-    canvasHash,
-    gpu,
-    audioHash,
-    screen: \`\${screen.width}x\${screen.height}@\${window.devicePixelRatio}\`,
-    cores: navigator.hardwareConcurrency,
-    ram: navigator.deviceMemory
-  };
-
-  const fpId = 'FP-' + sha256(JSON.stringify(entropyPayload)).slice(0, 16);
-  return { fpId, entropyPayload };
-}`}
-              </pre>
+              <span className='text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800 font-semibold'>
+                100% GAAP Match
+              </span>
             </div>
 
-            {/* SQL Attribution Query */}
-            <div className='rounded-lg border border-[#8A8A8A]/40 bg-[#000000] p-4'>
-              <div className='flex items-center justify-between pb-2.5 border-b border-[#8A8A8A]/30 mb-3'>
-                <span className='font-bold text-[#FFFFFF] text-xs flex items-center gap-1.5'>
-                  <Icons.product className='size-3.5 text-[#FFFFFF]' />
-                  DuckDB Cross-Platform Attribution Query
-                </span>
-                <Badge variant='outline' className='text-[10px] border-[#8A8A8A] text-[#8A8A8A] bg-[#111111]'>
-                  SQL Query
-                </Badge>
+            <p className='text-xs text-emerald-900/80 dark:text-emerald-200/80 leading-relaxed mb-4'>
+              Evaluates cooperative game theory marginal contribution, allocating exactly 100% of realized cash:
+            </p>
+
+            <div className='space-y-2.5 font-mono text-xs'>
+              {shapleyAttributions.map((item) => (
+                <div
+                  key={item.platform}
+                  className='p-3 rounded-md bg-white dark:bg-zinc-900 border border-emerald-200 dark:border-emerald-900/50 flex items-center justify-between'
+                >
+                  <div className='flex items-center gap-2'>
+                    <span className={cn('text-[10px] px-1.5 py-0.5 rounded border uppercase', item.badgeStyle)}>
+                      {(item.weight * 100).toFixed(0)}%
+                    </span>
+                    <span>{item.platform} ({item.stage}):</span>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <span className='text-zinc-500 dark:text-zinc-400'>
+                      ₹{item.spend.toFixed(0)} spend &rarr;
+                    </span>
+                    <strong className='text-emerald-700 dark:text-emerald-300 font-semibold'>
+                      ₹{item.attributedRevenue.toFixed(2)}
+                    </strong>
+                  </div>
+                </div>
+              ))}
+
+              <div className='p-3.5 rounded-md bg-emerald-100/60 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 flex flex-col gap-2'>
+                <div className='flex items-center justify-between text-emerald-950 dark:text-emerald-100 font-bold'>
+                  <span>Sum of Deduplicated Attributions:</span>
+                  <span>₹{actualBankReceipts.toLocaleString('en-IN')}.00 (100.0%)</span>
+                </div>
+                <div className='flex items-center justify-between text-emerald-900 dark:text-emerald-200 text-[11px] pt-1.5 border-t border-emerald-200 dark:border-emerald-800'>
+                  <span>True Realized ROAS:</span>
+                  <span className='font-bold text-zinc-950 dark:text-zinc-50'>
+                    {deduplicatedRoas}x (Reconciled with Cash)
+                  </span>
+                </div>
+                <div className='flex items-center justify-between text-emerald-900 dark:text-emerald-200 text-[11px]'>
+                  <span>True Contribution POAS:</span>
+                  <span className='font-bold text-zinc-950 dark:text-zinc-50'>
+                    {deduplicatedPoas}x (Net of COGS &amp; ₹{selectedJourney.freightCost} Freight)
+                  </span>
+                </div>
               </div>
-              <pre className='bg-[#111111] text-[#FFFFFF] p-3 rounded text-[11px] overflow-x-auto leading-relaxed border border-[#8A8A8A]/30'>
-{`-- Stitch YouTube impressions to Amazon checkout
+            </div>
+          </div>
+
+          <div className='mt-4 pt-3 border-t border-emerald-200 dark:border-emerald-900/60 text-[11px] text-emerald-900/70 dark:text-emerald-300/70'>
+            Result: Zero double-counting. Spend allocation is driven by true marginal contribution rather than inflated ad claim vanity metrics.
+          </div>
+        </div>
+      </div>
+
+      {/* 5. BENTO CARD 5: DUCKDB / POSTGRES TELEMETRY SQL INGESTION SNIPPET */}
+      <div className='rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 p-6 flex flex-col gap-4'>
+        <div className='flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800'>
+          <div className='flex items-center gap-2'>
+            <IconCode className='size-4 text-zinc-700 dark:text-zinc-300' />
+            <h2 className='text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100'>
+              DuckDB Lakehouse Query: Cookieless Touchpoint Stitching
+            </h2>
+          </div>
+          <span className='text-[10px] font-mono text-zinc-500 dark:text-zinc-400'>
+            duckdb: data/dqps.duckdb • Table: unified_commerce_ledger
+          </span>
+        </div>
+
+        <pre className='p-4 rounded-md bg-zinc-950 text-zinc-100 font-mono text-xs overflow-x-auto border border-zinc-800 leading-relaxed'>
+{`-- Step 1: Cluster anonymous touchpoints by /24 subnet and hardware entropy
+WITH touchpoint_clusters AS (
+  SELECT
+    cluster_id,
+    subnet_masked,
+    channel,
+    click_token,   -- gclid, fbclid, ttclid
+    cost_micros / 1000000.0 AS spend_inr,
+    event_timestamp
+  FROM raw_ad_impressions_and_clicks
+  WHERE subnet_masked = '198.51.100.0/24'
+),
+
+-- Step 2: Join first-party Shopify conversion event with zero userId
+order_attribution AS (
+  SELECT
+    o.order_id,
+    o.total_price_inr,
+    o.cogs_inr,
+    o.freight_inr,
+    c.channel,
+    c.click_token,
+    -- Shapley cooperative game fair-share allocation
+    SHAPLEY_MARGINAL_WEIGHT(c.channel, c.event_timestamp, o.created_at) AS shapley_weight
+  FROM shopify_orders o
+  JOIN touchpoint_clusters c ON o.subnet_masked = c.subnet_masked
+  WHERE o.order_id = '${selectedJourney.steps[3].tokenValue}'
+)
+
 SELECT
-  yt.fingerprint_id,
-  yt.ad_campaign       AS youtube_campaign,
-  yt.cost_usd          AS total_ad_spend,
-  amz.order_id         AS amazon_order,
-  amz.revenue_usd      AS amazon_revenue,
-  date_diff('hour', yt.timestamp, amz.timestamp) AS latency_hours,
-  ROUND(amz.revenue_usd / yt.cost_usd, 2) AS assisted_roas
-FROM nexus_telemetry.youtube_ads yt
-JOIN nexus_telemetry.amazon_orders amz
-  ON yt.fingerprint_id = amz.fingerprint_id
-WHERE yt.event_type = 'AD_CLICK'
-  AND amz.event_type = 'PURCHASE_CONVERSION'
-  AND amz.timestamp > yt.timestamp;`}
-              </pre>
-            </div>
-          </div>
-        )}
+  channel,
+  ROUND(SUM(total_price_inr * shapley_weight), 2) AS attributed_revenue_inr,
+  ROUND(SUM(total_price_inr * shapley_weight) / NULLIF(SUM(spend_inr), 0), 2) AS deduplicated_roas
+FROM order_attribution
+GROUP BY channel;`}
+        </pre>
       </div>
     </div>
   );

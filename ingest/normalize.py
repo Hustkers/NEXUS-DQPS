@@ -32,31 +32,51 @@ DEFAULT_FX_RATES_TO_USD: Dict[str, float] = {
     "CAD": 0.73,
     "AUD": 0.65,
     "JPY": 0.0065,
-    "INR": 0.012,
+    "INR": 0.0119,
+}
+
+DEFAULT_FX_RATES_TO_INR: Dict[str, float] = {
+    "INR": 1.0,
+    "USD": 84.0,
+    "EUR": 91.5,
+    "GBP": 108.2,
+    "CAD": 61.5,
+    "AUD": 55.0,
+    "JPY": 0.55,
 }
 
 
-def cost_micros_to_usd(cost_micros: int | float) -> float:
-    """Convert Google Ads cost_micros into standard USD decimal.
+def cost_micros_to_inr(cost_micros: int | float) -> float:
+    """Convert Google Ads cost_micros into standard INR decimal.
 
-    1,000,000 micros = $1.00 USD
+    1,000,000 micros = ₹1.00 INR
     """
     if not cost_micros:
         return 0.0
     return round(float(cost_micros) / 1_000_000.0, 4)
 
 
-def usd_to_cost_micros(usd: float) -> int:
-    """Convert USD decimal amount to Google Ads cost_micros integer."""
-    if not usd:
+def inr_to_cost_micros(inr: float) -> int:
+    """Convert INR decimal amount to Google Ads cost_micros integer."""
+    if not inr:
         return 0
-    return int(round(usd * 1_000_000))
+    return int(round(inr * 1_000_000))
+
+
+def cost_micros_to_usd(cost_micros: int | float) -> float:
+    """Convert Google Ads cost_micros into standard decimal currency units."""
+    return cost_micros_to_inr(cost_micros)
+
+
+def usd_to_cost_micros(usd: float) -> int:
+    """Convert decimal currency units to Google Ads cost_micros integer."""
+    return inr_to_cost_micros(usd)
 
 
 def convert_currency(
     amount: float,
     from_currency: str,
-    to_currency: str = "USD",
+    to_currency: str = "INR",
     custom_fx: Optional[Dict[str, float]] = None,
 ) -> float:
     """Convert monetary amount between currencies to target currency (default USD)."""
@@ -126,6 +146,8 @@ class ProductMapping(BaseModel):
     retail_price: float
     unit_cogs: float
     category: str = "Footwear"
+    retail_price_inr: float = 0.0
+    unit_cogs_inr: float = 0.0
 
 
 DEFAULT_PRODUCT_CATALOG: Dict[str, ProductMapping] = {
@@ -136,6 +158,8 @@ DEFAULT_PRODUCT_CATALOG: Dict[str, ProductMapping] = {
         shopify_variant_id="gid://shopify/ProductVariant/41001",
         retail_price=192.71,
         unit_cogs=58.00,
+        retail_price_inr=15995.0,
+        unit_cogs_inr=5800.0,
         category="Jordan",
     ),
     "880848-005": ProductMapping(
@@ -145,6 +169,8 @@ DEFAULT_PRODUCT_CATALOG: Dict[str, ProductMapping] = {
         shopify_variant_id="gid://shopify/ProductVariant/41002",
         retail_price=174.64,
         unit_cogs=52.50,
+        retail_price_inr=14495.0,
+        unit_cogs_inr=5250.0,
         category="Running",
     ),
     "AH8050-100": ProductMapping(
@@ -154,6 +180,8 @@ DEFAULT_PRODUCT_CATALOG: Dict[str, ProductMapping] = {
         shopify_variant_id="gid://shopify/ProductVariant/41003",
         retail_price=168.61,
         unit_cogs=48.00,
+        retail_price_inr=13995.0,
+        unit_cogs_inr=4800.0,
         category="Lifestyle / Casual",
     ),
     "315122-001": ProductMapping(
@@ -163,6 +191,8 @@ DEFAULT_PRODUCT_CATALOG: Dict[str, ProductMapping] = {
         shopify_variant_id="gid://shopify/ProductVariant/41004",
         retail_price=87.89,
         unit_cogs=38.50,
+        retail_price_inr=7495.0,
+        unit_cogs_inr=3150.0,
         category="Lifestyle / Casual",
     ),
     "BQ8928-011": ProductMapping(
@@ -172,6 +202,8 @@ DEFAULT_PRODUCT_CATALOG: Dict[str, ProductMapping] = {
         shopify_variant_id="gid://shopify/ProductVariant/41005",
         retail_price=125.27,
         unit_cogs=52.00,
+        retail_price_inr=10397.0,
+        unit_cogs_inr=3900.0,
         category="Running",
     ),
     "849559-004": ProductMapping(
@@ -181,6 +213,8 @@ DEFAULT_PRODUCT_CATALOG: Dict[str, ProductMapping] = {
         shopify_variant_id="gid://shopify/ProductVariant/41006",
         retail_price=192.71,
         unit_cogs=65.00,
+        retail_price_inr=15995.0,
+        unit_cogs_inr=5500.0,
         category="Running",
     ),
     "CD4371-001": ProductMapping(
@@ -190,6 +224,8 @@ DEFAULT_PRODUCT_CATALOG: Dict[str, ProductMapping] = {
         shopify_variant_id="gid://shopify/ProductVariant/41007",
         retail_price=168.61,
         unit_cogs=69.00,
+        retail_price_inr=13995.0,
+        unit_cogs_inr=5800.0,
         category="Running",
     ),
     "AQ2730-009": ProductMapping(
@@ -199,6 +235,8 @@ DEFAULT_PRODUCT_CATALOG: Dict[str, ProductMapping] = {
         shopify_variant_id="gid://shopify/ProductVariant/41008",
         retail_price=180.66,
         unit_cogs=62.00,
+        retail_price_inr=14995.0,
+        unit_cogs_inr=5200.0,
         category="Running",
     ),
     "634835-108": ProductMapping(
@@ -208,6 +246,8 @@ DEFAULT_PRODUCT_CATALOG: Dict[str, ProductMapping] = {
         shopify_variant_id="gid://shopify/ProductVariant/41009",
         retail_price=108.37,
         unit_cogs=42.00,
+        retail_price_inr=8995.0,
+        unit_cogs_inr=3500.0,
         category="Lifestyle / Casual",
     ),
     "AO2924-401": ProductMapping(
@@ -217,6 +257,8 @@ DEFAULT_PRODUCT_CATALOG: Dict[str, ProductMapping] = {
         shopify_variant_id="gid://shopify/ProductVariant/41010",
         retail_price=154.18,
         unit_cogs=56.00,
+        retail_price_inr=12797.0,
+        unit_cogs_inr=4500.0,
         category="Lifestyle / Casual",
     ),
     "CI3831-002": ProductMapping(
@@ -226,6 +268,8 @@ DEFAULT_PRODUCT_CATALOG: Dict[str, ProductMapping] = {
         shopify_variant_id="gid://shopify/ProductVariant/41098",
         retail_price=350.00,
         unit_cogs=105.00,
+        retail_price_inr=29400.0,
+        unit_cogs_inr=8800.0,
         category="Basketball",
     ),
     "CK6637-104": ProductMapping(
@@ -235,6 +279,8 @@ DEFAULT_PRODUCT_CATALOG: Dict[str, ProductMapping] = {
         shopify_variant_id="gid://shopify/ProductVariant/41099",
         retail_price=120.00,
         unit_cogs=36.00,
+        retail_price_inr=9995.0,
+        unit_cogs_inr=3200.0,
         category="Running",
     ),
 }

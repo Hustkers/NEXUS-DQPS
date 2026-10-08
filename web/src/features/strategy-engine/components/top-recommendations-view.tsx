@@ -51,57 +51,57 @@ export function TopRecommendationsView({
 
   const bestStrat = top3[0];
   const evBest = bestStrat?.evaluation;
-  const curSym = '₹';
+  const curSym = '$';
 
   const rankBadges = [
     {
       label: 'Rank #1 Recommendation',
-      tagBg: 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+      tagBg: 'bg-zinc-800 text-zinc-100 border-zinc-700'
     },
     {
       label: 'Rank #2 Recommendation',
-      tagBg: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30'
+      tagBg: 'bg-zinc-800/60 text-zinc-300 border-zinc-700'
     },
     {
       label: 'Rank #3 Recommendation',
-      tagBg: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+      tagBg: 'bg-zinc-900 text-zinc-400 border-zinc-800'
     }
   ];
 
   const getPlatformColor = (platform: string) => {
     switch (platform.toLowerCase()) {
       case 'google':
-        return 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10';
+        return 'text-zinc-200 border-zinc-700 bg-zinc-800/40';
       case 'meta':
-        return 'text-blue-400 border-blue-500/30 bg-blue-500/10';
+        return 'text-zinc-200 border-zinc-700 bg-zinc-800/40';
       case 'amazon':
-        return 'text-amber-400 border-amber-500/30 bg-amber-500/10';
+        return 'text-zinc-200 border-zinc-700 bg-zinc-800/40';
       case 'tiktok':
-        return 'text-pink-400 border-pink-500/30 bg-pink-500/10';
+        return 'text-zinc-200 border-zinc-700 bg-zinc-800/40';
       default:
-        return 'text-zinc-400 border-zinc-500/30 bg-zinc-500/10';
+        return 'text-zinc-400 border-zinc-800 bg-zinc-900';
     }
   };
 
   const getClassificationBadge = (classification?: string) => {
     switch (classification) {
       case 'PROVEN':
-        return 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40';
+        return 'bg-zinc-800 text-zinc-200 border-zinc-700';
       case 'PROMISING':
-        return 'bg-blue-500/15 text-blue-400 border-blue-500/40';
+        return 'bg-zinc-900 text-zinc-300 border-zinc-800';
       default:
-        return 'bg-purple-500/15 text-purple-400 border-purple-500/40';
+        return 'bg-zinc-900 text-zinc-400 border-zinc-800';
     }
   };
 
   const answers = bestChoice?.answers || {
     whatAreWeRecommending: `We recommend executing "${bestStrat.strategyName}" across ${bestStrat.platform.toUpperCase()} using ${bestStrat.adFormat} with ${bestStrat.creativeAngle.toLowerCase()} creative positioning and ${bestStrat.biddingStrategy}.`,
-    whyAreWeRecommendingIt: `This strategy achieves the highest composite performance score (${evBest?.overallScore.toFixed(1)}/100) across all candidate models, balancing strong projected ROAS (${evBest?.expectedRoas.toFixed(2)}x) with verified historical evidence in Indian metro footwear markets.`,
-    whatHappenedHistorically: evBest?.historicalEvidenceText || 'Past accounts with similar configuration averaged 4.62x ROAS and ₹412 CPA in top metro search auctions.',
-    whatDoesCurrentMarketDataIndicate: evBest?.marketEvidenceText || 'Commercial search queries for performance footwear rose +18.4% MoM across Delhi NCR, Mumbai, and Bengaluru.',
-    whatDoWePredictWillHappen: `Forecasts ${evBest?.expectedConversions} completed sales generating ${curSym}${evBest?.expectedRevenue.toLocaleString()} in gross revenue at ₹${evBest?.expectedCpa.toLocaleString()} CPA.`,
+    whyAreWeRecommendingIt: `This strategy achieves the highest composite performance score (${evBest?.overallScore.toFixed(1)}/100) across all candidate models, balancing strong projected ROAS (${evBest?.expectedRoas.toFixed(2)}x) with verified historical evidence in US Tier-1 footwear markets.`,
+    whatHappenedHistorically: evBest?.historicalEvidenceText || 'Past accounts with similar configuration averaged 4.62x ROAS and $38 CPA in Tier-1 search auctions.',
+    whatDoesCurrentMarketDataIndicate: evBest?.marketEvidenceText || 'Commercial search queries for performance footwear rose +18.4% MoM across US Tier-1 markets (New York, Los Angeles, Chicago).',
+    whatDoWePredictWillHappen: `Forecasts ${evBest?.expectedConversions} completed sales generating ${curSym}${evBest?.expectedRevenue.toLocaleString()} in gross revenue at $${evBest?.expectedCpa.toLocaleString()} CPA.`,
     howConfidentAreWe: `${Math.round((evBest?.confidenceScore || 0.85) * 100)}% confident (${evBest?.confidenceLevel || 'HIGH'}). Grounded in historical user precedent and auction signal calibration.`,
-    whatCouldGoWrong: bestStrat.risks?.[0]?.evidence || 'Search auction CPC inflation from festival competition or audience saturation past 14 days.',
+    whatCouldGoWrong: bestStrat.risks?.[0]?.evidence || 'Search auction CPC inflation from holiday competition or audience saturation past 14 days.',
     howCanUserPreventIt: bestStrat.risks?.[0]?.preventiveAction || 'Enforce strict target CPA caps and rotate creative variations every 10 days.'
   };
 
@@ -119,24 +119,22 @@ export function TopRecommendationsView({
   return (
     <div className='space-y-6'>
       {/* 1. SINGLE "BEST CHOICE" PROMINENT SHOWCASE */}
-      <div className='rounded-2xl border-2 border-amber-500/60 bg-gradient-to-b from-amber-500/10 via-card to-card p-5 md:p-6 shadow-xl relative overflow-hidden'>
-        <div className='absolute -right-12 -top-12 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none' />
-
-        <div className='flex flex-wrap items-center justify-between gap-3 border-b border-amber-500/30 pb-4'>
+      <div className='rounded-xl border border-border bg-card p-5 md:p-6 relative'>
+        <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-4'>
           <div className='flex items-center gap-3'>
-            <div className='p-2.5 rounded-xl bg-amber-500 text-black font-bold shadow-md'>
-              <IconCrown className='size-6' />
+            <div className='p-2 rounded-lg bg-zinc-800 text-zinc-100 border border-zinc-700'>
+              <IconCrown className='size-5' />
             </div>
             <div>
               <div className='flex items-center gap-2'>
-                <span className='text-xs font-mono font-bold uppercase tracking-wider text-amber-400'>
-                  Single Best Choice Recommendation
+                <span className='text-xs font-mono uppercase tracking-wider text-muted-foreground'>
+                  Primary Recommendation
                 </span>
-                <span className={`text-[10px] font-mono px-2 py-0.5 rounded border uppercase font-bold ${getClassificationBadge(evBest?.classification)}`}>
+                <span className={`text-[10px] font-mono px-2 py-0.5 rounded border uppercase font-medium ${getClassificationBadge(evBest?.classification)}`}>
                   {evBest?.classification || 'PROVEN'}
                 </span>
               </div>
-              <h2 className='text-lg font-mono font-bold text-foreground mt-0.5'>
+              <h2 className='text-base font-mono font-bold text-foreground mt-0.5'>
                 {bestStrat.strategyName}
               </h2>
             </div>
@@ -146,49 +144,49 @@ export function TopRecommendationsView({
             <Button
               size='sm'
               onClick={() => onOpenLaunchModal(bestStrat)}
-              className='bg-amber-500 hover:bg-amber-400 text-black font-mono font-bold text-xs h-9 px-4 shadow-md flex items-center gap-2'
+              className='bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-mono font-medium text-xs h-8 px-4 rounded-md transition-colors flex items-center gap-2'
             >
-              <IconRocket className='size-4' />
-              Approve & Launch Campaign
+              <IconRocket className='size-3.5' />
+              Approve &amp; Launch Campaign
             </Button>
           </div>
         </div>
 
         {/* Best Choice Key Metrics Grid */}
         <div className='grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 py-4 border-b border-border/60'>
-          <div className='p-3 rounded-xl border border-border/60 bg-muted/20'>
+          <div className='p-3 rounded-lg border border-border/60 bg-muted/20'>
             <span className='text-[10px] font-mono text-muted-foreground uppercase block'>Predicted ROAS</span>
-            <span className='text-xl font-mono font-bold text-emerald-400'>
+            <span className='text-xl font-mono font-bold text-foreground'>
               {evBest?.expectedRoas.toFixed(2)}x
             </span>
           </div>
-          <div className='p-3 rounded-xl border border-border/60 bg-muted/20'>
+          <div className='p-3 rounded-lg border border-border/60 bg-muted/20'>
             <span className='text-[10px] font-mono text-muted-foreground uppercase block'>Expected Revenue</span>
             <span className='text-xl font-mono font-bold text-foreground'>
               {curSym}{evBest?.expectedRevenue.toLocaleString()}
             </span>
           </div>
-          <div className='p-3 rounded-xl border border-border/60 bg-muted/20'>
+          <div className='p-3 rounded-lg border border-border/60 bg-muted/20'>
             <span className='text-[10px] font-mono text-muted-foreground uppercase block'>Expected CPA</span>
             <span className='text-xl font-mono font-bold text-foreground'>
               {curSym}{evBest?.expectedCpa.toLocaleString()}
             </span>
           </div>
-          <div className='p-3 rounded-xl border border-border/60 bg-muted/20'>
+          <div className='p-3 rounded-lg border border-border/60 bg-muted/20'>
             <span className='text-[10px] font-mono text-muted-foreground uppercase block'>Expected Orders</span>
             <span className='text-xl font-mono font-bold text-foreground'>
               {evBest?.expectedConversions}
             </span>
           </div>
-          <div className='p-3 rounded-xl border border-border/60 bg-muted/20'>
+          <div className='p-3 rounded-lg border border-border/60 bg-muted/20'>
             <span className='text-[10px] font-mono text-muted-foreground uppercase block'>Confidence</span>
-            <span className='text-xl font-mono font-bold text-cyan-400'>
+            <span className='text-xl font-mono font-bold text-foreground'>
               {Math.round((evBest?.confidenceScore || 0.85) * 100)}%
             </span>
           </div>
-          <div className='p-3 rounded-xl border border-border/60 bg-muted/20'>
+          <div className='p-3 rounded-lg border border-border/60 bg-muted/20'>
             <span className='text-[10px] font-mono text-muted-foreground uppercase block'>Risk Score</span>
-            <span className='text-xl font-mono font-bold text-emerald-400'>
+            <span className='text-xl font-mono font-bold text-foreground'>
               {evBest?.riskScore}/100
             </span>
           </div>
@@ -197,12 +195,12 @@ export function TopRecommendationsView({
         {/* 8 EVIDENCE-BASED QUESTIONS BREAKDOWN */}
         <div className='pt-4 space-y-2'>
           <div className='flex items-center justify-between'>
-            <span className='text-xs font-mono font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5'>
-              <IconShieldCheck className='size-4 text-amber-400' />
-              8-Point Empirical Evidence & Decision Rationale
+            <span className='text-xs font-mono font-medium text-foreground uppercase tracking-wider flex items-center gap-1.5'>
+              <IconShieldCheck className='size-4 text-muted-foreground' />
+              8-Point Empirical Evidence &amp; Decision Rationale
             </span>
             <span className='text-[11px] font-mono text-muted-foreground'>
-              Click any question to view data-backed response
+              Click question to expand rationale
             </span>
           </div>
 
@@ -212,23 +210,23 @@ export function TopRecommendationsView({
               return (
                 <div
                   key={item.key}
-                  className={`rounded-xl border transition-all cursor-pointer p-3 text-xs font-mono ${
+                  className={`rounded-lg border transition-all cursor-pointer p-3 text-xs font-mono ${
                     isExpanded
-                      ? 'border-amber-500/50 bg-amber-500/10'
+                      ? 'border-zinc-600 bg-zinc-800/30'
                       : 'border-border/60 bg-muted/10 hover:border-border'
                   }`}
                   onClick={() => setExpandedAnswer(isExpanded ? null : item.key)}
                 >
-                  <div className='flex items-center justify-between gap-2 font-bold text-foreground'>
+                  <div className='flex items-center justify-between gap-2 font-medium text-foreground'>
                     <span>{item.q}</span>
                     {isExpanded ? (
-                      <IconChevronUp className='size-4 text-amber-400 shrink-0' />
+                      <IconChevronUp className='size-4 text-muted-foreground shrink-0' />
                     ) : (
                       <IconChevronDown className='size-4 text-muted-foreground shrink-0' />
                     )}
                   </div>
                   {isExpanded && (
-                    <p className='mt-2 text-muted-foreground text-[11px] leading-relaxed border-t border-amber-500/20 pt-2 text-foreground/90'>
+                    <p className='mt-2 text-muted-foreground text-[11px] leading-relaxed border-t border-border/40 pt-2'>
                       {item.a}
                     </p>
                   )}
@@ -255,21 +253,21 @@ export function TopRecommendationsView({
           </div>
 
           {/* Allocation Visual Progress Bar */}
-          <div className='h-3.5 w-full bg-muted/40 rounded-full overflow-hidden flex border border-border/60'>
-            <div className='bg-amber-500 h-full' style={{ width: `${budgetAllocation.strategy1.percentage}%` }} title={`Strategy 1: ${budgetAllocation.strategy1.percentage}%`} />
-            <div className='bg-cyan-500 h-full' style={{ width: `${budgetAllocation.strategy2.percentage}%` }} title={`Strategy 2: ${budgetAllocation.strategy2.percentage}%`} />
-            <div className='bg-emerald-500 h-full' style={{ width: `${budgetAllocation.strategy3.percentage}%` }} title={`Strategy 3: ${budgetAllocation.strategy3.percentage}%`} />
-            <div className='bg-purple-500 h-full' style={{ width: `${budgetAllocation.testingReserve.percentage}%` }} title={`Testing Reserve: ${budgetAllocation.testingReserve.percentage}%`} />
+          <div className='h-2 w-full bg-muted/40 rounded-sm overflow-hidden flex border border-border/60'>
+            <div className='bg-zinc-200 h-full' style={{ width: `${budgetAllocation.strategy1.percentage}%` }} title={`Strategy 1: ${budgetAllocation.strategy1.percentage}%`} />
+            <div className='bg-zinc-400 h-full' style={{ width: `${budgetAllocation.strategy2.percentage}%` }} title={`Strategy 2: ${budgetAllocation.strategy2.percentage}%`} />
+            <div className='bg-zinc-600 h-full' style={{ width: `${budgetAllocation.strategy3.percentage}%` }} title={`Strategy 3: ${budgetAllocation.strategy3.percentage}%`} />
+            <div className='bg-zinc-800 h-full' style={{ width: `${budgetAllocation.testingReserve.percentage}%` }} title={`Testing Reserve: ${budgetAllocation.testingReserve.percentage}%`} />
           </div>
 
           {/* Legend Grid */}
           <div className='grid grid-cols-2 md:grid-cols-4 gap-3 text-xs pt-1'>
             <div className='p-2.5 rounded-lg border border-border/60 bg-muted/10'>
               <div className='flex items-center gap-1.5'>
-                <span className='size-2 rounded-full bg-amber-500' />
-                <span className='font-bold text-foreground'>Strategy 1 ({budgetAllocation.strategy1.percentage}%)</span>
+                <span className='size-2 rounded-full bg-zinc-200' />
+                <span className='font-medium text-foreground'>Strategy 1 ({budgetAllocation.strategy1.percentage}%)</span>
               </div>
-              <span className='text-sm font-bold text-amber-400 block mt-1'>
+              <span className='text-sm font-bold text-foreground block mt-1'>
                 {curSym}{budgetAllocation.strategy1.budget.toLocaleString()}
               </span>
               <span className='text-[10px] text-muted-foreground truncate block mt-0.5' title={budgetAllocation.strategy1.strategyName}>
@@ -279,10 +277,10 @@ export function TopRecommendationsView({
 
             <div className='p-2.5 rounded-lg border border-border/60 bg-muted/10'>
               <div className='flex items-center gap-1.5'>
-                <span className='size-2 rounded-full bg-cyan-500' />
-                <span className='font-bold text-foreground'>Strategy 2 ({budgetAllocation.strategy2.percentage}%)</span>
+                <span className='size-2 rounded-full bg-zinc-400' />
+                <span className='font-medium text-foreground'>Strategy 2 ({budgetAllocation.strategy2.percentage}%)</span>
               </div>
-              <span className='text-sm font-bold text-cyan-400 block mt-1'>
+              <span className='text-sm font-bold text-foreground block mt-1'>
                 {curSym}{budgetAllocation.strategy2.budget.toLocaleString()}
               </span>
               <span className='text-[10px] text-muted-foreground truncate block mt-0.5' title={budgetAllocation.strategy2.strategyName}>
@@ -292,10 +290,10 @@ export function TopRecommendationsView({
 
             <div className='p-2.5 rounded-lg border border-border/60 bg-muted/10'>
               <div className='flex items-center gap-1.5'>
-                <span className='size-2 rounded-full bg-emerald-500' />
-                <span className='font-bold text-foreground'>Strategy 3 ({budgetAllocation.strategy3.percentage}%)</span>
+                <span className='size-2 rounded-full bg-zinc-600' />
+                <span className='font-medium text-foreground'>Strategy 3 ({budgetAllocation.strategy3.percentage}%)</span>
               </div>
-              <span className='text-sm font-bold text-emerald-400 block mt-1'>
+              <span className='text-sm font-bold text-foreground block mt-1'>
                 {curSym}{budgetAllocation.strategy3.budget.toLocaleString()}
               </span>
               <span className='text-[10px] text-muted-foreground truncate block mt-0.5' title={budgetAllocation.strategy3.strategyName}>
@@ -305,10 +303,10 @@ export function TopRecommendationsView({
 
             <div className='p-2.5 rounded-lg border border-border/60 bg-muted/10'>
               <div className='flex items-center gap-1.5'>
-                <span className='size-2 rounded-full bg-purple-500' />
-                <span className='font-bold text-foreground'>Testing Reserve ({budgetAllocation.testingReserve.percentage}%)</span>
+                <span className='size-2 rounded-full bg-zinc-800' />
+                <span className='font-medium text-foreground'>Testing Reserve ({budgetAllocation.testingReserve.percentage}%)</span>
               </div>
-              <span className='text-sm font-bold text-purple-400 block mt-1'>
+              <span className='text-sm font-bold text-muted-foreground block mt-1'>
                 {curSym}{budgetAllocation.testingReserve.budget.toLocaleString()}
               </span>
               <span className='text-[10px] text-muted-foreground truncate block mt-0.5'>
@@ -345,26 +343,26 @@ export function TopRecommendationsView({
             return (
               <div
                 key={strat.strategyId}
-                className={`rounded-2xl border bg-card p-5 shadow-sm transition-all relative flex flex-col justify-between hover:shadow-md ${
-                  idx === 0 ? 'border-amber-500/40' : 'border-border/80'
+                className={`rounded-xl border bg-card p-5 shadow-xs transition-all relative flex flex-col justify-between hover:border-zinc-500 ${
+                  idx === 0 ? 'border-zinc-500' : 'border-border'
                 }`}
               >
                 <div className='space-y-4 font-mono'>
                   {/* Header Rank & Tags */}
                   <div className='flex items-center justify-between gap-2 flex-wrap'>
                     <span
-                      className={`text-[11px] font-bold px-2.5 py-1 rounded-md border flex items-center gap-1.5 ${badgeStyle.tagBg}`}
+                      className={`text-[11px] font-medium px-2 py-0.5 rounded border flex items-center gap-1.5 ${badgeStyle.tagBg}`}
                     >
                       <IconCrown className='size-3.5' />
                       Rank #{idx + 1}
                     </span>
 
                     <div className='flex items-center gap-1.5'>
-                      <span className={`text-[10px] px-2 py-0.5 rounded border uppercase font-bold ${getClassificationBadge(ev?.classification)}`}>
+                      <span className={`text-[10px] px-2 py-0.5 rounded border uppercase font-medium ${getClassificationBadge(ev?.classification)}`}>
                         {ev?.classification || 'PROVEN'}
                       </span>
                       <span
-                        className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded border ${getPlatformColor(
+                        className={`text-[10px] uppercase font-medium px-2 py-0.5 rounded border ${getPlatformColor(
                           strat.platform
                         )}`}
                       >
@@ -380,7 +378,7 @@ export function TopRecommendationsView({
                   <div>
                     <div className='flex items-center justify-between text-[11px] text-muted-foreground'>
                       <span>{strat.strategyId}</span>
-                      <span className='font-bold text-cyan-400'>Score: {ev?.overallScore.toFixed(1)}/100</span>
+                      <span className='font-medium text-foreground'>Score: {ev?.overallScore.toFixed(1)}/100</span>
                     </div>
                     <h3 className='text-sm font-bold text-foreground mt-0.5 line-clamp-2'>
                       {strat.strategyName}
@@ -389,11 +387,11 @@ export function TopRecommendationsView({
 
                   {/* Creative Recommendation Preview */}
                   {strat.creativeRecommendation && (
-                    <div className='rounded-xl border border-border/80 bg-muted/20 p-3 space-y-1 text-xs'>
-                      <span className='text-[10px] uppercase text-muted-foreground font-bold block'>
+                    <div className='rounded-lg border border-border/80 bg-muted/20 p-3 space-y-1 text-xs'>
+                      <span className='text-[10px] uppercase text-muted-foreground font-medium block'>
                         Creative Angle: {strat.creativeRecommendation.creativeAngle}
                       </span>
-                      <p className='text-foreground font-bold line-clamp-1'>
+                      <p className='text-foreground font-semibold line-clamp-1'>
                         "{strat.creativeRecommendation.headlineDirection}"
                       </p>
                       <p className='text-[11px] text-muted-foreground line-clamp-2'>
@@ -406,7 +404,7 @@ export function TopRecommendationsView({
                   <div className='grid grid-cols-3 gap-2 pt-1'>
                     <div className='p-2 rounded-lg border border-border/60 bg-muted/10'>
                       <span className='text-[10px] text-muted-foreground block'>Expected ROAS</span>
-                      <span className='text-sm font-bold text-emerald-400'>
+                      <span className='text-sm font-bold text-foreground'>
                         {ev?.expectedRoas.toFixed(2)}x
                       </span>
                     </div>
@@ -432,7 +430,7 @@ export function TopRecommendationsView({
                     </div>
                     <div className='flex items-center justify-between'>
                       <span>Historical Precedent:</span>
-                      <span className='font-semibold text-cyan-400'>{ev?.similarCampaignsCount || 0} similar runs</span>
+                      <span className='font-medium text-foreground'>{ev?.similarCampaignsCount || 0} similar runs</span>
                     </div>
                   </div>
                 </div>
@@ -442,7 +440,7 @@ export function TopRecommendationsView({
                   <Button
                     size='sm'
                     onClick={() => onOpenLaunchModal(strat)}
-                    className='flex-1 text-xs font-mono h-8 bg-amber-500 hover:bg-amber-400 text-black font-bold'
+                    className='flex-1 text-xs font-mono h-8 bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-medium rounded-md transition-colors'
                   >
                     Launch
                   </Button>
@@ -462,7 +460,7 @@ export function TopRecommendationsView({
                     onClick={() => onToggleCompare(strat.strategyId)}
                     className={`text-xs font-mono h-8 px-2.5 border ${
                       isComparing
-                        ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400'
+                        ? 'border-zinc-500 bg-zinc-800 text-zinc-100'
                         : 'border-border hover:bg-muted'
                     }`}
                     title='Add to comparison matrix'

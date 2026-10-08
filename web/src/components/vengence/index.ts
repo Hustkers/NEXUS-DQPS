@@ -17,3 +17,5 @@ export * from './highlight-grid';
 export * from './locomotive-hero-video';
 export * from './faq-accordion';
 export * from './pillars-cards-stack';
+export * from '../ui/corner-button';
+export * from '../ui/gradient-card-showcase';

@@ -34,12 +34,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'campaignDuration must be greater than 0' }, { status: 400 });
     }
 
-    const sanitizedSlug = (body.campaignName || 'campaign')
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '')
-      .slice(0, 24);
-    const campaignId = body.campaignId || `cmp-${sanitizedSlug}-${Math.round(Number(body.totalBudget))}`;
+    const campaignId = body.campaignId || `cmp-${Math.random().toString(36).substring(2, 10)}`;
 
     const config: CampaignConfig = {
       campaignId,

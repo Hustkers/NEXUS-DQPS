@@ -363,7 +363,7 @@ export function AllStrategiesTable({
 
                     {/* Expected CPC */}
                     <td className='py-2.5 px-3 text-right text-muted-foreground'>
-                      ₹{ev?.expectedCpc.toFixed(2)}
+                      ${ev?.expectedCpc.toFixed(2)}
                     </td>
 
                     {/* Expected CVR */}
@@ -378,7 +378,7 @@ export function AllStrategiesTable({
 
                     {/* Expected Revenue */}
                     <td className='py-2.5 px-3 text-right font-bold text-foreground'>
-                      ₹{ev?.expectedRevenue.toLocaleString()}
+                      ${ev?.expectedRevenue.toLocaleString()}
                     </td>
 
                     {/* Expected ROAS */}
@@ -388,7 +388,7 @@ export function AllStrategiesTable({
 
                     {/* CPA */}
                     <td className='py-2.5 px-3 text-right text-foreground'>
-                      ₹{ev?.expectedCpa.toLocaleString()}
+                      ${ev?.expectedCpa.toLocaleString()}
                     </td>
 
                     {/* Risk */}
@@ -429,12 +429,12 @@ export function AllStrategiesTable({
                     {/* Status */}
                     <td className='py-2.5 px-3 text-center'>
                       {isSelected ? (
-                        <span className='inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/40 bg-emerald-500/15 text-emerald-400'>
-                          <IconCheck className='size-3' />
+                        <span className='inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-md border border-zinc-700 bg-zinc-800 text-zinc-200'>
+                          <IconCheck className='size-3 text-zinc-300' />
                           SELECTED
                         </span>
                       ) : (
-                        <span className='inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded-full border border-border bg-muted/40 text-muted-foreground'>
+                        <span className='inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded-md border border-zinc-800 bg-zinc-900/40 text-zinc-400'>
                           NOT SELECTED
                         </span>
                       )}

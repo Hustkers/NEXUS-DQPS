@@ -4,10 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Icons } from '@/components/icons';
+import { PlatformLogo } from '@/components/icons/platform-logos';
 import { useDecisionEngine } from '@/context/decision-engine-store';
-import { formatINR, type ReallocationItem as EngineReallocationItem } from '@/lib/gauges-engine';
-import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
+import { formatCurrency, getChannelMeta, type ReallocationItem as EngineReallocationItem } from '@/lib/gauges-engine';
 
 export interface LegacyReallocationItem {
   id: string;
@@ -39,10 +38,11 @@ export interface LegacyReallocationItem {
   targetRoas?: number;
   targetMarginalRoas?: number;
   netRevenueLift?: number;
-  timestamp?: string;
 }
 
 export type ReallocationItem = EngineReallocationItem | LegacyReallocationItem;
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 export interface ReallocationFeedProps {
   initialItems?: any;
@@ -51,7 +51,7 @@ export interface ReallocationFeedProps {
   className?: string;
 }
 
-export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
+export function ReallocationFeed({ className, initialItems, campaigns, onExecuteReallocation }: ReallocationFeedProps = {}) {
   const {
     reallocations,
     autoPilot,
@@ -94,7 +94,7 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const tickInterval = prefersReducedMotion ? 50 : 650;
+    const tickInterval = prefersReducedMotion ? 50 : 700;
 
     const timer = setInterval(() => {
       setExecutingStepIndex((prev) => {
@@ -135,10 +135,11 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const total = reallocations.length;
+    // Step through visual progress
     for (let i = 1; i <= total; i++) {
       setExecuteAllProgress({ current: i, total });
       if (!prefersReducedMotion) {
-        await new Promise((res) => setTimeout(res, 450));
+        await new Promise((res) => setTimeout(res, 500));
       }
     }
 
@@ -148,31 +149,32 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
     toast.success('All pending budget reallocations executed synchronously');
   };
 
+  // Aggregated preview stats for Execute All
   const totalMovedAll = reallocations.reduce((acc, it) => acc + it.movedAmount, 0);
   const totalLiftAll = reallocations.reduce((acc, it) => acc + it.netRevenueLift, 0);
 
   return (
-    <div className={cn('rounded-xl border border-border bg-card p-4 sm:p-5 shadow-xs text-card-foreground font-orbitron min-w-0 max-w-full space-y-4', className)}>
+    <div className={cn('rounded-xl border border-[#27272a] bg-[#121215] p-5 shadow-none text-foreground font-sans min-w-0 max-w-full', className)}>
       {/* Header */}
-      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border/70 pb-3'>
+      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-[#27272a] pb-3 mb-4'>
         <div className='flex items-center gap-2'>
-          <Icons.adjustments className='size-4 text-primary' />
-          <h3 className='text-xs font-bold text-foreground font-orbitron uppercase tracking-wider'>
-            Decision Feed
+          <Icons.adjustments className='size-3.5 text-zinc-400' />
+          <h3 className='text-xs font-semibold text-zinc-100 uppercase tracking-wider font-sans'>
+            Autonomous Capital Reallocation Stream
           </h3>
-          <span className='px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold'>
-            {reallocations.length} pending
+          <span className='text-xs text-zinc-400 font-mono'>
+            ({reallocations.length} pending)
           </span>
         </div>
 
-        <div className='flex items-center gap-3'>
+        <div className='flex items-center gap-4'>
           {/* Auto-Pilot Toggle */}
-          <div className='flex items-center gap-2 text-xs text-muted-foreground'>
-            <span className={cn(autoPilot && 'text-emerald-500 font-bold')}>Auto-Pilot</span>
+          <div className='flex items-center gap-2 text-xs text-zinc-400'>
+            <span className={cn(autoPilot && 'text-emerald-400 font-medium')}>Auto-Pilot (≥80% conf)</span>
             <Switch
               checked={autoPilot}
               onCheckedChange={toggleAutoPilot}
-              className='data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-muted border border-border'
+              className='data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-zinc-800 border border-zinc-700'
             />
           </div>
 
@@ -180,103 +182,85 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
             size='sm'
             onClick={handleStartExecuteAll}
             disabled={reallocations.length === 0}
-            className='h-7 px-3 text-xs font-mono bg-foreground hover:bg-foreground/90 text-background font-bold uppercase tracking-wider rounded-lg shadow-sm active:scale-[0.98]'
+            className='h-8 text-xs font-sans bg-zinc-100 hover:bg-white text-zinc-900 font-semibold border-none active:scale-[0.98] shadow-xs'
           >
             Execute All
           </Button>
         </div>
       </div>
 
-      {/* Streamlined Decision Feed: TIME | PRODUCT | ISSUE | ACTION | OUTCOME */}
+      {/* Streamlined Reallocation Rows */}
       {reallocations.length === 0 ? (
-        <div className='rounded-xl border border-dashed border-border bg-muted/20 p-6 text-center space-y-1'>
-          <Icons.check className='size-5 text-emerald-500 mx-auto' />
-          <p className='text-xs font-bold text-foreground uppercase tracking-wider'>
-            All Decisions Executed
+        <div className='rounded-lg border border-[#27272a] bg-zinc-900/30 p-8 text-center'>
+          <Icons.check className='size-5 text-emerald-400 mx-auto mb-2' />
+          <p className='text-xs font-semibold text-zinc-100'>
+            All Capital Reallocations Executed &amp; Calibrated
           </p>
-          <p className='text-[10px] text-muted-foreground'>
-            Zero pending budget imbalance across channels.
+          <p className='text-[11px] text-zinc-400 mt-0.5'>
+            No pending budget rebalancing directives at this optimization tick.
           </p>
         </div>
       ) : (
-        <div className='space-y-2'>
-          {/* Column Header */}
-          <div className='hidden md:grid grid-cols-12 gap-3 px-3 py-1 text-[10px] uppercase font-bold text-muted-foreground tracking-wider border-b border-border/50'>
-            <span className='col-span-1'>Time</span>
-            <span className='col-span-3'>Product</span>
-            <span className='col-span-3'>Issue</span>
-            <span className='col-span-3'>Action</span>
-            <span className='col-span-2 text-right'>Outcome</span>
-          </div>
-
-          {reallocations.map((item, idx) => {
+        <div className='divide-y divide-[#27272a]'>
+          {reallocations.map((item) => {
             const isKill = item.actionTag === 'PAUSE';
-            const isRedirect = item.actionTag === 'REDIRECT';
-
-            const timeStr = (item as any).timestamp || `03:${(17 + idx * 4).toString().padStart(2, '0')}`;
-            const issueStr = isKill
-              ? '⚠ OUT OF STOCK'
-              : isRedirect
-              ? '⚡ BID SURGE'
-              : '📉 ROAS DECAY';
-            const issueBadgeColor = isKill
-              ? 'text-rose-500 bg-rose-500/10 border-rose-500/30'
-              : isRedirect
-              ? 'text-amber-500 bg-amber-500/10 border-amber-500/30'
-              : 'text-indigo-400 bg-indigo-500/10 border-indigo-500/30';
-
-            const actionStr = isKill
-              ? 'Pause campaign → Reallocate 80%'
-              : isRedirect
-              ? `Redirect spend → ${item.targetChannel}`
-              : 'Trim spend → Maximize yield';
+            const isLowStock = item.actionTag === 'REDIRECT';
+            const actionLabel = isKill ? 'PAUSE SPEND' : isLowStock ? 'CAP SPEND' : 'TRIM BUDGET';
+            const badgeColor = isKill
+              ? 'bg-zinc-900 text-red-400 border-zinc-800'
+              : isLowStock
+              ? 'bg-zinc-900 text-amber-400 border-zinc-800'
+              : 'bg-zinc-900 text-zinc-300 border-zinc-800';
 
             return (
               <div
                 key={item.id}
-                className='p-3 rounded-lg border border-border/80 bg-card/60 hover:bg-card hover:border-border transition-colors flex flex-col md:grid md:grid-cols-12 gap-2 md:gap-3 items-start md:items-center text-xs'
+                className='py-5 px-3 sm:px-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors rounded-lg font-sans'
               >
-                {/* 1. TIME */}
-                <div className='col-span-1 text-[11px] font-mono text-muted-foreground font-semibold'>
-                  {timeStr}
+                {/* One clear line: Product (Channel) -> Target (Channel) · Move $X/day · +$Y/day · Z% */}
+                <div className='flex-1 min-w-0 space-y-1.5'>
+                  <div className='flex items-center gap-2 text-xs flex-wrap leading-relaxed'>
+                    <span className={cn('text-[10px] font-mono font-medium px-2 py-0.5 rounded border uppercase tracking-wider', badgeColor)}>
+                      [{actionLabel}]
+                    </span>
+
+                    <span className='font-semibold text-zinc-100 break-words'>
+                      {item.sourceProductName} ({item.sourceChannel}) → {item.targetProductName} ({item.targetChannel})
+                    </span>
+
+                    <span className='text-zinc-600'>·</span>
+
+                    <span className='text-zinc-200 font-mono tabular-nums font-medium'>
+                      Move {formatCurrency(item.movedAmount)}
+                    </span>
+
+                    <span className='text-zinc-600'>·</span>
+
+                    <span className='text-emerald-400 font-mono tabular-nums font-semibold'>
+                      +{formatCurrency(item.netRevenueLift)}
+                    </span>
+
+                    <span className='text-zinc-600'>·</span>
+
+                    <span className='text-zinc-400 font-mono tabular-nums'>
+                      {item.confidence}%
+                    </span>
+                  </div>
+
+                  {/* Campaign IDs only as small grey secondary text */}
+                  <div className='text-[10px] text-zinc-500 font-mono'>
+                    #{item.sourceCampaign} → #{item.targetCampaign}
+                  </div>
                 </div>
 
-                {/* 2. PRODUCT */}
-                <div className='col-span-3 min-w-0'>
-                  <div className='font-bold text-foreground truncate'>
-                    {item.sourceProductName}
-                  </div>
-                  <div className='text-[10px] text-muted-foreground font-normal truncate'>
-                    {item.sourceChannel}
-                  </div>
-                </div>
-
-                {/* 3. ISSUE */}
-                <div className='col-span-3'>
-                  <span className={cn('px-2 py-0.5 rounded text-[10px] font-bold border inline-flex items-center gap-1 font-mono', issueBadgeColor)}>
-                    {issueStr}
-                  </span>
-                </div>
-
-                {/* 4. ACTION */}
-                <div className='col-span-3 font-mono text-[11px] text-foreground font-medium'>
-                  <div>{actionStr.split('→')[0].trim()}</div>
-                  <div className='text-emerald-400 font-semibold text-[10px]'>
-                    → {actionStr.split('→')[1]?.trim() || 'Reallocate'}
-                  </div>
-                </div>
-
-                {/* 5. OUTCOME & BUTTON */}
-                <div className='col-span-2 w-full flex md:flex-col items-center md:items-end justify-between gap-1.5'>
-                  <div className='text-emerald-400 font-bold font-mono text-xs whitespace-nowrap'>
-                    +{formatINR(item.netRevenueLift)}/day
-                  </div>
+                {/* Single Execute Button */}
+                <div className='shrink-0 flex items-center'>
                   <Button
                     size='sm'
                     onClick={() => handleOpenReview(item)}
-                    className='h-6 px-2.5 text-[10px] font-mono bg-foreground hover:bg-foreground/90 text-background font-bold uppercase tracking-wider rounded shadow-xs'
+                    className='h-8 px-4 text-xs font-sans bg-zinc-100 hover:bg-white text-zinc-900 font-semibold uppercase tracking-wider rounded-lg shadow-xs transition-all active:scale-[0.98]'
                   >
-                    Review &amp; Move
+                    Execute
                   </Button>
                 </div>
               </div>
@@ -288,6 +272,7 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
       {/* RIGHT-SIDE REALLOCATION CONSOLE DRAWER */}
       {selectedItem && (
         <div className='fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-xs animate-in fade-in duration-200'>
+          {/* Backdrop Click */}
           <div
             className='fixed inset-0'
             onClick={() => {
@@ -295,20 +280,20 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
             }}
           />
 
+          {/* Right-Side Drawer: width min(560px, 100vw), padding 32px, 28px gap */}
           <div
-            className='relative z-10 h-full w-full max-w-[min(560px,100vw)] bg-card border-l border-border p-6 sm:p-8 overflow-y-auto overflow-x-hidden font-mono shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-200 text-card-foreground'
+            className='relative z-10 h-full w-full max-w-[min(560px,100vw)] bg-[#121215] border-l border-[#27272a] p-8 overflow-y-auto overflow-x-hidden font-sans shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-200 text-foreground'
             onClick={(e) => e.stopPropagation()}
             role='dialog'
             aria-modal='true'
           >
             {/* Drawer Header */}
-            <div className='flex items-start justify-between border-b border-border/80 pb-4'>
+            <div className='flex items-start justify-between border-b border-[#27272a] pb-5'>
               <div className='min-w-0 pr-4'>
-                <h3 className='text-sm font-bold text-foreground uppercase tracking-tight flex items-center gap-2'>
-                  <Icons.adjustments className='size-4 text-primary' />
-                  Execute Budget Directive
+                <h3 className='text-base font-semibold text-zinc-100 uppercase tracking-tight font-sans'>
+                  Move budget
                 </h3>
-                <p className='text-xs text-muted-foreground mt-1 break-words leading-relaxed'>
+                <p className='text-xs text-zinc-400 mt-1 break-words leading-relaxed font-sans'>
                   {selectedItem.sourceProductName} ({selectedItem.sourceChannel}) →{' '}
                   {selectedItem.targetProductName} ({selectedItem.targetChannel})
                 </p>
@@ -317,7 +302,7 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
                 <button
                   type='button'
                   onClick={() => setSelectedItem(null)}
-                  className='size-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0'
+                  className='size-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors shrink-0'
                   aria-label='Close drawer'
                 >
                   ✕
@@ -327,131 +312,142 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
 
             {/* STEP 1: REVIEW */}
             {modalStep === 1 && (
-              <div className='space-y-5 my-auto py-4'>
-                <div className='rounded-xl border border-border bg-muted/30 py-5 px-4 text-center space-y-1'>
-                  <div className='text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight font-mono'>
-                    {formatINR(selectedItem.movedAmount)}
+              <div className='space-y-7 my-auto py-4 font-sans'>
+                {/* Big Centered Number Block */}
+                <div className='rounded-xl border border-[#27272a] bg-[#18181b] py-6 px-4 text-center'>
+                  <div className='text-3xl font-extrabold text-zinc-100 tracking-tight font-mono tabular-nums'>
+                    {formatCurrency(selectedItem.movedAmount)}
                   </div>
-                  <p className='text-xs text-muted-foreground'>
-                    Capital diverted toward higher marginal return inventory
+                  <p className='text-xs text-zinc-400 mt-1.5 font-sans'>
+                    moves to a campaign earning more
                   </p>
                 </div>
 
-                <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
-                  <div className='rounded-lg border border-border bg-muted/20 p-3.5 flex flex-col justify-between space-y-2'>
+                {/* From / To Cards (each with 16px padding; badge sits below name) */}
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                  {/* FROM CARD */}
+                  <div className='rounded-lg border border-[#27272a] bg-[#18181b] p-4 flex flex-col justify-between'>
                     <div>
-                      <span className='text-[10px] uppercase tracking-wider font-semibold text-muted-foreground block'>
-                        Source Channel
+                      <span className='text-[10px] uppercase font-mono font-medium tracking-wider text-zinc-400 block'>
+                        From
                       </span>
-                      <div className='text-xs font-bold text-foreground mt-1 break-words'>
+                      <div className='text-xs font-semibold text-zinc-100 mt-1 break-words font-sans'>
                         {selectedItem.sourceProductName} · {selectedItem.sourceChannel}
                       </div>
                       <div className='mt-2'>
                         <span className={cn(
-                          'text-[9px] font-bold px-2 py-0.5 rounded border uppercase',
+                          'text-[10px] font-mono font-medium px-2 py-0.5 rounded border uppercase',
                           selectedItem.actionTag === 'PAUSE'
-                            ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30'
+                            ? 'bg-zinc-900 text-red-400 border-zinc-800'
                             : selectedItem.actionTag === 'REDIRECT'
-                            ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30'
-                            : 'bg-muted text-muted-foreground border-border'
+                            ? 'bg-zinc-900 text-amber-400 border-zinc-800'
+                            : 'bg-zinc-900 text-zinc-300 border-zinc-800'
                         )}>
-                          {selectedItem.actionTag === 'PAUSE' ? 'PAUSE SPEND' : selectedItem.actionTag === 'REDIRECT' ? 'REDIRECT SPEND' : 'TRIM BUDGET'}
+                          {selectedItem.actionTag === 'PAUSE' ? 'PAUSE SPEND' : selectedItem.actionTag === 'REDIRECT' ? 'CAP SPEND' : 'TRIM BUDGET'}
                         </span>
                       </div>
                     </div>
-                    <div className='pt-2.5 border-t border-border/50 space-y-1 text-xs font-mono'>
-                      <div className='text-muted-foreground text-[11px]'>
-                        {formatINR(selectedItem.sourceSpendBefore)} → {formatINR(selectedItem.sourceSpendAfter)}
+                    <div className='mt-3.5 pt-3 border-t border-[#27272a] space-y-1 text-xs font-mono tabular-nums'>
+                      <div className='text-zinc-200'>
+                        {formatCurrency(selectedItem.sourceSpendBefore)} → {formatCurrency(selectedItem.sourceSpendAfter)}
                       </div>
-                      <div className='text-muted-foreground text-[10px]'>
+                      <div className='text-zinc-400'>
                         ROAS {selectedItem.sourceRoas.toFixed(2)}x
                       </div>
                     </div>
                   </div>
 
-                  <div className='rounded-lg border border-border bg-muted/20 p-3.5 flex flex-col justify-between space-y-2'>
+                  {/* TO CARD */}
+                  <div className='rounded-lg border border-[#27272a] bg-[#18181b] p-4 flex flex-col justify-between'>
                     <div>
-                      <span className='text-[10px] uppercase tracking-wider font-semibold text-muted-foreground block'>
-                        Destination Channel
+                      <span className='text-[10px] uppercase font-mono font-medium tracking-wider text-zinc-400 block'>
+                        To
                       </span>
-                      <div className='text-xs font-bold text-foreground mt-1 break-words'>
+                      <div className='text-xs font-semibold text-zinc-100 mt-1 break-words font-sans'>
                         {selectedItem.targetProductName} · {selectedItem.targetChannel}
                       </div>
                       <div className='mt-2'>
-                        <span className='text-[9px] font-bold px-2 py-0.5 rounded border uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'>
-                          SCALE YIELD
+                        <span className='text-[10px] font-mono font-medium px-2 py-0.5 rounded border uppercase bg-zinc-900 text-emerald-400 border-zinc-800'>
+                          SCALE REVENUE
                         </span>
                       </div>
                     </div>
-                    <div className='pt-2.5 border-t border-border/50 space-y-1 text-xs font-mono'>
-                      <div className='text-muted-foreground text-[11px]'>
-                        {formatINR(selectedItem.targetSpendBefore)} → {formatINR(selectedItem.targetSpendAfter)}
+                    <div className='mt-3.5 pt-3 border-t border-[#27272a] space-y-1 text-xs font-mono tabular-nums'>
+                      <div className='text-zinc-200'>
+                        {formatCurrency(selectedItem.targetSpendBefore)} → {formatCurrency(selectedItem.targetSpendAfter)}
                       </div>
-                      <div className='text-emerald-600 dark:text-emerald-400 font-bold text-[10px]'>
+                      <div className='text-emerald-400 font-semibold'>
                         ROAS {selectedItem.targetRoas.toFixed(2)}x
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className='space-y-2.5 rounded-lg border border-border/80 bg-muted/20 p-4 text-xs'>
+                {/* Why and Expected gain */}
+                <div className='space-y-3 rounded-lg border border-[#27272a] bg-[#18181b] p-4 text-xs font-sans'>
                   <div className='space-y-1'>
-                    <span className='text-[10px] uppercase tracking-wider font-bold text-muted-foreground block'>
-                      Algorithmic Rationale
+                    <span className='text-[10px] uppercase font-mono font-medium tracking-wider text-zinc-400 block'>
+                      Why
                     </span>
-                    <p className='text-foreground leading-relaxed break-words font-sans text-xs'>
+                    <p className='text-zinc-200 leading-relaxed break-words font-sans'>
                       {selectedItem.reason}
                     </p>
                   </div>
-                  <div className='space-y-0.5 pt-2 border-t border-border/50'>
-                    <span className='text-[10px] uppercase tracking-wider font-bold text-muted-foreground block'>
-                      Projected Gain
+                  <div className='space-y-1 pt-2.5 border-t border-[#27272a]'>
+                    <span className='text-[10px] uppercase font-mono font-medium tracking-wider text-zinc-400 block'>
+                      Expected gain
                     </span>
-                    <p className='text-emerald-600 dark:text-emerald-400 font-bold text-xs'>
-                      +{formatINR(selectedItem.netRevenueLift)}/day revenue lift • {selectedItem.confidence}% Bayesian confidence
+                    <p className='text-emerald-400 font-semibold font-sans'>
+                      +{formatCurrency(selectedItem.netRevenueLift)} extra revenue · {selectedItem.confidence}% confidence
                     </p>
                   </div>
                 </div>
 
-                <details className='rounded-lg border border-border/60 bg-muted/10 p-3 text-xs group'>
-                  <summary className='cursor-pointer text-muted-foreground hover:text-foreground font-medium flex items-center justify-between select-none'>
-                    <span>Mathematical proof &amp; campaign lineage</span>
-                    <span className='text-[10px] text-muted-foreground group-open:rotate-90 transition-transform'>▸</span>
+                {/* Details (collapsed by default: formula, campaign IDs, assumptions) */}
+                <details className='rounded-lg border border-[#27272a] bg-zinc-900/40 p-3 text-xs group font-sans'>
+                  <summary className='cursor-pointer text-zinc-400 hover:text-zinc-100 font-medium flex items-center justify-between select-none font-sans'>
+                    <span>Details (formula, campaign IDs, assumptions)</span>
+                    <span className='text-[10px] text-zinc-500 group-open:rotate-90 transition-transform'>▸</span>
                   </summary>
-                  <div className='mt-2.5 space-y-2 pt-2 border-t border-border/50 text-[11px] text-muted-foreground'>
+                  <div className='mt-3 space-y-2.5 pt-2.5 border-t border-[#27272a] text-[11px] text-zinc-400 font-sans'>
                     <div>
-                      <span className='text-muted-foreground block text-[10px] uppercase font-bold'>Net Lift Formulation:</span>
-                      <span className='font-mono text-foreground'>
-                        {formatINR(selectedItem.movedAmount)} × ({selectedItem.targetMarginalRoas}x − {selectedItem.sourceRoas.toFixed(2)}x) = +{formatINR(selectedItem.netRevenueLift)}
+                      <span className='text-zinc-500 block font-sans'>Net lift formula:</span>
+                      <span className='font-mono tabular-nums text-zinc-200'>
+                        {formatCurrency(selectedItem.movedAmount)} × ({selectedItem.targetMarginalRoas}x − {selectedItem.sourceRoas.toFixed(2)}x) = +{formatCurrency(selectedItem.netRevenueLift)}
                       </span>
                     </div>
                     <div className='grid grid-cols-2 gap-2 text-[10px] font-mono'>
                       <div>
-                        <span className='text-muted-foreground block'>Source Campaign:</span>
-                        <span className='text-foreground font-bold'>{selectedItem.sourceCampaign}</span>
+                        <span className='text-zinc-500 block font-sans'>Source ID:</span>
+                        <span className='text-zinc-300'>#{selectedItem.sourceCampaign}</span>
                       </div>
                       <div>
-                        <span className='text-muted-foreground block'>Destination Campaign:</span>
-                        <span className='text-foreground font-bold'>{selectedItem.targetCampaign}</span>
+                        <span className='text-zinc-500 block font-sans'>Destination ID:</span>
+                        <span className='text-zinc-300'>#{selectedItem.targetCampaign}</span>
                       </div>
+                    </div>
+                    <div className='text-[10px] text-zinc-400 leading-relaxed font-sans'>
+                      Assumptions: Destination marginal ROAS calculated via analytical Hill saturation auction curve derivatives (diminishing marginal returns); destination expansion capped at +50% of current spend.
                     </div>
                   </div>
                 </details>
 
-                <div className='flex items-center justify-end gap-2.5 pt-3 border-t border-border/70'>
-                  <Button
-                    variant='outline'
+                {/* Action Buttons */}
+                <div className='flex items-center justify-end gap-3 pt-4 border-t border-[#27272a]'>
+                  <button
+                    type='button'
                     onClick={() => setSelectedItem(null)}
-                    className='h-9 text-xs font-mono border-border'
+                    className='px-4 py-2.5 rounded-lg border border-[#27272a] bg-[#18181b] text-xs font-medium text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors font-sans'
                   >
                     Cancel
-                  </Button>
-                  <Button
+                  </button>
+                  <button
+                    type='button'
                     onClick={() => setModalStep(2)}
-                    className='h-9 px-5 bg-foreground hover:bg-foreground/90 text-background text-xs font-bold uppercase tracking-wider shadow-sm'
+                    className='px-5 py-2.5 rounded-lg bg-zinc-100 text-zinc-900 text-xs font-semibold uppercase tracking-wider hover:bg-white transition-all shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 font-sans'
                   >
-                    Confirm Move ({formatINR(selectedItem.movedAmount)})
-                  </Button>
+                    Move {formatCurrency(selectedItem.movedAmount)}
+                  </button>
                 </div>
               </div>
             )}
@@ -459,77 +455,79 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
             {/* STEP 2: EXECUTING */}
             {modalStep === 2 && (
               <div className='py-12 space-y-6 text-center my-auto'>
-                <div className='size-12 rounded-full border-2 border-primary border-t-transparent animate-spin mx-auto' />
-                <div className='space-y-1.5'>
-                  <h4 className='text-sm font-bold text-foreground uppercase tracking-wider'>
-                    Executing Reallocation Vector
+                <div className='size-12 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin mx-auto' />
+                <div>
+                  <h4 className='text-sm font-bold text-white uppercase tracking-wider'>
+                    Moving Budget
                   </h4>
-                  <p className='text-xs text-muted-foreground'>
-                    {executingStepIndex === 0 && 'Validating convex bounds & margin constraints...'}
-                    {executingStepIndex === 1 && 'Dispatching ad network reallocation API vector...'}
-                    {executingStepIndex >= 2 && 'Committing immutable entry to Decision Ledger...'}
+                  <p className='text-xs text-[#737373] mt-1'>
+                    Rebalancing daily allocations across channels...
                   </p>
-                </div>
-                <div className='w-full max-w-xs mx-auto bg-muted rounded-full h-1.5 overflow-hidden'>
-                  <div
-                    className='bg-primary h-full transition-all duration-300'
-                    style={{ width: `${((executingStepIndex + 1) / 3) * 100}%` }}
-                  />
                 </div>
               </div>
             )}
 
-            {/* STEP 3: DONE */}
+            {/* STEP 3: DONE COMPACT STATE */}
             {modalStep === 3 && (
-              <div className='space-y-5 my-auto py-4'>
-                <div className='rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-4 flex items-center justify-between'>
+              <div className='space-y-6 my-auto py-4 font-sans'>
+                {/* Green Banner: Moved at HH:MM */}
+                <div className='rounded-lg border border-emerald-800/40 bg-emerald-950/30 p-4 flex items-center justify-between'>
                   <div className='flex items-center gap-2.5'>
-                    <div className='size-7 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold'>
+                    <div className='size-6 rounded-full bg-emerald-500 text-black flex items-center justify-center text-xs font-bold font-mono'>
                       ✓
                     </div>
                     <div>
-                      <span className='text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider'>
-                        Executed at {new Date().toTimeString().slice(0, 5)}
+                      <span className='text-xs font-semibold text-emerald-300 uppercase tracking-wider font-sans'>
+                        Moved at {new Date().toTimeString().slice(0, 5)}
                       </span>
-                      <p className='text-[11px] text-emerald-600/80 dark:text-emerald-400/80'>
-                        Committed to Decision Ledger
+                      <p className='text-[11px] text-emerald-400/80 font-sans'>
+                        Added to Decision Ledger
                       </p>
                     </div>
                   </div>
-                  <span className='text-[10px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/20 px-2.5 py-1 rounded border border-emerald-500/30 uppercase font-bold'>
-                    Moved {formatINR(selectedItem.movedAmount)}
+                  <span className='text-[10px] font-mono tabular-nums text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded border border-emerald-800/60 uppercase font-medium'>
+                    Moved {formatCurrency(selectedItem.movedAmount)}
                   </span>
                 </div>
 
-                <div className='rounded-lg border border-border bg-muted/20 p-4 space-y-2.5 text-xs'>
-                  <span className='text-[10px] uppercase font-bold tracking-wider text-muted-foreground block'>
-                    Updated Active Allocations
+                {/* The two before -> after lines */}
+                <div className='rounded-lg border border-[#27272a] bg-[#18181b] p-4 space-y-3 text-xs font-sans'>
+                  <span className='text-[10px] uppercase font-mono font-medium tracking-wider text-zinc-400 block'>
+                    Updated Allocations
                   </span>
-                  <div className='space-y-2'>
+                  <div className='space-y-2.5 font-sans'>
                     <div className='flex items-center justify-between'>
-                      <span className='text-foreground font-semibold'>{selectedItem.sourceProductName}</span>
-                      <span className='font-mono'>
-                        <span className='text-muted-foreground line-through'>{formatINR(selectedItem.sourceSpendBefore)}</span>{' '}
-                        → <span className='text-foreground font-bold'>{formatINR(selectedItem.sourceSpendAfter)}</span>
+                      <span className='text-zinc-200 font-medium'>{selectedItem.sourceProductName}</span>
+                      <span className='font-mono tabular-nums'>
+                        <span className='text-zinc-500 line-through'>{formatCurrency(selectedItem.sourceSpendBefore)}</span>{' '}
+                        → <span className='text-zinc-100 font-semibold'>{formatCurrency(selectedItem.sourceSpendAfter)}</span>
                       </span>
                     </div>
                     <div className='flex items-center justify-between'>
-                      <span className='text-foreground font-semibold'>{selectedItem.targetProductName}</span>
-                      <span className='font-mono'>
-                        <span className='text-muted-foreground line-through'>{formatINR(selectedItem.targetSpendBefore)}</span>{' '}
-                        → <span className='text-emerald-600 dark:text-emerald-400 font-bold'>{formatINR(selectedItem.targetSpendAfter)}</span>
+                      <span className='text-zinc-200 font-medium'>{selectedItem.targetProductName}</span>
+                      <span className='font-mono tabular-nums'>
+                        <span className='text-zinc-500 line-through'>{formatCurrency(selectedItem.targetSpendBefore)}</span>{' '}
+                        → <span className='text-emerald-400 font-semibold'>{formatCurrency(selectedItem.targetSpendAfter)}</span>
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className='flex items-center justify-end pt-3 border-t border-border/70'>
-                  <Button
+                {/* Note that outcomes are projections measured over 7 days */}
+                <div className='flex items-center gap-2 text-[11px] text-zinc-400 bg-zinc-900/50 p-3 rounded border border-[#27272a] font-sans'>
+                  <Icons.info className='size-3.5 text-zinc-400 shrink-0' />
+                  <span>Outcomes are projections measured over 7 days.</span>
+                </div>
+
+                {/* Close Button */}
+                <div className='flex items-center justify-end pt-4 border-t border-[#27272a]'>
+                  <button
+                    type='button'
                     onClick={() => setSelectedItem(null)}
-                    className='h-9 px-5 bg-foreground hover:bg-foreground/90 text-background text-xs font-bold uppercase tracking-wider'
+                    className='px-5 py-2.5 rounded-lg bg-zinc-100 text-zinc-900 text-xs font-semibold uppercase tracking-wider hover:bg-white transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 font-sans'
                   >
-                    Done
-                  </Button>
+                    Close
+                  </button>
                 </div>
               </div>
             )}
@@ -539,7 +537,8 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
 
       {/* RIGHT-SIDE DRAWER: EXECUTE ALL FLOW */}
       {executeAllState && (
-        <div className='fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-xs animate-in fade-in duration-200'>
+        <div className='fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-xs animate-in fade-in duration-200 font-sans'>
+          {/* Backdrop Click */}
           <div
             className='fixed inset-0'
             onClick={() => {
@@ -547,27 +546,28 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
             }}
           />
 
+          {/* Right-Side Drawer: width min(560px, 100vw), padding 32px, 28px gap */}
           <div
-            className='relative z-10 h-full w-full max-w-[min(560px,100vw)] bg-card border-l border-border p-6 sm:p-8 overflow-y-auto overflow-x-hidden font-mono shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-200 text-card-foreground'
+            className='relative z-10 h-full w-full max-w-[min(560px,100vw)] bg-[#121215] border-l border-[#27272a] p-8 overflow-y-auto overflow-x-hidden font-sans shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-200 text-foreground'
             onClick={(e) => e.stopPropagation()}
             role='dialog'
             aria-modal='true'
           >
-            <div className='flex items-start justify-between border-b border-border/80 pb-4'>
+            {/* Header */}
+            <div className='flex items-start justify-between border-b border-[#27272a] pb-5'>
               <div className='min-w-0 pr-4'>
-                <h3 className='text-sm font-bold text-foreground uppercase tracking-tight flex items-center gap-2'>
-                  <Icons.check className='size-4 text-emerald-500' />
-                  Execute All Budget Directives
+                <h3 className='text-base font-semibold text-zinc-100 uppercase tracking-tight font-sans'>
+                  Move all budgets
                 </h3>
-                <p className='text-xs text-muted-foreground mt-1'>
-                  {reallocations.length} pending capital rebalancing operations queued
+                <p className='text-xs text-zinc-400 mt-1 font-sans'>
+                  {reallocations.length} pending capital moves queued
                 </p>
               </div>
               {executeAllState !== 'executing' && (
                 <button
                   type='button'
                   onClick={() => setExecuteAllState(null)}
-                  className='size-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors shrink-0'
+                  className='size-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors shrink-0'
                   aria-label='Close drawer'
                 >
                   ✕
@@ -577,107 +577,146 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
 
             {/* PREVIEW STEP */}
             {executeAllState === 'preview' && (
-              <div className='space-y-5 my-auto py-4'>
+              <div className='space-y-7 my-auto py-4 font-sans'>
                 <div className='grid grid-cols-2 gap-3'>
-                  <div className='rounded-xl border border-border bg-muted/20 p-3.5'>
-                    <span className='text-[10px] text-muted-foreground uppercase font-semibold block'>
+                  <div className='rounded-lg border border-[#27272a] bg-[#18181b] p-4'>
+                    <span className='text-[10px] text-zinc-400 uppercase font-medium block font-sans'>
                       Total Capital Moved
                     </span>
-                    <span className='text-xl font-extrabold text-foreground font-mono mt-1 block'>
-                      {formatINR(totalMovedAll)}
+                    <span className='text-xl font-bold text-zinc-100 mt-1 block font-mono tabular-nums'>
+                      {formatCurrency(totalMovedAll)}
                     </span>
                   </div>
-                  <div className='rounded-xl border border-border bg-muted/20 p-3.5'>
-                    <span className='text-[10px] text-muted-foreground uppercase font-semibold block'>
-                      Net Revenue Lift
+                  <div className='rounded-lg border border-[#27272a] bg-[#18181b] p-4'>
+                    <span className='text-[10px] text-zinc-400 uppercase font-medium block font-sans'>
+                      Total Expected Gain
                     </span>
-                    <span className='text-xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono mt-1 block'>
-                      +{formatINR(totalLiftAll)}
+                    <span className='text-xl font-bold text-emerald-400 mt-1 block font-mono tabular-nums'>
+                      +{formatCurrency(totalLiftAll)}
                     </span>
                   </div>
                 </div>
 
-                <div className='space-y-2 rounded-xl border border-border bg-muted/20 p-4'>
-                  <span className='text-[10px] uppercase font-bold tracking-wider text-muted-foreground block'>
-                    Queue Summary ({reallocations.length} Directives)
+                <div className='rounded-lg border border-[#27272a] bg-[#18181b] p-4 space-y-2 font-sans'>
+                  <span className='text-[10px] uppercase font-mono font-medium tracking-wider text-zinc-400 block'>
+                    Pending Reallocations ({reallocations.length})
                   </span>
-                  <div className='space-y-1.5 max-h-48 overflow-y-auto pr-1 text-xs'>
+                  <div className='space-y-2 max-h-64 overflow-y-auto pr-1 text-xs'>
                     {reallocations.map((it) => (
-                      <div key={it.id} className='flex items-center justify-between py-1 border-b border-border/40 last:border-b-0'>
-                        <span className='text-foreground truncate max-w-[200px]'>
-                          {it.sourceProductName} → {it.targetProductName}
-                        </span>
-                        <span className='font-mono font-bold text-foreground shrink-0'>
-                          {formatINR(it.movedAmount)}
+                      <div key={it.id} className='rounded border border-[#27272a] bg-zinc-900/40 p-3 flex items-center justify-between font-sans'>
+                        <div className='min-w-0 pr-2'>
+                          <span className='text-zinc-100 font-medium truncate block font-sans'>
+                            {it.sourceProductName} → {it.targetProductName}
+                          </span>
+                          <span className='text-[11px] text-zinc-400 font-mono tabular-nums'>
+                            Move {formatCurrency(it.movedAmount)} · Gain +{formatCurrency(it.netRevenueLift)}
+                          </span>
+                        </div>
+                        <span className='text-[10px] font-mono tabular-nums text-emerald-400 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800 shrink-0'>
+                          {it.confidence}%
                         </span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className='flex items-center justify-end gap-2.5 pt-3 border-t border-border/70'>
-                  <Button
-                    variant='outline'
+                <div className='flex items-center justify-end gap-3 pt-4 border-t border-[#27272a]'>
+                  <button
+                    type='button'
                     onClick={() => setExecuteAllState(null)}
-                    className='h-9 text-xs font-mono border-border'
+                    className='px-4 py-2.5 rounded-lg border border-[#27272a] bg-[#18181b] text-xs font-medium text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors font-sans'
                   >
                     Cancel
-                  </Button>
-                  <Button
+                  </button>
+                  <button
+                    type='button'
                     onClick={handleConfirmExecuteAll}
-                    className='h-9 px-5 bg-foreground hover:bg-foreground/90 text-background text-xs font-bold uppercase tracking-wider'
+                    className='px-5 py-2.5 rounded-lg bg-zinc-100 text-zinc-900 text-xs font-semibold uppercase tracking-wider hover:bg-white transition-all shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 font-sans'
                   >
-                    Execute All Now
-                  </Button>
+                    Move All Budget ({reallocations.length} Actions)
+                  </button>
                 </div>
               </div>
             )}
 
             {/* EXECUTING STEP */}
             {executeAllState === 'executing' && (
-              <div className='py-12 space-y-6 text-center my-auto'>
-                <div className='size-12 rounded-full border-2 border-primary border-t-transparent animate-spin mx-auto' />
-                <div className='space-y-1.5'>
-                  <h4 className='text-sm font-bold text-foreground uppercase tracking-wider'>
-                    Executing Reallocations ({executeAllProgress.current} / {executeAllProgress.total})
+              <div className='py-12 space-y-6 text-center my-auto font-sans'>
+                <div className='size-12 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin mx-auto' />
+                <div>
+                  <h4 className='text-sm font-semibold text-zinc-100 uppercase tracking-wider font-sans'>
+                    Moving All Budgets Sequentially
                   </h4>
-                  <p className='text-xs text-muted-foreground'>
-                    Dispatching multi-channel API vectors and committing to ledger...
+                  <p className='text-xs text-zinc-400 mt-1 font-sans'>
+                    Applying action {executeAllProgress.current} of {executeAllProgress.total}...
                   </p>
                 </div>
-                <div className='w-full max-w-xs mx-auto bg-muted rounded-full h-1.5 overflow-hidden'>
+
+                <div className='w-full bg-zinc-800 rounded-full h-2 overflow-hidden'>
                   <div
-                    className='bg-primary h-full transition-all duration-300'
+                    className='bg-emerald-500 h-full transition-all duration-300'
                     style={{
-                      width: `${(executeAllProgress.current / Math.max(executeAllProgress.total, 1)) * 100}%`
+                      width: `${(executeAllProgress.current / Math.max(1, executeAllProgress.total)) * 100}%`,
                     }}
                   />
                 </div>
               </div>
             )}
 
-            {/* RESULT STEP */}
+            {/* COMBINED RESULT STEP */}
             {executeAllState === 'result' && executeAllSummary && (
-              <div className='space-y-5 my-auto py-4'>
-                <div className='rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-5 text-center space-y-2'>
-                  <div className='size-10 rounded-full bg-emerald-500 text-white flex items-center justify-center text-sm font-bold mx-auto'>
-                    ✓
+              <div className='space-y-6 my-auto py-4 font-sans'>
+                <div className='rounded-lg border border-emerald-800/40 bg-emerald-950/30 p-4 flex items-center justify-between'>
+                  <div className='flex items-center gap-2.5'>
+                    <div className='size-6 rounded-full bg-emerald-500 text-black flex items-center justify-center text-xs font-bold font-mono'>
+                      ✓
+                    </div>
+                    <div>
+                      <span className='text-xs font-semibold text-emerald-300 uppercase tracking-wider font-sans'>
+                        Batch Done at {new Date().toTimeString().slice(0, 5)}
+                      </span>
+                      <p className='text-[11px] text-emerald-400/80 font-sans'>
+                        {executeAllSummary.count} reallocations executed and logged to Decision Ledger
+                      </p>
+                    </div>
                   </div>
-                  <h4 className='text-sm font-bold text-foreground uppercase tracking-wider'>
-                    All {executeAllSummary.count} Directives Successfully Executed
-                  </h4>
-                  <p className='text-xs text-emerald-600 dark:text-emerald-400 font-mono'>
-                    +{formatINR(executeAllSummary.totalLift)}/day Net Revenue Lift Captured
-                  </p>
+                  <span className='text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded border border-emerald-800/60 uppercase font-medium'>
+                    Batch Done
+                  </span>
                 </div>
 
-                <div className='flex items-center justify-end pt-3 border-t border-border/70'>
-                  <Button
+                <div className='grid grid-cols-2 gap-3'>
+                  <div className='rounded-lg border border-[#27272a] bg-[#18181b] p-4'>
+                    <span className='text-[10px] text-zinc-400 uppercase font-medium block font-sans'>
+                      Total Capital Moved
+                    </span>
+                    <span className='text-xl font-bold text-zinc-100 mt-1 block font-mono tabular-nums'>
+                      {formatCurrency(executeAllSummary.totalMoved)}
+                    </span>
+                  </div>
+                  <div className='rounded-lg border border-[#27272a] bg-[#18181b] p-4'>
+                    <span className='text-[10px] text-zinc-400 uppercase font-medium block font-sans'>
+                      Total Projected Lift
+                    </span>
+                    <span className='text-xl font-bold text-emerald-400 mt-1 block font-mono tabular-nums'>
+                      +{formatCurrency(executeAllSummary.totalLift)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className='flex items-center gap-2 text-[11px] text-zinc-400 bg-zinc-900/50 p-3 rounded border border-[#27272a] font-sans'>
+                  <Icons.info className='size-3.5 text-zinc-400 shrink-0' />
+                  <span>Outcomes are algorithmic projections modeled over a 7-day calibration window.</span>
+                </div>
+
+                <div className='flex items-center justify-end pt-4 border-t border-[#27272a]'>
+                  <button
+                    type='button'
                     onClick={() => setExecuteAllState(null)}
-                    className='h-9 px-5 bg-foreground hover:bg-foreground/90 text-background text-xs font-bold uppercase tracking-wider'
+                    className='px-5 py-2.5 rounded-lg bg-zinc-100 text-zinc-900 text-xs font-semibold uppercase tracking-wider hover:bg-white transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 font-sans'
                   >
                     Done
-                  </Button>
+                  </button>
                 </div>
               </div>
             )}
