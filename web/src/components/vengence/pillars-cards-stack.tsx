@@ -177,73 +177,82 @@ export function PillarsCardsStack() {
   ];
 
   return (
-    <ContainerScroll className='w-full max-w-5xl mx-auto pb-28 pt-4'>
-      {cards.map((card, index) => (
-        <CardSticky
-          key={card.id}
-          index={index}
-          incrementY={28}
-          incrementZ={10}
-          baseTop={92}
-          className='mb-[45vh] last:mb-0 w-full'
-        >
-          <div className='rounded-3xl border border-border/80 bg-card/95 backdrop-blur-xl shadow-2xl p-6 sm:p-8 md:p-10 transition-all duration-300 relative overflow-hidden group hover:border-primary/50'>
-            {/* Top Bar: Tag Badge & Big Step Index */}
-            <div className='flex items-center justify-between gap-4 mb-4 sm:mb-6 border-b border-border/60 pb-4'>
-              <div className='flex items-center gap-3 flex-wrap'>
-                <span className='p-2 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center'>
-                  {card.icon}
-                </span>
-                <span className='font-mono text-xs font-bold text-muted-foreground tracking-wider uppercase'>
-                  {card.tag}
-                </span>
-                <span
-                  className={cn(
-                    'font-orbitron text-[10px] px-2.5 py-0.5 rounded-full font-bold border',
-                    card.badgeColor
-                  )}
-                >
-                  {card.badge}
-                </span>
-              </div>
-
-              {/* Step number matching video (01, 02, 03, 04) */}
-              <div className='font-orbitron font-extrabold text-3xl sm:text-4xl text-primary/80 tracking-tight'>
-                {card.step}
-              </div>
-            </div>
-
-            {/* Middle Grid: Title + Description on left, Hairline Instrument on right */}
-            <div className='grid grid-cols-1 lg:grid-cols-12 gap-6 items-start'>
-              <div className='lg:col-span-5 flex flex-col justify-between space-y-4'>
-                <div>
-                  <h3 className='font-orbitron font-bold text-xl sm:text-2xl text-foreground tracking-tight leading-snug mb-3 group-hover:text-primary transition-colors'>
-                    {card.title}
-                  </h3>
-                  <p className='text-xs sm:text-sm text-muted-foreground leading-relaxed'>
-                    {card.description}
-                  </p>
-                </div>
-
-                <div className='pt-2'>
-                  <Link
-                    href={card.href}
-                    className='inline-flex items-center gap-2 text-xs sm:text-sm font-mono font-bold text-primary hover:text-primary/80 transition-colors group/link'
+    <ContainerScroll
+      className='w-full max-w-5xl mx-auto pt-4'
+      style={{ paddingBottom: '90vh' }}
+    >
+      {cards.map((card, index) => {
+        const isLast = index === cards.length - 1;
+        return (
+          <CardSticky
+            key={card.id}
+            index={index}
+            incrementY={16}
+            incrementZ={10}
+            baseTop={88}
+            className='w-full'
+            style={{
+              marginBottom: isLast ? '0px' : '45vh'
+            }}
+          >
+            <div className='rounded-3xl border border-border/80 bg-card dark:bg-zinc-950 shadow-2xl p-6 sm:p-8 md:p-10 transition-all duration-300 relative overflow-hidden group hover:border-primary/50'>
+              {/* Top Bar: Tag Badge & Big Step Index */}
+              <div className='flex items-center justify-between gap-4 mb-4 sm:mb-6 border-b border-border/60 pb-4'>
+                <div className='flex items-center gap-3 flex-wrap'>
+                  <span className='p-2 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center'>
+                    {card.icon}
+                  </span>
+                  <span className='font-mono text-xs font-bold text-muted-foreground tracking-wider uppercase'>
+                    {card.tag}
+                  </span>
+                  <span
+                    className={cn(
+                      'font-orbitron text-[10px] px-2.5 py-0.5 rounded-full font-bold border',
+                      card.badgeColor
+                    )}
                   >
-                    <span>{card.actionText}</span>
-                    <span className='group-hover/link:translate-x-1 transition-transform'>→</span>
-                  </Link>
+                    {card.badge}
+                  </span>
+                </div>
+
+                {/* Step number matching video (01, 02, 03, 04) */}
+                <div className='font-orbitron font-extrabold text-3xl sm:text-4xl text-primary/80 tracking-tight'>
+                  {card.step}
                 </div>
               </div>
 
-              {/* Hairline Visual Figure Preview */}
-              <div className='lg:col-span-7 w-full'>
-                {card.figure}
+              {/* Middle Grid: Title + Description on left, Hairline Instrument on right */}
+              <div className='grid grid-cols-1 lg:grid-cols-12 gap-6 items-start'>
+                <div className='lg:col-span-5 flex flex-col justify-between space-y-4'>
+                  <div>
+                    <h3 className='font-orbitron font-bold text-xl sm:text-2xl text-foreground tracking-tight leading-snug mb-3 group-hover:text-primary transition-colors'>
+                      {card.title}
+                    </h3>
+                    <p className='text-xs sm:text-sm text-muted-foreground leading-relaxed'>
+                      {card.description}
+                    </p>
+                  </div>
+
+                  <div className='pt-2'>
+                    <Link
+                      href={card.href}
+                      className='inline-flex items-center gap-2 text-xs sm:text-sm font-mono font-bold text-primary hover:text-primary/80 transition-colors group/link'
+                    >
+                      <span>{card.actionText}</span>
+                      <span className='group-hover/link:translate-x-1 transition-transform'>→</span>
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Hairline Visual Figure Preview */}
+                <div className='lg:col-span-7 w-full'>
+                  {card.figure}
+                </div>
               </div>
             </div>
-          </div>
-        </CardSticky>
-      ))}
+          </CardSticky>
+        );
+      })}
     </ContainerScroll>
   );
 }
