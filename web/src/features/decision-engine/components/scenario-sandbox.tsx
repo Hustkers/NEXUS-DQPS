@@ -3,9 +3,9 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
 import { MetaLogo, GoogleLogo, AmazonLogo } from '@/components/icons/platform-logos';
+import { cn } from '@/lib/utils';
 import {
   ComposedChart,
   Area,
@@ -141,25 +141,32 @@ export function computeFinancials(meta: number, google: number, amazon: number) 
   };
 }
 
-// Smooth animated number component
+// Smooth animated number component with trigger support for reload roll-up
 function AnimatedNumber({
   value,
   formatter = (v: number) => Math.round(v).toLocaleString('en-IN'),
-  duration = 320
+  duration = 400,
+  trigger = 0
 }: {
   value: number;
   formatter?: (v: number) => string;
   duration?: number;
+  trigger?: number;
 }) {
   const [displayValue, setDisplayValue] = useState(value);
   const prevValueRef = useRef(value);
+  const prevTriggerRef = useRef(trigger);
 
   useEffect(() => {
-    const startValue = prevValueRef.current;
+    const isNewTrigger = prevTriggerRef.current !== trigger;
+    prevTriggerRef.current = trigger;
+
+    // If trigger changed (e.g. user pressed Apply), count up swiftly to land on value
+    const startValue = isNewTrigger ? Math.max(0, value * 0.88) : prevValueRef.current;
     const endValue = value;
     prevValueRef.current = value;
 
-    if (startValue === endValue) {
+    if (!isNewTrigger && startValue === endValue) {
       setDisplayValue(endValue);
       return;
     }
@@ -183,7 +190,7 @@ function AnimatedNumber({
 
     frameId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frameId);
-  }, [value, duration]);
+  }, [value, duration, trigger]);
 
   return <>{formatter(displayValue)}</>;
 }
@@ -309,6 +316,8 @@ export function ScenarioSandbox({
   const [activeChartMode, setActiveChartMode] = useState<'curve' | 'breakdown'>('curve');
   const [isSimulating, setIsSimulating] = useState<boolean>(false);
   const [justApplied, setJustApplied] = useState<boolean>(false);
+  const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
+  const [isLoadedPulse, setIsLoadedPulse] = useState<boolean>(false);
   const [appliedVector, setAppliedVector] = useState<{
     timestamp: string;
     financials: ReturnType<typeof computeFinancials>;
@@ -408,6 +417,10 @@ export function ScenarioSandbox({
     setTimeout(() => {
       setIsSimulating(false);
       setJustApplied(true);
+      setRefreshTrigger((prev) => prev + 1);
+      setIsLoadedPulse(true);
+
+      setTimeout(() => setIsLoadedPulse(false), 2000);
       setTimeout(() => setJustApplied(false), 2400);
 
       const appliedPayload: ScenarioAllocationVector = {
@@ -441,7 +454,7 @@ export function ScenarioSandbox({
       toast.success('Applied Scenario Reallocation Vector', {
         description: `Meta: ₹${metaSpend}/d • Google: ₹${googleSpend}/d • Amazon: ₹${amazonSpend}/d. Net Margin Lift: ${deltaMargin >= 0 ? '+' : ''}₹${Math.round(deltaMargin).toLocaleString('en-IN')}/d.`
       });
-    }, 600);
+    }, 800);
   };
 
   const handleReset = () => {
@@ -450,28 +463,37 @@ export function ScenarioSandbox({
     setAmazonSpend(CHANNEL_MODELS.amazon.baselineSpend);
     setAppliedVector(null);
     setJustApplied(false);
+    setRefreshTrigger((prev) => prev + 1);
     toast.info('Sandbox Reset to Baseline Steady-State');
   };
 
   const applyPreset = (preset: 'optimal' | 'aggressive' | 'conservative' | 'baseline') => {
-    if (preset === 'baseline') {
-      handleReset();
-    } else if (preset === 'optimal') {
-      setMetaSpend(0);
-      setGoogleSpend(950);
-      setAmazonSpend(800);
-      toast.success('Loaded SLSQP Optimal Preset');
-    } else if (preset === 'aggressive') {
-      setMetaSpend(0);
-      setGoogleSpend(1200);
-      setAmazonSpend(1050);
-      toast.success('Loaded Aggressive Growth Preset');
-    } else if (preset === 'conservative') {
-      setMetaSpend(0);
-      setGoogleSpend(500);
-      setAmazonSpend(450);
-      toast.success('Loaded Capital Conservation Preset');
-    }
+    setIsSimulating(true);
+    setTimeout(() => {
+      setIsSimulating(false);
+      setRefreshTrigger((prev) => prev + 1);
+      setIsLoadedPulse(true);
+      setTimeout(() => setIsLoadedPulse(false), 2000);
+
+      if (preset === 'baseline') {
+        handleReset();
+      } else if (preset === 'optimal') {
+        setMetaSpend(0);
+        setGoogleSpend(950);
+        setAmazonSpend(800);
+        toast.success('Loaded SLSQP Optimal Preset');
+      } else if (preset === 'aggressive') {
+        setMetaSpend(0);
+        setGoogleSpend(1200);
+        setAmazonSpend(1050);
+        toast.success('Loaded Aggressive Growth Preset');
+      } else if (preset === 'conservative') {
+        setMetaSpend(0);
+        setGoogleSpend(500);
+        setAmazonSpend(450);
+        toast.success('Loaded Capital Conservation Preset');
+      }
+    }, 450);
   };
 
   const metaShare = scenario.totalSpend > 0 ? (scenario.meta / scenario.totalSpend) * 100 : 0;
@@ -559,302 +581,423 @@ export function ScenarioSandbox({
         </div>
       </div>
 
-      {/* 2. PRIORITIZED 5 KPIS: TOTAL BUDGET, FORECAST REVENUE, ROAS, POAS, NET MARGIN */}
-      <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5'>
-        {/* KPI 1: TOTAL BUDGET */}
-        <div className='p-3 rounded-lg border border-border bg-muted/20 space-y-1'>
-          <div className='flex items-center justify-between text-[10px] text-muted-foreground uppercase font-bold tracking-wider'>
-            <span>TOTAL BUDGET</span>
-            <span className='font-mono text-[9px]'>₹{baseline.totalSpend}/d</span>
+      {/* 2 & 3. DETAILS SECTION: 5 KPIS + VISUAL CHANNEL ALLOCATION WITH COMPUTATIONAL LOADOVER */}
+      <div className='relative min-w-0 space-y-5'>
+        {/* COMPUTATIONAL LOADOVER (COVERS 5 KPIS + CHANNEL ALLOCATION WHEN APPLYING) */}
+        {isSimulating && (
+          <div className='absolute inset-0 z-30 flex flex-col items-center justify-center bg-background/80 dark:bg-zinc-950/80 backdrop-blur-md rounded-xl border border-primary/50 shadow-2xl transition-all duration-200 animate-in fade-in'>
+            <div className='flex flex-col items-center text-center p-6 space-y-3.5 max-w-sm'>
+              {/* Futuristic Dual-Ring Orbiting Radar Spinner */}
+              <div className='relative flex items-center justify-center size-14'>
+                <div className='absolute inset-0 rounded-full border-2 border-primary/20 animate-ping opacity-75' />
+                <div className='absolute inset-0 rounded-full border-2 border-t-primary border-r-cyan-400 border-b-transparent border-l-transparent animate-spin' />
+                <div className='absolute inset-2 rounded-full border border-primary/40 animate-pulse' />
+                <Icons.sliders className='size-5 text-primary animate-pulse' />
+              </div>
+
+              {/* Status Header */}
+              <div className='space-y-1'>
+                <div className='text-xs font-orbitron font-extrabold uppercase tracking-widest text-foreground flex items-center justify-center gap-2'>
+                  <span className='size-2 rounded-full bg-emerald-400 animate-ping' />
+                  Computing SLSQP Reallocation
+                </div>
+                <p className='text-[11px] font-mono text-muted-foreground leading-snug'>
+                  Evaluating KKT stationarity, channel saturation curves &amp; net margin lift...
+                </p>
+              </div>
+
+              {/* Scanning Shimmer Laser Bar */}
+              <div className='w-52 h-1 bg-muted/80 rounded-full overflow-hidden relative'>
+                <div className='absolute inset-0 bg-gradient-to-r from-blue-500 via-cyan-400 to-emerald-400 animate-pulse w-full' />
+              </div>
+
+              {/* Live Vector Telemetry Chips */}
+              <div className='flex items-center gap-2 text-[10px] font-mono text-muted-foreground/90 pt-0.5'>
+                <span className='px-2 py-0.5 rounded bg-muted/70 border border-border/80'>
+                  Meta: ₹{metaSpend}/d
+                </span>
+                <span className='px-2 py-0.5 rounded bg-muted/70 border border-border/80'>
+                  Google: ₹{googleSpend}/d
+                </span>
+                <span className='px-2 py-0.5 rounded bg-muted/70 border border-border/80'>
+                  Amazon: ₹{amazonSpend}/d
+                </span>
+              </div>
+            </div>
           </div>
-          <div className='text-base sm:text-lg font-bold text-foreground font-mono'>
-            ₹<AnimatedNumber value={scenario.totalSpend} />/d
+        )}
+
+        <div className={cn('space-y-5 transition-all duration-300', isSimulating && 'opacity-35 blur-[1.5px] pointer-events-none select-none')}>
+          {/* 2. PRIORITIZED 5 KPIS: TOTAL BUDGET, FORECAST REVENUE, ROAS, POAS, NET MARGIN */}
+          <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5'>
+            {/* KPI 1: TOTAL BUDGET */}
+            <div
+              className={cn(
+                'p-3 rounded-lg border border-border bg-muted/20 space-y-1 transition-all duration-500 relative overflow-hidden',
+                isLoadedPulse && 'ring-1 ring-emerald-500/60 bg-emerald-500/10 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
+              )}
+            >
+              <div className='flex items-center justify-between text-[10px] text-muted-foreground uppercase font-bold tracking-wider'>
+                <span>TOTAL BUDGET</span>
+                <div className='flex items-center gap-1.5'>
+                  {isLoadedPulse && (
+                    <span className='text-[8px] font-mono px-1 py-0.2 rounded bg-emerald-500/25 text-emerald-400 font-bold animate-in fade-in zoom-in-90 duration-200'>
+                      SYNCED ✓
+                    </span>
+                  )}
+                  <span className='font-mono text-[9px]'>₹{baseline.totalSpend}/d</span>
+                </div>
+              </div>
+              <div className='text-base sm:text-lg font-bold text-foreground font-mono'>
+                ₹<AnimatedNumber value={scenario.totalSpend} trigger={refreshTrigger} />/d
+              </div>
+              <div className='text-[10px] font-mono'>
+                {deltaSpend === 0 ? (
+                  <span className='text-muted-foreground'>Neutral (₹0)</span>
+                ) : deltaSpend > 0 ? (
+                  <span className='text-amber-500 font-semibold'>+₹{deltaSpend.toLocaleString('en-IN')}</span>
+                ) : (
+                  <span className='text-emerald-500 font-semibold'>-₹{Math.abs(deltaSpend).toLocaleString('en-IN')}</span>
+                )}
+              </div>
+            </div>
+
+            {/* KPI 2: FORECAST REVENUE */}
+            <div
+              className={cn(
+                'p-3 rounded-lg border border-border bg-muted/20 space-y-1 transition-all duration-500 relative overflow-hidden',
+                isLoadedPulse && 'ring-1 ring-emerald-500/60 bg-emerald-500/10 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
+              )}
+            >
+              <div className='flex items-center justify-between text-[10px] text-muted-foreground uppercase font-bold tracking-wider'>
+                <span>FORECAST REVENUE</span>
+                <div className='flex items-center gap-1.5'>
+                  {isLoadedPulse && (
+                    <span className='text-[8px] font-mono px-1 py-0.2 rounded bg-emerald-500/25 text-emerald-400 font-bold animate-in fade-in zoom-in-90 duration-200'>
+                      SYNCED ✓
+                    </span>
+                  )}
+                  <span className='font-mono text-[9px]'>₹{Math.round(baseline.totalRev).toLocaleString('en-IN')}</span>
+                </div>
+              </div>
+              <div className='text-base sm:text-lg font-bold text-cyan-400 font-mono'>
+                ₹<AnimatedNumber value={Math.round(scenario.totalRev)} trigger={refreshTrigger} />/d
+              </div>
+              <div className='text-[10px] font-mono'>
+                {deltaRevenue === 0 ? (
+                  <span className='text-muted-foreground'>Baseline</span>
+                ) : deltaRevenue > 0 ? (
+                  <span className='text-emerald-500 font-bold'>+{pctRevChange.toFixed(1)}%</span>
+                ) : (
+                  <span className='text-rose-500 font-bold'>{pctRevChange.toFixed(1)}%</span>
+                )}
+              </div>
+            </div>
+
+            {/* KPI 3: ROAS */}
+            <div
+              className={cn(
+                'p-3 rounded-lg border border-border bg-muted/20 space-y-1 transition-all duration-500 relative overflow-hidden',
+                isLoadedPulse && 'ring-1 ring-emerald-500/60 bg-emerald-500/10 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
+              )}
+            >
+              <div className='flex items-center justify-between text-[10px] text-muted-foreground uppercase font-bold tracking-wider'>
+                <span>ROAS</span>
+                <div className='flex items-center gap-1.5'>
+                  {isLoadedPulse && (
+                    <span className='text-[8px] font-mono px-1 py-0.2 rounded bg-emerald-500/25 text-emerald-400 font-bold animate-in fade-in zoom-in-90 duration-200'>
+                      SYNCED ✓
+                    </span>
+                  )}
+                  <span className='font-mono text-[9px]'>{baseline.blendedRoas.toFixed(2)}x</span>
+                </div>
+              </div>
+              <div className='text-base sm:text-lg font-bold text-foreground font-mono'>
+                <AnimatedNumber
+                  value={scenario.blendedRoas}
+                  formatter={(v) => `${v.toFixed(2)}x`}
+                  trigger={refreshTrigger}
+                />
+              </div>
+              <div className='text-[10px] font-mono'>
+                {deltaRoas === 0 ? (
+                  <span className='text-muted-foreground'>±0.00x</span>
+                ) : deltaRoas > 0 ? (
+                  <span className='text-emerald-500 font-bold'>+{deltaRoas.toFixed(2)}x</span>
+                ) : (
+                  <span className='text-rose-500 font-bold'>{deltaRoas.toFixed(2)}x</span>
+                )}
+              </div>
+            </div>
+
+            {/* KPI 4: POAS */}
+            <div
+              className={cn(
+                'p-3 rounded-lg border border-border bg-muted/20 space-y-1 transition-all duration-500 relative overflow-hidden',
+                isLoadedPulse && 'ring-1 ring-emerald-500/60 bg-emerald-500/10 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
+              )}
+            >
+              <div className='flex items-center justify-between text-[10px] text-muted-foreground uppercase font-bold tracking-wider'>
+                <span>POAS</span>
+                <div className='flex items-center gap-1.5'>
+                  {isLoadedPulse && (
+                    <span className='text-[8px] font-mono px-1 py-0.2 rounded bg-emerald-500/25 text-emerald-400 font-bold animate-in fade-in zoom-in-90 duration-200'>
+                      SYNCED ✓
+                    </span>
+                  )}
+                  <span className='font-mono text-[9px]'>{baseline.poas.toFixed(2)}x</span>
+                </div>
+              </div>
+              <div className='text-base sm:text-lg font-bold text-foreground font-mono'>
+                <AnimatedNumber
+                  value={scenario.poas}
+                  formatter={(v) => `${v.toFixed(2)}x`}
+                  trigger={refreshTrigger}
+                />
+              </div>
+              <div className='text-[10px] font-mono'>
+                {deltaPoas === 0 ? (
+                  <span className='text-muted-foreground'>±0.00x</span>
+                ) : deltaPoas > 0 ? (
+                  <span className='text-emerald-500 font-bold'>+{deltaPoas.toFixed(2)}x</span>
+                ) : (
+                  <span className='text-rose-500 font-bold'>{deltaPoas.toFixed(2)}x</span>
+                )}
+              </div>
+            </div>
+
+            {/* KPI 5: NET MARGIN */}
+            <div
+              className={cn(
+                'p-3 rounded-lg border border-border bg-emerald-500/10 space-y-1 col-span-2 sm:col-span-1 transition-all duration-500 relative overflow-hidden',
+                isLoadedPulse && 'ring-2 ring-emerald-400 bg-emerald-500/25 shadow-[0_0_20px_rgba(16,185,129,0.3)]'
+              )}
+            >
+              <div className='flex items-center justify-between text-[10px] text-muted-foreground uppercase font-bold tracking-wider'>
+                <span className='text-emerald-400 font-bold flex items-center gap-1'>
+                  <Icons.sparkles className='size-3' />
+                  NET MARGIN
+                </span>
+                <div className='flex items-center gap-1.5'>
+                  {isLoadedPulse && (
+                    <span className='text-[8px] font-mono px-1 py-0.2 rounded bg-emerald-500/30 text-emerald-300 font-bold animate-in fade-in zoom-in-90 duration-200'>
+                      SYNCED ✓
+                    </span>
+                  )}
+                  <span className='font-mono text-[9px]'>₹{Math.round(baseline.netContribution).toLocaleString('en-IN')}</span>
+                </div>
+              </div>
+              <div className='text-base sm:text-lg font-bold text-emerald-400 font-mono'>
+                ₹<AnimatedNumber value={Math.round(scenario.netContribution)} trigger={refreshTrigger} />/d
+              </div>
+              <div className='text-[10px] font-mono'>
+                {deltaMargin === 0 ? (
+                  <span className='text-muted-foreground'>₹0</span>
+                ) : deltaMargin > 0 ? (
+                  <span className='text-emerald-400 font-bold'>+{pctMarginChange.toFixed(1)}%</span>
+                ) : (
+                  <span className='text-rose-500 font-bold'>{pctMarginChange.toFixed(1)}%</span>
+                )}
+              </div>
+            </div>
           </div>
-          <div className='text-[10px] font-mono'>
-            {deltaSpend === 0 ? (
-              <span className='text-muted-foreground'>Neutral (₹0)</span>
-            ) : deltaSpend > 0 ? (
-              <span className='text-amber-500 font-semibold'>+₹{deltaSpend.toLocaleString('en-IN')}</span>
-            ) : (
-              <span className='text-emerald-500 font-semibold'>-₹{Math.abs(deltaSpend).toLocaleString('en-IN')}</span>
+
+          {/* 3. VISUAL CHANNEL ALLOCATION BARS + SLIDERS */}
+          <div
+            className={cn(
+              'p-4 rounded-xl bg-muted/20 border border-border space-y-4 transition-all duration-500 relative overflow-hidden',
+              isLoadedPulse && 'ring-1 ring-emerald-500/50 bg-emerald-500/[0.03] shadow-[0_0_15px_rgba(16,185,129,0.1)]'
             )}
-          </div>
-        </div>
-
-        {/* KPI 2: FORECAST REVENUE */}
-        <div className='p-3 rounded-lg border border-border bg-muted/20 space-y-1'>
-          <div className='flex items-center justify-between text-[10px] text-muted-foreground uppercase font-bold tracking-wider'>
-            <span>FORECAST REVENUE</span>
-            <span className='font-mono text-[9px]'>₹{Math.round(baseline.totalRev).toLocaleString('en-IN')}</span>
-          </div>
-          <div className='text-base sm:text-lg font-bold text-cyan-400 font-mono'>
-            ₹<AnimatedNumber value={Math.round(scenario.totalRev)} />/d
-          </div>
-          <div className='text-[10px] font-mono'>
-            {deltaRevenue === 0 ? (
-              <span className='text-muted-foreground'>Baseline</span>
-            ) : deltaRevenue > 0 ? (
-              <span className='text-emerald-500 font-bold'>+{pctRevChange.toFixed(1)}%</span>
-            ) : (
-              <span className='text-rose-500 font-bold'>{pctRevChange.toFixed(1)}%</span>
-            )}
-          </div>
-        </div>
-
-        {/* KPI 3: ROAS */}
-        <div className='p-3 rounded-lg border border-border bg-muted/20 space-y-1'>
-          <div className='flex items-center justify-between text-[10px] text-muted-foreground uppercase font-bold tracking-wider'>
-            <span>ROAS</span>
-            <span className='font-mono text-[9px]'>{baseline.blendedRoas.toFixed(2)}x</span>
-          </div>
-          <div className='text-base sm:text-lg font-bold text-foreground font-mono'>
-            <AnimatedNumber
-              value={scenario.blendedRoas}
-              formatter={(v) => `${v.toFixed(2)}x`}
-            />
-          </div>
-          <div className='text-[10px] font-mono'>
-            {deltaRoas === 0 ? (
-              <span className='text-muted-foreground'>±0.00x</span>
-            ) : deltaRoas > 0 ? (
-              <span className='text-emerald-500 font-bold'>+{deltaRoas.toFixed(2)}x</span>
-            ) : (
-              <span className='text-rose-500 font-bold'>{deltaRoas.toFixed(2)}x</span>
-            )}
-          </div>
-        </div>
-
-        {/* KPI 4: POAS */}
-        <div className='p-3 rounded-lg border border-border bg-muted/20 space-y-1'>
-          <div className='flex items-center justify-between text-[10px] text-muted-foreground uppercase font-bold tracking-wider'>
-            <span>POAS</span>
-            <span className='font-mono text-[9px]'>{baseline.poas.toFixed(2)}x</span>
-          </div>
-          <div className='text-base sm:text-lg font-bold text-foreground font-mono'>
-            <AnimatedNumber
-              value={scenario.poas}
-              formatter={(v) => `${v.toFixed(2)}x`}
-            />
-          </div>
-          <div className='text-[10px] font-mono'>
-            {deltaPoas === 0 ? (
-              <span className='text-muted-foreground'>±0.00x</span>
-            ) : deltaPoas > 0 ? (
-              <span className='text-emerald-500 font-bold'>+{deltaPoas.toFixed(2)}x</span>
-            ) : (
-              <span className='text-rose-500 font-bold'>{deltaPoas.toFixed(2)}x</span>
-            )}
-          </div>
-        </div>
-
-        {/* KPI 5: NET MARGIN */}
-        <div className='p-3 rounded-lg border border-border bg-emerald-500/10 space-y-1 col-span-2 sm:col-span-1'>
-          <div className='flex items-center justify-between text-[10px] text-muted-foreground uppercase font-bold tracking-wider'>
-            <span className='text-emerald-400 font-bold flex items-center gap-1'>
-              <Icons.sparkles className='size-3' />
-              NET MARGIN
-            </span>
-            <span className='font-mono text-[9px]'>₹{Math.round(baseline.netContribution).toLocaleString('en-IN')}</span>
-          </div>
-          <div className='text-base sm:text-lg font-bold text-emerald-400 font-mono'>
-            ₹<AnimatedNumber value={Math.round(scenario.netContribution)} />/d
-          </div>
-          <div className='text-[10px] font-mono'>
-            {deltaMargin === 0 ? (
-              <span className='text-muted-foreground'>₹0</span>
-            ) : deltaMargin > 0 ? (
-              <span className='text-emerald-400 font-bold'>+{pctMarginChange.toFixed(1)}%</span>
-            ) : (
-              <span className='text-rose-500 font-bold'>{pctMarginChange.toFixed(1)}%</span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* 3. VISUAL CHANNEL ALLOCATION BARS + SLIDERS */}
-      <div className='p-4 rounded-xl bg-muted/20 border border-border space-y-4'>
-        <div className='flex items-center justify-between text-xs'>
-          <span className='font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5'>
-            <Icons.normalization className='size-3.5 text-foreground' />
-            Visual Channel Allocation
-          </span>
-          <span className='text-xs font-mono font-bold text-foreground'>
-            ₹<AnimatedNumber value={scenario.totalSpend} />/day total
-          </span>
-        </div>
-
-        {/* Horizontal Visual Channel Bars: Meta, Google, Amazon */}
-        <div className='space-y-2.5 font-mono text-xs'>
-          {/* Meta Bar */}
-          <div className='space-y-1'>
-            <div className='flex items-center justify-between text-[11px]'>
-              <div className='flex items-center gap-1.5 font-bold'>
-                <MetaLogo size={12} />
-                <span>Meta Ads</span>
-                <span className='text-[10px] text-muted-foreground font-normal'>(Air Force 1 - Stockout)</span>
-              </div>
-              <div className='flex items-center gap-2'>
-                <span className='text-foreground font-bold'>₹{metaSpend}/d</span>
-                <span className='text-muted-foreground text-[10px]'>{metaShare.toFixed(0)}%</span>
-              </div>
-            </div>
-            <div className='h-2 w-full rounded bg-muted/60 overflow-hidden'>
-              <div
-                className='h-full bg-blue-500 transition-all duration-300'
-                style={{ width: `${Math.max(metaShare, 0)}%` }}
-              />
-            </div>
-          </div>
-
-          {/* Google Bar */}
-          <div className='space-y-1'>
-            <div className='flex items-center justify-between text-[11px]'>
-              <div className='flex items-center gap-1.5 font-bold'>
-                <GoogleLogo size={12} />
-                <span>Google Search</span>
-                <span className='text-[10px] text-muted-foreground font-normal'>(Epic React - In-Stock)</span>
-              </div>
-              <div className='flex items-center gap-2'>
-                <span className='text-foreground font-bold'>₹{googleSpend}/d</span>
-                <span className='text-muted-foreground text-[10px]'>{googleShare.toFixed(0)}%</span>
-              </div>
-            </div>
-            <div className='h-2 w-full rounded bg-muted/60 overflow-hidden'>
-              <div
-                className='h-full bg-emerald-500 transition-all duration-300'
-                style={{ width: `${Math.max(googleShare, 0)}%` }}
-              />
-            </div>
-          </div>
-
-          {/* Amazon Bar */}
-          <div className='space-y-1'>
-            <div className='flex items-center justify-between text-[11px]'>
-              <div className='flex items-center gap-1.5 font-bold'>
-                <AmazonLogo size={12} />
-                <span>Amazon SP</span>
-                <span className='text-[10px] text-muted-foreground font-normal'>(Air Jordan 10)</span>
-              </div>
-              <div className='flex items-center gap-2'>
-                <span className='text-foreground font-bold'>₹{amazonSpend}/d</span>
-                <span className='text-muted-foreground text-[10px]'>{amazonShare.toFixed(0)}%</span>
-              </div>
-            </div>
-            <div className='h-2 w-full rounded bg-muted/60 overflow-hidden'>
-              <div
-                className='h-full bg-amber-500 transition-all duration-300'
-                style={{ width: `${Math.max(amazonShare, 0)}%` }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Sliders Grid */}
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-3 pt-2 border-t border-border/50'>
-          {/* Meta Slider */}
-          <div className='p-3 rounded-lg bg-card border border-border space-y-2'>
+          >
             <div className='flex items-center justify-between text-xs'>
-              <span className='font-bold text-foreground'>Meta Spend</span>
-              <span className='font-mono font-bold text-foreground'>₹{metaSpend}/d</span>
+              <span className='font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5'>
+                <Icons.normalization className='size-3.5 text-foreground' />
+                Visual Channel Allocation
+                {isLoadedPulse && (
+                  <span className='text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold animate-in fade-in duration-200'>
+                    REALLOCATED ✓
+                  </span>
+                )}
+              </span>
+              <span className='text-xs font-mono font-bold text-foreground'>
+                ₹<AnimatedNumber value={scenario.totalSpend} trigger={refreshTrigger} />/day total
+              </span>
             </div>
-            <input
-              type='range'
-              min={0}
-              max={1500}
-              step={25}
-              value={metaSpend}
-              onChange={(e) => setMetaSpend(Number(e.target.value))}
-              className='w-full accent-blue-500 cursor-pointer h-1.5 bg-muted rounded-lg'
-            />
-            <div className='flex items-center justify-between text-[10px] text-muted-foreground'>
-              <span>mROAS: {scenario.metaMroas.toFixed(2)}x</span>
-              <div className='flex items-center gap-1'>
-                <button
-                  type='button'
-                  onClick={() => setMetaSpend(Math.max(0, metaSpend - 50))}
-                  className='px-1.5 py-0.5 rounded bg-muted hover:bg-muted/80'
-                >
-                  -50
-                </button>
-                <button
-                  type='button'
-                  onClick={() => setMetaSpend(Math.min(1500, metaSpend + 50))}
-                  className='px-1.5 py-0.5 rounded bg-muted hover:bg-muted/80'
-                >
-                  +50
-                </button>
+
+            {/* Horizontal Visual Channel Bars: Meta, Google, Amazon */}
+            <div className='space-y-2.5 font-mono text-xs'>
+              {/* Meta Bar */}
+              <div className='space-y-1'>
+                <div className='flex items-center justify-between text-[11px]'>
+                  <div className='flex items-center gap-1.5 font-bold'>
+                    <MetaLogo size={12} />
+                    <span>Meta Ads</span>
+                    <span className='text-[10px] text-muted-foreground font-normal'>(Air Force 1 - Stockout)</span>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <span className='text-foreground font-bold'>₹{metaSpend}/d</span>
+                    <span className='text-muted-foreground text-[10px]'>{metaShare.toFixed(0)}%</span>
+                  </div>
+                </div>
+                <div className='h-2 w-full rounded bg-muted/60 overflow-hidden'>
+                  <div
+                    className='h-full bg-blue-500 transition-all duration-500 ease-out'
+                    style={{ width: `${Math.max(metaShare, 0)}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Google Bar */}
+              <div className='space-y-1'>
+                <div className='flex items-center justify-between text-[11px]'>
+                  <div className='flex items-center gap-1.5 font-bold'>
+                    <GoogleLogo size={12} />
+                    <span>Google Search</span>
+                    <span className='text-[10px] text-muted-foreground font-normal'>(Epic React - In-Stock)</span>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <span className='text-foreground font-bold'>₹{googleSpend}/d</span>
+                    <span className='text-muted-foreground text-[10px]'>{googleShare.toFixed(0)}%</span>
+                  </div>
+                </div>
+                <div className='h-2 w-full rounded bg-muted/60 overflow-hidden'>
+                  <div
+                    className='h-full bg-emerald-500 transition-all duration-500 ease-out'
+                    style={{ width: `${Math.max(googleShare, 0)}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Amazon Bar */}
+              <div className='space-y-1'>
+                <div className='flex items-center justify-between text-[11px]'>
+                  <div className='flex items-center gap-1.5 font-bold'>
+                    <AmazonLogo size={12} />
+                    <span>Amazon SP</span>
+                    <span className='text-[10px] text-muted-foreground font-normal'>(Air Jordan 10)</span>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <span className='text-foreground font-bold'>₹{amazonSpend}/d</span>
+                    <span className='text-muted-foreground text-[10px]'>{amazonShare.toFixed(0)}%</span>
+                  </div>
+                </div>
+                <div className='h-2 w-full rounded bg-muted/60 overflow-hidden'>
+                  <div
+                    className='h-full bg-amber-500 transition-all duration-500 ease-out'
+                    style={{ width: `${Math.max(amazonShare, 0)}%` }}
+                  />
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Google Slider */}
-          <div className='p-3 rounded-lg bg-card border border-border space-y-2'>
-            <div className='flex items-center justify-between text-xs'>
-              <span className='font-bold text-foreground'>Google Spend</span>
-              <span className='font-mono font-bold text-foreground'>₹{googleSpend}/d</span>
-            </div>
-            <input
-              type='range'
-              min={200}
-              max={1500}
-              step={25}
-              value={googleSpend}
-              onChange={(e) => setGoogleSpend(Number(e.target.value))}
-              className='w-full accent-emerald-500 cursor-pointer h-1.5 bg-muted rounded-lg'
-            />
-            <div className='flex items-center justify-between text-[10px] text-muted-foreground'>
-              <span>mROAS: {scenario.googleMroas.toFixed(2)}x</span>
-              <div className='flex items-center gap-1'>
-                <button
-                  type='button'
-                  onClick={() => setGoogleSpend(Math.max(200, googleSpend - 50))}
-                  className='px-1.5 py-0.5 rounded bg-muted hover:bg-muted/80'
-                >
-                  -50
-                </button>
-                <button
-                  type='button'
-                  onClick={() => setGoogleSpend(Math.min(1500, googleSpend + 50))}
-                  className='px-1.5 py-0.5 rounded bg-muted hover:bg-muted/80'
-                >
-                  +50
-                </button>
+            {/* Sliders Grid */}
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-3 pt-2 border-t border-border/50'>
+              {/* Meta Slider */}
+              <div className='p-3 rounded-lg bg-card border border-border space-y-2'>
+                <div className='flex items-center justify-between text-xs'>
+                  <span className='font-bold text-foreground'>Meta Spend</span>
+                  <span className='font-mono font-bold text-foreground'>₹{metaSpend}/d</span>
+                </div>
+                <input
+                  type='range'
+                  min={0}
+                  max={1500}
+                  step={25}
+                  value={metaSpend}
+                  onChange={(e) => setMetaSpend(Number(e.target.value))}
+                  className='w-full accent-blue-500 cursor-pointer h-1.5 bg-muted rounded-lg'
+                />
+                <div className='flex items-center justify-between text-[10px] text-muted-foreground'>
+                  <span>mROAS: {scenario.metaMroas.toFixed(2)}x</span>
+                  <div className='flex items-center gap-1'>
+                    <button
+                      type='button'
+                      onClick={() => setMetaSpend(Math.max(0, metaSpend - 50))}
+                      className='px-1.5 py-0.5 rounded bg-muted hover:bg-muted/80'
+                    >
+                      -50
+                    </button>
+                    <button
+                      type='button'
+                      onClick={() => setMetaSpend(Math.min(1500, metaSpend + 50))}
+                      className='px-1.5 py-0.5 rounded bg-muted hover:bg-muted/80'
+                    >
+                      +50
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
 
-          {/* Amazon Slider */}
-          <div className='p-3 rounded-lg bg-card border border-border space-y-2'>
-            <div className='flex items-center justify-between text-xs'>
-              <span className='font-bold text-foreground'>Amazon Spend</span>
-              <span className='font-mono font-bold text-foreground'>₹{amazonSpend}/d</span>
-            </div>
-            <input
-              type='range'
-              min={200}
-              max={1500}
-              step={25}
-              value={amazonSpend}
-              onChange={(e) => setAmazonSpend(Number(e.target.value))}
-              className='w-full accent-amber-500 cursor-pointer h-1.5 bg-muted rounded-lg'
-            />
-            <div className='flex items-center justify-between text-[10px] text-muted-foreground'>
-              <span>mROAS: {scenario.amazonMroas.toFixed(2)}x</span>
-              <div className='flex items-center gap-1'>
-                <button
-                  type='button'
-                  onClick={() => setAmazonSpend(Math.max(200, amazonSpend - 50))}
-                  className='px-1.5 py-0.5 rounded bg-muted hover:bg-muted/80'
-                >
-                  -50
-                </button>
-                <button
-                  type='button'
-                  onClick={() => setAmazonSpend(Math.min(1500, amazonSpend + 50))}
-                  className='px-1.5 py-0.5 rounded bg-muted hover:bg-muted/80'
-                >
-                  +50
-                </button>
+              {/* Google Slider */}
+              <div className='p-3 rounded-lg bg-card border border-border space-y-2'>
+                <div className='flex items-center justify-between text-xs'>
+                  <span className='font-bold text-foreground'>Google Spend</span>
+                  <span className='font-mono font-bold text-foreground'>₹{googleSpend}/d</span>
+                </div>
+                <input
+                  type='range'
+                  min={200}
+                  max={1500}
+                  step={25}
+                  value={googleSpend}
+                  onChange={(e) => setGoogleSpend(Number(e.target.value))}
+                  className='w-full accent-emerald-500 cursor-pointer h-1.5 bg-muted rounded-lg'
+                />
+                <div className='flex items-center justify-between text-[10px] text-muted-foreground'>
+                  <span>mROAS: {scenario.googleMroas.toFixed(2)}x</span>
+                  <div className='flex items-center gap-1'>
+                    <button
+                      type='button'
+                      onClick={() => setGoogleSpend(Math.max(200, googleSpend - 50))}
+                      className='px-1.5 py-0.5 rounded bg-muted hover:bg-muted/80'
+                    >
+                      -50
+                    </button>
+                    <button
+                      type='button'
+                      onClick={() => setGoogleSpend(Math.min(1500, googleSpend + 50))}
+                      className='px-1.5 py-0.5 rounded bg-muted hover:bg-muted/80'
+                    >
+                      +50
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Amazon Slider */}
+              <div className='p-3 rounded-lg bg-card border border-border space-y-2'>
+                <div className='flex items-center justify-between text-xs'>
+                  <span className='font-bold text-foreground'>Amazon Spend</span>
+                  <span className='font-mono font-bold text-foreground'>₹{amazonSpend}/d</span>
+                </div>
+                <input
+                  type='range'
+                  min={200}
+                  max={1500}
+                  step={25}
+                  value={amazonSpend}
+                  onChange={(e) => setAmazonSpend(Number(e.target.value))}
+                  className='w-full accent-amber-500 cursor-pointer h-1.5 bg-muted rounded-lg'
+                />
+                <div className='flex items-center justify-between text-[10px] text-muted-foreground'>
+                  <span>mROAS: {scenario.amazonMroas.toFixed(2)}x</span>
+                  <div className='flex items-center gap-1'>
+                    <button
+                      type='button'
+                      onClick={() => setAmazonSpend(Math.max(200, amazonSpend - 50))}
+                      className='px-1.5 py-0.5 rounded bg-muted hover:bg-muted/80'
+                    >
+                      -50
+                    </button>
+                    <button
+                      type='button'
+                      onClick={() => setAmazonSpend(Math.min(1500, amazonSpend + 50))}
+                      className='px-1.5 py-0.5 rounded bg-muted hover:bg-muted/80'
+                    >
+                      +50
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
