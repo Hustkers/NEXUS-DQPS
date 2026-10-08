@@ -64,7 +64,7 @@ function ReviewSummary({
         </div>
         <div>
           <p className='text-muted-foreground text-xs font-medium uppercase'>Price</p>
-          <p className='text-sm'>{values.price != null ? `₹${values.price}` : '—'}</p>
+          <p className='text-sm'>{values.price != null ? `$${values.price}` : '—'}</p>
         </div>
         <div>
           <p className='text-muted-foreground text-xs font-medium uppercase'>Description</p>

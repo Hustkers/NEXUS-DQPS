@@ -89,7 +89,7 @@ export default function ProfileViewPage() {
                     <input
                       type='text'
                       disabled
-                      value='INR (₹) - Indian Rupee'
+                      value='USD ($) - US Dollar'
                       className='w-full h-9 rounded-md border border-border bg-muted/40 px-3 text-xs font-mono text-muted-foreground'
                     />
                   </div>

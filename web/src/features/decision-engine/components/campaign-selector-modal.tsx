@@ -288,7 +288,7 @@ export function CampaignSelectorModal({
                           {camp.productName || camp.sku}
                         </h4>
                         <div className='flex items-center gap-2 mt-0.5 text-[11px] text-zinc-400'>
-                          <span>₹{camp.price?.toLocaleString()}</span>
+                          <span>${camp.price?.toLocaleString()}</span>
                           <span>•</span>
                           <span className='text-zinc-500'>{camp.category || 'Footwear'}</span>
                         </div>

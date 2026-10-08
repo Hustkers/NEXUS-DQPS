@@ -927,7 +927,7 @@ STRATEGIC_ARCHETYPES = [
         "platform_default": "meta",
         "ad_format": "Side-by-Side Multi-Item Collection Ad with 'Shop the Look'",
         "creative_angle": "Full Kit Cohesion: Matching Shoe, Performance Tee & Shorts Bundle",
-        "messaging_angle": "The Complete Runner's Kit: Save ₹2,500 When Purchased as a Set",
+        "messaging_angle": "The Complete Runner's Kit: Save $30 When Purchased as a Set",
         "targeting_method": "High Household Income Zip Codes + Lookalike of High-AOV Buyers",
         "audience_segment": "Affluent shoppers seeking complete coordinated athletic attire",
         "bidding_strategy": "Target ROAS with High Minimum Order Value Floor",
@@ -1311,7 +1311,7 @@ def rank_and_evaluate_all(
             reasons = [
                 f"Selected as Rank #{rank_idx} with top-tier overall performance score of {strat.evaluation.overall_score}/100.",
                 f"Predicted ROAS of {strat.evaluation.expected_roas:.2f}x significantly outperforms portfolio average ({avg_roas:.2f}x).",
-                f"Exceptional acquisition efficiency: expected CPA of ₹{strat.evaluation.expected_cpa:,.2f} is lower than {better_cpa_than} of {total_count-1} alternative strategies.",
+                f"Exceptional acquisition efficiency: expected CPA of ${strat.evaluation.expected_cpa:,.2f} is lower than {better_cpa_than} of {total_count-1} alternative strategies.",
                 f"High audience fit rating ({int(strat.evaluation.audience_fit_score*100)}%) on {strat.platform.upper()} with controlled risk score ({strat.evaluation.risk_score}/100)."
             ]
             strat.evaluation.selection_reasons = reasons
@@ -1327,7 +1327,7 @@ def rank_and_evaluate_all(
                 )
             if strat.evaluation.expected_cpa > avg_cpa:
                 rejection_reasons.append(
-                    f"Higher expected CPA (₹{strat.evaluation.expected_cpa:,.2f} vs ₹{avg_cpa:,.2f} benchmark)"
+                    f"Higher expected CPA (${strat.evaluation.expected_cpa:,.2f} vs ${avg_cpa:,.2f} benchmark)"
                 )
             if strat.evaluation.risk_score > 40:
                 rejection_reasons.append(
@@ -1406,12 +1406,12 @@ def compare_strategies(
             "lowest_cpa": {
                 "strategy_id": best_cpa["strategy_id"],
                 "strategy_name": best_cpa["strategy_name"],
-                "value": f"₹{best_cpa['expected_cpa']:,.2f}"
+                "value": f"${best_cpa['expected_cpa']:,.2f}"
             },
             "highest_revenue": {
                 "strategy_id": best_rev["strategy_id"],
                 "strategy_name": best_rev["strategy_name"],
-                "value": f"₹{best_rev['expected_revenue']:,.2f}"
+                "value": f"${best_rev['expected_revenue']:,.2f}"
             },
             "lowest_risk": {
                 "strategy_id": lowest_risk["strategy_id"],

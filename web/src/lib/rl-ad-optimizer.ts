@@ -24,6 +24,11 @@ export interface PlatformAuctionTelemetry {
   metric3Label: string;
   metric3Value: string;
   governanceFlag: string;
+  thresholdAlert?: {
+    status: 'NORMAL' | 'WARNING' | 'CRITICAL';
+    message: string;
+    thresholdValue: string;
+  };
 }
 
 export interface RegionalRLState {
@@ -403,26 +408,50 @@ export function computeRLAdAllocation(params: {
   // Platform Auction Telemetry according to DATASET.md Section 3
   let platformTelemetry: PlatformAuctionTelemetry;
   if (platform === 'google') {
+    const isScaleHeadroom = params.sku === '315122-001';
     platformTelemetry = {
       platform: 'google',
       metric1Label: 'Search Budget Lost IS',
-      metric1Value: '26.4%',
+      metric1Value: isScaleHeadroom ? '34.2%' : '26.4%',
       metric2Label: 'Search Rank Lost IS',
       metric2Value: '6.8%',
       metric3Label: 'Ad Quality Score',
       metric3Value: '9.2 / 10',
-      governanceFlag: 'Google SearchStream API v17.0 Active'
+      governanceFlag: 'Google SearchStream API v17.0 Active',
+      thresholdAlert: isScaleHeadroom
+        ? {
+            status: 'WARNING',
+            message: 'Search Budget Lost IS > 25.0%. Scale headroom available',
+            thresholdValue: '34.2% > 25.0%',
+          }
+        : {
+            status: 'NORMAL',
+            message: 'Search Budget Lost IS within nominal pacing bounds',
+            thresholdValue: '26.4% / 25.0%',
+          },
     };
   } else if (platform === 'amazon') {
+    const isBuyBoxLost = isStockout || (params.sku === '315122-001' && platform === 'amazon');
     platformTelemetry = {
       platform: 'amazon',
       metric1Label: 'Buy Box Win Rate',
-      metric1Value: isStockout ? '0.0% (LOST)' : '97.2%',
+      metric1Value: isBuyBoxLost ? '0.0% (LOST)' : '97.2%',
       metric2Label: 'FBA Days of Supply',
       metric2Value: isStockout ? '0 Days' : `${Math.round((params.inventory ?? 300) / 9)} Days`,
       metric3Label: 'Catalog Halo Lift',
       metric3Value: '+18.4%',
-      governanceFlag: isStockout ? 'SP-API Buy Box Kill-Switch TRIGGERED' : 'SP-API Bidding Guard Active (>85%)'
+      governanceFlag: isBuyBoxLost ? 'SP-API Buy Box Kill-Switch TRIGGERED' : 'SP-API Bidding Guard Active (>85%)',
+      thresholdAlert: isBuyBoxLost
+        ? {
+            status: 'CRITICAL',
+            message: 'Buy Box ownership < 85% safety threshold. Automated kill-switch engaged',
+            thresholdValue: '0.0% < 85.0%',
+          }
+        : {
+            status: 'NORMAL',
+            message: 'Buy Box win rate healthy above 85% safety floor',
+            thresholdValue: '97.2% > 85.0%',
+          },
     };
   } else if (platform === 'shopify') {
     platformTelemetry = {
@@ -433,19 +462,42 @@ export function computeRLAdAllocation(params: {
       metric2Value: '3.40x',
       metric3Label: 'Gateway Fee Net',
       metric3Value: '2.9% + $0.30',
-      governanceFlag: isStockout ? 'Shopify Stockout Alert (0 Units)' : 'Shopify 2024-01 Sync Healthy'
+      governanceFlag: isStockout ? 'Shopify Stockout Alert (0 Units)' : 'Shopify 2024-01 Sync Healthy',
+      thresholdAlert: isStockout
+        ? {
+            status: 'CRITICAL',
+            message: 'Warehouse stock depleted. 100% ad budget liberated to non-stockout SKUs',
+            thresholdValue: '0 Units on hand',
+          }
+        : {
+            status: 'NORMAL',
+            message: 'Contribution Margin 3 and ERP inventory levels nominal',
+            thresholdValue: 'Healthy',
+          },
     };
   } else {
     // Meta Ads default
+    const isFatigued = params.sku === '880848-005' || params.sku === 'AO2924-401';
     platformTelemetry = {
       platform: 'meta',
       metric1Label: 'Learning Phase',
-      metric1Value: 'SUCCESS (Exited)',
+      metric1Value: isFatigued ? 'LEARNING_LIMITED' : 'SUCCESS (Exited)',
       metric2Label: 'Ad Frequency',
-      metric2Value: '2.14x (Safe)',
+      metric2Value: isFatigued ? '3.42x (WEAROUT)' : '2.14x (Safe)',
       metric3Label: '3s Video Hook Rate',
       metric3Value: '38.4%',
-      governanceFlag: 'Meta Marketing API v19.0 Budget Cap Active'
+      governanceFlag: 'Meta Marketing API v19.0 Budget Cap Active',
+      thresholdAlert: isFatigued
+        ? {
+            status: 'CRITICAL',
+            message: 'Creative Fatigue: Frequency > 2.8x detected in Meta Graph API',
+            thresholdValue: '3.42x > 2.80x',
+          }
+        : {
+            status: 'NORMAL',
+            message: 'Ad frequency within safe non-fatigued exploratory window',
+            thresholdValue: '2.14x / 2.80x',
+          },
     };
   }
 

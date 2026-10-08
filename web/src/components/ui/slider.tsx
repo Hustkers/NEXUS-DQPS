@@ -27,10 +27,15 @@ function Slider({
       thumbAlignment='edge'
       {...props}
     >
-      <SliderPrimitive.Control className='relative flex w-full touch-none items-center select-none data-disabled:opacity-50 data-vertical:h-full data-vertical:min-h-40 data-vertical:w-auto data-vertical:flex-col'>
+      <SliderPrimitive.Control className='relative flex w-full touch-none items-center select-none data-disabled:opacity-50 data-vertical:h-full data-vertical:min-h-40 data-vertical:w-auto data-vertical:flex-col py-1.5'>
+        {/* Visible background color trough behind the track */}
+        <div
+          aria-hidden='true'
+          className='absolute inset-x-0 top-1/2 -translate-y-1/2 h-2.5 rounded-full bg-zinc-950/80 dark:bg-zinc-950/80 border border-zinc-800/80 shadow-inner pointer-events-none data-vertical:inset-x-auto data-vertical:inset-y-0 data-vertical:left-1/2 data-vertical:-translate-x-1/2 data-vertical:w-2.5'
+        />
         <SliderPrimitive.Track
           data-slot='slider-track'
-          className='relative grow overflow-hidden rounded-full bg-muted select-none data-horizontal:h-1 data-horizontal:w-full data-vertical:h-full data-vertical:w-1'
+          className='relative grow overflow-hidden rounded-full bg-zinc-800/90 dark:bg-zinc-800 border border-zinc-700/40 select-none data-horizontal:h-1.5 data-horizontal:w-full data-vertical:h-full data-vertical:w-1.5 shadow-inner'
         >
           <SliderPrimitive.Indicator
             data-slot='slider-range'
@@ -41,7 +46,7 @@ function Slider({
           <SliderPrimitive.Thumb
             data-slot='slider-thumb'
             key={index}
-            className='relative block size-3 shrink-0 rounded-full border border-ring bg-white ring-ring/50 transition-[color,box-shadow] select-none after:absolute after:-inset-2 hover:ring-3 focus-visible:ring-3 focus-visible:outline-hidden active:ring-3 disabled:pointer-events-none disabled:opacity-50'
+            className='relative z-10 block size-3.5 shrink-0 rounded-full border border-zinc-400/60 bg-zinc-100 dark:bg-zinc-100 shadow-md ring-ring/50 transition-[color,box-shadow,transform] select-none after:absolute after:-inset-2 hover:scale-110 hover:ring-3 focus-visible:ring-3 focus-visible:outline-hidden active:scale-95 disabled:pointer-events-none disabled:opacity-50 cursor-grab active:cursor-grabbing'
           />
         ))}
       </SliderPrimitive.Control>

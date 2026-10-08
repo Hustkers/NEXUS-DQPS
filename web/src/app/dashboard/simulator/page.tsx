@@ -151,7 +151,7 @@ function SimulationLabContent() {
       setSimulatedDay(horizon);
       setExecutedResult(computedResult);
       toast.success(`Simulation Completed: ${computedResult.scenarioMeta.title}`, {
-        description: `Applied ${computedResult.activeStrategyName}. Projected Loss Avoided: +₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}.`
+        description: `Applied ${computedResult.activeStrategyName}. Projected Loss Avoided: +$${computedResult.financialImpact.lossAvoided.toLocaleString('en-US')}.`
       });
     }, 1700);
   };
@@ -201,10 +201,10 @@ function SimulationLabContent() {
 
       const spendDisplay =
         simStage === 'ready' || simStage === 'baseline'
-          ? `₹${base.spend.toLocaleString('en-IN')}/day`
+          ? `$${base.spend.toLocaleString('en-US')}/day`
           : simStage === 'shock' || simStage === 'propagating'
-          ? `₹${shock.spend.toLocaleString('en-IN')}/day (Burning)`
-          : `₹${mit.spend.toLocaleString('en-IN')}/day (Controlled)`;
+          ? `$${shock.spend.toLocaleString('en-US')}/day (Burning)`
+          : `$${mit.spend.toLocaleString('en-US')}/day (Controlled)`;
 
       const roasDisplay =
         simStage === 'ready' || simStage === 'baseline'
@@ -215,10 +215,10 @@ function SimulationLabContent() {
 
       const protectedDisplay =
         simStage === 'completed'
-          ? `+₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}`
+          ? `+$${computedResult.financialImpact.lossAvoided.toLocaleString('en-US')}`
           : simStage === 'mitigating'
-          ? `+₹${Math.round(computedResult.financialImpact.lossAvoided * 0.85).toLocaleString('en-IN')}`
-          : '₹0';
+          ? `+$${Math.round(computedResult.financialImpact.lossAvoided * 0.85).toLocaleString('en-US')}`
+          : '$0';
 
       return {
         labelA: 'Physical Inventory',
@@ -239,15 +239,15 @@ function SimulationLabContent() {
     if (selectedScenarioId === 'cpm-spike') {
       const cpmDisplay =
         simStage === 'ready' || simStage === 'baseline'
-          ? `₹${inputs.baselineCpm.toFixed(2)}`
-          : `₹${(inputs.baselineCpm * inputs.cpmMultiplier).toFixed(2)} (+${Math.round((inputs.cpmMultiplier - 1) * 100)}%)`;
+          ? `$${inputs.baselineCpm.toFixed(2)}`
+          : `$${(inputs.baselineCpm * inputs.cpmMultiplier).toFixed(2)} (+${Math.round((inputs.cpmMultiplier - 1) * 100)}%)`;
 
       const impDisplay =
         simStage === 'ready' || simStage === 'baseline'
-          ? base.impressions.toLocaleString('en-IN')
+          ? base.impressions.toLocaleString('en-US')
           : simStage === 'shock' || simStage === 'propagating'
-          ? `${shock.impressions.toLocaleString('en-IN')} (Compressed)`
-          : mit.impressions.toLocaleString('en-IN');
+          ? `${shock.impressions.toLocaleString('en-US')} (Compressed)`
+          : mit.impressions.toLocaleString('en-US');
 
       const roasDisplay =
         simStage === 'ready' || simStage === 'baseline'
@@ -258,8 +258,8 @@ function SimulationLabContent() {
 
       const lossDisplay =
         simStage === 'completed'
-          ? `+₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}`
-          : '₹0';
+          ? `+$${computedResult.financialImpact.lossAvoided.toLocaleString('en-US')}`
+          : '$0';
 
       return {
         labelA: 'Auction CPM',
@@ -301,8 +301,8 @@ function SimulationLabContent() {
 
       const lossDisplay =
         simStage === 'completed'
-          ? `+₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}`
-          : '₹0';
+          ? `+$${computedResult.financialImpact.lossAvoided.toLocaleString('en-US')}`
+          : '$0';
 
       return {
         labelA: 'Ad Set CTR',
@@ -330,8 +330,8 @@ function SimulationLabContent() {
 
     const priceDisplay =
       simStage === 'ready' || simStage === 'baseline'
-        ? `₹${inputs.ourPrice.toLocaleString('en-IN')}`
-        : `₹${inputs.competitorPrice.toLocaleString('en-IN')} (-${inputs.competitorUndercutPct}%)`;
+        ? `$${inputs.ourPrice.toLocaleString('en-US')}`
+        : `$${inputs.competitorPrice.toLocaleString('en-US')} (-${inputs.competitorUndercutPct}%)`;
 
     const roasDisplay =
       simStage === 'ready' || simStage === 'baseline'
@@ -342,8 +342,8 @@ function SimulationLabContent() {
 
     const lossDisplay =
       simStage === 'completed'
-        ? `+₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}`
-        : '₹0';
+        ? `+$${computedResult.financialImpact.lossAvoided.toLocaleString('en-US')}`
+        : '$0';
 
     return {
       labelA: 'Buy Box Win Rate',
@@ -553,7 +553,7 @@ function SimulationLabContent() {
                     </div>
                     <div className='text-right'>
                       <span className='text-emerald-600 dark:text-emerald-400 font-bold block'>
-                        +₹{run.lossAvoided.toLocaleString('en-IN')}
+                        +${run.lossAvoided.toLocaleString('en-US')}
                       </span>
                       <span className='text-[10px] text-muted-foreground'>{run.roas.toFixed(2)}x ROAS</span>
                     </div>

@@ -132,7 +132,7 @@ export function ScenarioSimulationModal({
       setSimulatedDay(horizon);
       setExecutedResult(computedResult);
       toast.success(`Simulation Completed: ${computedResult.scenarioMeta.title}`, {
-        description: `Applied ${computedResult.activeStrategyName}. Projected Loss Avoided: +₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}.`
+        description: `Applied ${computedResult.activeStrategyName}. Projected Loss Avoided: +$${computedResult.financialImpact.lossAvoided.toLocaleString('en-US')}.`
       });
     }, 1700);
   };
@@ -186,10 +186,10 @@ export function ScenarioSimulationModal({
 
       const spendDisplay =
         stage === 'ready' || stage === 'baseline'
-          ? `₹${base.spend.toLocaleString('en-IN')}/day`
+          ? `$${base.spend.toLocaleString('en-US')}/day`
           : stage === 'shock' || stage === 'propagating'
-          ? `₹${shock.spend.toLocaleString('en-IN')}/day (Burning)`
-          : `₹${mit.spend.toLocaleString('en-IN')}/day (Controlled)`;
+          ? `$${shock.spend.toLocaleString('en-US')}/day (Burning)`
+          : `$${mit.spend.toLocaleString('en-US')}/day (Controlled)`;
 
       const roasDisplay =
         stage === 'ready' || stage === 'baseline'
@@ -200,10 +200,10 @@ export function ScenarioSimulationModal({
 
       const protectedDisplay =
         stage === 'completed'
-          ? `+₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}`
+          ? `+$${computedResult.financialImpact.lossAvoided.toLocaleString('en-US')}`
           : stage === 'mitigating'
-          ? `+₹${Math.round(computedResult.financialImpact.lossAvoided * 0.85).toLocaleString('en-IN')}`
-          : '₹0';
+          ? `+$${Math.round(computedResult.financialImpact.lossAvoided * 0.85).toLocaleString('en-US')}`
+          : '$0';
 
       return {
         labelA: 'Physical Inventory',
@@ -224,15 +224,15 @@ export function ScenarioSimulationModal({
     if (scenarioId === 'cpm-spike') {
       const cpmDisplay =
         stage === 'ready' || stage === 'baseline'
-          ? `₹${inputs.baselineCpm.toFixed(2)}`
-          : `₹${(inputs.baselineCpm * inputs.cpmMultiplier).toFixed(2)} (+${Math.round((inputs.cpmMultiplier - 1) * 100)}%)`;
+          ? `$${inputs.baselineCpm.toFixed(2)}`
+          : `$${(inputs.baselineCpm * inputs.cpmMultiplier).toFixed(2)} (+${Math.round((inputs.cpmMultiplier - 1) * 100)}%)`;
 
       const impDisplay =
         stage === 'ready' || stage === 'baseline'
-          ? base.impressions.toLocaleString('en-IN')
+          ? base.impressions.toLocaleString('en-US')
           : stage === 'shock' || stage === 'propagating'
-          ? `${shock.impressions.toLocaleString('en-IN')} (Compressed)`
-          : mit.impressions.toLocaleString('en-IN');
+          ? `${shock.impressions.toLocaleString('en-US')} (Compressed)`
+          : mit.impressions.toLocaleString('en-US');
 
       const roasDisplay =
         stage === 'ready' || stage === 'baseline'
@@ -243,8 +243,8 @@ export function ScenarioSimulationModal({
 
       const lossDisplay =
         stage === 'completed'
-          ? `+₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}`
-          : '₹0';
+          ? `+$${computedResult.financialImpact.lossAvoided.toLocaleString('en-US')}`
+          : '$0';
 
       return {
         labelA: 'Auction CPM',
@@ -286,8 +286,8 @@ export function ScenarioSimulationModal({
 
       const lossDisplay =
         stage === 'completed'
-          ? `+₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}`
-          : '₹0';
+          ? `+$${computedResult.financialImpact.lossAvoided.toLocaleString('en-US')}`
+          : '$0';
 
       return {
         labelA: 'Ad Set CTR',
@@ -315,8 +315,8 @@ export function ScenarioSimulationModal({
 
     const priceDisplay =
       stage === 'ready' || stage === 'baseline'
-        ? `₹${inputs.ourPrice.toLocaleString('en-IN')}`
-        : `₹${inputs.competitorPrice.toLocaleString('en-IN')} (-${inputs.competitorUndercutPct}%)`;
+        ? `$${inputs.ourPrice.toLocaleString('en-US')}`
+        : `$${inputs.competitorPrice.toLocaleString('en-US')} (-${inputs.competitorUndercutPct}%)`;
 
     const roasDisplay =
       stage === 'ready' || stage === 'baseline'
@@ -327,8 +327,8 @@ export function ScenarioSimulationModal({
 
     const lossDisplay =
       stage === 'completed'
-        ? `+₹${computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}`
-        : '₹0';
+        ? `+$${computedResult.financialImpact.lossAvoided.toLocaleString('en-US')}`
+        : '$0';
 
     return {
       labelA: 'Buy Box Win Rate',
@@ -457,7 +457,7 @@ export function ScenarioSimulationModal({
                 {computedResult.recommendation.reason}
               </p>
               <div className='flex items-center justify-between pt-2 border-t border-emerald-500/20 text-[10px] text-muted-foreground'>
-                <span>Protected Waste: <strong className='text-emerald-600 dark:text-emerald-400'>+₹{computedResult.financialImpact.lossAvoided.toLocaleString('en-IN')}</strong></span>
+                <span>Protected Waste: <strong className='text-emerald-600 dark:text-emerald-400'>+${computedResult.financialImpact.lossAvoided.toLocaleString('en-US')}</strong></span>
                 <span>Target ROAS: <strong className='text-foreground'>{computedResult.mitigated.roas.toFixed(2)}x</strong></span>
               </div>
             </div>

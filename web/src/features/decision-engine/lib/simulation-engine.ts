@@ -20,9 +20,9 @@ export const SCENARIO_METAS: Record<ShockScenarioId, ScenarioMeta> = {
     tag: 'ERP Inventory Bleed',
     severity: 'CRITICAL',
     eventDescription: 'ERP warehouse inventory reaches 0 units on hero SKU 315122-001 while active ad campaigns continue spending.',
-    traditionalOutcome: 'Ad platforms continue burning ₹1,84,800/day driving traffic to an empty product page with 0 inventory.',
+    traditionalOutcome: 'Ad platforms continue burning $1,84,800/day driving traffic to an empty product page with 0 inventory.',
     autonomousAction: 'Instant Circuit Breaker kills spend in <15 mins. Capital redirected to Google PMax React Infinity (+3.6x ROAS).',
-    savedWasteWeekly: '₹12,93,600 / week',
+    savedWasteWeekly: '$12,93,600 / week',
     responseSpeed: '< 15 mins',
     affectedSku: '315122-001',
     affectedProductName: "Nike Air Force 1 '07",
@@ -33,10 +33,10 @@ export const SCENARIO_METAS: Record<ShockScenarioId, ScenarioMeta> = {
     title: 'Meta Sneaker Auction CPM Surge (+45%)',
     tag: 'Auction Inflation',
     severity: 'HIGH',
-    eventDescription: 'Holiday competitive rush pushes Meta Advantage+ CPM from ₹798 to ₹1,192, dropping ROAS below the 1.8x break-even floor.',
+    eventDescription: 'Holiday competitive rush pushes Meta Advantage+ CPM from $798 to $1,192, dropping ROAS below the 1.8x break-even floor.',
     traditionalOutcome: 'Marketers notice 48 hours later after daily spend burns operating margin.',
-    autonomousAction: 'Optimizer shifts ₹2,94,000/day into Amazon Sponsored Products & Google Shopping where margin elasticity is preserved.',
-    savedWasteWeekly: '₹7,72,800 / week',
+    autonomousAction: 'Optimizer shifts $2,94,000/day into Amazon Sponsored Products & Google Shopping where margin elasticity is preserved.',
+    savedWasteWeekly: '$7,72,800 / week',
     responseSpeed: 'Real-time (<30s)',
     affectedSku: 'AO2924-401',
     affectedProductName: 'Nike Air Max 720',
@@ -50,7 +50,7 @@ export const SCENARIO_METAS: Record<ShockScenarioId, ScenarioMeta> = {
     eventDescription: 'Hero TikTok video ad set frequency exceeds 5.2. Hook rate collapses, CTR drops 60%, doubling customer acquisition cost.',
     traditionalOutcome: 'Fatigued video continues eating 40% of TikTok ad budget with plummeting conversion rate.',
     autonomousAction: 'Auto-pauses exhausted ad set, triggers creative refresh alert, and reroutes spend to high-vitality Meta Reels.',
-    savedWasteWeekly: '₹4,36,800 / week',
+    savedWasteWeekly: '$4,36,800 / week',
     responseSpeed: 'Autonomous (<1hr)',
     affectedSku: 'AH8050-100',
     affectedProductName: 'Nike Air Max 270',
@@ -64,7 +64,7 @@ export const SCENARIO_METAS: Record<ShockScenarioId, ScenarioMeta> = {
     eventDescription: 'Rival seller launches aggressive 25% price drop on Amazon Buy Box, lowering conversion rate from 4.8% to 2.8%.',
     traditionalOutcome: 'Amazon Sponsored spend continues bidding high CPC for unprofitable and losing Buy Box sessions.',
     autonomousAction: 'Scipy convex optimizer re-solves: shifts capital to Nike Direct Brand Search where gross margin is 68%.',
-    savedWasteWeekly: '₹5,71,200 / week',
+    savedWasteWeekly: '$5,71,200 / week',
     responseSpeed: '< 30 mins',
     affectedSku: '880848-005',
     affectedProductName: 'Nike Zoom Fly',
@@ -155,7 +155,7 @@ export const SCENARIO_STRATEGIES: Record<ShockScenarioId, StrategyOption[]> = {
       id: 'pause-spend',
       name: 'Pause Affected SKU Spend (Kill-Switch)',
       badge: 'Defensive',
-      description: 'Halt spend immediately. Stops ₹2,200/day ad burn but does not capture alternative demand.'
+      description: 'Halt spend immediately. Stops $2,200/day ad burn but does not capture alternative demand.'
     },
     {
       id: 'redirect-spend',
@@ -195,7 +195,7 @@ export const SCENARIO_STRATEGIES: Record<ShockScenarioId, StrategyOption[]> = {
       name: 'Reallocate to Amazon & Google Shopping',
       badge: 'Recommended',
       isRecommended: true,
-      description: 'Shift ₹3,500/day to Amazon Sponsored Products & Google PMax where margin elasticity is preserved.'
+      description: 'Shift $3,500/day to Amazon Sponsored Products & Google PMax where margin elasticity is preserved.'
     },
     {
       id: 'balanced-realloc',
@@ -267,7 +267,7 @@ export const SCENARIO_STRATEGIES: Record<ShockScenarioId, StrategyOption[]> = {
       id: 'match-price-floor',
       name: 'Match Price within 45% Margin Floor',
       badge: 'Competitive',
-      description: 'Automated repricing matches competitor down to ₹11,200 floor to reclaim Buy Box.'
+      description: 'Automated repricing matches competitor down to $11,200 floor to reclaim Buy Box.'
     },
     {
       id: 'custom-strategy',
@@ -384,7 +384,7 @@ export function runDeterministicSimulation(
 
   let recReason = '';
   if (scenarioId === 'stockout') {
-    recReason = 'Redirecting ad spend to in-stock React Infinity restores campaign ROAS to 3.6x and prevents burning ₹2,200/day on out-of-stock sessions.';
+    recReason = 'Redirecting ad spend to in-stock React Infinity restores campaign ROAS to 3.6x and prevents burning $2,200/day on out-of-stock sessions.';
   } else if (scenarioId === 'cpm-spike') {
     recReason = 'Meta auction surge makes customer acquisition unprofitable; shifting capital to Google & Amazon captures preserved margin elasticity.';
   } else if (scenarioId === 'creative-fatigue') {
@@ -794,8 +794,8 @@ function buildCausalChain(
       {
         step: 4,
         title: 'Ad Spend Burns Wasted Capital',
-        detail: 'Under unmitigated conditions, ad platforms burn ₹2,200/day driving traffic to an unpurchasable page.',
-        metricChange: `Wasted spend: ₹${inputs.baselineDailySpend}/day`,
+        detail: 'Under unmitigated conditions, ad platforms burn $2,200/day driving traffic to an unpurchasable page.',
+        metricChange: `Wasted spend: $${inputs.baselineDailySpend}/day`,
         status: 'warning'
       },
       {
@@ -815,14 +815,14 @@ function buildCausalChain(
       {
         step: 1,
         title: 'Auction Inflation Detected',
-        detail: `Holiday bidding rush pushes Meta Advantage+ CPM from ₹${inputs.baselineCpm.toFixed(2)} to ₹${(inputs.baselineCpm * inputs.cpmMultiplier).toFixed(2)}.`,
+        detail: `Holiday bidding rush pushes Meta Advantage+ CPM from $${inputs.baselineCpm.toFixed(2)} to $${(inputs.baselineCpm * inputs.cpmMultiplier).toFixed(2)}.`,
         metricChange: `CPM: +${Math.round((inputs.cpmMultiplier - 1) * 100)}%`,
         status: 'critical'
       },
       {
         step: 2,
         title: 'Impression Delivery Compresses',
-        detail: `Fixed daily spend of ₹${inputs.baselineDailySpend.toLocaleString('en-IN')} captures significantly fewer ad impressions.`,
+        detail: `Fixed daily spend of $${inputs.baselineDailySpend.toLocaleString('en-US')} captures significantly fewer ad impressions.`,
         metricChange: `Impressions: -${Math.round((1 - shocked.impressions / (shocked.impressions * inputs.cpmMultiplier)) * 100)}%`,
         status: 'warning'
       },
@@ -880,7 +880,7 @@ function buildCausalChain(
     {
       step: 1,
       title: 'Competitor Price Undercut Launched',
-      detail: `Rival merchant initiates 25% price discount on Amazon, taking price from ₹${inputs.ourPrice.toLocaleString('en-IN')} to ₹${inputs.competitorPrice.toLocaleString('en-IN')}.`,
+      detail: `Rival merchant initiates 25% price discount on Amazon, taking price from $${inputs.ourPrice.toLocaleString('en-US')} to $${inputs.competitorPrice.toLocaleString('en-US')}.`,
       metricChange: 'Competitor Price: -25%',
       status: 'warning'
     },
@@ -902,7 +902,7 @@ function buildCausalChain(
       step: 4,
       title: 'D2C Direct Channel Rerouting',
       detail: 'Capital diverted from Amazon to Nike Direct Brand Search where pricing and 68% margin are defended.',
-      metricChange: `Preserved Margin: ₹${mitigated.margin.toLocaleString('en-IN')}/day`,
+      metricChange: `Preserved Margin: $${mitigated.margin.toLocaleString('en-US')}/day`,
       status: 'mitigated'
     }
   ];

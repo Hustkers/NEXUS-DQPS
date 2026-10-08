@@ -42,10 +42,10 @@ export function SimulationFinancialImpact({
             Projected {horizonDays}-Day Loss:
           </div>
           <div className='text-xl sm:text-2xl font-bold text-rose-600 dark:text-rose-400'>
-            ₹{financialImpact.lossWithoutMitigation.toLocaleString('en-IN')}
+            ${financialImpact.lossWithoutMitigation.toLocaleString('en-US')}
           </div>
           <div className='text-[10px] text-muted-foreground pt-1 border-t border-rose-500/20'>
-            Daily Loss Rate: ₹{financialImpact.dailyLossRate.toLocaleString('en-IN')}/day
+            Daily Loss Rate: ${financialImpact.dailyLossRate.toLocaleString('en-US')}/day
           </div>
         </div>
 
@@ -61,10 +61,10 @@ export function SimulationFinancialImpact({
             Projected {horizonDays}-Day Loss:
           </div>
           <div className='text-xl sm:text-2xl font-bold text-foreground'>
-            ₹{financialImpact.lossWithMitigation.toLocaleString('en-IN')}
+            ${financialImpact.lossWithMitigation.toLocaleString('en-US')}
           </div>
           <div className='text-[10px] text-muted-foreground pt-1 border-t border-border/40'>
-            Margin Delta: ₹{(financialImpact.lossWithoutMitigation - financialImpact.lossWithMitigation).toLocaleString('en-IN')} protected
+            Margin Delta: ${(financialImpact.lossWithoutMitigation - financialImpact.lossWithMitigation).toLocaleString('en-US')} protected
           </div>
         </div>
 
@@ -80,10 +80,10 @@ export function SimulationFinancialImpact({
             Total Loss Avoided:
           </div>
           <div className='text-xl sm:text-2xl font-extrabold text-emerald-600 dark:text-emerald-400'>
-            +₹{financialImpact.lossAvoided.toLocaleString('en-IN')}
+            +${financialImpact.lossAvoided.toLocaleString('en-US')}
           </div>
           <div className='text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold pt-1 border-t border-emerald-500/20'>
-            Protected Waste Capital: ₹{financialImpact.protectedWasteWeekly.toLocaleString('en-IN')} / week
+            Protected Waste Capital: ${financialImpact.protectedWasteWeekly.toLocaleString('en-US')} / week
           </div>
         </div>
       </div>
@@ -95,7 +95,7 @@ export function SimulationFinancialImpact({
             Unmitigated Wasted Ad Spend
           </span>
           <span className='font-bold text-rose-500 text-sm'>
-            ₹{financialImpact.wastedSpend.toLocaleString('en-IN')}
+            ${financialImpact.wastedSpend.toLocaleString('en-US')}
           </span>
         </div>
 
@@ -104,7 +104,7 @@ export function SimulationFinancialImpact({
             Gross Revenue Gap
           </span>
           <span className='font-bold text-foreground text-sm'>
-            ₹{financialImpact.revenueLoss.toLocaleString('en-IN')}
+            ${financialImpact.revenueLoss.toLocaleString('en-US')}
           </span>
         </div>
 
@@ -113,7 +113,7 @@ export function SimulationFinancialImpact({
             Direct Contribution Margin Gap
           </span>
           <span className='font-bold text-amber-600 dark:text-amber-400 text-sm'>
-            ₹{financialImpact.marginLoss.toLocaleString('en-IN')}
+            ${financialImpact.marginLoss.toLocaleString('en-US')}
           </span>
         </div>
       </div>

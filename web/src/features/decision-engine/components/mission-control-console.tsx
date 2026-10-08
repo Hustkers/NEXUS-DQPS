@@ -161,7 +161,7 @@ export function MissionControlConsole() {
             </span>
           </div>
           <h2 className='text-base sm:text-lg font-bold uppercase tracking-tight text-foreground'>
-            WHERE SHOULD THE NEXT ₹ GO?
+            WHERE SHOULD THE NEXT $ GO?
           </h2>
           <p className='text-xs text-muted-foreground leading-relaxed'>
             The engine analyzes historical campaign outcomes, models non-linear diminishing returns (Hill saturation curves), and continuously re-allocates multi-channel budgets to maximize incremental profit.

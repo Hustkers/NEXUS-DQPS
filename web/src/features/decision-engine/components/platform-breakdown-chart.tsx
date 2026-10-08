@@ -47,7 +47,7 @@ export function PlatformBreakdownChart({
                 30-Day Financial Telemetry
               </h3>
               <p className='text-xs text-muted-foreground font-mono mt-0.5'>
-                Spend vs Gross Revenue vs Contribution Margin (₹)
+                Spend vs Gross Revenue vs Contribution Margin ($)
               </p>
             </div>
             <div className='flex items-center gap-3 text-xs font-mono'>
@@ -82,7 +82,7 @@ export function PlatformBreakdownChart({
                   fontSize={10}
                   tickLine={false}
                   fontFamily='monospace'
-                  tickFormatter={(val) => `₹${val > 999 ? (val / 1000).toFixed(0) + 'k' : val}`}
+                  tickFormatter={(val) => `$${val > 999 ? (val / 1000).toFixed(0) + 'k' : val}`}
                 />
                 <Tooltip
                   content={({ active, payload, label }) => {
@@ -92,15 +92,15 @@ export function PlatformBreakdownChart({
                           <p className='font-bold text-foreground border-b border-border pb-1'>{label}</p>
                           <div className='flex justify-between gap-4 text-foreground font-medium'>
                             <span>Revenue:</span>
-                            <span>₹{Number(payload[0]?.value).toLocaleString()}</span>
+                            <span>${Number(payload[0]?.value).toLocaleString()}</span>
                           </div>
                           <div className='flex justify-between gap-4 text-muted-foreground font-medium'>
                             <span>Margin:</span>
-                            <span>₹{Number(payload[1]?.value).toLocaleString()}</span>
+                            <span>${Number(payload[1]?.value).toLocaleString()}</span>
                           </div>
                           <div className='flex justify-between gap-4 text-muted-foreground font-medium'>
                             <span>Spend:</span>
-                            <span>₹{Number(payload[2]?.value).toLocaleString()}</span>
+                            <span>${Number(payload[2]?.value).toLocaleString()}</span>
                           </div>
                         </div>
                       );
@@ -178,7 +178,7 @@ export function PlatformBreakdownChart({
                       <span className='font-semibold text-foreground'>{p.displayName}</span>
                     </div>
                     <div className='flex items-center gap-2'>
-                      <span className='text-muted-foreground font-medium'>₹{p.spend.toLocaleString()}</span>
+                      <span className='text-muted-foreground font-medium'>${p.spend.toLocaleString()}</span>
                       <Badge variant='outline' className='text-[10px] font-mono py-0 px-1.5 border border-border text-foreground bg-muted/60 font-semibold'>
                         {p.roas.toFixed(2)}x ROAS
                       </Badge>
@@ -195,7 +195,7 @@ export function PlatformBreakdownChart({
 
                   <div className='flex items-center justify-between text-[10px] text-muted-foreground font-mono'>
                     <span>Share: {p.share}% ({p.campaignsCount} active)</span>
-                    <span className='font-semibold text-foreground'>Margin: ₹{p.margin.toLocaleString()}</span>
+                    <span className='font-semibold text-foreground'>Margin: ${p.margin.toLocaleString()}</span>
                   </div>
                 </div>
               );

@@ -258,20 +258,20 @@ export default function GlobeIntelligencePage() {
 
             <div className='grid grid-cols-4 gap-2 pt-3 border-t border-border text-center font-mono text-[10px]'>
               <div className='p-1.5 rounded bg-zinc-900/60 border border-zinc-800/60'>
-                <div className='text-zinc-500'>US-EAST</div>
-                <div className='text-zinc-200 font-bold'>24ms • 48.2k imp</div>
+                <div className='text-zinc-500'>FC-ALLENTOWN</div>
+                <div className='text-zinc-200 font-bold'>24ms &bull; 48.2k imp</div>
               </div>
               <div className='p-1.5 rounded bg-zinc-900/60 border border-zinc-800/60'>
-                <div className='text-zinc-500'>EMEA-LON</div>
-                <div className='text-zinc-200 font-bold'>38ms • 29.4k imp</div>
+                <div className='text-zinc-500'>FC-DAVENTRY</div>
+                <div className='text-zinc-200 font-bold'>38ms &bull; 29.4k imp</div>
               </div>
               <div className='p-1.5 rounded bg-zinc-900/60 border border-zinc-800/60'>
-                <div className='text-zinc-500'>APAC-TYO</div>
-                <div className='text-zinc-200 font-bold'>64ms • 18.9k imp</div>
+                <div className='text-zinc-500'>FC-NARITA</div>
+                <div className='text-zinc-200 font-bold'>64ms &bull; 18.9k imp</div>
               </div>
               <div className='p-1.5 rounded bg-zinc-900/60 border border-zinc-800/60'>
-                <div className='text-zinc-500'>SEA-SGP</div>
-                <div className='text-zinc-200 font-bold'>82ms • 4.1k imp</div>
+                <div className='text-zinc-500'>FC-CHANGI</div>
+                <div className='text-zinc-200 font-bold'>82ms &bull; 4.1k imp</div>
               </div>
             </div>
           </div>

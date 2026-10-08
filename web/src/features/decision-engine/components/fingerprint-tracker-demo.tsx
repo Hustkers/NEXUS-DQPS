@@ -668,7 +668,7 @@ export function FingerprintTrackerDemo() {
                     : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700'
                 )}
               >
-                {j.productName} (₹{j.retailPrice.toLocaleString('en-IN')})
+                {j.productName} (${j.retailPrice.toLocaleString('en-US')})
               </button>
             ))}
           </div>
@@ -695,7 +695,7 @@ export function FingerprintTrackerDemo() {
                     </span>
                     {step.costInr > 0 ? (
                       <span className='text-zinc-700 dark:text-zinc-300 font-semibold'>
-                        ₹{step.costInr.toFixed(2)}
+                        ${step.costInr.toFixed(2)}
                       </span>
                     ) : (
                       <span className='text-emerald-600 dark:text-emerald-400 font-semibold'>
@@ -738,10 +738,10 @@ export function FingerprintTrackerDemo() {
           <div className='flex items-center gap-4'>
             <span>Visitor ID: <code className='text-zinc-800 dark:text-zinc-200'>{selectedJourney.visitorId.slice(0, 18)}...</code></span>
             <span>SKU: <strong className='text-zinc-900 dark:text-zinc-100'>{selectedJourney.sku}</strong></span>
-            <span>MSRP: <strong className='text-zinc-900 dark:text-zinc-100'>₹{selectedJourney.retailPrice.toLocaleString('en-IN')}</strong></span>
+            <span>MSRP: <strong className='text-zinc-900 dark:text-zinc-100'>${selectedJourney.retailPrice.toLocaleString('en-US')}</strong></span>
           </div>
           <div className='flex items-center gap-4 text-zinc-600 dark:text-zinc-400'>
-            <span>Incurred Ad Spend: <strong className='text-zinc-900 dark:text-zinc-100'>₹{totalIncurredSpend.toFixed(2)}</strong></span>
+            <span>Incurred Ad Spend: <strong className='text-zinc-900 dark:text-zinc-100'>${totalIncurredSpend.toFixed(2)}</strong></span>
             <span>Fulfillment: <strong className='text-zinc-900 dark:text-zinc-100'>{selectedJourney.freightZone}</strong></span>
           </div>
         </div>
@@ -775,7 +775,7 @@ export function FingerprintTrackerDemo() {
                   <span>Google Ads Tag Claim:</span>
                 </div>
                 <strong className='text-rose-700 dark:text-rose-300 font-semibold'>
-                  ₹{selectedJourney.retailPrice.toLocaleString('en-IN')} (100% Credit)
+                  ${selectedJourney.retailPrice.toLocaleString('en-US')} (100% Credit)
                 </strong>
               </div>
 
@@ -785,19 +785,19 @@ export function FingerprintTrackerDemo() {
                   <span>Meta Pixel / CAPI Claim:</span>
                 </div>
                 <strong className='text-rose-700 dark:text-rose-300 font-semibold'>
-                  ₹{selectedJourney.retailPrice.toLocaleString('en-IN')} (100% Credit)
+                  ${selectedJourney.retailPrice.toLocaleString('en-US')} (100% Credit)
                 </strong>
               </div>
 
               <div className='p-3.5 rounded-md bg-rose-100/60 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-800 flex flex-col gap-2'>
                 <div className='flex items-center justify-between text-rose-950 dark:text-rose-100 font-bold'>
                   <span>Total Platform-Claimed Revenue:</span>
-                  <span>₹{doubleCountedRevenue.toLocaleString('en-IN')}</span>
+                  <span>${doubleCountedRevenue.toLocaleString('en-US')}</span>
                 </div>
                 <div className='flex items-center justify-between text-zinc-700 dark:text-zinc-300 text-[11px] pt-1.5 border-t border-rose-200 dark:border-rose-800'>
                   <span>Actual Cash in Bank (GAAP Receipts):</span>
                   <span className='font-semibold text-zinc-900 dark:text-zinc-100'>
-                    ₹{actualBankReceipts.toLocaleString('en-IN')}
+                    ${actualBankReceipts.toLocaleString('en-US')}
                   </span>
                 </div>
                 <div className='flex items-center justify-between text-rose-800 dark:text-rose-300 text-[11px] font-semibold'>
@@ -846,10 +846,10 @@ export function FingerprintTrackerDemo() {
                   </div>
                   <div className='flex items-center gap-2'>
                     <span className='text-zinc-500 dark:text-zinc-400'>
-                      ₹{item.spend.toFixed(0)} spend &rarr;
+                      ${item.spend.toFixed(0)} spend &rarr;
                     </span>
                     <strong className='text-emerald-700 dark:text-emerald-300 font-semibold'>
-                      ₹{item.attributedRevenue.toFixed(2)}
+                      ${item.attributedRevenue.toFixed(2)}
                     </strong>
                   </div>
                 </div>
@@ -858,7 +858,7 @@ export function FingerprintTrackerDemo() {
               <div className='p-3.5 rounded-md bg-emerald-100/60 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 flex flex-col gap-2'>
                 <div className='flex items-center justify-between text-emerald-950 dark:text-emerald-100 font-bold'>
                   <span>Sum of Deduplicated Attributions:</span>
-                  <span>₹{actualBankReceipts.toLocaleString('en-IN')}.00 (100.0%)</span>
+                  <span>${actualBankReceipts.toLocaleString('en-US')}.00 (100.0%)</span>
                 </div>
                 <div className='flex items-center justify-between text-emerald-900 dark:text-emerald-200 text-[11px] pt-1.5 border-t border-emerald-200 dark:border-emerald-800'>
                   <span>True Realized ROAS:</span>
@@ -869,7 +869,7 @@ export function FingerprintTrackerDemo() {
                 <div className='flex items-center justify-between text-emerald-900 dark:text-emerald-200 text-[11px]'>
                   <span>True Contribution POAS:</span>
                   <span className='font-bold text-zinc-950 dark:text-zinc-50'>
-                    {deduplicatedPoas}x (Net of COGS &amp; ₹{selectedJourney.freightCost} Freight)
+                    {deduplicatedPoas}x (Net of COGS &amp; ${selectedJourney.freightCost} Freight)
                   </span>
                 </div>
               </div>

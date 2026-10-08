@@ -21,6 +21,9 @@ import {
   IconShieldCheck,
   IconArrowRight,
   IconFileText,
+  IconWorld,
+  IconMapPin,
+  IconCurrencyDollar,
 } from '@tabler/icons-react';
 import { executeAssistantTurn } from './tools';
 import { AssistantGraphRenderer, type AssistantGraphConfig } from './assistant-graph-renderer';
@@ -432,6 +435,215 @@ export function AssistantChat({
                           <span className="text-[9px] text-zinc-500 block">Credentials</span>
                           <span className="font-semibold text-zinc-200">{toolData.auth_method}</span>
                         </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 5. CPM & Auction Clearing Intelligence Panel */}
+                  {m.toolCall?.name === 'get_cpm_analytics' && toolData && (
+                    <div className="rounded-md border border-cyan-500/30 bg-cyan-950/10 p-3 space-y-2.5 font-mono text-[10px]">
+                      <div className="flex items-center justify-between border-b border-cyan-500/20 pb-1.5">
+                        <div className="flex items-center gap-1.5 text-cyan-400 font-semibold">
+                          <IconCurrencyDollar className="size-3.5" />
+                          <span>
+                            {toolData.isIndiaTarget
+                              ? 'REGIONAL AUCTION TELEMETRY: SOUTH ASIA (INDIA HUB)'
+                              : 'GLOBAL CPM AUCTION BENCHMARKS'}
+                          </span>
+                        </div>
+                        <span className="px-1.5 py-0.5 rounded text-[9px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-bold">
+                          {toolData.isIndiaTarget && toolData.indiaMetrics
+                            ? `CPM: $${toolData.indiaMetrics.cpm.toFixed(2)} / ₹${toolData.indiaMetrics.cpmInr.toLocaleString()}`
+                            : '8 HUBS COMPILED'}
+                        </span>
+                      </div>
+
+                      {toolData.isIndiaTarget && toolData.indiaMetrics ? (
+                        <div className="space-y-2">
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-zinc-300">
+                            <div className="p-2 rounded bg-zinc-950/60 border border-zinc-800">
+                              <span className="text-[9px] text-zinc-500 block">India CPM Rate</span>
+                              <span className="font-bold text-cyan-400 text-xs">
+                                ${toolData.indiaMetrics.cpm.toFixed(2)}
+                              </span>
+                              <span className="text-[9px] text-zinc-400 block font-sans">
+                                ₹{toolData.indiaMetrics.cpmInr.toLocaleString()} / 1k Imp
+                              </span>
+                            </div>
+                            <div className="p-2 rounded bg-zinc-950/60 border border-zinc-800">
+                              <span className="text-[9px] text-zinc-500 block">CTR &amp; CPC</span>
+                              <span className="font-semibold text-zinc-200">
+                                {toolData.indiaMetrics.ctr}% CTR
+                              </span>
+                              <span className="text-[9px] text-zinc-400 block font-sans">
+                                ${toolData.indiaMetrics.cpc.toFixed(2)} CPC (₹{Math.round(toolData.indiaMetrics.cpc * 83)})
+                              </span>
+                            </div>
+                            <div className="p-2 rounded bg-zinc-950/60 border border-zinc-800">
+                              <span className="text-[9px] text-zinc-500 block">Realized ROAS</span>
+                              <span className="font-bold text-emerald-400 text-xs">
+                                {toolData.indiaMetrics.roas}x
+                              </span>
+                              <span className="text-[9px] text-zinc-400 block font-sans">
+                                Margin: {toolData.indiaMetrics.marginPct}%
+                              </span>
+                            </div>
+                            <div className="p-2 rounded bg-zinc-950/60 border border-zinc-800">
+                              <span className="text-[9px] text-zinc-500 block">Fulfillment Node</span>
+                              <span className="font-semibold text-zinc-200 truncate block text-[9px]">
+                                {toolData.indiaMetrics.fulfillmentCenter}
+                              </span>
+                              <span className="text-[9px] text-emerald-400 block truncate">
+                                SKU: {toolData.indiaMetrics.topSku}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left border-collapse">
+                            <thead>
+                              <tr className="border-b border-zinc-800 text-zinc-500 text-[9px] uppercase">
+                                <th className="py-1 px-1.5">Region / Platform</th>
+                                <th className="py-1 px-1.5 text-right">Spend</th>
+                                <th className="py-1 px-1.5 text-right">Impressions</th>
+                                <th className="py-1 px-1.5 text-right">Effective CPM</th>
+                                <th className="py-1 px-1.5 text-right">ROAS</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-zinc-900 text-zinc-300">
+                              {toolData.regionalCpms?.map((r: any) => (
+                                <tr key={r.id} className="hover:bg-zinc-900/40">
+                                  <td className="py-1 px-1.5 font-medium text-zinc-200">{r.name}</td>
+                                  <td className="py-1 px-1.5 text-right text-zinc-400">${r.spend.toLocaleString()}</td>
+                                  <td className="py-1 px-1.5 text-right text-zinc-400">{r.impressions.toLocaleString()}</td>
+                                  <td className="py-1 px-1.5 text-right font-bold text-cyan-400">${r.cpm.toFixed(2)}</td>
+                                  <td className="py-1 px-1.5 text-right font-semibold text-emerald-400">{r.roas}x</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* 6. Regional Geographic Telemetry Panel */}
+                  {m.toolCall?.name === 'get_regional_telemetry' && toolData && (
+                    <div className="rounded-md border border-emerald-500/30 bg-emerald-950/10 p-3 space-y-2.5 font-mono text-[10px]">
+                      <div className="flex items-center justify-between border-b border-emerald-500/20 pb-1.5">
+                        <div className="flex items-center gap-1.5 text-emerald-400 font-semibold">
+                          <IconWorld className="size-3.5" />
+                          <span>
+                            {toolData.selectedRegion
+                              ? `REGIONAL TELEMETRY: ${toolData.selectedRegion.name.toUpperCase()}`
+                              : 'GLOBAL GEOGRAPHIC TELEMETRY MATRIX'}
+                          </span>
+                        </div>
+                        <span className="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">
+                          {toolData.selectedRegion
+                            ? `ROAS: ${toolData.selectedRegion.roas.toFixed(2)}x`
+                            : `TOTAL REV: $${toolData.totalRegionalRevenue?.toLocaleString()}`}
+                        </span>
+                      </div>
+
+                      {toolData.selectedRegion ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-zinc-300">
+                          <div className="p-2 rounded bg-zinc-950/60 border border-zinc-800">
+                            <span className="text-[9px] text-zinc-500 block">Ad Spend</span>
+                            <span className="font-semibold text-zinc-200">${toolData.selectedRegion.spend.toLocaleString()}</span>
+                          </div>
+                          <div className="p-2 rounded bg-zinc-950/60 border border-zinc-800">
+                            <span className="text-[9px] text-zinc-500 block">Gross Revenue</span>
+                            <span className="font-bold text-emerald-400 text-xs">${toolData.selectedRegion.revenue.toLocaleString()}</span>
+                          </div>
+                          <div className="p-2 rounded bg-zinc-950/60 border border-zinc-800">
+                            <span className="text-[9px] text-zinc-500 block">Realized Profit</span>
+                            <span className="font-semibold text-emerald-400">${toolData.selectedRegion.profit.toFixed(2)}</span>
+                          </div>
+                          <div className="p-2 rounded bg-zinc-950/60 border border-zinc-800">
+                            <span className="text-[9px] text-zinc-500 block">Fulfillment Hub</span>
+                            <span className="font-semibold text-zinc-200 truncate block text-[9px]">{toolData.selectedRegion.fulfillmentCenter}</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left border-collapse">
+                            <thead>
+                              <tr className="border-b border-zinc-800 text-zinc-500 text-[9px] uppercase">
+                                <th className="py-1 px-1.5">Region Hub</th>
+                                <th className="py-1 px-1.5 text-right">Spend</th>
+                                <th className="py-1 px-1.5 text-right">Revenue</th>
+                                <th className="py-1 px-1.5 text-right">Margin %</th>
+                                <th className="py-1 px-1.5 text-right">ROAS</th>
+                                <th className="py-1 px-1.5 text-left">Fulfillment Node</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-zinc-900 text-zinc-300">
+                              {toolData.allRegions?.map((r: any) => (
+                                <tr key={r.id} className="hover:bg-zinc-900/40">
+                                  <td className="py-1 px-1.5 font-medium text-zinc-200">{r.name}</td>
+                                  <td className="py-1 px-1.5 text-right text-zinc-400">${r.spend.toLocaleString()}</td>
+                                  <td className="py-1 px-1.5 text-right text-zinc-200">${r.revenue.toLocaleString()}</td>
+                                  <td className="py-1 px-1.5 text-right text-zinc-400">{(r.marginRate * 100).toFixed(0)}%</td>
+                                  <td className="py-1 px-1.5 text-right font-bold text-emerald-400">{r.roas.toFixed(2)}x</td>
+                                  <td className="py-1 px-1.5 text-zinc-400 truncate max-w-[140px] text-[9px]">{r.fulfillmentCenter}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* 7. Campaign Audit Ledger Panel */}
+                  {m.toolCall?.name === 'get_campaign_analytics' && toolData?.campaigns && (
+                    <div className="rounded-md border border-zinc-800 bg-zinc-950/60 p-3 space-y-2 font-mono text-[10px]">
+                      <div className="flex items-center justify-between border-b border-zinc-800 pb-1.5 text-zinc-300">
+                        <span className="font-semibold flex items-center gap-1.5">
+                          <IconBolt className="size-3.5 text-amber-400" />
+                          <span>ACTIVE CAMPAIGN AUDIT LEDGER</span>
+                        </span>
+                        <span className="text-zinc-400 text-[9px]">
+                          Matched: {toolData.matchedCount} of {toolData.totalCampaigns}
+                        </span>
+                      </div>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                          <thead>
+                            <tr className="border-b border-zinc-800 text-zinc-500 text-[9px] uppercase">
+                              <th className="py-1 px-1.5">Product</th>
+                              <th className="py-1 px-1.5">Platform</th>
+                              <th className="py-1 px-1.5 text-right">Daily Spend</th>
+                              <th className="py-1 px-1.5 text-right">ROAS</th>
+                              <th className="py-1 px-1.5 text-right">Inventory</th>
+                              <th className="py-1 px-1.5 text-center">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-zinc-900 text-zinc-300">
+                            {toolData.campaigns.map((c: any) => (
+                              <tr key={c.campaign} className="hover:bg-zinc-900/40">
+                                <td className="py-1 px-1.5 font-medium text-zinc-200">{c.productName}</td>
+                                <td className="py-1 px-1.5 uppercase text-zinc-400">{c.platform}</td>
+                                <td className="py-1 px-1.5 text-right text-zinc-300">${c.currentDailySpend?.toLocaleString()}</td>
+                                <td className="py-1 px-1.5 text-right font-bold text-emerald-400">{c.roas}x</td>
+                                <td className="py-1 px-1.5 text-right text-zinc-300">{c.inventory} u</td>
+                                <td className="py-1 px-1.5 text-center">
+                                  <span
+                                    className={`px-1.5 py-0.5 rounded text-[8px] font-bold ${
+                                      c.roasStatus === 'ABOVE_TARGET'
+                                        ? 'bg-emerald-950 text-emerald-400 border border-emerald-500/30'
+                                        : 'bg-rose-950 text-rose-400 border border-rose-500/30'
+                                    }`}
+                                  >
+                                    {c.roasStatus}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                   )}

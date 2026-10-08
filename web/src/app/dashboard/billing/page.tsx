@@ -91,10 +91,10 @@ export default function BillingPage() {
               </Badge>
               <CardTitle className='text-xl font-bold font-sans'>Autonomous Pro</CardTitle>
               <CardDescription className='text-xs'>
-                For high-velocity DTC brands spending ₹5L - ₹20L/mo.
+                For high-velocity DTC brands spending $5L - $20L/mo.
               </CardDescription>
               <div className='pt-3 font-mono'>
-                <span className='text-3xl font-bold text-foreground'>₹24,999</span>
+                <span className='text-3xl font-bold text-foreground'>$24,999</span>
                 <span className='text-xs text-muted-foreground'> / month</span>
               </div>
             </CardHeader>
@@ -140,10 +140,10 @@ export default function BillingPage() {
               </Badge>
               <CardTitle className='text-xl font-bold font-sans'>Autonomous Enterprise</CardTitle>
               <CardDescription className='text-xs'>
-                For omnichannel enterprises spending ₹20L - ₹1Cr+/mo.
+                For omnichannel enterprises spending $20L - $1Cr+/mo.
               </CardDescription>
               <div className='pt-3 font-mono'>
-                <span className='text-3xl font-bold text-foreground'>₹79,999</span>
+                <span className='text-3xl font-bold text-foreground'>$79,999</span>
                 <span className='text-xs text-muted-foreground'> / month</span>
               </div>
             </CardHeader>
@@ -301,7 +301,7 @@ export default function BillingPage() {
                     <td className='py-3 px-4 text-muted-foreground'>{inv.date}</td>
                     <td className='py-3 px-4 text-muted-foreground'>{inv.method}</td>
                     <td className='py-3 px-4 text-right font-bold text-foreground'>
-                      ₹{inv.amount.toLocaleString('en-IN')}
+                      ${inv.amount.toLocaleString('en-US')}
                     </td>
                     <td className='py-3 px-4 text-center'>
                       <Badge variant='outline' className='bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 text-[10px]'>

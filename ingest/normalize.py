@@ -49,7 +49,7 @@ DEFAULT_FX_RATES_TO_INR: Dict[str, float] = {
 def cost_micros_to_inr(cost_micros: int | float) -> float:
     """Convert Google Ads cost_micros into standard INR decimal.
 
-    1,000,000 micros = ₹1.00 INR
+    1,000,000 micros = $1.00 INR
     """
     if not cost_micros:
         return 0.0

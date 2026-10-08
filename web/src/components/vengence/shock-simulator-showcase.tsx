@@ -14,25 +14,25 @@ const SCENARIOS = [
     tag: 'ERP Inventory Bleed',
     severity: 'CRITICAL',
     event: 'ERP warehouse inventory reaches 0 units on hero SKU 315122-001',
-    traditionalOutcome: 'Ad platforms continue burning ₹2,200/day driving traffic to an empty product page.',
+    traditionalOutcome: 'Ad platforms continue burning $2,200/day driving traffic to an empty product page.',
     autonomousAction: 'Instant Circuit Breaker kills spend in <15 mins. Capital redirected to Google PMax React Infinity (+3.6x ROAS).',
-    savedWaste: '₹15,400 / week',
+    savedWaste: '$15,400 / week',
     speed: '< 15 mins',
     metricType: 'Spend Cut',
-    delta: '-₹2,200/day'
+    delta: '-$2,200/day'
   },
   {
     id: 'cpm-spike',
     title: 'Meta Sneaker Auction CPM Surge (+45%)',
     tag: 'Auction Inflation',
     severity: 'HIGH',
-    event: 'Holiday competitive rush pushes Meta Advantage+ CPM from ₹9.50 to ₹14.20, dropping ROAS below 1.8x floor.',
+    event: 'Holiday competitive rush pushes Meta Advantage+ CPM from $9.50 to $14.20, dropping ROAS below 1.8x floor.',
     traditionalOutcome: 'Marketer notices 48 hours later after daily spend burns margin.',
-    autonomousAction: 'Optimizer shifts ₹3,500/day into Amazon Sponsored Products & Google Shopping where margin elasticity is preserved.',
-    savedWaste: '₹9,200 / week',
+    autonomousAction: 'Optimizer shifts $3,500/day into Amazon Sponsored Products & Google Shopping where margin elasticity is preserved.',
+    savedWaste: '$9,200 / week',
     speed: 'Real-time',
     metricType: 'Reallocated',
-    delta: '₹3,500/day'
+    delta: '$3,500/day'
   },
   {
     id: 'creative-fatigue',
@@ -42,7 +42,7 @@ const SCENARIOS = [
     event: 'Hero TikTok video frequency exceeds 5.2. Hook rate collapses, CTR drops 60%, doubling CAC.',
     traditionalOutcome: 'Fatigued video continues eating 40% of TikTok ad budget.',
     autonomousAction: 'Auto-pauses exhausted ad set, triggers creative refresh alert, and reroutes spend to high-vitality Meta Reels.',
-    savedWaste: '₹5,200 / week',
+    savedWaste: '$5,200 / week',
     speed: 'Autonomous',
     metricType: 'Protected',
     delta: '+31% CTR'
@@ -55,10 +55,10 @@ const SCENARIOS = [
     event: 'Rival seller launches 25% price drop on Amazon, depressing Nike Zoom Fly conversion from 4.8% to 2.8%.',
     traditionalOutcome: 'Amazon Sponsored spend continues bidding high for unprofitable conversions.',
     autonomousAction: 'Scipy convex optimizer re-solves: shifts capital to Nike Direct Brand Search where gross margin is 68%.',
-    savedWaste: '₹6,800 / week',
+    savedWaste: '$6,800 / week',
     speed: '< 30 mins',
     metricType: 'Shifted',
-    delta: '₹6,800/wk'
+    delta: '$6,800/wk'
   }
 ];
 

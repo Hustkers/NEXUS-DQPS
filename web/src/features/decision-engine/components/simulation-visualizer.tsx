@@ -339,7 +339,7 @@ export function SimulationVisualizer({
                   tickLine={false}
                   axisLine={false}
                   tick={{ fill: '#71717a', fontSize: 9 }}
-                  tickFormatter={(v) => `₹${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
+                  tickFormatter={(v) => `$${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
                 />
                 <Tooltip
                   content={({ active, payload, label }) => {
@@ -349,8 +349,8 @@ export function SimulationVisualizer({
                       return (
                         <div className='rounded border border-border bg-card p-2 text-xs font-mono shadow'>
                           <div className='font-bold text-[10px] text-muted-foreground'>{label}</div>
-                          <div className='text-rose-500 font-semibold'>No Action: ₹{noAction.toLocaleString('en-IN')}</div>
-                          <div className='text-emerald-600 dark:text-emerald-400 font-semibold'>Mitigated: ₹{mit.toLocaleString('en-IN')}</div>
+                          <div className='text-rose-500 font-semibold'>No Action: ${noAction.toLocaleString('en-US')}</div>
+                          <div className='text-emerald-600 dark:text-emerald-400 font-semibold'>Mitigated: ${mit.toLocaleString('en-US')}</div>
                         </div>
                       );
                     }

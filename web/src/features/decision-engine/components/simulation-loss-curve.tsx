@@ -71,7 +71,7 @@ export function SimulationLossCurve({
               tickLine={false}
               axisLine={false}
               tick={{ fill: '#71717a', fontSize: 10 }}
-              tickFormatter={(v) => `₹${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
+              tickFormatter={(v) => `$${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
             />
             <Tooltip
               content={({ active, payload, label }) => {
@@ -88,15 +88,15 @@ export function SimulationLossCurve({
                       <div className='space-y-1 text-[11px]'>
                         <div className='flex justify-between gap-4 text-rose-500 font-semibold'>
                           <span>No Action:</span>
-                          <span>₹{noActionVal.toLocaleString('en-IN')}</span>
+                          <span>${noActionVal.toLocaleString('en-US')}</span>
                         </div>
                         <div className='flex justify-between gap-4 text-foreground font-medium'>
                           <span>Mitigated:</span>
-                          <span>₹{mitigatedVal.toLocaleString('en-IN')}</span>
+                          <span>${mitigatedVal.toLocaleString('en-US')}</span>
                         </div>
                         <div className='flex justify-between gap-4 pt-1 border-t border-border/40 text-[10px] text-emerald-600 dark:text-emerald-400 font-bold'>
                           <span>Loss Avoided:</span>
-                          <span>+₹{saved.toLocaleString('en-IN')}</span>
+                          <span>+${saved.toLocaleString('en-US')}</span>
                         </div>
                       </div>
                     </div>
@@ -128,7 +128,7 @@ export function SimulationLossCurve({
       <div className='pt-1 text-[10px] text-muted-foreground flex items-center justify-between'>
         <span>Day 1 through Day {horizonDays} simulation envelope</span>
         <span className='font-bold text-emerald-600 dark:text-emerald-400'>
-          +₹{financialImpact.lossAvoided.toLocaleString('en-IN')} Capital Protected
+          +${financialImpact.lossAvoided.toLocaleString('en-US')} Capital Protected
         </span>
       </div>
     </div>

@@ -463,12 +463,12 @@ export function TrackingDashboard() {
                 <div className="text-xs space-y-1.5 pt-1">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Attributed Revenue:</span>
-                    <span className="font-semibold">₹{activeCampPerf.revenue.toLocaleString()}</span>
+                    <span className="font-semibold">${activeCampPerf.revenue.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">True Contribution Profit:</span>
                     <span className={cn('font-semibold', activeCampPerf.profit >= 0 ? 'text-emerald-600' : 'text-rose-500')}>
-                      ₹{activeCampPerf.profit.toLocaleString()}
+                      ${activeCampPerf.profit.toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -538,11 +538,11 @@ export function TrackingDashboard() {
                     <td className="py-2.5 px-3 text-right">{c.add_to_carts}</td>
                     <td className="py-2.5 px-3 text-right font-semibold text-emerald-600">{c.purchases}</td>
                     <td className="py-2.5 px-3 text-right font-medium">{(c.conversion_rate * 100).toFixed(1)}%</td>
-                    <td className="py-2.5 px-3 text-right text-muted-foreground">₹{c.spend.toLocaleString()}</td>
-                    <td className="py-2.5 px-3 text-right font-medium">₹{c.revenue.toLocaleString()}</td>
+                    <td className="py-2.5 px-3 text-right text-muted-foreground">${c.spend.toLocaleString()}</td>
+                    <td className="py-2.5 px-3 text-right font-medium">${c.revenue.toLocaleString()}</td>
                     <td className="py-2.5 px-3 text-right font-semibold">
                       <span className={c.profit >= 0 ? 'text-emerald-600' : 'text-rose-500'}>
-                        ₹{c.profit.toLocaleString()}
+                        ${c.profit.toLocaleString()}
                       </span>
                     </td>
                     <td className="py-2.5 px-3 text-center">
@@ -727,7 +727,7 @@ export function TrackingDashboard() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Completed Purchases:</span>
-                    <span className="font-semibold text-emerald-600">{timelineData.total_orders} (₹{Number(timelineData.total_spend || 0).toLocaleString()})</span>
+                    <span className="font-semibold text-emerald-600">{timelineData.total_orders} (${Number(timelineData.total_spend || 0).toLocaleString()})</span>
                   </div>
                   <div className="pt-2 border-t flex justify-end">
                     <Button

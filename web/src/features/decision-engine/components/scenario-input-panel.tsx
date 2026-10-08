@@ -106,7 +106,7 @@ export function ScenarioInputPanel({
 
             <div className='space-y-1'>
               <label className='text-[10px] text-muted-foreground uppercase'>
-                Baseline Daily Spend (₹)
+                Baseline Daily Spend ($)
               </label>
               <input
                 type='number'
@@ -135,7 +135,7 @@ export function ScenarioInputPanel({
 
             <div className='space-y-1'>
               <label className='text-[10px] text-muted-foreground uppercase'>
-                AOV (₹)
+                AOV ($)
               </label>
               <input
                 type='number'
@@ -173,14 +173,14 @@ export function ScenarioInputPanel({
               Meta Advantage+ Sneaker Placements (AO2924-401)
             </div>
             <div className='text-[11px] text-muted-foreground'>
-              Holiday auction crowding inflates 1,000 impression costs from ₹9.50 baseline.
+              Holiday auction crowding inflates 1,000 impression costs from $9.50 baseline.
             </div>
           </div>
 
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
             <div className='space-y-1'>
               <label className='text-[10px] text-muted-foreground uppercase'>
-                Baseline CPM (₹)
+                Baseline CPM ($)
               </label>
               <input
                 type='number'
@@ -205,7 +205,7 @@ export function ScenarioInputPanel({
                 className='w-full rounded-md border border-amber-500/40 bg-card px-2.5 py-1.5 text-xs text-foreground font-bold focus:ring-1 focus:ring-amber-500'
               />
               <span className='text-[9px] text-amber-600 dark:text-amber-400 font-semibold'>
-                Current Shock CPM: ₹{(inputs.baselineCpm * inputs.cpmMultiplier).toFixed(2)}
+                Current Shock CPM: ${(inputs.baselineCpm * inputs.cpmMultiplier).toFixed(2)}
               </span>
             </div>
           </div>
@@ -213,7 +213,7 @@ export function ScenarioInputPanel({
           <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
             <div className='space-y-1'>
               <label className='text-[10px] text-muted-foreground uppercase'>
-                Meta Daily Spend (₹)
+                Meta Daily Spend ($)
               </label>
               <input
                 type='number'
@@ -302,7 +302,7 @@ export function ScenarioInputPanel({
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
             <div className='space-y-1'>
               <label className='text-[10px] text-muted-foreground uppercase'>
-                Daily Spend (₹)
+                Daily Spend ($)
               </label>
               <input
                 type='number'
@@ -315,7 +315,7 @@ export function ScenarioInputPanel({
 
             <div className='space-y-1'>
               <label className='text-[10px] text-muted-foreground uppercase'>
-                AOV (₹)
+                AOV ($)
               </label>
               <input
                 type='number'
@@ -346,7 +346,7 @@ export function ScenarioInputPanel({
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
             <div className='space-y-1'>
               <label className='text-[10px] text-muted-foreground uppercase'>
-                Official Nike Price (₹)
+                Official Nike Price ($)
               </label>
               <input
                 type='number'
@@ -359,7 +359,7 @@ export function ScenarioInputPanel({
 
             <div className='space-y-1'>
               <label className='text-[10px] text-muted-foreground uppercase'>
-                Competitor Price (₹)
+                Competitor Price ($)
               </label>
               <input
                 type='number'
@@ -391,7 +391,7 @@ export function ScenarioInputPanel({
 
             <div className='space-y-1'>
               <label className='text-[10px] text-muted-foreground uppercase'>
-                Daily Spend (₹)
+                Daily Spend ($)
               </label>
               <input
                 type='number'
