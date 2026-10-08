@@ -1,0 +1,9 @@
+# Exclude cleanup/reference files from Vercel build
+web/__CLEANUP__
+scratch/
+
+# Exclude Bun configuration so Vercel uses pnpm
+bun.lock
+bunfig.toml
+web/bun.lock
+web/bunfig.toml

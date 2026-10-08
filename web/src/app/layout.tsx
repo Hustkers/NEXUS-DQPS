@@ -31,9 +31,9 @@ const ranade = localFont({
 });
 
 const orbitron = localFont({
-  src: '../../public/fonts/orbitron/Orbitron-Variable.woff2',
+  src: '../../public/fonts/ranade/Ranade-Variable.woff2',
   variable: '--font-orbitron',
-  weight: '400 900',
+  weight: '100 700',
   display: 'swap'
 });
 
@@ -116,6 +116,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         className={cn(
           'bg-background font-sans antialiased',
           ranade.variable,
+          orbitron.variable,
           fontVariables
         )}
       >
