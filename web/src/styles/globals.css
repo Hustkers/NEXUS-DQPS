@@ -17,11 +17,15 @@
   * {
     @apply border-border outline-ring;
   }
-  html,
-  body {
+  html {
     @apply bg-background text-foreground;
     max-width: 100%;
-    overflow-x: clip;
+    overflow-x: hidden;
+  }
+  body {
+    @apply bg-background text-foreground;
+    min-height: 100vh;
+    max-width: 100%;
   }
 
   /* Global scrollbar styling to match ScrollArea */

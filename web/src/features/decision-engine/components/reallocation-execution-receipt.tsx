@@ -64,28 +64,28 @@ export function ReallocationExecutionReceipt({
         <div className='flex justify-between items-center py-1 border-b border-[#000000]'>
           <span className='text-[#8A8A8A]'>Capital Moved:</span>
           <span className='font-bold text-[#FFFFFF]'>
-            ₹{Math.round(capitalMoved).toLocaleString('en-IN')}/day
+            ${Math.round(capitalMoved).toLocaleString('en-US')}/day
           </span>
         </div>
 
         <div className='flex justify-between items-center py-1 border-b border-[#000000]'>
           <span className='text-[#8A8A8A]'>Previous Allocation:</span>
           <span className='font-medium text-[#8A8A8A]'>
-            ₹{Math.round(destination.currentSpend).toLocaleString('en-IN')}/day
+            ${Math.round(destination.currentSpend).toLocaleString('en-US')}/day
           </span>
         </div>
 
         <div className='flex justify-between items-center py-1 border-b border-[#000000]'>
           <span className='text-[#8A8A8A]'>New Allocation:</span>
           <span className='font-bold text-[#FFFFFF]'>
-            ₹{Math.round(destination.newSpend).toLocaleString('en-IN')}/day
+            ${Math.round(destination.newSpend).toLocaleString('en-US')}/day
           </span>
         </div>
 
         <div className='flex justify-between items-center py-1 border-b border-[#000000]'>
           <span className='text-[#8A8A8A]'>Expected Daily Lift:</span>
           <span className='font-bold text-[#FFFFFF]'>
-            +₹{Math.round(expectedDailyLift).toLocaleString('en-IN')}/day
+            +${Math.round(expectedDailyLift).toLocaleString('en-US')}/day
           </span>
         </div>
 
@@ -107,7 +107,7 @@ export function ReallocationExecutionReceipt({
           <span className='text-[#8A8A8A]'>Audit Status:</span>
           <span className='font-bold bg-[#FFFFFF] text-[#000000] px-1.5 py-0.5 rounded text-[11px] flex items-center gap-1'>
             <Icons.check className='size-3 text-[#000000]' />
-            EXECUTED ✓
+            EXECUTED
           </span>
         </div>
       </div>

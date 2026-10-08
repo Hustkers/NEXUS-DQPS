@@ -13,14 +13,14 @@ export interface GithubGlobeProps {
 }
 
 const DEFAULT_MARKERS: Marker[] = [
-  { location: [37.7749, -122.4194], size: 0.09, color: [1.0, 1.0, 1.0] }, // SF (Meta HQ / US-West)
-  { location: [40.7128, -74.006], size: 0.08, color: [1.0, 1.0, 1.0] }, // NY (Google Ads / US-East)
-  { location: [51.5074, -0.1278], size: 0.07, color: [0.54, 0.54, 0.54] }, // London (EMEA Hub)
-  { location: [35.6762, 139.6503], size: 0.08, color: [0.54, 0.54, 0.54] }, // Tokyo (APAC Hub)
-  { location: [1.3521, 103.8198], size: 0.07, color: [0.54, 0.54, 0.54] }, // Singapore (TikTok SEA)
-  { location: [19.076, 72.8777], size: 0.07, color: [0.54, 0.54, 0.54] }, // Mumbai (India Direct)
-  { location: [50.1109, 8.6821], size: 0.06, color: [0.54, 0.54, 0.54] }, // Frankfurt (EU Central)
-  { location: [-33.8688, 151.2093], size: 0.06, color: [0.54, 0.54, 0.54] }, // Sydney (Oceania)
+  { location: [37.7749, -122.4194], size: 0.038, color: [1.0, 1.0, 1.0] }, // SF (Meta HQ / US-West)
+  { location: [40.7128, -74.006], size: 0.035, color: [1.0, 1.0, 1.0] }, // NY (Google Ads / US-East)
+  { location: [51.5074, -0.1278], size: 0.032, color: [0.65, 0.65, 0.65] }, // London (EMEA Hub)
+  { location: [35.6762, 139.6503], size: 0.035, color: [0.65, 0.65, 0.65] }, // Tokyo (APAC Hub)
+  { location: [1.3521, 103.8198], size: 0.032, color: [0.65, 0.65, 0.65] }, // Singapore (TikTok SEA)
+  { location: [19.076, 72.8777], size: 0.032, color: [0.65, 0.65, 0.65] }, // Mumbai (India Direct)
+  { location: [50.1109, 8.6821], size: 0.03, color: [0.65, 0.65, 0.65] }, // Frankfurt (EU Central)
+  { location: [-33.8688, 151.2093], size: 0.03, color: [0.65, 0.65, 0.65] }, // Sydney (Oceania)
 ];
 
 const DEFAULT_ARCS: Arc[] = [
@@ -71,9 +71,9 @@ export function GithubGlobe({
       markers: DEFAULT_MARKERS,
       arcs: DEFAULT_ARCS,
       arcColor: accentColor,
-      arcWidth: 0.8,
+      arcWidth: 0.45,
       arcHeight: 0.35,
-      scale: 1.05,
+      scale: 1.02,
     });
 
     let animationFrameId: number;
@@ -128,7 +128,7 @@ export function GithubGlobe({
         aspectRatio: '1 / 1',
       }}
       className={cn(
-        'relative flex items-center justify-center overflow-hidden bg-[#000000] shrink-0 rounded-2xl select-none',
+        'relative flex items-center justify-center select-none bg-transparent shrink-0',
         className
       )}
       onMouseEnter={() => setIsHovered(true)}
@@ -151,23 +151,23 @@ export function GithubGlobe({
 
       {/* Atmospheric Ring Overlay (Monochrome) */}
       <div className='pointer-events-none absolute inset-0 flex items-center justify-center'>
-        <div className='size-[82%] rounded-full ring-1 ring-[#8A8A8A]/30 ring-offset-2 ring-offset-transparent' />
+        <div className='size-[82%] rounded-full ring-1 ring-zinc-500/20 ring-offset-2 ring-offset-transparent' />
       </div>
 
       {/* Interactive Telemetry HUD tags floating over Globe */}
       <div className='pointer-events-none absolute bottom-3 left-4 flex flex-col gap-1 text-[10px] font-mono'>
-        <div className='flex items-center gap-1.5 text-[#FFFFFF] bg-[#000000] px-2.5 py-1 rounded border border-[#1A1A1A]'>
-          <span className='size-1.5 rounded-full bg-[#FFFFFF]' />
+        <div className='flex items-center gap-1.5 text-zinc-100 bg-zinc-950/80 backdrop-blur-sm px-2.5 py-1 rounded border border-zinc-800 shadow-sm'>
+          <span className='size-1.5 rounded-full bg-zinc-100' />
           <span className='font-bold'>GLOBAL TELEMETRY STREAM</span>
         </div>
-        <div className='text-[#8A8A8A] text-[9px] px-1'>
+        <div className='text-zinc-500 text-[9px] px-1'>
           Lat: 37.77° N • Lon: -122.42° W • 8 Edge Hubs Active
         </div>
       </div>
 
-      <div className='pointer-events-none absolute top-3 right-4 flex items-center gap-2 text-[10px] font-mono text-[#FFFFFF] bg-[#000000] px-2.5 py-1 rounded border border-[#1A1A1A]'>
-        <span className='size-1.5 rounded-full bg-[#FFFFFF]' />
-        <span>github.com/globe WebGL</span>
+      <div className='pointer-events-none absolute top-3 right-4 flex items-center gap-2 text-[10px] font-mono text-zinc-300 bg-zinc-950/80 backdrop-blur-sm px-2.5 py-1 rounded border border-zinc-800 shadow-sm'>
+        <span className='size-1.5 rounded-full bg-zinc-300' />
+        <span>NEXUS 3D WebGL</span>
       </div>
     </div>
   );

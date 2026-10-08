@@ -7,18 +7,18 @@ export const SEED_MARKET_SIGNALS: MarketSignal[] = [
     timestamp: new Date().toISOString(),
     dataType: 'SEARCH_DEMAND',
     title: 'Surge in Commercial Intent for Performance Footwear & Running Gear',
-    description: 'High-intent search queries for marathon, cushioning, and performance running shoes rose +18.4% MoM across Delhi NCR, Mumbai, and Bengaluru.',
+    description: 'High-intent search queries for marathon, cushioning, and performance running shoes rose +18.4% MoM across US Tier-1 markets (New York, Los Angeles, Chicago).',
     impact: 'POSITIVE',
     confidence: 0.92,
     isLive: true
   },
   {
     id: 'mkt-sig-002',
-    source: 'Meta Ads Manager Auction Benchmark Report (Q3/Q4 India)',
+    source: 'Meta Ads Manager Auction Benchmark Report (Q3/Q4 North America)',
     timestamp: new Date().toISOString(),
     dataType: 'CPC_TREND',
     title: 'Meta CPM Inflation in Broad Open Audiences',
-    description: 'Broad lifestyle CPMs on Instagram Reels and Feeds increased by 14.2% due to festive inventory competition. Lookalike and remarketing CPMs remain steady.',
+    description: 'Broad lifestyle CPMs on Instagram Reels and Feeds increased by 14.2% due to seasonal Q4 inventory competition. Lookalike and remarketing CPMs remain steady.',
     impact: 'NEGATIVE',
     confidence: 0.88,
     isLive: true
@@ -47,7 +47,7 @@ export const SEED_MARKET_SIGNALS: MarketSignal[] = [
   },
   {
     id: 'mkt-sig-005',
-    source: 'E-Commerce Festive Seasonal Demand Model',
+    source: 'E-Commerce Holiday & Marathon Seasonal Demand Model',
     timestamp: new Date().toISOString(),
     dataType: 'SEASONAL_TREND',
     title: 'Pre-Winter Fitness & Marathon Training Spike',
@@ -77,8 +77,8 @@ export function assessStrategyRisks(
   const pNorm = platform.toLowerCase();
   const risks: StrategyRisk[] = [];
 
-  // Risk 1: Unsegmented Budget Exhaustion (>₹65k threshold on Meta)
-  if (pNorm.includes('meta') && budget > 50000) {
+  // Risk 1: Unsegmented Budget Exhaustion (>$15k threshold on Meta)
+  if (pNorm.includes('meta') && budget > 8000) {
     risks.push({
       riskId: `risk-${strategyId}-01`,
       strategyId,
@@ -86,10 +86,10 @@ export function assessStrategyRisks(
       probability: 'HIGH',
       impact: 'HIGH',
       severity: 'CRITICAL',
-      evidence: 'User account history shows campaigns scaling above ₹65,000 on broad Meta experienced 46% ROAS drops due to rapid audience exhaustion.',
-      triggerCondition: 'Daily spend pace exceeds ₹2,200/day on open audiences without segment exclusions.',
-      preventiveAction: 'Cap ad set spend at ₹1,500/day per ad set; enforce strict 1% Lookalike exclusions from 180-day purchaser list.',
-      contingencyAction: 'Trigger automatic bid cap adjustment (-15%) or shift 30% of budget to Google Search if CPA exceeds ₹650.',
+      evidence: 'Account history shows campaigns scaling above $15,000 on broad Meta experienced 46% ROAS drops due to rapid audience exhaustion.',
+      triggerCondition: 'Daily spend pace exceeds $650/day on open audiences without segment exclusions.',
+      preventiveAction: 'Cap ad set spend at $450/day per ad set; enforce strict 1% Lookalike exclusions from 180-day purchaser list.',
+      contingencyAction: 'Trigger automatic bid cap adjustment (-15%) or shift 30% of budget to Google Search if CPA exceeds $52.00.',
       confidence: 0.91
     });
   }
@@ -122,7 +122,7 @@ export function assessStrategyRisks(
       impact: 'MEDIUM',
       severity: 'MEDIUM',
       evidence: 'Market signal reveals +14% CPM/CPC inflation in top metro search auctions for running footwear.',
-      triggerCondition: 'Actual CPC exceeds target threshold of ₹4.50 by > 20% over 48 consecutive hours.',
+      triggerCondition: 'Actual CPC exceeds target threshold of $2.85 by > 20% over 48 consecutive hours.',
       preventiveAction: 'Use Target ROAS or Maximize Conversions with a strict CPA cap rather than unconstrained Manual CPC.',
       contingencyAction: 'Negate high-cost broad match queries and shift allocation toward exact high-intent long-tail keywords.',
       confidence: 0.84

@@ -154,3 +154,32 @@
 - [x] 10.8 Script Act 3 (0:60 - 0:90): Trigger live ElevenLabs voice briefing, deliver verbal executive authorization ("Authorize reallocation"), and showcase live UI update.
 - [x] 10.9 Create a one-command master launch script (`./start_demo.sh`) that spins up the FastAPI backend, seeds telemetry, and serves the web console.
 - [x] 10.10 Rehearse and record a backup video walkthrough of the 90-second pitch flow to safeguard against hardware failure during judging rounds.
+
+
+---
+
+## Left Sidebar Navigation Routes
+
+Summary of all active left sidebar routes defined in [`web/src/config/nav-config.ts`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/config/nav-config.ts) and rendered in [`AppSidebar`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/components/layout/app-sidebar.tsx):
+
+### Group 1: Autonomous Decision Engine
+| Status | Route Name | Route URL | Keyboard Shortcut | Icon ID | Implementation / Component |
+| :---: | :--- | :--- | :---: | :---: | :--- |
+| [x] (9.8/10) | **Autonomous Ad Learning Engine** | [`/dashboard/autonomous-engine`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/autonomous-engine/page.tsx) | `a` `l` | `sparkles` | `AutonomousEngineConsole` |
+| [x] (9.8/10) | **AI Strategy Engine** | [`/dashboard/strategy-engine`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/strategy-engine/page.tsx) | `a` `e` | `bot` | `StrategyEngineConsole` |
+| [x] (9.8/10) | **3D Global Intelligence** | [`/dashboard/globe`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/globe/page.tsx) | `3` `g` | `globe` | `GithubGlobe` + `GlobePulse` |
+| [x] (9.8/10) | **Diagnostic Anomalies & RCA** | [`/dashboard/anomalies`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/anomalies/page.tsx) | `r` `c` | `warning` | Anomaly RCA Workbench |
+| [x] (9.8/10) | **ROAS & Health Gauges** | [`/dashboard/gauges`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/gauges/page.tsx) | `r` `g` | `trendingUp` | `RoasGauge` & Channel Breakdown |
+| [x] (9.8/10) | **Budget Reallocation Feed** | [`/dashboard/reallocations`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/reallocations/page.tsx) | `b` `r` | `adjustments` | `ReallocationFeed` |
+| [ ] | **Ad Playground** | [`/dashboard/playground`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/playground/page.tsx) | `a` `p` | `sparkles` | `AdPlaygroundConsole` |
+| [ ] | **Decision Ledger & Learning** | [`/dashboard/ledger`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/ledger/page.tsx) | `d` `l` | `check` | `DecisionLedgerTable` |
+| [ ] | **Visitor Tracking & Attribution** | [`/dashboard/tracking`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/tracking/page.tsx) | `v` `t` | `search` | `TrackingDashboard` |
+
+### Group 2: Simulation & Catalog
+| Status | Route Name | Route URL | Keyboard Shortcut | Icon ID | Implementation / Component |
+| :---: | :--- | :--- | :---: | :---: | :--- |
+| [ ] | **Fingerprint Identity Tracker** | [`/dashboard/fingerprint`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/fingerprint/page.tsx) | `f` `p` | `fingerprint` | `FingerprintTrackerDemo` |
+| [ ] | **Scenario Shock Sandbox** | [`/dashboard/simulator`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/simulator/page.tsx) | `s` `s` | `sparkles` | `ScenarioSandbox` |
+| [ ] | **Nike Footwear Catalog** | [`/dashboard/product`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/product/page.tsx) | `n` `p` | `kanban` | `ProductTable` & Product Cards |
+| [ ] | **SKU & Channel Matrix** | [`/dashboard/matrix`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/matrix/page.tsx) | `s` `m` | `product` | Minimalist SKU/Channel Grid |
+| [ ] | **Live Schema Normalizer** | [`/dashboard/normalization`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/normalization/page.tsx) | `s` `n` | `normalization` | `NormalizationShowcase` |

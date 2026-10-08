@@ -34,6 +34,8 @@ export function BackgroundShader() {
           hue={0}
           saturation={1.0}
           brightness={1.0}
+          className='pointer-events-none'
+          style={{ pointerEvents: 'none' }}
         />
       </div>
     </div>

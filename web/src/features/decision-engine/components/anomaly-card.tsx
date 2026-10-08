@@ -123,7 +123,7 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, onViewReceipt, isM
               )}
             </div>
             <div className='flex items-center gap-2 text-[11px] font-mono text-muted-foreground mt-0.5'>
-              <span className='text-foreground'>₹{anomaly.spend.toLocaleString()}/d</span>
+              <span className='text-foreground'>${anomaly.spend.toLocaleString()}/d</span>
               <span>•</span>
               <span className='font-bold text-foreground'>
                 {anomaly.roas.toFixed(2)}x ROAS

@@ -61,7 +61,7 @@ export function ReallocationFlowAnimator({
             </>
           ) : phase === 'transferring' ? (
             <>
-              <span className='size-2 rounded-full bg-[#FFFFFF] animate-ping' />
+              <span className='size-1.5 rounded-full bg-[#FFFFFF] inline-block' />
               <span className='text-[#FFFFFF] font-bold uppercase tracking-wider text-[11px]'>
                 Phase 2: Executing Autonomous Capital Transfer
               </span>
@@ -105,10 +105,10 @@ export function ReallocationFlowAnimator({
             <span className='font-bold text-[#FFFFFF]'>
               {phase === 'completed' ? (
                 <span className='text-[#8A8A8A]'>
-                  ₹{Math.round(source.newSpend).toLocaleString('en-IN')}/d
+                  ${Math.round(source.newSpend).toLocaleString('en-US')}/d
                 </span>
               ) : (
-                `₹${Math.round(source.currentSpend).toLocaleString('en-IN')}/d`
+                `$${Math.round(source.currentSpend).toLocaleString('en-US')}/d`
               )}
             </span>
           </div>
@@ -118,21 +118,13 @@ export function ReallocationFlowAnimator({
         <div className='md:col-span-1 flex flex-col items-center justify-center py-2'>
           <div className='relative flex flex-col items-center gap-1 w-full'>
             <div className='text-[11px] font-bold text-[#000000] bg-[#FFFFFF] px-2 py-0.5 rounded whitespace-nowrap'>
-              -₹{Math.round(capitalMoved).toLocaleString('en-IN')}/d
+              -${Math.round(capitalMoved).toLocaleString('en-US')}/d
             </div>
             
-            {/* Visual vector arrow with flowing marker */}
+            {/* Visual vector arrow */}
             <div className='relative w-full flex items-center justify-center my-1'>
-              <div className='hidden md:block w-full h-0.5 bg-[#1A1A1A] relative overflow-hidden'>
-                {phase === 'transferring' && !reducedMotion && (
-                  <div className='absolute inset-y-0 w-8 bg-[#FFFFFF] animate-[moveRight_1s_infinite]' />
-                )}
-              </div>
-              <div className='md:hidden h-6 w-0.5 bg-[#1A1A1A] relative overflow-hidden'>
-                {phase === 'transferring' && !reducedMotion && (
-                  <div className='absolute inset-x-0 h-4 bg-[#FFFFFF] animate-[moveDown_1s_infinite]' />
-                )}
-              </div>
+              <div className='hidden md:block w-full h-0.5 bg-[#1A1A1A] relative overflow-hidden' />
+              <div className='md:hidden h-6 w-0.5 bg-[#1A1A1A] relative overflow-hidden' />
               <Icons.arrowRight className='hidden md:block size-4 text-[#FFFFFF] shrink-0 ml-1' />
               <Icons.chevronDown className='md:hidden size-4 text-[#FFFFFF] shrink-0 mt-1' />
             </div>
@@ -164,9 +156,9 @@ export function ReallocationFlowAnimator({
           <div className='pt-1 border-t border-[#000000] flex items-center justify-between text-xs'>
             <span className='text-[#8A8A8A] text-[11px]'>New Daily Spend:</span>
             <span className='font-bold text-[#FFFFFF] flex items-center gap-1'>
-              ₹{Math.round(destination.newSpend).toLocaleString('en-IN')}/d
+              ${Math.round(destination.newSpend).toLocaleString('en-US')}/d
               <span className='text-[10px] text-[#8A8A8A] font-semibold'>
-                (+₹{Math.round(capitalMoved).toLocaleString('en-IN')})
+                (+${Math.round(capitalMoved).toLocaleString('en-US')})
               </span>
             </span>
           </div>

@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { reallocationService } from '@/features/decision-engine/lib/reallocation-service';
+import { anomalyService } from '@/features/decision-engine/lib/anomaly-service';
 
 export async function GET() {
   try {
-    const anomalies = reallocationService.getAnomalies();
+    const anomalies = anomalyService.getAnomalies();
     return NextResponse.json({
       success: true,
       anomalies,

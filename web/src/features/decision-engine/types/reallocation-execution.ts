@@ -60,6 +60,7 @@ export interface ReallocationExecutionDetails {
     destinationRoas: number;
     roasDifference: number;
     liftPerRupee: number;
+    liftPerDollar?: number;
     summary: string;
   };
   // Before / After metric comparisons

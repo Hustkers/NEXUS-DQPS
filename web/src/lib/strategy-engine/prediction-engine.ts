@@ -30,8 +30,8 @@ export function generateRevenueForecast(
   const optRoas = +(optRevenue / budget).toFixed(2);
 
   const aovNote = productPrice
-    ? `AOV calibrated to ₹${productPrice.toLocaleString('en-IN')}`
-    : 'AOV calibrated to historical average order value of ₹2,850';
+    ? `AOV calibrated to $${productPrice.toFixed(2)}`
+    : 'AOV calibrated to historical Nike footwear catalog average order value of $168.61';
 
   return {
     conservative: {
@@ -52,9 +52,9 @@ export function generateRevenueForecast(
       conversions: optConversions,
       cpa: optCpa
     },
-    explanation: `Forecast calculated across 3 auction scenarios using account historical variance bounds. ${aovNote}. Range reflects ±20% normal auction volatility in Indian metro markets.`,
+    explanation: `Forecast calculated across 3 auction scenarios using account historical variance bounds. ${aovNote}. Range reflects ±20% normal auction volatility in Tier 1 US markets.`,
     isMissingInput: !productPrice,
-    missingInputNote: !productPrice ? 'No custom product price provided; utilized user account historical average order value (₹2,850).' : undefined
+    missingInputNote: !productPrice ? 'No custom product price provided; utilized catalog historical average order value ($168.61).' : undefined
   };
 }
 
@@ -67,7 +67,7 @@ export function simulateBudgetDiminishingReturns(
   simulatedBudget: number,
   baseRoas: number,
   baseCpa: number,
-  aov: number = 2850
+  aov: number = 168.61
 ) {
   if (baseBudget <= 0) return { spend: simulatedBudget, revenue: 0, roas: 0, conversions: 0, cpa: 0, efficiencyIndex: 0 };
 
@@ -106,7 +106,7 @@ export function runWhatIfScenario({
   cpcShiftPct = 0,
   cvrShiftPct = 0,
   wearoutDays = 0,
-  aov = 2850
+  aov = 168.61
 }: {
   baseBudget: number;
   baseRoas: number;
@@ -171,8 +171,8 @@ export function buildCreativeRecommendation(
   let videoConcept: string | undefined = '0-3s hook showcasing footwear impact absorption on asphalt, followed by athlete sprint.';
 
   if (pNorm.includes('google')) {
-    headlineDirection = `Official Store | Buy ${productService} | Fast Shipping Across India`;
-    primaryMessage = '100% Original Nike Footwear. Unmatched Cushioning & Grip. Free Metro Returns.';
+    headlineDirection = `Official Store | Buy ${productService} | Free Express Delivery`;
+    primaryMessage = '100% Authentic Nike Footwear. Verified Track & Field Performance. Free 30-Day Returns.';
     cta = 'Order Online';
     visualConcept = 'High-intent RSA layout with sitelink extensions for Men, Women, and Running Tech.';
     videoConcept = undefined;
@@ -185,7 +185,7 @@ export function buildCreativeRecommendation(
       videoConcept = '15s unboxing reel showcasing unvarnished texture, arch support, and runner testimonial.';
     } else {
       headlineDirection = `Stop Running in Yesterday\'s Tech. Upgrade to ${productService}`;
-      primaryMessage = 'Over 10,000 runners in Delhi, Mumbai & Bengaluru have made the switch to responsive energy return.';
+      primaryMessage = 'Over 10,000 marathon runners nationwide have made the switch to responsive ZoomX energy return.';
       cta = 'Explore Shoes';
       visualConcept = 'Split-screen comparison: ordinary sole fatigue vs. Nike ZoomX cushioning rebound.';
       videoConcept = 'Fast-paced reel highlighting runner stride analysis and breathable mesh engineering.';
@@ -206,7 +206,7 @@ export function buildCreativeRecommendation(
     cta,
     visualConcept,
     videoConcept,
-    historicalBasis: `Historical analysis shows ${creativeAngle} angle drove 24% higher CTR and 18% lower CPA in user account records.`
+    historicalBasis: `Historical analysis shows ${creativeAngle} angle drove 24% higher CTR and 18% lower CPA in account records.`
   };
 }
 
@@ -222,14 +222,14 @@ export function buildAudienceRecommendation(
   const pNorm = platform.toLowerCase();
 
   const metroLocations = [
-    'Delhi NCR',
-    'Mumbai (MMR)',
-    'Bengaluru',
-    'Hyderabad',
-    'Chennai',
-    'Pune',
-    'Kolkata',
-    'Ahmedabad'
+    'New York (NY)',
+    'Los Angeles (CA)',
+    'Chicago (IL)',
+    'San Francisco / Bay Area (CA)',
+    'Seattle (WA)',
+    'Austin (TX)',
+    'Boston (MA)',
+    'Denver (CO)'
   ];
 
   let ageRange = '21 - 38';
@@ -241,11 +241,11 @@ export function buildAudienceRecommendation(
 
   if (pNorm.includes('google')) {
     interests = ['High-Intent In-Market: Athletic & Outdoor Footwear', 'Sports & Fitness Equipment'];
-    behaviors = ['Google Pay / UPI High-Value E-Commerce Transactors'];
+    behaviors = ['Apple Pay / High-Value E-Commerce Transactors'];
     lookalikeSegments = ['Similar Audiences to Converters (Google Customer Match)'];
   } else if (pNorm.includes('amazon')) {
     interests = ['Amazon Prime Members who browsed Sports & Outdoors category within 7 days'];
-    behaviors = ['Repeat footwear buyers with cart value > ₹3,000'];
+    behaviors = ['Repeat footwear buyers with cart value > $120.00'];
     retargetingSegments = ['Product ASIN viewers who did not buy within 14 days'];
   }
 
@@ -257,6 +257,6 @@ export function buildAudienceRecommendation(
     retargetingSegments,
     lookalikeSegments,
     highIntentSegments,
-    rationale: `Targeting aligned with user account historical top-performing cohort (Ages 21-38, Top 8 Metros), which yielded 4.2x ROAS in past 12 months.`
+    rationale: `Targeting aligned with user account historical top-performing cohort (Ages 21-38, US Tier-1 Metros), which yielded 4.2x ROAS in past 12 months.`
   };
 }

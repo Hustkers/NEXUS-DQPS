@@ -38,17 +38,17 @@ export function StrategyGenerationProgress({ currentStage }: StrategyGenerationP
   ];
 
   return (
-    <div className='rounded-2xl border border-cyan-500/30 bg-card p-6 shadow-xl relative overflow-hidden'>
-      <div className='absolute top-0 left-0 right-0 h-1 bg-muted overflow-hidden'>
-        <div className='h-full bg-cyan-500 animate-pulse w-3/4 transition-all duration-700' />
+    <div className='rounded-xl border border-border bg-card p-5 relative overflow-hidden'>
+      <div className='absolute top-0 left-0 right-0 h-0.5 bg-muted overflow-hidden'>
+        <div className='h-full bg-zinc-200 w-3/4 transition-all duration-700' />
       </div>
 
-      <div className='flex items-center gap-3 mb-5'>
-        <div className='p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400'>
-          <IconCpu className='size-6 animate-spin' style={{ animationDuration: '4s' }} />
+      <div className='flex items-center gap-3 mb-4'>
+        <div className='p-2 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-200'>
+          <IconCpu className='size-5' />
         </div>
         <div>
-          <h3 className='text-sm font-mono font-bold text-foreground'>
+          <h3 className='text-sm font-mono font-medium text-foreground'>
             Simulating &amp; Evaluating Campaign Strategies
           </h3>
           <p className='text-xs font-mono text-muted-foreground'>
@@ -57,15 +57,15 @@ export function StrategyGenerationProgress({ currentStage }: StrategyGenerationP
         </div>
       </div>
 
-      <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
+      <div className='grid grid-cols-1 md:grid-cols-4 gap-3'>
         {steps.map((st, i) => (
           <div
             key={st.id}
-            className={`p-3 rounded-xl border transition-all ${
+            className={`p-3 rounded-lg border transition-all ${
               st.status === 'active'
-                ? 'border-cyan-500 bg-cyan-500/10 shadow-xs'
+                ? 'border-zinc-500 bg-zinc-800/40'
                 : st.status === 'done'
-                ? 'border-emerald-500/30 bg-emerald-500/5'
+                ? 'border-border bg-zinc-900/40'
                 : 'border-border/40 bg-muted/10 opacity-60'
             }`}
           >
@@ -74,18 +74,18 @@ export function StrategyGenerationProgress({ currentStage }: StrategyGenerationP
                 Phase {i + 1}
               </span>
               {st.status === 'done' ? (
-                <span className='text-emerald-400 font-mono text-xs flex items-center gap-1'>
-                  <IconCheck className='size-3.5' /> Done
+                <span className='text-zinc-300 font-mono text-xs flex items-center gap-1'>
+                  <IconCheck className='size-3.5' /> Complete
                 </span>
               ) : st.status === 'active' ? (
-                <span className='text-cyan-400 font-mono text-xs flex items-center gap-1 animate-pulse'>
-                  <span className='size-2 rounded-full bg-cyan-400 animate-ping' /> Processing
+                <span className='text-zinc-100 font-mono text-xs flex items-center gap-1 font-medium'>
+                  Processing
                 </span>
               ) : (
                 <span className='text-muted-foreground/40 font-mono text-xs'>Queued</span>
               )}
             </div>
-            <h4 className='text-xs font-mono font-semibold text-foreground truncate'>{st.title}</h4>
+            <h4 className='text-xs font-mono font-medium text-foreground truncate'>{st.title}</h4>
             <p className='text-[11px] font-mono text-muted-foreground mt-1 line-clamp-2'>{st.detail}</p>
           </div>
         ))}

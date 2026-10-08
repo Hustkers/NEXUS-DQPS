@@ -61,7 +61,7 @@ export function ReallocationBeforeAfterChart({
               tickLine={false}
               axisLine={false}
               tick={{ fill: '#8A8A8A', fontSize: 10 }}
-              tickFormatter={(v) => `₹${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
+              tickFormatter={(v) => `$${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
             />
             <Tooltip
               cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
@@ -80,17 +80,17 @@ export function ReallocationBeforeAfterChart({
                         <div className='flex justify-between gap-4 text-[#8A8A8A]'>
                           <span>Before:</span>
                           <span className='font-medium text-[#8A8A8A]'>
-                            ₹{beforeVal.toLocaleString('en-IN')}
+                            ${beforeVal.toLocaleString('en-US')}
                           </span>
                         </div>
                         <div className='flex justify-between gap-4 text-[#FFFFFF] font-bold'>
                           <span>After:</span>
-                          <span>₹{afterVal.toLocaleString('en-IN')}</span>
+                          <span>${afterVal.toLocaleString('en-US')}</span>
                         </div>
                         <div className='flex justify-between gap-4 pt-1 border-t border-[#000000] text-[10px]'>
                           <span className='text-[#8A8A8A]'>Delta:</span>
                           <span className='text-[#FFFFFF] font-bold'>
-                            {delta >= 0 ? '+' : ''}₹{delta.toLocaleString('en-IN')}
+                            {delta >= 0 ? '+' : ''}${delta.toLocaleString('en-US')}
                           </span>
                         </div>
                       </div>

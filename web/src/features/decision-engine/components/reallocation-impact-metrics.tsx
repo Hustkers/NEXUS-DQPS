@@ -25,7 +25,7 @@ export function ReallocationImpactMetrics({
             Capital Moved
           </div>
           <div className='text-sm sm:text-base font-bold text-[#FFFFFF] mt-0.5'>
-            ₹{Math.round(capitalMoved).toLocaleString('en-IN')}<span className='text-xs font-normal text-[#8A8A8A]'>/day</span>
+            ${Math.round(capitalMoved).toLocaleString('en-US')}<span className='text-xs font-normal text-[#8A8A8A]'>/day</span>
           </div>
           <div className='text-[10px] text-[#FFFFFF] font-semibold mt-1 flex items-center gap-0.5'>
             <Icons.arrowRight className='size-2.5 shrink-0 text-[#FFFFFF]' />
@@ -38,7 +38,7 @@ export function ReallocationImpactMetrics({
             Expected Lift
           </div>
           <div className='text-sm sm:text-base font-bold text-[#FFFFFF] mt-0.5'>
-            +₹{Math.round(expectedDailyLift).toLocaleString('en-IN')}<span className='text-xs font-normal text-[#8A8A8A]'>/day</span>
+            +${Math.round(expectedDailyLift).toLocaleString('en-US')}<span className='text-xs font-normal text-[#8A8A8A]'>/day</span>
           </div>
           <div className='text-[10px] text-[#8A8A8A] font-medium mt-1'>
             Net Contribution Margin
@@ -63,10 +63,10 @@ export function ReallocationImpactMetrics({
             Projected Revenue
           </div>
           <div className='text-sm sm:text-base font-bold text-[#FFFFFF] mt-0.5'>
-            ₹{Math.round(destination.newDailyRevenue).toLocaleString('en-IN')}<span className='text-xs font-normal text-[#8A8A8A]'>/day</span>
+            ${Math.round(destination.newDailyRevenue).toLocaleString('en-US')}<span className='text-xs font-normal text-[#8A8A8A]'>/day</span>
           </div>
           <div className='text-[10px] text-[#8A8A8A] mt-1'>
-            +₹{Math.round(destination.revenueDelta).toLocaleString('en-IN')}/d incremental
+            +${Math.round(destination.revenueDelta).toLocaleString('en-US')}/d incremental
           </div>
         </div>
       </div>

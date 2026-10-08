@@ -38,10 +38,6 @@ export function LearningLedgerView({ completedHistory }: LearningLedgerViewProps
             </p>
           </div>
         </div>
-
-        <span className='text-xs px-2.5 py-1 rounded border border-border bg-muted/30 text-foreground font-bold'>
-          System Becomes Smarter With Every Completed Run
-        </span>
       </div>
 
       {/* 2. CORE FEEDBACK LOOP INFOGRAPHIC */}
@@ -133,16 +129,16 @@ export function LearningLedgerView({ completedHistory }: LearningLedgerViewProps
                     </tr>
                     <tr>
                       <td className='p-2.5 font-bold text-foreground'>Gross Revenue</td>
-                      <td className='p-2.5 text-muted-foreground'>₹{item.predicted.revenue.toLocaleString()}</td>
-                      <td className='p-2.5 font-bold text-foreground'>₹{item.actual.revenue.toLocaleString()}</td>
+                      <td className='p-2.5 text-muted-foreground'>${item.predicted.revenue.toLocaleString()}</td>
+                      <td className='p-2.5 font-bold text-foreground'>${item.actual.revenue.toLocaleString()}</td>
                       <td className='p-2.5 font-bold text-emerald-400'>
                         {item.errorPct.revenueError > 0 ? `+${item.errorPct.revenueError}%` : `${item.errorPct.revenueError}%`}
                       </td>
                     </tr>
                     <tr>
                       <td className='p-2.5 font-bold text-foreground'>Cost Per Acquisition (CPA)</td>
-                      <td className='p-2.5 text-muted-foreground'>₹{item.predicted.cpa.toLocaleString()}</td>
-                      <td className='p-2.5 font-bold text-foreground'>₹{item.actual.cpa.toLocaleString()}</td>
+                      <td className='p-2.5 text-muted-foreground'>${item.predicted.cpa.toLocaleString()}</td>
+                      <td className='p-2.5 font-bold text-foreground'>${item.actual.cpa.toLocaleString()}</td>
                       <td className={`p-2.5 font-bold ${item.errorPct.cpaError <= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                         {item.errorPct.cpaError > 0 ? `+${item.errorPct.cpaError}%` : `${item.errorPct.cpaError}%`}
                       </td>
@@ -199,7 +195,7 @@ export function LearningLedgerView({ completedHistory }: LearningLedgerViewProps
             <span className='text-[10px] text-muted-foreground uppercase block'>Meta Broad Risk Penalty</span>
             <span className='text-sm font-bold text-amber-400 block'>-5.0% → -12.0%</span>
             <p className='text-[11px] text-muted-foreground'>
-              Account history confirmed steep CPM inflation and audience saturation when unsegmented spend &gt; ₹65k.
+              Account history confirmed steep CPM inflation and audience saturation when unsegmented spend &gt; $15k.
             </p>
           </div>
 
@@ -207,7 +203,7 @@ export function LearningLedgerView({ completedHistory }: LearningLedgerViewProps
             <span className='text-[10px] text-muted-foreground uppercase block'>TikTok Checkout Prior</span>
             <span className='text-sm font-bold text-rose-400 block'>0.018 → 0.012 CVR</span>
             <p className='text-[11px] text-muted-foreground'>
-              Calibrated downward for products priced above ₹4,000 to prevent over-optimistic revenue projections.
+              Calibrated downward for footwear catalog items priced above $120.00 to prevent over-optimistic revenue projections.
             </p>
           </div>
         </div>

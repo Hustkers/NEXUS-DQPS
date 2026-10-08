@@ -88,7 +88,7 @@ export function computeRLAdAllocation(params: {
   inventory?: number;
 }): RLOptimizationResult {
   const baseSpend = params.spend && params.spend > 0 ? params.spend : 4850;
-  const unitPrice = params.price && params.price > 0 ? params.price : 140;
+  const unitPrice = params.price && params.price > 0 ? params.price : 168.61;
   const grossMargin = (params.grossMarginPct ?? 62) / 100;
   const isStockout = params.inventory !== undefined && params.inventory <= 0;
 
@@ -107,7 +107,7 @@ export function computeRLAdAllocation(params: {
       shareOfBudget: 0.38,
       saturationFactor: 0.35, // Low saturation -> high headroom
       baseMarginMultiplier: 1.35,
-      color: '#ef4444' // Vibrant Red (Highest Sales & Headroom)
+      color: '#fafafa' // Peak Headroom (High Velocity)
     },
     {
       id: 'reg-emea',
@@ -122,7 +122,7 @@ export function computeRLAdAllocation(params: {
       shareOfBudget: 0.28,
       saturationFactor: 0.55,
       baseMarginMultiplier: 1.15,
-      color: '#f97316' // Orange (Strong Sales)
+      color: '#d4d4d8' // Solid Sales
     },
     {
       id: 'reg-apac',
@@ -137,7 +137,7 @@ export function computeRLAdAllocation(params: {
       shareOfBudget: 0.18,
       saturationFactor: 0.40,
       baseMarginMultiplier: 1.10,
-      color: '#eab308' // Yellow (Decreasing / Moderate)
+      color: '#a1a1aa' // Moderate Velocity
     },
     {
       id: 'reg-latam',
@@ -152,7 +152,7 @@ export function computeRLAdAllocation(params: {
       shareOfBudget: 0.10,
       saturationFactor: 0.85, // High CAC, low margin
       baseMarginMultiplier: 0.55,
-      color: '#06b6d4' // Cyan / Diverted away
+      color: '#71717a' // Reduced Allocation
     },
     {
       id: 'reg-sea',
@@ -167,7 +167,7 @@ export function computeRLAdAllocation(params: {
       shareOfBudget: 0.06,
       saturationFactor: 0.92,
       baseMarginMultiplier: 0.40,
-      color: '#6366f1' // Indigo / Suppressed
+      color: '#52525b' // Suppressed
     }
   ];
 
@@ -314,7 +314,7 @@ export function computeRLAdAllocation(params: {
     barComparison,
     decisionFlow: {
       stateIngestion: [
-        'Ingest cross-channel telemetry (Meta, Google, Amazon, TikTok)',
+        'Ingest cross-channel telemetry (Meta, Google, Amazon, Shopify)',
         'Compute regional conversion probability P(sale) via Thompson Sampling priors',
         'Extract live stock levels from Shopify/ERP (Inventory check constraint)'
       ],

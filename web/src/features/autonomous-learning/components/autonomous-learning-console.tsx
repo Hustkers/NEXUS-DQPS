@@ -63,13 +63,13 @@ export function AutonomousLearningConsole() {
     setTimeout(() => {
       setIsApplying(false);
       toast.success('Autonomous Optimization Policy Dispatched', {
-        description: `Reallocated ₹${(result.totalRecommendedBudget / 100000).toFixed(2)}L across 4 channels. Expected +₹${Math.round(result.profitImprovementAmount).toLocaleString('en-IN')} net profit recorded in Decision Ledger.`
+        description: `Reallocated $${result.totalRecommendedBudget.toLocaleString('en-US')} across 4 channels. Projected +$${Math.round(result.profitImprovementAmount).toLocaleString('en-US')} net profit recorded in Decision Ledger.`
       });
     }, 850);
   };
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen font-mono'>
+    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-zinc-50/50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 min-h-screen font-mono'>
       {/* 1. MASTER BANNER: Autonomous Budget Engine */}
       <AutonomousBudgetEngineHero
         result={result}
@@ -130,18 +130,18 @@ export function AutonomousLearningConsole() {
       <ModelLearningHistorySection />
 
       {/* 7. RED TEAM VALIDATION CALLOUT BUTTON */}
-      <div className='rounded-xl border border-border/80 bg-muted/20 p-4 flex flex-wrap items-center justify-between gap-3 text-xs'>
+      <div className='rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-4 flex flex-wrap items-center justify-between gap-3 text-xs'>
         <div className='flex items-center gap-2'>
-          <span className='size-2 rounded-full bg-emerald-500 animate-pulse' />
-          <span className='text-muted-foreground'>AI Red Team Validation Status:</span>
-          <span className='font-bold text-foreground'>
-            {result.validationDecision.status === 'PASSED' ? 'PASSED (0 Guardrail Breaches)' : 'CAUTION (Constraint Active)'}
+          <span className='size-1.5 rounded-full bg-zinc-900 dark:bg-zinc-100' />
+          <span className='text-zinc-500'>Guardrail Verification:</span>
+          <span className='font-mono font-medium text-zinc-900 dark:text-zinc-100'>
+            {result.validationDecision.status === 'PASSED' ? 'PASSED (0 Guardrail Breaches)' : 'CONSTRAINED (Circuit Breaker Active)'}
           </span>
         </div>
 
         <button
           onClick={() => setIsRedTeamOpen(true)}
-          className='text-xs font-bold text-primary hover:underline flex items-center gap-1'
+          className='text-xs font-semibold text-zinc-900 dark:text-zinc-100 hover:underline flex items-center gap-1'
         >
           Inspect Red Team Stress-Test Challenge →
         </button>

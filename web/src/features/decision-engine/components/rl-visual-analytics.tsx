@@ -77,19 +77,19 @@ export function RLVisualAnalytics({
       {/* Top Banner: RL Agent Summary & Navigation Tabs */}
       <div className='flex flex-wrap items-center justify-between gap-3 p-4 rounded-xl border border-zinc-800 bg-zinc-950/80 shadow-md'>
         <div className='flex items-center gap-3'>
-          <div className='size-10 rounded-lg bg-cyan-950/60 border border-cyan-800/60 flex items-center justify-center text-cyan-400'>
-            <IconCpu className='size-5 animate-pulse' />
+          <div className='size-10 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300'>
+            <IconCpu className='size-5' />
           </div>
           <div>
             <div className='flex items-center gap-2'>
-              <h4 className='font-mono text-sm font-bold text-zinc-100'>
+              <h4 className='font-sans text-sm font-semibold tracking-tight text-zinc-100'>
                 REINFORCEMENT LEARNING AD ALLOCATION AGENT
               </h4>
-              <Badge variant='outline' className='text-[10px] font-mono border-emerald-500/40 bg-emerald-950/30 text-emerald-400'>
+              <Badge variant='outline' className='text-[10px] font-mono border-zinc-800 bg-zinc-900 text-zinc-300'>
                 Thompson Bandit Q-Policy
               </Badge>
             </div>
-            <p className='text-xs font-mono text-zinc-400 mt-0.5'>
+            <p className='text-xs font-sans text-zinc-400 mt-0.5'>
               Maximizing profit by diverting ad spend away from low-probability regions into high-headroom zones
             </p>
           </div>
@@ -106,7 +106,7 @@ export function RLVisualAnalytics({
                 : 'text-zinc-400 hover:text-zinc-200'
             )}
           >
-            <IconSparkles className='size-3.5 text-cyan-400' />
+            <IconSparkles className='size-3.5 text-zinc-400' />
             All Analytics
           </button>
           <button
@@ -118,7 +118,7 @@ export function RLVisualAnalytics({
                 : 'text-zinc-400 hover:text-zinc-200'
             )}
           >
-            <IconGitFork className='size-3.5 text-purple-400' />
+            <IconGitFork className='size-3.5 text-zinc-400' />
             Flow Chart
           </button>
           <button
@@ -130,7 +130,7 @@ export function RLVisualAnalytics({
                 : 'text-zinc-400 hover:text-zinc-200'
             )}
           >
-            <IconTrendingUp className='size-3.5 text-emerald-400' />
+            <IconTrendingUp className='size-3.5 text-zinc-400' />
             Profit Graph
           </button>
           <button
@@ -142,7 +142,7 @@ export function RLVisualAnalytics({
                 : 'text-zinc-400 hover:text-zinc-200'
             )}
           >
-            <IconChartPie className='size-3.5 text-amber-400' />
+            <IconChartPie className='size-3.5 text-zinc-400' />
             Spend Pie Chart
           </button>
           <button
@@ -154,7 +154,7 @@ export function RLVisualAnalytics({
                 : 'text-zinc-400 hover:text-zinc-200'
             )}
           >
-            <IconChartBar className='size-3.5 text-rose-400' />
+            <IconChartBar className='size-3.5 text-zinc-400' />
             Probability Bar Plot
           </button>
         </div>
@@ -165,10 +165,10 @@ export function RLVisualAnalytics({
         <div className='p-3.5 rounded-xl border border-zinc-800 bg-zinc-950/70'>
           <span className='text-[11px] font-mono text-zinc-400 uppercase'>Expected Profit Lift</span>
           <div className='flex items-baseline gap-2 mt-1'>
-            <span className='text-xl font-mono font-bold text-emerald-400'>
+            <span className='text-xl font-mono font-bold text-zinc-100'>
               +${data.totalProjectedProfitLift.toLocaleString()}
             </span>
-            <span className='text-xs font-mono text-emerald-500 font-bold'>
+            <span className='text-xs font-mono text-zinc-300 font-medium'>
               (+{data.profitLiftPct}%)
             </span>
           </div>
@@ -178,7 +178,7 @@ export function RLVisualAnalytics({
         <div className='p-3.5 rounded-xl border border-zinc-800 bg-zinc-950/70'>
           <span className='text-[11px] font-mono text-zinc-400 uppercase'>Low-Probability Ad Waste Saved</span>
           <div className='flex items-baseline gap-2 mt-1'>
-            <span className='text-xl font-mono font-bold text-rose-400'>
+            <span className='text-xl font-mono font-bold text-zinc-100'>
               ${data.lowProbabilitySpendAvoided.toLocaleString()}/day
             </span>
           </div>
@@ -188,7 +188,7 @@ export function RLVisualAnalytics({
         <div className='p-3.5 rounded-xl border border-zinc-800 bg-zinc-950/70'>
           <span className='text-[11px] font-mono text-zinc-400 uppercase'>RL Policy Confidence</span>
           <div className='flex items-baseline gap-2 mt-1'>
-            <span className='text-xl font-mono font-bold text-cyan-400'>
+            <span className='text-xl font-mono font-bold text-zinc-100'>
               {(data.policyConfidence * 100).toFixed(1)}%
             </span>
             <span className='text-xs font-mono text-zinc-400'>Beta(α, β)</span>
@@ -199,7 +199,7 @@ export function RLVisualAnalytics({
         <div className='p-3.5 rounded-xl border border-zinc-800 bg-zinc-950/70'>
           <span className='text-[11px] font-mono text-zinc-400 uppercase'>Exploration Rate (ε)</span>
           <div className='flex items-baseline justify-between mt-1'>
-            <span className='text-xl font-mono font-bold text-amber-400'>
+            <span className='text-xl font-mono font-bold text-zinc-100'>
               {(data.explorationRate * 100).toFixed(0)}%
             </span>
             <Button
@@ -209,7 +209,7 @@ export function RLVisualAnalytics({
               disabled={isRetraining}
               className='h-6 text-[10px] font-mono border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-zinc-200'
             >
-              <IconPlayerPlay className='size-3 mr-1 text-emerald-400' />
+              <IconPlayerPlay className='size-3 mr-1 text-zinc-300' />
               {isRetraining ? 'Learning...' : 'Re-Train'}
             </Button>
           </div>
@@ -222,12 +222,12 @@ export function RLVisualAnalytics({
         <div className='rounded-xl border border-zinc-800 bg-zinc-950/70 p-5 space-y-4'>
           <div className='flex items-center justify-between border-b border-zinc-800/80 pb-3'>
             <div className='flex items-center gap-2'>
-              <IconGitFork className='size-4 text-purple-400' />
-              <h5 className='font-mono text-sm font-bold text-zinc-100 uppercase'>
+              <IconGitFork className='size-4 text-zinc-300' />
+              <h5 className='font-sans text-sm font-semibold text-zinc-100 uppercase tracking-wide'>
                 Reinforcement Learning Decision Flow Chart
               </h5>
             </div>
-            <span className='text-xs font-mono text-zinc-400'>
+            <span className='text-xs font-sans text-zinc-400'>
               Closed-Loop Dynamic Allocation Pipeline
             </span>
           </div>
@@ -235,133 +235,133 @@ export function RLVisualAnalytics({
           {/* Interactive Flow Chart Diagram */}
           <div className='grid grid-cols-1 md:grid-cols-4 gap-3 relative'>
             {/* Stage 1 */}
-            <div className='flex flex-col justify-between p-4 rounded-xl border border-cyan-800/40 bg-cyan-950/20 relative group'>
+            <div className='flex flex-col justify-between p-4 rounded-xl border border-zinc-800 bg-zinc-950/70 relative group'>
               <div>
-                <div className='flex items-center justify-between text-xs font-mono text-cyan-400 mb-2'>
+                <div className='flex items-center justify-between text-xs font-mono text-zinc-300 mb-2'>
                   <span className='font-bold flex items-center gap-1.5'>
-                    <span className='size-2 rounded-full bg-cyan-400 animate-pulse' />
+                    <span className='size-2 rounded-full bg-zinc-400' />
                     1. STATE (S_t)
                   </span>
-                  <Badge variant='outline' className='text-[9px] border-cyan-700 text-cyan-300'>Ingestion</Badge>
+                  <Badge variant='outline' className='text-[9px] border-zinc-700 text-zinc-300 bg-zinc-900'>Ingestion</Badge>
                 </div>
-                <h6 className='font-mono text-xs font-bold text-zinc-200 mb-1.5'>
+                <h6 className='font-sans text-xs font-semibold text-zinc-200 mb-1.5'>
                   Regional Market Signals
                 </h6>
-                <ul className='space-y-1.5 text-[11px] font-mono text-zinc-400'>
+                <ul className='space-y-1.5 text-[11px] font-sans text-zinc-400'>
                   <li className='flex items-start gap-1.5'>
-                    <span className='text-cyan-400'>•</span>
-                    <span>P(Sale) Posterior: North America 78%, EMEA 56%</span>
+                    <span className='text-zinc-300'>•</span>
+                    <span>P(Sale) Posterior: <span className='font-mono tabular-nums'>North America 78%</span>, <span className='font-mono tabular-nums'>EMEA 56%</span></span>
                   </li>
                   <li className='flex items-start gap-1.5'>
-                    <span className='text-rose-400'>•</span>
-                    <span>Low Probability: LatAm 14%, SEA 9%</span>
+                    <span className='text-zinc-500'>•</span>
+                    <span>Low Probability: <span className='font-mono tabular-nums'>LatAm 14%</span>, <span className='font-mono tabular-nums'>SEA 9%</span></span>
                   </li>
                   <li className='flex items-start gap-1.5'>
-                    <span className='text-cyan-400'>•</span>
+                    <span className='text-zinc-300'>•</span>
                     <span>Stock levels &amp; CPM auction volatility</span>
                   </li>
                 </ul>
               </div>
-              <div className='mt-3 pt-2 border-t border-cyan-900/40 text-[10px] font-mono text-cyan-300/80'>
+              <div className='mt-3 pt-2 border-t border-zinc-800 text-[10px] font-sans text-zinc-400'>
                 DuckDB + Multi-Source Reconciler
               </div>
             </div>
 
             {/* Stage 2 */}
-            <div className='flex flex-col justify-between p-4 rounded-xl border border-purple-800/40 bg-purple-950/20 relative group'>
+            <div className='flex flex-col justify-between p-4 rounded-xl border border-zinc-800 bg-zinc-950/70 relative group'>
               <div>
-                <div className='flex items-center justify-between text-xs font-mono text-purple-400 mb-2'>
+                <div className='flex items-center justify-between text-xs font-mono text-zinc-300 mb-2'>
                   <span className='font-bold flex items-center gap-1.5'>
-                    <span className='size-2 rounded-full bg-purple-400 animate-pulse' />
+                    <span className='size-2 rounded-full bg-zinc-400' />
                     2. POLICY EVALUATION
                   </span>
-                  <Badge variant='outline' className='text-[9px] border-purple-700 text-purple-300'>Bandit Q(s,a)</Badge>
+                  <Badge variant='outline' className='text-[9px] border-zinc-700 text-zinc-300 bg-zinc-900'>Bandit Q(s,a)</Badge>
                 </div>
-                <h6 className='font-mono text-xs font-bold text-zinc-200 mb-1.5'>
+                <h6 className='font-sans text-xs font-semibold text-zinc-200 mb-1.5'>
                   Marginal Headroom Optimization
                 </h6>
-                <ul className='space-y-1.5 text-[11px] font-mono text-zinc-400'>
+                <ul className='space-y-1.5 text-[11px] font-sans text-zinc-400'>
                   <li className='flex items-start gap-1.5'>
-                    <span className='text-purple-400'>•</span>
+                    <span className='text-zinc-300'>•</span>
                     <span>Computes dProfit / dSpend gradient</span>
                   </li>
                   <li className='flex items-start gap-1.5'>
-                    <span className='text-purple-400'>•</span>
+                    <span className='text-zinc-300'>•</span>
                     <span>Detects audience saturation saturation index</span>
                   </li>
                   <li className='flex items-start gap-1.5'>
-                    <span className='text-purple-400'>•</span>
+                    <span className='text-zinc-300'>•</span>
                     <span>Thompson Sampling Balances Exploit vs Explore</span>
                   </li>
                 </ul>
               </div>
-              <div className='mt-3 pt-2 border-t border-purple-900/40 text-[10px] font-mono text-purple-300/80'>
+              <div className='mt-3 pt-2 border-t border-zinc-800 text-[10px] font-sans text-zinc-400'>
                 Multi-Armed Contextual Policy
               </div>
             </div>
 
             {/* Stage 3 */}
-            <div className='flex flex-col justify-between p-4 rounded-xl border border-amber-800/40 bg-amber-950/20 relative group'>
+            <div className='flex flex-col justify-between p-4 rounded-xl border border-zinc-800 bg-zinc-950/70 relative group'>
               <div>
-                <div className='flex items-center justify-between text-xs font-mono text-amber-400 mb-2'>
+                <div className='flex items-center justify-between text-xs font-mono text-zinc-300 mb-2'>
                   <span className='font-bold flex items-center gap-1.5'>
-                    <span className='size-2 rounded-full bg-amber-400 animate-pulse' />
+                    <span className='size-2 rounded-full bg-zinc-400' />
                     3. ACTION (A_t)
                   </span>
-                  <Badge variant='outline' className='text-[9px] border-amber-700 text-amber-300'>Reallocation</Badge>
+                  <Badge variant='outline' className='text-[9px] border-zinc-700 text-zinc-300 bg-zinc-900'>Reallocation</Badge>
                 </div>
-                <h6 className='font-mono text-xs font-bold text-zinc-200 mb-1.5'>
+                <h6 className='font-sans text-xs font-semibold text-zinc-200 mb-1.5'>
                   Ad Display Redistribution
                 </h6>
-                <ul className='space-y-1.5 text-[11px] font-mono text-zinc-400'>
+                <ul className='space-y-1.5 text-[11px] font-sans text-zinc-400'>
                   <li className='flex items-start gap-1.5'>
-                    <span className='text-emerald-400 font-bold'>+</span>
-                    <span>Scale High Headroom: US (+68%), EU (+22%)</span>
+                    <span className='text-zinc-200 font-bold'>+</span>
+                    <span>Scale High Headroom: <span className='font-mono tabular-nums'>US (+68%)</span>, <span className='font-mono tabular-nums'>EU (+22%)</span></span>
                   </li>
                   <li className='flex items-start gap-1.5'>
-                    <span className='text-rose-400 font-bold'>-</span>
-                    <span>Suppress Low Probability: LatAm (-72%), SEA (-88%)</span>
+                    <span className='text-zinc-500 font-bold'>-</span>
+                    <span>Suppress Low Probability: <span className='font-mono tabular-nums'>LatAm (-72%)</span>, <span className='font-mono tabular-nums'>SEA (-88%)</span></span>
                   </li>
                   <li className='flex items-start gap-1.5'>
-                    <span className='text-amber-400'>•</span>
+                    <span className='text-zinc-300'>•</span>
                     <span>Zero Ad Budget Burn on Stockouts</span>
                   </li>
                 </ul>
               </div>
-              <div className='mt-3 pt-2 border-t border-amber-900/40 text-[10px] font-mono text-amber-300/80'>
+              <div className='mt-3 pt-2 border-t border-zinc-800 text-[10px] font-sans text-zinc-400'>
                 Meta &amp; Google Ads Script API
               </div>
             </div>
 
             {/* Stage 4 */}
-            <div className='flex flex-col justify-between p-4 rounded-xl border border-emerald-800/40 bg-emerald-950/20 relative group'>
+            <div className='flex flex-col justify-between p-4 rounded-xl border border-zinc-800 bg-zinc-950/70 relative group'>
               <div>
-                <div className='flex items-center justify-between text-xs font-mono text-emerald-400 mb-2'>
+                <div className='flex items-center justify-between text-xs font-mono text-zinc-300 mb-2'>
                   <span className='font-bold flex items-center gap-1.5'>
-                    <span className='size-2 rounded-full bg-emerald-400 animate-pulse' />
+                    <span className='size-2 rounded-full bg-zinc-400' />
                     4. REWARD (R_t)
                   </span>
-                  <Badge variant='outline' className='text-[9px] border-emerald-700 text-emerald-300'>Feedback</Badge>
+                  <Badge variant='outline' className='text-[9px] border-zinc-700 text-zinc-300 bg-zinc-900'>Feedback</Badge>
                 </div>
-                <h6 className='font-mono text-xs font-bold text-zinc-200 mb-1.5'>
+                <h6 className='font-sans text-xs font-semibold text-zinc-200 mb-1.5'>
                   Profit Lift &amp; Policy Refit
                 </h6>
-                <ul className='space-y-1.5 text-[11px] font-mono text-zinc-400'>
+                <ul className='space-y-1.5 text-[11px] font-sans text-zinc-400'>
                   <li className='flex items-start gap-1.5'>
-                    <span className='text-emerald-400'>✓</span>
+                    <span className='text-zinc-300'>✓</span>
                     <span>Reward = ΔMargin$ − ΔSpend − Penalty</span>
                   </li>
                   <li className='flex items-start gap-1.5'>
-                    <span className='text-emerald-400'>✓</span>
+                    <span className='text-zinc-300'>✓</span>
                     <span>Thompson Beta priors updated with sales</span>
                   </li>
                   <li className='flex items-start gap-1.5'>
-                    <span className='text-emerald-400'>✓</span>
+                    <span className='text-zinc-300'>✓</span>
                     <span>Append-only Decision Ledger Audit</span>
                   </li>
                 </ul>
               </div>
-              <div className='mt-3 pt-2 border-t border-emerald-900/40 text-[10px] font-mono text-emerald-300/80'>
+              <div className='mt-3 pt-2 border-t border-zinc-800 text-[10px] font-sans text-zinc-400'>
                 Continuous Learning Feedback Loop
               </div>
             </div>
@@ -381,14 +381,14 @@ export function RLVisualAnalytics({
               <div className='flex items-center justify-between border-b border-zinc-800/80 pb-3 mb-3'>
                 <div>
                   <h5 className='font-mono text-sm font-bold text-zinc-100 flex items-center gap-2'>
-                    <IconTrendingUp className='size-4 text-emerald-400' />
+                    <IconTrendingUp className='size-4 text-zinc-300' />
                     RL Policy Profit Convergence Graph
                   </h5>
                   <p className='text-xs font-mono text-zinc-400 mt-0.5'>
                     Learning Episode Progress: RL Dynamic Policy vs Static Rule-Based Baseline
                   </p>
                 </div>
-                <Badge variant='outline' className='font-mono text-[10px] border-emerald-500/40 text-emerald-400 bg-emerald-950/30'>
+                <Badge variant='outline' className='font-mono text-[10px] border-zinc-700 bg-zinc-900 text-zinc-300'>
                   Episode {retrainStep}/24
                 </Badge>
               </div>
@@ -399,8 +399,8 @@ export function RLVisualAnalytics({
                   <AreaChart data={filteredLearningCurve} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id='rlProfitGrad' x1='0' y1='0' x2='0' y2='1'>
-                        <stop offset='5%' stopColor='#10b981' stopOpacity={0.4} />
-                        <stop offset='95%' stopColor='#10b981' stopOpacity={0.0} />
+                        <stop offset='5%' stopColor='#d4d4d8' stopOpacity={0.4} />
+                        <stop offset='95%' stopColor='#d4d4d8' stopOpacity={0.0} />
                       </linearGradient>
                       <linearGradient id='baselineProfitGrad' x1='0' y1='0' x2='0' y2='1'>
                         <stop offset='5%' stopColor='#71717a' stopOpacity={0.2} />
@@ -443,8 +443,8 @@ export function RLVisualAnalytics({
                       type='monotone'
                       dataKey='rlPolicyProfit'
                       name='RL Adaptive Policy'
-                      stroke='#10b981'
-                      strokeWidth={2.5}
+                      stroke='#fafafa'
+                      strokeWidth={2}
                       fillOpacity={1}
                       fill='url(#rlProfitGrad)'
                     />
@@ -479,11 +479,11 @@ export function RLVisualAnalytics({
             <div>
               <div className='flex items-center justify-between border-b border-zinc-800/80 pb-3 mb-3'>
                 <div>
-                  <h5 className='font-mono text-sm font-bold text-zinc-100 flex items-center gap-2'>
-                    <IconChartPie className='size-4 text-amber-400' />
+                  <h5 className='font-sans text-sm font-semibold text-zinc-100 flex items-center gap-2'>
+                    <IconChartPie className='size-4 text-zinc-300' />
                     Ad Budget Allocation Pie Chart
                   </h5>
-                  <p className='text-xs font-mono text-zinc-400 mt-0.5'>
+                  <p className='text-xs font-sans text-zinc-400 mt-0.5'>
                     Budget pulled from low-probability zones &amp; concentrated into high-yield markets
                   </p>
                 </div>
@@ -569,8 +569,8 @@ export function RLVisualAnalytics({
 
             <div className='pt-2 mt-2 border-t border-zinc-900 text-[10px] font-mono text-zinc-400'>
               {pieMode === 'post'
-                ? '✅ Post-RL: North America receives 68% of budget; low-probability zones pruned to 0-3%.'
-                : '⚠️ Pre-RL: 16% of daily ad budget wasted in LatAm & SEA with low conversion probabilities.'}
+                ? 'Post-RL: North America receives 68% of budget; low-probability zones pruned to 0-3%.'
+                : 'Pre-RL: 16% of daily ad budget wasted in LatAm & SEA with low conversion probabilities.'}
             </div>
           </div>
         )}
@@ -582,7 +582,7 @@ export function RLVisualAnalytics({
           <div className='flex items-center justify-between border-b border-zinc-800/80 pb-3'>
             <div>
               <h5 className='font-mono text-sm font-bold text-zinc-100 flex items-center gap-2'>
-                <IconChartBar className='size-4 text-rose-400' />
+                <IconChartBar className='size-4 text-zinc-300' />
                 Regional Conversion Probability vs. Profit Headroom Bar Plot
               </h5>
               <p className='text-xs font-mono text-zinc-400 mt-0.5'>
@@ -591,11 +591,11 @@ export function RLVisualAnalytics({
             </div>
             <div className='flex items-center gap-3 font-mono text-xs'>
               <div className='flex items-center gap-1.5 text-zinc-300'>
-                <span className='size-2.5 rounded bg-rose-500' />
+                <span className='size-2.5 rounded bg-zinc-300' />
                 <span>Conversion Probability %</span>
               </div>
               <div className='flex items-center gap-1.5 text-zinc-300'>
-                <span className='size-2.5 rounded bg-emerald-500' />
+                <span className='size-2.5 rounded bg-zinc-600' />
                 <span>Expected Margin Index ($)</span>
               </div>
             </div>
@@ -633,13 +633,13 @@ export function RLVisualAnalytics({
                 <Bar
                   dataKey='conversionProbabilityPct'
                   name='Conversion Probability %'
-                  fill='#ef4444'
+                  fill='#d4d4d8'
                   radius={[4, 4, 0, 0]}
                 />
                 <Bar
                   dataKey='projectedProfitLift'
                   name='Expected Margin Index'
-                  fill='#10b981'
+                  fill='#71717a'
                   radius={[4, 4, 0, 0]}
                 />
               </BarChart>
@@ -666,41 +666,30 @@ export function RLVisualAnalytics({
                       <span className='size-2.5 rounded-full' style={{ backgroundColor: r.color }} />
                       {r.region}
                     </td>
-                    <td className='p-2.5'>
-                      <span className={cn(
-                        'font-bold',
-                        r.conversionProbability >= 0.7 ? 'text-rose-400' :
-                        r.conversionProbability >= 0.4 ? 'text-amber-400' : 'text-zinc-500'
-                      )}>
-                        {(r.conversionProbability * 100).toFixed(0)}%
-                      </span>
+                    <td className='p-2.5 font-bold text-zinc-200'>
+                      {(r.conversionProbability * 100).toFixed(0)}%
                     </td>
                     <td className='p-2.5 text-zinc-400'>${r.currentDailySpend.toLocaleString()}/day</td>
                     <td className='p-2.5 font-bold text-zinc-100'>${r.recommendedDailySpend.toLocaleString()}/day</td>
-                    <td className='p-2.5'>
-                      <span className={cn(
-                        'font-bold',
-                        r.spendDeltaPct > 0 ? 'text-emerald-400' : r.spendDeltaPct < 0 ? 'text-rose-400' : 'text-zinc-400'
-                      )}>
-                        {r.spendDeltaPct > 0 ? `+${r.spendDeltaPct}%` : `${r.spendDeltaPct}%`}
-                      </span>
+                    <td className='p-2.5 font-bold text-zinc-200'>
+                      {r.spendDeltaPct > 0 ? `+${r.spendDeltaPct}%` : `${r.spendDeltaPct}%`}
                     </td>
                     <td className='p-2.5'>
                       <Badge
                         variant='outline'
                         className={cn(
-                          'text-[10px] font-mono font-bold',
-                          r.rlAction === 'BOOST_ADS' ? 'border-rose-500/50 bg-rose-950/40 text-rose-300' :
-                          r.rlAction === 'EXPAND_ADS' ? 'border-amber-500/50 bg-amber-950/40 text-amber-300' :
-                          r.rlAction === 'MAINTAIN' ? 'border-zinc-700 bg-zinc-800 text-zinc-300' :
-                          'border-zinc-800 bg-zinc-900 text-zinc-500'
+                          'text-[10px] font-mono font-medium rounded-md px-2 py-0.5',
+                          r.rlAction === 'BOOST_ADS' ? 'border-zinc-500 bg-zinc-800 text-zinc-100' :
+                          r.rlAction === 'EXPAND_ADS' ? 'border-zinc-600 bg-zinc-800/80 text-zinc-200' :
+                          r.rlAction === 'MAINTAIN' ? 'border-zinc-700 bg-zinc-900 text-zinc-300' :
+                          'border-zinc-800 bg-zinc-900 text-zinc-400'
                         )}
                       >
-                        {r.rlAction === 'BOOST_ADS' && '🚀 DISPLAY MORE ADS (HIGH HEADROOM)'}
-                        {r.rlAction === 'EXPAND_ADS' && '📈 EXPAND ADS (STRONG ROAS)'}
-                        {r.rlAction === 'MAINTAIN' && '⚖️ MAINTAIN TEST'}
-                        {r.rlAction === 'SCALE_DOWN' && '📉 SLASH ADS (-72%)'}
-                        {r.rlAction === 'SUPPRESS_ADS' && '🛑 SUPPRESS ADS (LOW PROBABILITY)'}
+                        {r.rlAction === 'BOOST_ADS' && 'SCALE AD DELIVERY (HIGH HEADROOM)'}
+                        {r.rlAction === 'EXPAND_ADS' && 'EXPAND AD REACH (STRONG ROAS)'}
+                        {r.rlAction === 'MAINTAIN' && 'MAINTAIN ALLOCATION'}
+                        {r.rlAction === 'SCALE_DOWN' && 'REDUCE SPEND (-72%)'}
+                        {r.rlAction === 'SUPPRESS_ADS' && 'SUPPRESS CAMPAIGNS (LOW PROBABILITY)'}
                       </Badge>
                     </td>
                   </tr>

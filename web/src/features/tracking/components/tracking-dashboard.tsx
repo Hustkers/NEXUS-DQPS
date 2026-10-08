@@ -768,11 +768,28 @@ export function TrackingDashboard() {
                       {e.product_id && (
                         <div className="text-muted-foreground">
                           Product: <span className="font-semibold text-foreground">{e.product_id}</span>
-                          {e.value && ` (₹${Number(e.value).toLocaleString()})`}
+                          {e.value && ` ($${Number(e.value).toLocaleString()})`}
                         </div>
                       )}
+                      <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                        {e.platform && (
+                          <Badge variant="outline" className="text-[9px] uppercase font-mono px-1 py-0 bg-muted/40">
+                            {e.platform}
+                          </Badge>
+                        )}
+                        {e.click_id && (
+                          <span className="font-mono text-[9px] text-zinc-500 bg-zinc-900/60 px-1 py-0.5 rounded truncate max-w-[220px]" title={e.click_id}>
+                            Token: {e.click_id}
+                          </span>
+                        )}
+                        {e.geo && (
+                          <span className="font-mono text-[9px] text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1 py-0.5 rounded">
+                            {e.geo.edge_pop} • {e.geo.subnet_masked}
+                          </span>
+                        )}
+                      </div>
                       {e.campaign_id && (
-                        <div className="text-muted-foreground">
+                        <div className="text-muted-foreground text-[10px]">
                           Campaign: <span className="text-blue-600 font-medium">{e.campaign_id}</span>
                         </div>
                       )}

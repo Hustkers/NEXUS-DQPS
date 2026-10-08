@@ -43,7 +43,7 @@ export function ReallocationSplitBar({
       <div className='space-y-2'>
         <div className='flex items-center justify-between text-[11px] font-bold text-[#8A8A8A] uppercase'>
           <span>Before Execution</span>
-          <span>Total: ₹{(allocation.sourceBefore + allocation.destBefore).toLocaleString('en-IN')}/d</span>
+          <span>Total: ${(allocation.sourceBefore + allocation.destBefore).toLocaleString('en-US')}/d</span>
         </div>
 
         <div className='space-y-1.5'>
@@ -51,7 +51,7 @@ export function ReallocationSplitBar({
           <div className='space-y-0.5'>
             <div className='flex items-center justify-between text-[10px] text-[#8A8A8A]'>
               <span className='truncate max-w-[200px] sm:max-w-xs'>{allocation.sourceLabel}</span>
-              <span className='font-medium text-[#FFFFFF]'>₹{allocation.sourceBefore.toLocaleString('en-IN')}/d ({allocation.sourceShareBeforePct.toFixed(0)}%)</span>
+              <span className='font-medium text-[#FFFFFF]'>${allocation.sourceBefore.toLocaleString('en-US')}/d ({allocation.sourceShareBeforePct.toFixed(0)}%)</span>
             </div>
             <div className='w-full bg-[#1A1A1A] h-2 rounded-none overflow-hidden'>
               <div
@@ -65,7 +65,7 @@ export function ReallocationSplitBar({
           <div className='space-y-0.5'>
             <div className='flex items-center justify-between text-[10px] text-[#8A8A8A]'>
               <span className='truncate max-w-[200px] sm:max-w-xs'>{allocation.destLabel}</span>
-              <span className='font-medium text-[#8A8A8A]'>₹{allocation.destBefore.toLocaleString('en-IN')}/d ({allocation.destShareBeforePct.toFixed(0)}%)</span>
+              <span className='font-medium text-[#8A8A8A]'>${allocation.destBefore.toLocaleString('en-US')}/d ({allocation.destShareBeforePct.toFixed(0)}%)</span>
             </div>
             <div className='w-full bg-[#1A1A1A] h-2 rounded-none overflow-hidden'>
               <div
@@ -81,7 +81,7 @@ export function ReallocationSplitBar({
       <div className='space-y-2 pt-2 border-t border-[#1A1A1A]'>
         <div className='flex items-center justify-between text-[11px] font-bold text-[#FFFFFF] uppercase'>
           <span>After Reallocation</span>
-          <span className='text-[#FFFFFF] font-semibold'>Total: ₹{(allocation.sourceAfter + allocation.destAfter).toLocaleString('en-IN')}/d</span>
+          <span className='text-[#FFFFFF] font-semibold'>Total: ${(allocation.sourceAfter + allocation.destAfter).toLocaleString('en-US')}/d</span>
         </div>
 
         <div className='space-y-1.5'>
@@ -90,7 +90,7 @@ export function ReallocationSplitBar({
             <div className='flex items-center justify-between text-[10px] text-[#8A8A8A]'>
               <span className='truncate max-w-[200px] sm:max-w-xs'>{allocation.sourceLabel}</span>
               <span className='font-medium text-[#8A8A8A]'>
-                ₹{allocation.sourceAfter.toLocaleString('en-IN')}/d ({allocation.sourceShareAfterPct.toFixed(0)}%)
+                ${allocation.sourceAfter.toLocaleString('en-US')}/d ({allocation.sourceShareAfterPct.toFixed(0)}%)
               </span>
             </div>
             <div className='w-full bg-[#1A1A1A] h-2 rounded-none overflow-hidden'>
@@ -106,7 +106,7 @@ export function ReallocationSplitBar({
             <div className='flex items-center justify-between text-[10px] text-[#8A8A8A]'>
               <span className='truncate max-w-[200px] sm:max-w-xs font-semibold text-[#FFFFFF]'>{allocation.destLabel}</span>
               <span className='font-bold text-[#FFFFFF]'>
-                ₹{allocation.destAfter.toLocaleString('en-IN')}/d ({allocation.destShareAfterPct.toFixed(0)}%)
+                ${allocation.destAfter.toLocaleString('en-US')}/d ({allocation.destShareAfterPct.toFixed(0)}%)
               </span>
             </div>
             <div className='w-full bg-[#1A1A1A] h-2 rounded-none overflow-hidden'>

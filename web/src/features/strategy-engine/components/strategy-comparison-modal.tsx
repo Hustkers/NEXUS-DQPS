@@ -105,11 +105,11 @@ export function StrategyComparisonModal({
                   {strategies.map((s) => (
                     <td key={s.strategyId} className='p-3'>
                       {s.evaluation?.status === 'SELECTED' ? (
-                        <span className='inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/40 bg-emerald-500/15 text-emerald-400'>
-                          <IconCheck className='size-3' /> SELECTED
+                        <span className='inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-md border border-zinc-700 bg-zinc-800 text-zinc-200'>
+                          <IconCheck className='size-3 text-zinc-300' /> SELECTED
                         </span>
                       ) : (
-                        <span className='text-[10px] text-muted-foreground border border-border px-2 py-0.5 rounded-full'>
+                        <span className='text-[10px] text-zinc-400 border border-zinc-800 bg-zinc-900/40 px-2 py-0.5 rounded-md'>
                           NOT SELECTED
                         </span>
                       )}
@@ -155,9 +155,9 @@ export function StrategyComparisonModal({
                     return (
                       <td key={s.strategyId} className='p-3 font-bold text-foreground'>
                         <div className='flex items-center gap-1.5'>
-                          <span>₹{s.evaluation?.expectedRevenue.toLocaleString()}</span>
+                          <span>${s.evaluation?.expectedRevenue.toLocaleString()}</span>
                           {isBest && (
-                            <span className='text-[9px] px-1 rounded bg-cyan-500/20 text-cyan-300 font-bold'>
+                            <span className='text-[9px] px-1 rounded bg-zinc-800 text-zinc-200 font-bold'>
                               MAX
                             </span>
                           )}
@@ -172,22 +172,22 @@ export function StrategyComparisonModal({
                   <td className='p-3 font-semibold text-muted-foreground bg-muted/10'>Budget Allocation</td>
                   {strategies.map((s) => (
                     <td key={s.strategyId} className='p-3 font-medium text-foreground'>
-                      ₹{s.budgetAllocation.toLocaleString()} ({s.campaignDuration}d)
+                      ${s.budgetAllocation.toLocaleString()} ({s.campaignDuration}d)
                     </td>
                   ))}
                 </tr>
 
                 {/* Expected CPA */}
-                <tr className='bg-cyan-500/5'>
-                  <td className='p-3 font-semibold text-cyan-400'>Expected CPA</td>
+                <tr className='bg-zinc-800/20'>
+                  <td className='p-3 font-semibold text-zinc-200'>Expected CPA</td>
                   {strategies.map((s) => {
                     const isBest = s.evaluation?.expectedCpa === minCpa;
                     return (
                       <td key={s.strategyId} className='p-3 font-bold text-foreground'>
                         <div className='flex items-center gap-1.5'>
-                          <span>₹{s.evaluation?.expectedCpa.toLocaleString()}</span>
+                          <span>${s.evaluation?.expectedCpa.toLocaleString()}</span>
                           {isBest && (
-                            <span className='text-[9px] px-1 rounded bg-cyan-500/20 text-cyan-300 font-bold'>
+                            <span className='text-[9px] px-1 rounded bg-zinc-800 text-zinc-200 font-bold'>
                               LOWEST
                             </span>
                           )}
@@ -212,7 +212,7 @@ export function StrategyComparisonModal({
                   <td className='p-3 font-semibold text-muted-foreground bg-muted/10'>CTR &amp; CPC</td>
                   {strategies.map((s) => (
                     <td key={s.strategyId} className='p-3 text-muted-foreground'>
-                      {((s.evaluation?.expectedCtr ?? 0) * 100).toFixed(2)}% CTR • ₹{s.evaluation?.expectedCpc.toFixed(2)} CPC
+                      {((s.evaluation?.expectedCtr ?? 0) * 100).toFixed(2)}% CTR • ${s.evaluation?.expectedCpc.toFixed(2)} CPC
                     </td>
                   ))}
                 </tr>

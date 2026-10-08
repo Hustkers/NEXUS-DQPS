@@ -9,7 +9,7 @@ import { computeRLAdAllocation } from '@/lib/rl-ad-optimizer';
 import initialEngineState from '@/data/nexus-engine-state.json';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { IconWorld, IconCpu, IconSparkles } from '@tabler/icons-react';
+import { IconWorld, IconCpu, IconAdjustments } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 
@@ -32,29 +32,34 @@ export default function GlobeIntelligencePage() {
     });
   }, [selectedProduct]);
 
+  const isBoth = activeGlobeView === 'both';
+  const stage1Size = isBoth ? 360 : 540;
+  const stage2Size = isBoth ? 360 : 560;
+  const stageMinH = isBoth ? 'min-h-[500px]' : 'min-h-[620px]';
+
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#07090e] text-zinc-100 min-h-screen'>
+    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-background text-zinc-100 min-h-screen'>
       {/* Page Header */}
-      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-4'>
+      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/80 pb-4'>
         <div>
           <div className='flex items-center gap-2'>
-            <IconWorld className='size-6 text-cyan-400' />
+            <IconWorld className='size-6 text-zinc-100' />
             <h1 className='text-xl font-mono font-bold text-zinc-100 uppercase tracking-tight'>
               3D Global Ad Delivery &amp; Customer Interaction Intelligence
             </h1>
           </div>
-          <p className='text-xs font-mono text-zinc-500 mt-1'>
-            WebGL 3D Delivery Arcs • Cobe Globe Pulse (Red/Yellow Heatmap • No Grey) • Reinforcement Learning Bandit
+          <p className='text-xs font-mono text-muted-foreground mt-1'>
+            WebGL Ad Delivery Arcs • Regional Telemetry &amp; Intent Pulse • Reinforcement Learning Bandit Allocation
           </p>
         </div>
 
         <div className='flex items-center gap-2'>
           {/* Globe View Filter */}
-          <div className='flex items-center bg-zinc-900 rounded-lg border border-zinc-800 p-0.5 text-xs font-mono'>
+          <div className='flex items-center bg-zinc-900 rounded-lg border border-border p-0.5 text-xs font-mono'>
             <button
               onClick={() => setActiveGlobeView('both')}
               className={cn(
-                'px-2.5 py-1 rounded font-semibold transition-all',
+                'px-2.5 py-1 rounded font-medium transition-all',
                 activeGlobeView === 'both' ? 'bg-zinc-800 text-zinc-100' : 'text-zinc-500 hover:text-zinc-300'
               )}
             >
@@ -63,17 +68,17 @@ export default function GlobeIntelligencePage() {
             <button
               onClick={() => setActiveGlobeView('arcs')}
               className={cn(
-                'px-2.5 py-1 rounded font-semibold transition-all',
-                activeGlobeView === 'arcs' ? 'bg-cyan-950 text-cyan-300 border border-cyan-800/60' : 'text-zinc-500 hover:text-zinc-300'
+                'px-2.5 py-1 rounded font-medium transition-all',
+                activeGlobeView === 'arcs' ? 'bg-zinc-800 text-zinc-100 border border-zinc-700' : 'text-zinc-500 hover:text-zinc-300'
               )}
             >
-              Analysing Arcs
+              Delivery Arcs
             </button>
             <button
               onClick={() => setActiveGlobeView('pulse')}
               className={cn(
-                'px-2.5 py-1 rounded font-semibold transition-all',
-                activeGlobeView === 'pulse' ? 'bg-rose-950 text-rose-300 border border-rose-800/60' : 'text-zinc-500 hover:text-zinc-300'
+                'px-2.5 py-1 rounded font-medium transition-all',
+                activeGlobeView === 'pulse' ? 'bg-zinc-800 text-zinc-100 border border-zinc-700' : 'text-zinc-500 hover:text-zinc-300'
               )}
             >
               Sales Pulse
@@ -94,9 +99,9 @@ export default function GlobeIntelligencePage() {
                 severity: selectedProduct.inventory === 0 ? 'CRITICAL' : 'HEALTHY'
               });
             }}
-            className='bg-cyan-600 hover:bg-cyan-500 text-white font-mono text-xs'
+            className='bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-mono text-xs font-semibold'
           >
-            <IconSparkles className='size-3.5 mr-1.5' />
+            <IconAdjustments className='size-3.5 mr-1.5' />
             Launch Modal Analysis
           </Button>
         </div>
@@ -112,8 +117,8 @@ export default function GlobeIntelligencePage() {
             className={cn(
               'px-3 py-1.5 rounded-lg border transition-all flex items-center gap-2 shrink-0',
               selectedProduct.sku === camp.sku
-                ? 'bg-zinc-800 border-cyan-500/60 text-zinc-100 shadow-sm'
-                : 'bg-zinc-950/80 border-zinc-800 text-zinc-400 hover:border-zinc-700'
+                ? 'bg-zinc-800 border-zinc-600 text-zinc-100 shadow-sm'
+                : 'bg-zinc-950/80 border-border text-zinc-400 hover:border-zinc-700'
             )}
           >
             {camp.photoUrl && (
@@ -132,51 +137,55 @@ export default function GlobeIntelligencePage() {
         {/* Globe 1: Analysing Arcs (GitHub 3D WebGL Globe) */}
         {(activeGlobeView === 'both' || activeGlobeView === 'arcs') && (
           <div className={cn(
-            'rounded-2xl border border-zinc-800 bg-zinc-950/70 p-5 flex flex-col justify-between shadow-xl',
+            'rounded-2xl border border-border bg-card p-5 flex flex-col justify-between shadow-sm overflow-hidden',
             activeGlobeView === 'arcs' ? 'lg:col-span-12' : 'lg:col-span-6'
           )}>
             <div>
-              <div className='flex items-center justify-between border-b border-zinc-800/80 pb-3 mb-3'>
+              <div className='flex items-center justify-between border-b border-border/80 pb-3 mb-3'>
                 <div className='flex items-center gap-2'>
-                  <span className='size-2.5 rounded-full bg-cyan-400 animate-ping' />
+                  <span className='size-2 rounded-full bg-zinc-300' />
                   <h3 className='font-mono text-sm font-bold text-zinc-100'>
-                    STAGE 1: ANALYSING PHASE (AD DELIVERY ARCS)
+                    STAGE 1: AD DELIVERY ARCS
                   </h3>
                 </div>
-                <Badge variant='outline' className='font-mono text-[10px] border-cyan-500/40 text-cyan-300'>
-                  github.com/globe WebGL
+                <Badge variant='outline' className='font-mono text-[10px] border-zinc-700 bg-zinc-900 text-zinc-300'>
+                  WebGL Delivery Stream
                 </Badge>
               </div>
 
-              <p className='text-xs font-mono text-zinc-400 mb-2'>
-                Live WebGL telemetry scanning global delivery vectors across Meta, Google Shopping, Amazon DSP &amp; TikTok feeds.
+              <p className='text-xs font-mono text-muted-foreground mb-2'>
+                WebGL telemetry scanning global delivery vectors across Meta Ads, Google Shopping, Amazon DSP, and Shopify direct routes.
               </p>
 
-              <div className='w-full min-h-[440px] flex items-center justify-center relative overflow-x-auto py-2'>
+              <div className={cn(
+                'w-full flex items-center justify-center relative overflow-hidden py-2',
+                stageMinH
+              )}>
                 <GithubGlobe
                   activeSku={selectedProduct.sku}
                   activePlatform={selectedProduct.platform}
-                  accentColor={[0.2, 0.85, 0.95]}
+                  accentColor={[0.85, 0.85, 0.85]}
+                  size={stage1Size}
                 />
               </div>
             </div>
 
-            <div className='grid grid-cols-4 gap-2 pt-3 border-t border-zinc-900 text-center font-mono text-[10px]'>
+            <div className='grid grid-cols-4 gap-2 pt-3 border-t border-border text-center font-mono text-[10px]'>
               <div className='p-1.5 rounded bg-zinc-900/60 border border-zinc-800/60'>
                 <div className='text-zinc-500'>US-EAST</div>
-                <div className='text-cyan-400 font-bold'>24ms • 48.2k imp</div>
+                <div className='text-zinc-200 font-bold'>24ms • 48.2k imp</div>
               </div>
               <div className='p-1.5 rounded bg-zinc-900/60 border border-zinc-800/60'>
                 <div className='text-zinc-500'>EMEA-LON</div>
-                <div className='text-blue-400 font-bold'>38ms • 29.4k imp</div>
+                <div className='text-zinc-200 font-bold'>38ms • 29.4k imp</div>
               </div>
               <div className='p-1.5 rounded bg-zinc-900/60 border border-zinc-800/60'>
                 <div className='text-zinc-500'>APAC-TYO</div>
-                <div className='text-amber-400 font-bold'>64ms • 18.9k imp</div>
+                <div className='text-zinc-200 font-bold'>64ms • 18.9k imp</div>
               </div>
               <div className='p-1.5 rounded bg-zinc-900/60 border border-zinc-800/60'>
                 <div className='text-zinc-500'>SEA-SGP</div>
-                <div className='text-emerald-400 font-bold'>82ms • 4.1k imp</div>
+                <div className='text-zinc-200 font-bold'>82ms • 4.1k imp</div>
               </div>
             </div>
           </div>
@@ -185,45 +194,54 @@ export default function GlobeIntelligencePage() {
         {/* Globe 2: Analysis Completed (Cobe Globe Pulse) */}
         {(activeGlobeView === 'both' || activeGlobeView === 'pulse') && (
           <div className={cn(
-            'rounded-2xl border border-zinc-800 bg-zinc-950/70 p-5 flex flex-col justify-between shadow-xl',
+            'rounded-2xl border border-border bg-card p-5 flex flex-col justify-between shadow-sm overflow-hidden',
             activeGlobeView === 'pulse' ? 'lg:col-span-12' : 'lg:col-span-6'
           )}>
             <div>
-              <div className='flex items-center justify-between border-b border-zinc-800/80 pb-3 mb-3'>
+              <div className='flex items-center justify-between border-b border-border/80 pb-3 mb-3'>
                 <div className='flex items-center gap-2'>
-                  <span className='size-2.5 rounded-full bg-rose-500 animate-pulse' />
-                  <h3 className='font-mono text-sm font-bold text-rose-300'>
-                    STAGE 2: ANALYSIS COMPLETED (SALES &amp; INTERACTION PULSE)
+                  <span className='size-2 rounded-full bg-zinc-300' />
+                  <h3 className='font-mono text-sm font-bold text-zinc-100'>
+                    STAGE 2: REGIONAL TELEMETRY &amp; INTERACTION PULSE
                   </h3>
                 </div>
-                <Badge variant='outline' className='font-mono text-[10px] border-rose-500/40 text-rose-400'>
-                  cobe-globe-pulse
+                <Badge variant='outline' className='font-mono text-[10px] border-zinc-700 bg-zinc-900 text-zinc-300'>
+                  Regional Orthographic Map
                 </Badge>
               </div>
 
-              <p className='text-xs font-mono text-zinc-400 mb-2'>
-                Interactive customer interaction pulse: High sales in <strong className='text-rose-400'>Red</strong>, decreasingly <strong className='text-amber-400'>Yellow</strong>, and suppressed in <strong className='text-zinc-400'>Grey</strong>. Click any dot to inspect telemetry, ROAS, and net profit.
+              <p className='text-xs font-mono text-muted-foreground mb-2'>
+                Interactive customer interaction pulse: High sales velocity in Red, moderate momentum in Amber, and suppressed in Zinc. Click any region to inspect unit economics.
               </p>
 
-              <div className='w-full min-h-[440px] flex items-center justify-center relative overflow-x-auto py-2'>
-                <GlobePulse speed={0.0035} />
+              <div className={cn(
+                'w-full flex items-center justify-center relative overflow-hidden py-2',
+                stageMinH
+              )}>
+                <GlobePulse
+                  speed={0.0035}
+                  renderDetailPanel={true}
+                  size={stage2Size}
+                  showRecentPurchases={true}
+                  maxOrders={isBoth ? 3 : 4}
+                />
               </div>
             </div>
 
-            <div className='flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-zinc-900 font-mono text-[10px]'>
+            <div className='flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-border font-mono text-[10px]'>
               <div className='flex items-center gap-1.5 text-zinc-300'>
-                <span className='size-2 rounded-full bg-red-500 ring-2 ring-red-500/20' />
-                <span>High Sales (US East/West: 78% P_conv)</span>
+                <span className='size-2 rounded-full bg-zinc-200' />
+                <span>High Velocity (US East/West: 78% P_conv)</span>
               </div>
               <div className='flex items-center gap-1.5 text-zinc-300'>
-                <span className='size-2 rounded-full bg-amber-400' />
-                <span>Decreasing (EMEA, APAC, SEA: 32%-56% P_conv)</span>
+                <span className='size-2 rounded-full bg-zinc-400' />
+                <span>Moderate Momentum (EMEA, APAC, SEA: 32%-56% P_conv)</span>
               </div>
               <div className='flex items-center gap-1.5 text-zinc-300'>
-                <span className='size-2 rounded-full bg-zinc-500' />
-                <span>Suppressed (LATAM, Nordic: Low Prob / Paused)</span>
+                <span className='size-2 rounded-full bg-zinc-600' />
+                <span>Suppressed / Paused (LATAM, Nordic: Stockout Shield)</span>
               </div>
-              <div className='text-cyan-400 font-bold'>
+              <div className='text-zinc-400 font-medium'>
                 Click marker for Net Margin &amp; Profit
               </div>
             </div>
@@ -232,15 +250,15 @@ export default function GlobeIntelligencePage() {
       </div>
 
       {/* Embedded Reinforcement Learning Visual Analytics Suite */}
-      <div className='rounded-2xl border border-zinc-800/80 bg-zinc-950/60 p-5 shadow-xl'>
-        <div className='mb-4 flex items-center justify-between border-b border-zinc-800/80 pb-3'>
+      <div className='rounded-2xl border border-border bg-card p-5 shadow-sm'>
+        <div className='mb-4 flex items-center justify-between border-b border-border/80 pb-3'>
           <div className='flex items-center gap-2'>
-            <IconCpu className='size-5 text-emerald-400' />
+            <IconCpu className='size-5 text-zinc-300' />
             <h2 className='text-base font-mono font-bold text-zinc-100 uppercase tracking-tight'>
               Reinforcement Learning Optimization &amp; Headroom Policy for {selectedProduct.productName}
             </h2>
           </div>
-          <Badge variant='outline' className='font-mono text-xs border-emerald-500/40 text-emerald-400 bg-emerald-950/30'>
+          <Badge variant='outline' className='font-mono text-xs border-zinc-700 bg-zinc-900 text-zinc-200'>
             Expected Lift: +${rlData.totalProjectedProfitLift.toLocaleString()}
           </Badge>
         </div>

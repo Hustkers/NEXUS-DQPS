@@ -17,9 +17,9 @@ export function generateDefaultLiveMonitoring(
   totalBudget: number
 ): LiveCampaignMonitoring {
   const currentSpend = Math.round(totalBudget * 0.32);
-  const clicks = Math.round(currentSpend / 4.16);
-  const conversions = Math.round(clicks * 0.0333);
-  const revenue = Math.round(conversions * 4650);
+  const clicks = Math.round(currentSpend / 2.15);
+  const conversions = Math.max(1, Math.round(clicks * 0.0333));
+  const revenue = Math.round(conversions * 120.00);
   const roas = +(revenue / currentSpend).toFixed(2);
   const cpa = +(currentSpend / conversions).toFixed(2);
 
@@ -34,7 +34,7 @@ export function generateDefaultLiveMonitoring(
     frequency: 1.43,
     clicks,
     ctr: 0.0348,
-    cpc: 4.16,
+    cpc: 2.15,
     conversions,
     conversionRate: 0.0333,
     cpa,
@@ -55,10 +55,10 @@ export function generateDefaultLiveMonitoring(
       {
         id: 'prob-01',
         type: 'CPC_INCREASE',
-        title: 'Auction CPC Elevation in Delhi NCR & Mumbai',
-        evidence: 'Average CPC rose from ₹3.75 to ₹4.28 over the past 48 hours as weekend search volume surged.',
-        possibleCause: 'Festive promotional bidding competition from competing sportswear aggregators.',
-        recommendedAction: 'Enforce target CPA ceiling cap of ₹460 or shift 15% budget toward Bengaluru & Pune exact match search.',
+        title: 'Auction CPC Elevation in US Tier-1 Search Markets',
+        evidence: 'Average CPC rose from $1.85 to $2.32 over the past 48 hours as weekend search volume surged.',
+        possibleCause: 'Holiday promotional bidding competition from competing sportswear aggregators.',
+        recommendedAction: 'Enforce target CPA ceiling cap of $42.00 or shift 15% budget toward exact match brand search.',
         severity: 'WARNING'
       }
     ],
@@ -75,7 +75,7 @@ export function generateDefaultLiveMonitoring(
       ctrDeltaPct: -4.8,
       cpaDeltaPct: +3.2,
       isSaturated: false,
-      recommendation: 'Audience capacity in Top 8 Metros remains highly responsive. Pacing remains stable.'
+      recommendation: 'Audience capacity in US Tier-1 Metros remains highly responsive. Pacing remains stable.'
     },
     funnelAnalysis: {
       adImpressions: 112500,
@@ -103,26 +103,26 @@ function seedInitialCampaign(): CampaignRecord {
   const defaultId = 'cmp-nike-pegasus-q4';
   const config: CampaignConfig = {
     campaignId: defaultId,
-    campaignName: 'Nike Pegasus 40 National Marathon Scale',
-    productService: 'Nike Air Zoom Pegasus 40',
+    campaignName: 'Nike Air Zoom Pegasus 36 Scale',
+    productService: 'Nike Air Zoom Pegasus 36',
     targetAudience: 'Marathon runners, daily joggers, urban fitness enthusiasts aged 20-45',
-    targetLocation: 'Pan-India Top 8 Metros (Mumbai, Delhi NCR, Bengaluru, Hyderabad, Pune, Chennai)',
+    targetLocation: 'United States (Tier 1 Metros: New York, Los Angeles, Chicago, San Francisco, Seattle)',
     industryCategory: 'Athletic Footwear & Performance Apparel',
     totalBudget: 50000,
     campaignDuration: 30,
     objective: 'CONVERSIONS',
     preferredPlatforms: ['meta', 'google', 'amazon', 'tiktok'],
-    productId: '310805-137',
-    productPrice: 4995,
+    productId: 'AO2924-401',
+    productPrice: 120.00,
     historicalData: {
       pastRoas: 3.42,
       pastCtr: 0.024,
-      pastCpc: 18.20,
+      pastCpc: 2.15,
       pastConversions: 420
     },
     constraints: {
       targetRoas: 3.20,
-      maxCpa: 450
+      maxCpa: 42.00
     }
   };
 

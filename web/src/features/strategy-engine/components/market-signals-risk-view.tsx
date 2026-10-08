@@ -53,10 +53,6 @@ export function MarketSignalsRiskView({ signals, strategies }: MarketSignalsRisk
             </p>
           </div>
         </div>
-
-        <span className='text-xs px-2.5 py-1 rounded border border-border bg-muted/30 text-foreground font-bold'>
-          Strict No-Fabrication Protocol Active
-        </span>
       </div>
 
       {/* 1. MARKET SIGNALS FEED */}

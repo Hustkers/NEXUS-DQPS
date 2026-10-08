@@ -33,9 +33,9 @@ export interface DecisionEngineStoreState {
   resetToDefaults: () => void;
 }
 
-const LOCAL_STORAGE_KEY_PRODUCTS = 'nexus_shared_products_v3';
-const LOCAL_STORAGE_KEY_LEDGER = 'nexus_shared_ledger_v3';
-const LOCAL_STORAGE_KEY_AUTOPILOT = 'nexus_shared_autopilot_v3';
+const LOCAL_STORAGE_KEY_PRODUCTS = 'nexus_shared_products_v4';
+const LOCAL_STORAGE_KEY_LEDGER = 'nexus_shared_ledger_v4';
+const LOCAL_STORAGE_KEY_AUTOPILOT = 'nexus_shared_autopilot_v4';
 
 const DecisionEngineContext = createContext<DecisionEngineStoreState | null>(null);
 

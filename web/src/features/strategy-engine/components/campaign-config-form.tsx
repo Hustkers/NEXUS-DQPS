@@ -21,49 +21,49 @@ interface CampaignConfigFormProps {
 
 const PRESETS = [
   {
-    name: 'Nike Pegasus 40 Marathon Scale',
-    productService: 'Nike Air Zoom Pegasus 40 Running Shoes',
+    name: 'Nike Pegasus 36 Scale',
+    productService: 'Nike Air Zoom Pegasus 36 (AO2924-401)',
     targetAudience: 'Marathon runners, daily fitness joggers & urban commuters (Ages 20-45)',
-    targetLocation: 'Pan-India Top 8 Metros (Mumbai, Delhi NCR, Bengaluru, Hyderabad, Chennai, Pune)',
+    targetLocation: 'United States (Tier 1 Metros: New York, Los Angeles, Chicago, San Francisco, Seattle)',
     industryCategory: 'Athletic Footwear & Performance Apparel',
     totalBudget: 50000,
     campaignDuration: 30,
     objective: 'CONVERSIONS' as const,
     preferredPlatforms: ['meta', 'google', 'amazon', 'tiktok'],
-    productPrice: 4995,
+    productPrice: 120.00,
     pastRoas: 3.42,
     pastCtr: 0.024,
-    pastCpc: 18.20
+    pastCpc: 2.15
   },
   {
     name: 'Nike Air Force 1 Holiday Drop',
-    productService: "Nike Air Force 1 '07 Heritage Sneakers",
+    productService: "Nike Air Force 1 '07 (315122-001)",
     targetAudience: 'Sneakerheads, streetwear enthusiasts & college fashion tastemakers (Ages 18-32)',
-    targetLocation: 'Metro & Tier-1 Lifestyle Clusters',
+    targetLocation: 'US Lifestyle & Urban Metros',
     industryCategory: 'Streetwear & Lifestyle Footwear',
     totalBudget: 75000,
     campaignDuration: 21,
     objective: 'ROAS' as const,
     preferredPlatforms: ['meta', 'tiktok', 'amazon'],
-    productPrice: 7495,
+    productPrice: 87.89,
     pastRoas: 4.10,
     pastCtr: 0.031,
-    pastCpc: 15.50
+    pastCpc: 1.85
   },
   {
-    name: 'D2C Recovery & Clearance Blitz',
-    productService: 'End-of-Season Performance Footwear Inventory',
-    targetAudience: 'Deal hunters, clearance shoppers & value-conscious runners (Ages 18-50)',
-    targetLocation: 'National Tier-1, Tier-2 & Tier-3 Cities',
+    name: 'Nike React Infinity Run Clearance',
+    productService: 'Nike React Infinity Run Flyknit (CD4371-001)',
+    targetAudience: 'Marathon runners & high-mileage road runners (Ages 18-50)',
+    targetLocation: 'United States (National D2C)',
     industryCategory: 'Footwear & Sporting Goods',
     totalBudget: 35000,
     campaignDuration: 14,
     objective: 'CONVERSIONS' as const,
     preferredPlatforms: ['google', 'meta', 'amazon'],
-    productPrice: 3200,
+    productPrice: 168.61,
     pastRoas: 2.85,
     pastCtr: 0.019,
-    pastCpc: 14.10
+    pastCpc: 2.40
   }
 ];
 
@@ -84,7 +84,7 @@ export function CampaignConfigForm({ onSubmit, isLoading }: CampaignConfigFormPr
   const [includeHistorical, setIncludeHistorical] = useState(true);
   const [pastRoas, setPastRoas] = useState<number>(3.42);
   const [pastCtr, setPastCtr] = useState<number>(0.024);
-  const [pastCpc, setPastCpc] = useState<number>(18.20);
+  const [pastCpc, setPastCpc] = useState<number>(2.15);
 
   const applyPreset = (preset: typeof PRESETS[0]) => {
     setCampaignName(preset.name);
@@ -226,7 +226,7 @@ export function CampaignConfigForm({ onSubmit, isLoading }: CampaignConfigFormPr
           <Input
             value={targetLocation}
             onChange={(e) => setTargetLocation(e.target.value)}
-            placeholder='e.g. Pan-India Top 8 Metros'
+            placeholder='e.g. United States (Tier 1 Metros)'
             className='font-mono text-xs bg-muted/20'
             required
           />
@@ -234,7 +234,7 @@ export function CampaignConfigForm({ onSubmit, isLoading }: CampaignConfigFormPr
 
         {/* Budget */}
         <div className='space-y-1.5'>
-          <Label className='text-xs font-mono text-foreground'>Total Budget (₹)</Label>
+          <Label className='text-xs font-mono text-foreground'>Total Budget ($)</Label>
           <Input
             type='number'
             min={1000}
@@ -262,11 +262,11 @@ export function CampaignConfigForm({ onSubmit, isLoading }: CampaignConfigFormPr
 
         {/* Unit Price / AOV */}
         <div className='space-y-1.5'>
-          <Label className='text-xs font-mono text-foreground'>Product Sale Price / AOV (₹)</Label>
+          <Label className='text-xs font-mono text-foreground'>Product Sale Price / AOV ($)</Label>
           <Input
             type='number'
-            min={100}
-            step={50}
+            min={10}
+            step={5}
             value={productPrice}
             onChange={(e) => setProductPrice(Number(e.target.value))}
             className='font-mono text-xs bg-muted/20'
@@ -372,10 +372,10 @@ export function CampaignConfigForm({ onSubmit, isLoading }: CampaignConfigFormPr
               />
             </div>
             <div className='space-y-1'>
-              <span className='text-[11px] font-mono text-muted-foreground'>Past CPC (₹)</span>
+              <span className='text-[11px] font-mono text-muted-foreground'>Past CPC ($)</span>
               <Input
                 type='number'
-                step='0.5'
+                step='0.1'
                 value={pastCpc}
                 onChange={(e) => setPastCpc(Number(e.target.value))}
                 className='font-mono text-xs h-8 bg-background'
@@ -402,24 +402,24 @@ export function CampaignConfigForm({ onSubmit, isLoading }: CampaignConfigFormPr
       {/* Submit Action */}
       <div className='flex items-center justify-between pt-2'>
         <div className='flex items-center gap-2 text-xs font-mono text-muted-foreground'>
-          <IconLayersLinked className='size-4 text-emerald-400' />
+          <IconLayersLinked className='size-4 text-muted-foreground' />
           <span>Generates 20 to 25 distinct candidate strategies across all funnel stages</span>
         </div>
 
         <Button
           type='submit'
           disabled={isLoading}
-          className='bg-cyan-500 hover:bg-cyan-400 text-black font-mono font-bold text-xs px-5 h-9 shadow-md'
+          className='bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-mono font-medium text-xs px-5 h-9 rounded-md transition-colors'
         >
           {isLoading ? (
             <span className='flex items-center gap-2'>
-              <span className='size-3.5 border-2 border-black border-t-transparent rounded-full animate-spin' />
+              <span className='size-3.5 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin' />
               Simulating Strategies...
             </span>
           ) : (
             <span className='flex items-center gap-2'>
               <IconSparkles className='size-4' />
-              Generate &amp; Evaluate 20–25 Strategies
+              Generate &amp; Evaluate Strategies
             </span>
           )}
         </Button>

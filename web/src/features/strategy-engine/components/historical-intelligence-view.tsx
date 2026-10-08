@@ -68,10 +68,6 @@ export function HistoricalIntelligenceView({ summary }: HistoricalIntelligenceVi
             </p>
           </div>
         </div>
-
-        <span className='text-xs px-2.5 py-1 rounded border border-border bg-muted/30 text-foreground font-bold'>
-          Evidence Hierarchy: User Account History (Tier 1 Priority)
-        </span>
       </div>
 
       {/* KPI Cards Grid */}
@@ -87,7 +83,7 @@ export function HistoricalIntelligenceView({ summary }: HistoricalIntelligenceVi
         <div className='rounded-xl border border-border/80 bg-card p-3.5 shadow-2xs'>
           <span className='text-[10px] uppercase text-muted-foreground block'>Cumulative Spend</span>
           <span className='text-xl font-bold text-foreground block mt-1'>
-            ₹{(summary?.totalSpend || 1354000).toLocaleString()}
+            ${(summary?.totalSpend || 1354000).toLocaleString()}
           </span>
           <span className='text-[10px] text-muted-foreground block mt-0.5'>Past 12 months</span>
         </div>
@@ -95,7 +91,7 @@ export function HistoricalIntelligenceView({ summary }: HistoricalIntelligenceVi
         <div className='rounded-xl border border-border/80 bg-card p-3.5 shadow-2xs'>
           <span className='text-[10px] uppercase text-muted-foreground block'>Cumulative Revenue</span>
           <span className='text-xl font-bold text-foreground block mt-1'>
-            ₹{(summary?.totalRevenue || 4630000).toLocaleString()}
+            ${(summary?.totalRevenue || 4630000).toLocaleString()}
           </span>
           <span className='text-[10px] text-muted-foreground block mt-0.5'>Verified sales return</span>
         </div>
@@ -111,7 +107,7 @@ export function HistoricalIntelligenceView({ summary }: HistoricalIntelligenceVi
         <div className='rounded-xl border border-border/80 bg-card p-3.5 shadow-2xs'>
           <span className='text-[10px] uppercase text-muted-foreground block'>Account Avg CPA</span>
           <span className='text-2xl font-bold text-foreground block mt-1'>
-            ₹{(summary?.averageCpa || 448).toLocaleString()}
+            ${(summary?.averageCpa || 38).toLocaleString()}
           </span>
           <span className='text-[10px] text-muted-foreground block mt-0.5'>Per completed order</span>
         </div>
@@ -124,7 +120,7 @@ export function HistoricalIntelligenceView({ summary }: HistoricalIntelligenceVi
           <span className='text-sm font-bold text-emerald-400 block mt-0.5'>
             {summary?.bestPlatform || 'Google (Search & Shopping)'}
           </span>
-          <span className='text-[11px] text-muted-foreground block mt-1'>4.62x Avg ROAS • ₹412 CPA</span>
+          <span className='text-[11px] text-muted-foreground block mt-1'>4.62x Avg ROAS • $38 CPA</span>
         </div>
 
         <div className='p-3 rounded-xl border border-border/60 bg-muted/10'>
@@ -146,7 +142,7 @@ export function HistoricalIntelligenceView({ summary }: HistoricalIntelligenceVi
         <div className='p-3 rounded-xl border border-border/60 bg-muted/10'>
           <span className='text-[10px] text-muted-foreground uppercase block'>Top Geography</span>
           <span className='text-sm font-bold text-foreground block mt-0.5'>
-            {summary?.bestLocation || 'Top 8 Metros (Delhi, Mumbai, BLR)'}
+            {summary?.bestLocation || 'US Tier-1 Metros (NY, LA, Chicago, Seattle)'}
           </span>
           <span className='text-[11px] text-muted-foreground block mt-1'>71% of total transaction volume</span>
         </div>
@@ -185,7 +181,7 @@ export function HistoricalIntelligenceView({ summary }: HistoricalIntelligenceVi
                 </div>
                 <div className='flex justify-between'>
                   <span className='text-muted-foreground'>Avg CPA:</span>
-                  <span className='font-bold text-foreground'>₹{win.averageCpa.toLocaleString()}</span>
+                  <span className='font-bold text-foreground'>${win.averageCpa.toLocaleString()}</span>
                 </div>
               </div>
 
@@ -216,7 +212,7 @@ export function HistoricalIntelligenceView({ summary }: HistoricalIntelligenceVi
               <div className='flex items-center justify-between'>
                 <span className='text-xs font-bold text-rose-400'>{fail.platform} Failure Pattern</span>
                 <span className='text-[10px] px-2 py-0.5 rounded border border-rose-500/40 bg-rose-500/20 text-rose-300 font-bold'>
-                  Threshold: &gt; ₹{fail.budgetThreshold.toLocaleString()}
+                  Threshold: &gt; ${fail.budgetThreshold.toLocaleString()}
                 </span>
               </div>
 
@@ -302,13 +298,13 @@ export function HistoricalIntelligenceView({ summary }: HistoricalIntelligenceVi
                       {camp.platform}
                     </span>
                   </td>
-                  <td className='p-3 font-semibold'>₹{camp.spend.toLocaleString()}</td>
+                  <td className='p-3 font-semibold'>${camp.spend.toLocaleString()}</td>
                   <td className='p-3 text-muted-foreground'>
                     {camp.clicks.toLocaleString()} <span className='text-[10px]'>({(camp.ctr * 100).toFixed(2)}%)</span>
                   </td>
                   <td className='p-3 font-semibold text-foreground'>{camp.conversions}</td>
-                  <td className='p-3 font-semibold'>₹{camp.cpa.toLocaleString()}</td>
-                  <td className='p-3 font-semibold text-foreground'>₹{camp.revenue.toLocaleString()}</td>
+                  <td className='p-3 font-semibold'>${camp.cpa.toLocaleString()}</td>
+                  <td className='p-3 font-semibold text-foreground'>${camp.revenue.toLocaleString()}</td>
                   <td className='p-3'>
                     <span className={`font-bold ${camp.roas >= 3.2 ? 'text-emerald-400' : camp.roas >= 2.0 ? 'text-amber-400' : 'text-rose-400'}`}>
                       {camp.roas.toFixed(2)}x

@@ -10,7 +10,6 @@ import {
   Tooltip,
   ResponsiveContainer
 } from 'recharts';
-import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import {
@@ -23,51 +22,51 @@ export function ModelLearningHistorySection({ className }: { className?: string 
   const insights = SEED_MODEL_INSIGHTS;
 
   return (
-    <div className={cn('rounded-2xl border border-border/80 bg-card p-5 font-mono shadow-xs space-y-6', className)}>
-      <div className='flex items-center justify-between border-b border-border/60 pb-3 flex-wrap gap-2'>
+    <div className={cn('rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-5 font-mono shadow-none space-y-6', className)}>
+      <div className='flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3 flex-wrap gap-2'>
         <div>
           <div className='flex items-center gap-2'>
-            <Icons.sparkles className='size-4 text-emerald-500' />
-            <h3 className='text-xs font-bold uppercase tracking-wider text-foreground'>
-              Continuous Model Learning &amp; Outcome Feedback Loop
+            <Icons.sparkles className='size-3.5 text-zinc-500' />
+            <h3 className='text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100'>
+              Empirical Prior Calibration &amp; Feedback Loop
             </h3>
-            <Badge variant='outline' className='text-[10px] uppercase font-bold border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10'>
-              91.4% Model Accuracy
-            </Badge>
+            <span className='text-[10px] font-mono uppercase px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-500'>
+              94.8% Calibration
+            </span>
           </div>
-          <p className='text-[10px] text-muted-foreground mt-0.5'>
-            DATA → LEARN → PREDICT → ALLOCATE → OBSERVE RESULTS → LEARN AGAIN
+          <p className='text-[10px] text-zinc-500 mt-0.5'>
+            DATA → ESTIMATE → ALLOCATE → RECONCILE OBSERVED TELEMETRY → UPDATE PRIORS
           </p>
         </div>
 
         <div className='flex items-center gap-2 text-xs'>
-          <span className='size-2 rounded-full bg-emerald-500' />
-          <span className='text-muted-foreground'>Priors Calibrated:</span>
-          <span className='font-bold text-foreground'>Cycle 9482</span>
+          <span className='size-1.5 rounded-full bg-zinc-900 dark:bg-zinc-100' />
+          <span className='text-zinc-500'>Active Cycle:</span>
+          <span className='font-mono font-medium text-zinc-900 dark:text-zinc-100'>CYC-9482</span>
         </div>
       </div>
 
       {/* Predicted vs Actual Profit Chart */}
       <div className='grid grid-cols-1 lg:grid-cols-12 gap-5'>
         <div className='lg:col-span-7 space-y-2'>
-          <div className='flex items-center justify-between text-[10px] uppercase font-bold text-muted-foreground'>
-            <span>Predicted Profit vs Actual Realized Profit (₹ in Thousands)</span>
+          <div className='flex items-center justify-between text-[10px] uppercase font-semibold text-zinc-500'>
+            <span>Predicted vs Realized Profit ($ in Thousands)</span>
             <div className='flex items-center gap-3'>
-              <span className='text-primary'>● Predicted Profit</span>
-              <span className='text-emerald-500'>● Actual Realized Profit</span>
+              <span className='text-zinc-500'>● Predicted</span>
+              <span className='text-zinc-900 dark:text-zinc-100 font-semibold'>● Realized</span>
             </div>
           </div>
 
           <div className='h-[200px] w-full pt-1'>
             <ResponsiveContainer width='100%' height='100%'>
               <LineChart data={history} margin={{ top: 10, right: 15, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray='3 3' stroke='#e2e8f0' vertical={false} className='dark:stroke-zinc-800' />
+                <CartesianGrid strokeDasharray='3 3' stroke='#e4e4e7' vertical={false} className='dark:stroke-zinc-800' />
                 <XAxis dataKey='week' tickLine={false} axisLine={false} tick={{ fill: '#71717a', fontSize: 10 }} />
                 <YAxis
                   tickLine={false}
                   axisLine={false}
                   tick={{ fill: '#71717a', fontSize: 9 }}
-                  tickFormatter={(v) => `₹${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
+                  tickFormatter={(v) => `$${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`}
                 />
                 <Tooltip
                   content={({ active, payload, label }) => {
@@ -76,20 +75,20 @@ export function ModelLearningHistorySection({ className }: { className?: string 
                       const act = Number(payload[1]?.value ?? 0);
                       const item = payload[0]?.payload;
                       return (
-                        <div className='rounded-lg border border-border bg-card p-2.5 text-xs font-mono shadow-md space-y-1'>
-                          <div className='font-bold text-foreground text-[11px] border-b border-border/50 pb-1'>
+                        <div className='rounded border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-2.5 text-xs font-mono shadow-md space-y-1'>
+                          <div className='font-semibold text-zinc-900 dark:text-zinc-100 text-[11px] border-b border-zinc-200 dark:border-zinc-800 pb-1'>
                             {label} ({item?.cycleId})
                           </div>
-                          <div className='text-primary font-bold'>
-                            Predicted: ₹{pred.toLocaleString('en-IN')}
+                          <div className='text-zinc-500'>
+                            Predicted: ${pred.toLocaleString('en-US')}
                           </div>
-                          <div className='text-emerald-600 dark:text-emerald-400 font-bold'>
-                            Actual: ₹{act.toLocaleString('en-IN')}
+                          <div className='text-zinc-900 dark:text-zinc-100 font-bold'>
+                            Actual: ${act.toLocaleString('en-US')}
                           </div>
-                          <div className='text-[10px] text-muted-foreground pt-1 border-t border-border/40'>
-                            Variance: <strong className='text-foreground'>{item?.errorPct > 0 ? '+' : ''}{item?.errorPct}%</strong> (Accuracy: {item?.accuracyPct}%)
+                          <div className='text-[10px] text-zinc-500 pt-1 border-t border-zinc-200 dark:border-zinc-800'>
+                            Variance: <strong className='text-zinc-800 dark:text-zinc-200'>{item?.errorPct > 0 ? '+' : ''}{item?.errorPct}%</strong> (Accuracy: {item?.accuracyPct}%)
                           </div>
-                          <p className='text-[9px] text-muted-foreground italic leading-tight pt-0.5'>
+                          <p className='text-[9px] text-zinc-500 italic leading-tight pt-0.5'>
                             {item?.keyLearning}
                           </p>
                         </div>
@@ -101,18 +100,19 @@ export function ModelLearningHistorySection({ className }: { className?: string 
                 <Line
                   type='monotone'
                   dataKey='predictedProfit'
-                  stroke='#3b82f6'
-                  strokeWidth={2}
-                  dot={{ r: 3 }}
-                  activeDot={{ r: 5 }}
+                  stroke='#a1a1aa'
+                  strokeWidth={1.5}
+                  dot={{ r: 2 }}
+                  activeDot={{ r: 4 }}
                 />
                 <Line
                   type='monotone'
                   dataKey='actualProfit'
-                  stroke='#10b981'
-                  strokeWidth={2.5}
-                  dot={{ r: 4 }}
-                  activeDot={{ r: 6 }}
+                  stroke='#18181b'
+                  className='dark:stroke-zinc-100'
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 5 }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -121,7 +121,7 @@ export function ModelLearningHistorySection({ className }: { className?: string 
 
         {/* Prediction Error Table */}
         <div className='lg:col-span-5 space-y-2'>
-          <div className='text-[10px] uppercase font-bold text-muted-foreground'>
+          <div className='text-[10px] uppercase font-semibold text-zinc-500'>
             Cycle Prediction Verification Log
           </div>
 
@@ -129,23 +129,23 @@ export function ModelLearningHistorySection({ className }: { className?: string 
             {history.map((h) => (
               <div
                 key={h.cycleId}
-                className='rounded-lg border border-border/70 p-2.5 bg-muted/20 text-xs flex items-center justify-between'
+                className='rounded-md border border-zinc-200 dark:border-zinc-800 p-2.5 bg-zinc-50/50 dark:bg-zinc-900/30 text-xs flex items-center justify-between'
               >
                 <div>
                   <div className='flex items-center gap-1.5'>
-                    <span className='font-bold text-foreground'>{h.week}</span>
-                    <span className='text-[10px] text-muted-foreground font-mono'>({h.cycleId})</span>
+                    <span className='font-semibold text-zinc-900 dark:text-zinc-100'>{h.week}</span>
+                    <span className='text-[10px] text-zinc-500 font-mono'>({h.cycleId})</span>
                   </div>
-                  <span className='text-[10px] text-muted-foreground line-clamp-1 mt-0.5'>
+                  <span className='text-[10px] text-zinc-500 line-clamp-1 mt-0.5'>
                     {h.keyLearning}
                   </span>
                 </div>
 
                 <div className='text-right shrink-0'>
-                  <span className='font-bold text-emerald-600 dark:text-emerald-400 block text-xs'>
+                  <span className='font-mono font-semibold text-zinc-900 dark:text-zinc-100 block text-xs'>
                     {h.accuracyPct}% Acc
                   </span>
-                  <span className='text-[10px] text-muted-foreground'>
+                  <span className='text-[10px] text-zinc-500 font-mono'>
                     {h.errorPct > 0 ? '+' : ''}{h.errorPct}% Error
                   </span>
                 </div>
@@ -155,30 +155,30 @@ export function ModelLearningHistorySection({ className }: { className?: string 
         </div>
       </div>
 
-      {/* Visual Insight Cards: "What Did the Model Learn?" */}
-      <div className='space-y-2 pt-2 border-t border-border/60'>
+      {/* Synthesized Priors */}
+      <div className='space-y-2 pt-2 border-t border-zinc-200 dark:border-zinc-800'>
         <div className='flex items-center justify-between'>
-          <span className='text-[10px] uppercase font-bold text-muted-foreground flex items-center gap-1.5'>
-            <Icons.sparkles className='size-3 text-primary' />
-            What Did The Model Learn from Historical Outcomes?
+          <span className='text-[10px] uppercase font-semibold text-zinc-500 flex items-center gap-1.5'>
+            <Icons.sparkles className='size-3 text-zinc-400' />
+            Calibrated Priors &amp; Empirical Constraints
           </span>
-          <span className='text-[10px] text-muted-foreground'>4 Validated Synthesized Priors</span>
+          <span className='text-[10px] font-mono text-zinc-500'>4 Active Priors</span>
         </div>
 
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3'>
           {insights.map((ins) => (
             <div
               key={ins.id}
-              className='rounded-xl border border-border/70 bg-card p-3 space-y-1.5 text-xs hover:border-foreground/30 transition-all shadow-2xs'
+              className='rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-3 space-y-1 text-xs'
             >
-              <div className='flex items-center justify-between text-[9px] uppercase font-bold'>
-                <span className='text-primary'>{ins.type}</span>
-                <span className='text-emerald-600 dark:text-emerald-400'>{ins.metricImpact}</span>
+              <div className='flex items-center justify-between text-[9px] uppercase font-semibold'>
+                <span className='text-zinc-500'>{ins.type}</span>
+                <span className='text-zinc-900 dark:text-zinc-100 font-mono'>{ins.metricImpact}</span>
               </div>
-              <h4 className='font-bold text-foreground text-xs leading-snug'>
+              <h4 className='font-semibold text-zinc-900 dark:text-zinc-100 text-xs leading-snug'>
                 {ins.headline}
               </h4>
-              <p className='text-[10px] text-muted-foreground leading-relaxed'>
+              <p className='text-[10px] text-zinc-500 leading-relaxed'>
                 {ins.detail}
               </p>
             </div>

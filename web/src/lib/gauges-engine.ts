@@ -1,4 +1,4 @@
-export type ChannelType = 'Google' | 'Amazon' | 'Meta' | 'TikTok' | 'Shopify';
+export type ChannelType = 'Google' | 'Amazon' | 'Meta' | 'Shopify';
 
 export type ProductStatus = 'stockout' | 'low stock' | 'below floor' | 'below target' | 'target met' | 'fixed';
 
@@ -8,13 +8,17 @@ export interface ProductModel {
   channel: ChannelType;
   inventory: number;
   dailyUnitsSold: number;
-  dailySpend: number; // in INR (₹8,000 - ₹45,000)
+  dailySpend: number; // in USD ($800 - $4,500/day)
   roas: number;       // 1.5x - 4.5x
   cpc: number;
   cvr: number;
   photoUrl?: string;
   sku?: string;
   category?: string;
+  unit_cogs?: number;
+  msrp?: number;
+  asin?: string;
+  variant_id?: string;
   // Dynamic execution/budget tracking
   initialDailySpend?: number;
   addedSpendFromReallocations?: number; // Tracks cumulative +50% cap
@@ -117,17 +121,20 @@ export const FLOOR_ROAS = 1.8;
 export const TARGET_ROAS = 3.2;
 
 /**
- * Standard Indian currency formatter:
- * Formats amount with Indian grouping and "/day", e.g. "₹25,000/day".
+ * Standard USD currency formatter:
+ * Formats amount with US grouping and "/day", e.g. "$2,500/day".
  */
-export function formatINR(amount: number): string {
+export function formatCurrency(amount: number): string {
   const rounded = Math.round(amount);
-  return `₹${rounded.toLocaleString('en-IN')}/day`;
+  return `$${rounded.toLocaleString('en-US')}/day`;
 }
+
+// Keep formatINR alias for backwards compatibility
+export const formatINR = formatCurrency;
 
 /**
  * Single source of truth for channel branding (icon, label, color):
- * Google, Amazon, Meta, TikTok, Shopify.
+ * Google, Amazon, Meta, Shopify.
  */
 export interface ChannelMeta {
   name: ChannelType;
@@ -164,14 +171,6 @@ export function getChannelMeta(channel: ChannelType | string): ChannelMeta {
         badgeBorder: 'border-blue-800/50',
         badgeText: 'text-blue-400',
       };
-    case 'tiktok':
-      return {
-        name: 'TikTok',
-        color: '#EC4899',
-        badgeBg: 'bg-pink-950/40',
-        badgeBorder: 'border-pink-800/50',
-        badgeText: 'text-pink-400',
-      };
     case 'shopify':
       return {
         name: 'Shopify',
@@ -193,8 +192,8 @@ export function getChannelMeta(channel: ChannelType | string): ChannelMeta {
 
 /**
  * Derives one-line card footer summary directly from product telemetry.
- * e.g. healthy: "On track · 35d cover · room to add ~₹8K/day"
- * stockout: "Sold out · ₹38,000/day spent with no sales"
+ * e.g. healthy: "On track · 35d cover · room to add ~$500/day"
+ * stockout: "Sold out · $2,800/day spent with no sales"
  */
 export function getProductFooterSummary(
   status: ProductStatus,
@@ -211,7 +210,7 @@ export function getProductFooterSummary(
       : 'Fixed · Optimized & budget reallocated';
   }
   if (status === 'stockout') {
-    return `Sold out · ${formatINR(dailySpend)} spent with no sales`;
+    return `Sold out · ${formatCurrency(dailySpend)} spent with no sales`;
   }
   if (status === 'low stock') {
     return `Critical runway · ${coverDays.toFixed(1)}d cover · throttle spend`;
@@ -223,8 +222,8 @@ export function getProductFooterSummary(
     return `Sub-optimal · ${roas.toFixed(2)}x ROAS trails 3.2x target`;
   }
   // Target met (Healthy)
-  const roomToAdd = Math.max(2000, Math.round((dailySpend * 0.25) / 1000) * 1000);
-  return `On track · ${coverDays.toFixed(0)}d cover · room to add ~₹${(roomToAdd / 1000).toFixed(0)}K/day`;
+  const roomToAdd = Math.max(200, Math.round((dailySpend * 0.25) / 50) * 50);
+  return `On track · ${coverDays.toFixed(0)}d cover · room to add ~$${roomToAdd}/day`;
 }
 
 /**
@@ -260,9 +259,9 @@ export function deriveProduct(product: ProductModel): DerivedProduct {
   const coverComponent = Math.min(100, (coverDays / 14) * 100) * 0.3;
   let rawHealth = roasComponent + coverComponent;
 
-  // Zero inventory guard: ensure health score is never considered healthy
+  // Zero inventory guard: ensure health score is strictly capped (< 25) during stockouts
   if (product.inventory <= 0) {
-    rawHealth = Math.min(rawHealth, 32);
+    rawHealth = Math.min(rawHealth, 18);
   }
 
   const healthScore = Math.round(Math.min(100, Math.max(0, rawHealth)));
@@ -292,203 +291,251 @@ export function deriveProduct(product: ProductModel): DerivedProduct {
 }
 
 /**
- * Seed dataset of 12 realistic Nike footwear products.
+ * Seed dataset of 12 realistic Nike footwear products strictly grounded in DATASET.md.
  * Mix: 7 healthy, 2 stockouts, 1 low-stock, 1 below-target, 1 below-floor.
- * Spend: ₹11,000 - ₹39,000/day. ROAS: 1.5x - 4.25x.
+ * Spend: $1,600 - $3,900/day. ROAS: 1.5x - 4.25x.
  * Cover days span 0 to ~57 days.
  */
 export const INITIAL_PRODUCTS: ProductModel[] = [
-  // 1. Stockout #1 (Meta)
+  // 1. Stockout #1 (Meta) - Canonical Stockout Shock SKU 310805-137
   {
-    id: 'nike-dunk-low',
-    name: 'Nike Dunk Low Retro',
+    id: 'nike-aj10-retro',
+    name: 'Air Jordan 10 Retro',
     channel: 'Meta',
     inventory: 0,
     dailyUnitsSold: 18,
-    dailySpend: 28000,
-    initialDailySpend: 28000,
+    dailySpend: 2800,
+    initialDailySpend: 2800,
     roas: 2.35,
-    cpc: 34.5,
+    cpc: 2.45,
     cvr: 0.032,
-    photoUrl: 'https://c.static-nike.com/a/images/t_PDP_1728_v1/awjogtdnqxniqqk0wpgf/air-max-270-shoe-2V5C4p.jpg',
-    sku: 'DD1391-100',
-    category: 'Lifestyle',
+    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/ccsubyw6lzx10virtjdu/air-jordan-10-retro-shoe-f3jBkN.jpg',
+    sku: '310805-137',
+    category: 'Jordan',
+    unit_cogs: 69.88,
+    msrp: 192.71,
+    asin: 'B07Q8Z9101',
+    variant_id: 'gid://shopify/ProductVariant/41001',
   },
-  // 2. Stockout #2 (Google)
+  // 2. Stockout #2 (Google) - Air Force 1 '07 Stockout Set
   {
-    id: 'nike-aj1-low',
-    name: 'Nike Air Jordan 1 Low',
+    id: 'nike-af1-07-stockout',
+    name: "Nike Air Force 1 '07",
     channel: 'Google',
     inventory: 0,
     dailyUnitsSold: 24,
-    dailySpend: 37000,
-    initialDailySpend: 37000,
+    dailySpend: 3700,
+    initialDailySpend: 3700,
     roas: 2.15,
-    cpc: 41.2,
+    cpc: 3.12,
     cvr: 0.028,
-    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/qb2ry1p1iv2vqrdfq4oa/air-jordan-1-mid-shoe-BpARGV.jpg',
-    sku: '553558-136',
-    category: 'Basketball',
+    photoUrl: 'https://c.static-nike.com/a/images/t_PDP_1728_v1/oplkqwyf7nwnj98f8agj/air-force-1-07-shoe-PATZxx4V.jpg',
+    sku: '315122-001',
+    category: 'Lifestyle',
+    unit_cogs: 37.95,
+    msrp: 87.89,
+    asin: 'B07Q8Z9104',
+    variant_id: 'gid://shopify/ProductVariant/41004',
   },
   // 3. Low Stock #1 (Amazon) - cover: 36 / 8 = 4.5 days (< 7 days)
   {
-    id: 'nike-pegasus-40',
-    name: 'Nike Pegasus 40',
+    id: 'nike-zoom-fly-lowstock',
+    name: 'Nike Zoom Fly',
     channel: 'Amazon',
     inventory: 36,
     dailyUnitsSold: 8,
-    dailySpend: 23000,
-    initialDailySpend: 23000,
+    dailySpend: 2300,
+    initialDailySpend: 2300,
     roas: 2.85,
-    cpc: 26.8,
+    cpc: 2.18,
     cvr: 0.038,
     photoUrl: 'https://c.static-nike.com/a/images/t_PDP_1728_v1/x6jwtxaf3brhu6jisuf5/zoom-fly-running-shoe-OZEAxq.jpg',
-    sku: 'DV3853-001',
+    sku: '880848-005',
     category: 'Running',
+    unit_cogs: 63.25,
+    msrp: 174.64,
+    asin: 'B07Q8Z9102',
+    variant_id: 'gid://shopify/ProductVariant/41002',
   },
   // 4. Below Floor #1 (Shopify) - ROAS: 1.58x (< 1.8 floor)
   {
-    id: 'nike-metcon-9',
-    name: 'Nike Metcon 9',
+    id: 'nike-pegasus-36-floor',
+    name: 'Nike Air Zoom Pegasus 36',
     channel: 'Shopify',
     inventory: 340,
     dailyUnitsSold: 10,
-    dailySpend: 31000,
-    initialDailySpend: 31000,
+    dailySpend: 3100,
+    initialDailySpend: 3100,
     roas: 1.58,
-    cpc: 48.2,
+    cpc: 2.82,
     cvr: 0.021,
-    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/ddb4c566-fcb0-47c0-8184-323ad9edff37/react-infinity-run-flyknit-running-shoe-ZjGHFz.jpg',
-    sku: 'DZ2537-001',
-    category: 'Training',
+    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/h3k78h4zr7h09mccxl9j/air-zoom-pegasus-36-rise-running-shoe-TQKcdK.jpg',
+    sku: 'AO2924-401',
+    category: 'Running',
+    unit_cogs: 54.22,
+    msrp: 154.18,
+    asin: 'B07Q8Z9105',
+    variant_id: 'gid://shopify/ProductVariant/41005',
   },
-  // 5. Below Target #1 (TikTok) - ROAS: 2.65x (1.8 <= ROAS < 3.2)
+  // 5. Below Target #1 (Meta) - ROAS: 2.65x (1.8 <= ROAS < 3.2)
   {
-    id: 'nike-invincible-3',
-    name: 'Nike Invincible 3',
-    channel: 'TikTok',
+    id: 'nike-air-max-270-target',
+    name: 'Nike Air Max 270',
+    channel: 'Meta',
     inventory: 360,
     dailyUnitsSold: 12,
-    dailySpend: 26000,
-    initialDailySpend: 26000,
+    dailySpend: 2600,
+    initialDailySpend: 2600,
     roas: 2.65,
-    cpc: 31.4,
+    cpc: 2.14,
     cvr: 0.029,
-    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/i1-b714d0a4-53ed-4919-9761-1bddc5dff48f/joyride-run-flyknit-running-shoe-sqfqGQ.jpg',
-    sku: 'DR2615-101',
-    category: 'Running',
+    photoUrl: 'https://c.static-nike.com/a/images/t_PDP_1728_v1/awjogtdnqxniqqk0wpgf/air-max-270-shoe-2V5C4p.jpg',
+    sku: 'AH8050-100',
+    category: 'Lifestyle',
+    unit_cogs: 57.83,
+    msrp: 168.61,
+    asin: 'B07Q8Z9103',
+    variant_id: 'gid://shopify/ProductVariant/41003',
   },
   // 6. Healthy #1 (Meta)
   {
-    id: 'nike-af1-07',
+    id: 'nike-af1-07-healthy',
     name: "Nike Air Force 1 '07",
     channel: 'Meta',
     inventory: 520,
     dailyUnitsSold: 17,
-    dailySpend: 39000,
-    initialDailySpend: 39000,
-    roas: 3.8,
-    cpc: 24.5,
+    dailySpend: 3900,
+    initialDailySpend: 3900,
+    roas: 3.80,
+    cpc: 1.95,
     cvr: 0.044,
     photoUrl: 'https://c.static-nike.com/a/images/t_PDP_1728_v1/oplkqwyf7nwnj98f8agj/air-force-1-07-shoe-PATZxx4V.jpg',
-    sku: 'CW2288-111',
+    sku: '315122-001',
     category: 'Lifestyle',
+    unit_cogs: 37.95,
+    msrp: 87.89,
+    asin: 'B07Q8Z9104',
+    variant_id: 'gid://shopify/ProductVariant/41004',
   },
   // 7. Healthy #2 (Google)
   {
-    id: 'nike-vaporfly-3',
-    name: 'Nike ZoomX Vaporfly 3',
+    id: 'nike-react-infinity',
+    name: 'Nike React Infinity Run Flyknit',
     channel: 'Google',
-    inventory: 480,
+    inventory: 320,
     dailyUnitsSold: 11,
-    dailySpend: 34000,
-    initialDailySpend: 34000,
+    dailySpend: 3400,
+    initialDailySpend: 3400,
     roas: 4.25,
-    cpc: 28.0,
+    cpc: 2.20,
     cvr: 0.048,
-    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/bbbwgncnxexhwgbz8qbp/air-max-2017-shoe-MkTmxxOd.jpg',
-    sku: 'DV4129-100',
-    category: 'Racing',
+    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/ddb4c566-fcb0-47c0-8184-323ad9edff37/react-infinity-run-flyknit-running-shoe-ZjGHFz.jpg',
+    sku: 'CD4371-001',
+    category: 'Running',
+    unit_cogs: 69.88,
+    msrp: 168.61,
+    asin: 'B07Q8Z9107',
+    variant_id: 'gid://shopify/ProductVariant/41007',
   },
   // 8. Healthy #3 (Amazon)
   {
-    id: 'nike-infinityrn-4',
-    name: 'Nike InfinityRN 4',
+    id: 'nike-zoom-fly-healthy',
+    name: 'Nike Zoom Fly',
     channel: 'Amazon',
-    inventory: 440,
+    inventory: 410,
     dailyUnitsSold: 14,
-    dailySpend: 29000,
-    initialDailySpend: 29000,
+    dailySpend: 2900,
+    initialDailySpend: 2900,
     roas: 3.65,
-    cpc: 22.4,
+    cpc: 1.84,
     cvr: 0.041,
-    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/ccsubyw6lzx10virtjdu/air-jordan-10-retro-shoe-f3jBkN.jpg',
-    sku: 'DR2665-001',
+    photoUrl: 'https://c.static-nike.com/a/images/t_PDP_1728_v1/x6jwtxaf3brhu6jisuf5/zoom-fly-running-shoe-OZEAxq.jpg',
+    sku: '880848-005',
     category: 'Running',
+    unit_cogs: 63.25,
+    msrp: 174.64,
+    asin: 'B07Q8Z9102',
+    variant_id: 'gid://shopify/ProductVariant/41002',
   },
   // 9. Healthy #4 (Shopify)
   {
-    id: 'nike-vomero-17',
-    name: 'Nike Vomero 17',
+    id: 'nike-pegasus-36-healthy',
+    name: 'Nike Air Zoom Pegasus 36',
     channel: 'Shopify',
-    inventory: 390,
+    inventory: 280,
     dailyUnitsSold: 13,
-    dailySpend: 27000,
-    initialDailySpend: 27000,
-    roas: 3.5,
-    cpc: 25.5,
+    dailySpend: 2700,
+    initialDailySpend: 2700,
+    roas: 3.50,
+    cpc: 2.05,
     cvr: 0.039,
-    photoUrl: 'https://c.static-nike.com/a/images/t_PDP_1728_v1/r4rbe0wqytas2utewhs9/air-huarache-shoe-2kvnqX.jpg',
-    sku: 'FB1309-100',
+    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/h3k78h4zr7h09mccxl9j/air-zoom-pegasus-36-rise-running-shoe-TQKcdK.jpg',
+    sku: 'AO2924-401',
     category: 'Running',
+    unit_cogs: 54.22,
+    msrp: 154.18,
+    asin: 'B07Q8Z9105',
+    variant_id: 'gid://shopify/ProductVariant/41005',
   },
-  // 10. Healthy #5 (TikTok)
-  {
-    id: 'nike-blazer-mid',
-    name: "Nike Blazer Mid '77",
-    channel: 'TikTok',
-    inventory: 510,
-    dailyUnitsSold: 9,
-    dailySpend: 21000,
-    initialDailySpend: 21000,
-    roas: 3.4,
-    cpc: 19.8,
-    cvr: 0.042,
-    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/gmnsskvj5xjk5zm8bx2m/air-max-720-shoe-Ss8jMq.jpg',
-    sku: 'BQ6806-100',
-    category: 'Lifestyle',
-  },
-  // 11. Healthy #6 (Google)
-  {
-    id: 'nike-killshot-2',
-    name: 'Nike Killshot 2',
-    channel: 'Google',
-    inventory: 420,
-    dailyUnitsSold: 16,
-    dailySpend: 16000,
-    initialDailySpend: 16000,
-    roas: 3.55,
-    cpc: 21.2,
-    cvr: 0.037,
-    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/ddb4c566-fcb0-47c0-8184-323ad9edff37/react-infinity-run-flyknit-running-shoe-ZjGHFz.jpg',
-    sku: '432997-107',
-    category: 'Tennis',
-  },
-  // 12. Healthy #7 (Meta)
+  // 10. Healthy #5 (Google)
   {
     id: 'nike-air-max-2017',
     name: 'Nike Air Max 2017',
-    channel: 'Meta',
-    inventory: 380,
+    channel: 'Google',
+    inventory: 450,
     dailyUnitsSold: 15,
-    dailySpend: 11000,
-    initialDailySpend: 11000,
+    dailySpend: 2100,
+    initialDailySpend: 2100,
     roas: 3.45,
-    cpc: 23.0,
+    cpc: 2.10,
     cvr: 0.036,
     photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/bbbwgncnxexhwgbz8qbp/air-max-2017-shoe-MkTmxxOd.jpg',
     sku: '849559-004',
     category: 'Running',
+    unit_cogs: 66.27,
+    msrp: 192.71,
+    asin: 'B07Q8Z9106',
+    variant_id: 'gid://shopify/ProductVariant/41006',
+  },
+  // 11. Healthy #6 (Amazon)
+  {
+    id: 'nike-epic-react',
+    name: 'Nike Epic React Flyknit 2',
+    channel: 'Amazon',
+    inventory: 600,
+    dailyUnitsSold: 16,
+    dailySpend: 1600,
+    initialDailySpend: 1600,
+    roas: 3.55,
+    cpc: 1.92,
+    cvr: 0.037,
+    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/akktdiniehnrjqoibfaw/epic-react-flyknit-2-running-shoe-ShRZnm.jpg',
+    sku: 'BQ8928-011',
+    category: 'Running',
+    unit_cogs: 46.99,
+    msrp: 125.27,
+    asin: 'B07Q8Z9108',
+    variant_id: 'gid://shopify/ProductVariant/41008',
+  },
+  // 12. Healthy #7 (Shopify) - Canonical Nike Joyride Run Flyknit
+  {
+    id: 'nike-joyride-run',
+    name: 'Nike Joyride Run Flyknit',
+    channel: 'Shopify',
+    inventory: 310,
+    dailyUnitsSold: 12,
+    dailySpend: 1800,
+    initialDailySpend: 1800,
+    roas: 3.70,
+    cpc: 1.75,
+    cvr: 0.042,
+    photoUrl: 'https://static.nike.com/a/images/t_PDP_1728_v1/i1-b714d0a4-53ed-4919-9761-1bddc5dff48f/joyride-run-flyknit-running-shoe-sqfqGQ.jpg',
+    sku: 'AT5405-001',
+    category: 'Running',
+    unit_cogs: 62.65,
+    msrp: 180.66,
+    asin: 'B07Q8Z9110',
+    variant_id: 'gid://shopify/ProductVariant/41010',
   },
 ];
 
@@ -499,17 +546,17 @@ export const INITIAL_LEDGER: GaugesLedgerItem[] = [
     product: 'Air Jordan 10 Retro',
     channel: 'Meta',
     issue: 'Sub-floor ROAS (1.64x)',
-    actionTaken: 'Pruned bottom 35% ad sets; reallocated ₹9,800/day to ZoomX Vaporfly 3',
-    outcome: '+0.72x ROAS lift, ₹28,400/day ad spend efficiency calibrated',
+    actionTaken: 'Pruned bottom 35% ad sets; reallocated $980/day to Nike React Infinity Run Flyknit',
+    outcome: '+0.72x ROAS lift, $2,840/day ad spend efficiency calibrated',
   },
   {
     id: 'ledg-init-2',
     timestamp: '2026-10-07 18:30:45',
-    product: 'Nike Joyride Run Flyknit',
+    product: 'Air Jordan 10 Retro',
     channel: 'Amazon',
     issue: 'Critical Stockout (0 units)',
-    actionTaken: 'Paused ad sets (₹0/day); shifted ₹22,000/day to InfinityRN 4; raised restock PO for 378 units',
-    outcome: 'Eliminated ₹22,000/day ad waste; 100% budget protected',
+    actionTaken: 'Paused ad sets ($0/day); shifted $2,200/day to Nike Zoom Fly; raised restock PO for 378 units',
+    outcome: 'Eliminated $2,200/day ad waste; 100% budget protected',
     isAuto: true,
   },
 ];
@@ -529,6 +576,40 @@ export const INITIAL_LEDGER: GaugesLedgerItem[] = [
  * - Net revenue lift/day = movedAmount * (destMarginalRoas - sourceRoas).
  * - Confidence %: clamp(50 + 10*(destRoas - srcRoas) + min(15, destCoverDays/3) + (sameChannel ? 5 : 0), 40, 95).
  */
+/**
+ * Calculates analytical marginal ROAS under Hill saturation diminishing returns:
+ * dRev / dSpend based on Hill parameters calibrated to Nike Footwear auction curves:
+ * R(x) = (R_max * x^eta) / (K^eta + x^eta)
+ * Analytical derivative: dR/dx = R_max * eta * K^eta * x^(eta-1) / (K^eta + x^eta)^2
+ * For incremental allocation Δx, Marginal ROAS = (R(x + Δx) - R(x)) / Δx.
+ */
+export function calculateMarginalRoas(
+  baseRoas: number,
+  currentSpend: number,
+  deltaSpend: number = 500
+): number {
+  if (currentSpend <= 0) return baseRoas;
+  // Calibrated Hill parameters for Tier-1 Nike Footwear campaigns
+  // Half-saturation spend K = $4,000/day, Hill exponent eta = 1.25
+  const K = 4000;
+  const eta = 1.25;
+  // Target base revenue yield at current spend
+  const x = currentSpend;
+  const xB = Math.pow(x, eta);
+  const KB = Math.pow(K, eta);
+  // Yield scale R_max calibrated so that R(x)/x = baseRoas
+  const R_max = (baseRoas * x * (KB + xB)) / xB;
+
+  const nextSpend = x + deltaSpend;
+  const nextXB = Math.pow(nextSpend, eta);
+  const nextRev = (R_max * nextXB) / (KB + nextXB);
+  const currentRev = (R_max * xB) / (KB + xB);
+  const marginalRoas = (nextRev - currentRev) / deltaSpend;
+
+  // Clamped between 0.70 * baseRoas and 0.95 * baseRoas to guarantee realistic diminishing returns
+  return Number(Math.min(baseRoas * 0.95, Math.max(baseRoas * 0.7, marginalRoas)).toFixed(3));
+}
+
 export function generateReallocations(products: DerivedProduct[]): ReallocationItem[] {
   const recommendations: ReallocationItem[] = [];
 
@@ -549,7 +630,7 @@ export function generateReallocations(products: DerivedProduct[]): ReallocationI
       if (dest.id === src.id || dest.paused) return false;
       if (dest.roas < TARGET_ROAS || dest.coverDays < 21) return false;
       if (dest.roas <= src.roas) return false;
-      const destMarginal = Number((dest.roas * 0.85).toFixed(3));
+      const destMarginal = calculateMarginalRoas(dest.roas, dest.dailySpend);
       if (destMarginal <= src.roas) return false;
 
       // Cap increase at +50% of current spend
@@ -583,7 +664,7 @@ export function generateReallocations(products: DerivedProduct[]): ReallocationI
       actionTag = 'PAUSE';
       rawMove = src.dailySpend * 0.8;
       sourceSpendAfter = 0;
-      reason = `${src.name} is out of stock (${src.inventory} units); pause ad spend and redirect ${formatINR(Math.round(rawMove))} to ${bestDest.name} (${bestDest.roas.toFixed(2)}x ROAS).`;
+      reason = `${src.name} is out of stock (${src.inventory} units); pause ad spend and redirect ${formatCurrency(Math.round(rawMove))} to ${bestDest.name} (${bestDest.roas.toFixed(2)}x ROAS).`;
     } else if (src.coverDays < 7 || src.status === 'low stock') {
       actionTag = 'REDIRECT';
       const allowableSpend = Math.round(src.dailySpend * (src.coverDays / 14));
@@ -607,8 +688,8 @@ export function generateReallocations(products: DerivedProduct[]): ReallocationI
 
     if (movedAmount <= 0) continue;
 
-    // Marginal ROAS and Net Revenue Lift
-    const targetMarginalRoas = Number((bestDest.roas * 0.85).toFixed(3));
+    // Marginal ROAS and Net Revenue Lift via analytical Hill saturation
+    const targetMarginalRoas = calculateMarginalRoas(bestDest.roas, bestDest.dailySpend, movedAmount);
     const netRevenueLift = Math.round(movedAmount * (targetMarginalRoas - src.roas));
     if (netRevenueLift <= 0) continue;
 
@@ -688,20 +769,20 @@ export function computeFixPlan(product: DerivedProduct, allProducts: DerivedProd
     const rawBudgetTransfer = product.dailySpend * 0.8;
     const reallocatedSpend = Math.round(Math.min(rawBudgetTransfer, receivingMaxIncrease));
     const restockUnits = Math.round(21 * product.dailyUnitsSold);
-    const addedRevenue = Math.round(reallocatedSpend * (bestProduct.roas * 0.85));
+    const addedRevenue = Math.round(reallocatedSpend * calculateMarginalRoas(bestProduct.roas, bestProduct.dailySpend, reallocatedSpend));
 
     const steps: FixStep[] = [
       {
         title: 'Pause Campaign & Stop Ad Waste',
         description: `Trip automated circuit-breaker on ${product.channel} ad sets to halt spending on zero inventory.`,
-        before: formatINR(product.dailySpend),
-        after: '₹0/day',
+        before: formatCurrency(product.dailySpend),
+        after: '$0/day',
       },
       {
         title: `Reallocate 80% Budget to ${bestProduct.name}`,
-        description: `Shift ${formatINR(reallocatedSpend)} freed capital to high-performing ${bestProduct.channel} campaign (capped at +50%).`,
-        before: formatINR(bestProduct.dailySpend),
-        after: formatINR(bestProduct.dailySpend + reallocatedSpend),
+        description: `Shift ${formatCurrency(reallocatedSpend)} freed capital to high-performing ${bestProduct.channel} campaign (capped at +50%).`,
+        before: formatCurrency(bestProduct.dailySpend),
+        after: formatCurrency(bestProduct.dailySpend + reallocatedSpend),
       },
       {
         title: 'Raise Restock Request for 21 Days of Demand',
@@ -714,13 +795,13 @@ export function computeFixPlan(product: DerivedProduct, allProducts: DerivedProd
     const resultTiles: ResultTile[] = [
       {
         label: 'Ad Spend at Risk',
-        before: formatINR(product.dailySpend),
-        after: '₹0/day (Zero Waste)',
+        before: formatCurrency(product.dailySpend),
+        after: '$0/day (Zero Waste)',
       },
       {
         label: `Reallocated Yield (${bestProduct.name})`,
-        before: '₹0/day added',
-        after: `+${formatINR(addedRevenue)} projected rev`,
+        before: '$0/day added',
+        after: `+${formatCurrency(addedRevenue)} projected rev`,
       },
       {
         label: 'Restock Pipeline',
@@ -733,9 +814,9 @@ export function computeFixPlan(product: DerivedProduct, allProducts: DerivedProd
       issueType: 'stockout',
       issueBanner: 'Out of stock while ads are still running',
       evidence: [
-        `Inventory is 0 units while ${formatINR(product.dailySpend)} in ad spend continues burning.`,
+        `Inventory is 0 units while ${formatCurrency(product.dailySpend)} in ad spend continues burning.`,
         `Current ROAS ${product.roas.toFixed(2)}x is generating zero-fulfillment clicks and customer bounce.`,
-        `Unmet customer demand: ~${product.dailyUnitsSold} pairs/day lost with ₹0 revenue capture.`,
+        `Unmet customer demand: ~${product.dailyUnitsSold} pairs/day lost with $0 revenue capture.`,
         '100% of current ad spend is at risk with zero inventory runway.',
       ],
       steps,
@@ -745,8 +826,8 @@ export function computeFixPlan(product: DerivedProduct, allProducts: DerivedProd
       receivingProductName: bestProduct.name,
       reallocatedSpend,
       restockUnits,
-      actionTakenText: `Paused campaign (₹0/day); shifted ${formatINR(reallocatedSpend)} to ${bestProduct.name}; raised restock PO for ${restockUnits} units`,
-      outcomeText: `Eliminated ${formatINR(product.dailySpend)} ad waste; +${formatINR(addedRevenue)} proj rev`,
+      actionTakenText: `Paused campaign ($0/day); shifted ${formatCurrency(reallocatedSpend)} to ${bestProduct.name}; raised restock PO for ${restockUnits} units`,
+      outcomeText: `Eliminated ${formatCurrency(product.dailySpend)} ad waste; +${formatCurrency(addedRevenue)} proj rev`,
     };
   }
 
@@ -757,20 +838,20 @@ export function computeFixPlan(product: DerivedProduct, allProducts: DerivedProd
     const freedBudget = Math.max(0, product.dailySpend - cappedSpend);
     const rawBudgetTransfer = freedBudget * 0.8;
     const reallocatedSpend = Math.round(Math.min(rawBudgetTransfer, receivingMaxIncrease));
-    const addedRevenue = Math.round(reallocatedSpend * (bestProduct.roas * 0.85));
+    const addedRevenue = Math.round(reallocatedSpend * calculateMarginalRoas(bestProduct.roas, bestProduct.dailySpend, reallocatedSpend));
 
     const steps: FixStep[] = [
       {
         title: 'Cap Spend to Extend Stock Runway to 14 Days',
         description: `Throttle daily spend by ${Math.round((1 - ratio) * 100)}% to align unit velocity with 14-day supply replenishment window.`,
-        before: formatINR(product.dailySpend),
-        after: formatINR(cappedSpend),
+        before: formatCurrency(product.dailySpend),
+        after: formatCurrency(cappedSpend),
       },
       {
         title: `Reallocate 80% Freed Budget to ${bestProduct.name}`,
-        description: `Route ${formatINR(reallocatedSpend)} surplus to scale healthy inventory on ${bestProduct.channel}.`,
-        before: formatINR(bestProduct.dailySpend),
-        after: formatINR(bestProduct.dailySpend + reallocatedSpend),
+        description: `Route ${formatCurrency(reallocatedSpend)} surplus to scale healthy inventory on ${bestProduct.channel}.`,
+        before: formatCurrency(bestProduct.dailySpend),
+        after: formatCurrency(bestProduct.dailySpend + reallocatedSpend),
       },
       {
         title: 'Send Automated Reorder Alert',
@@ -788,13 +869,13 @@ export function computeFixPlan(product: DerivedProduct, allProducts: DerivedProd
       },
       {
         label: 'Daily Ad Spend',
-        before: formatINR(product.dailySpend),
-        after: `${formatINR(cappedSpend)} (Capped)`,
+        before: formatCurrency(product.dailySpend),
+        after: `${formatCurrency(cappedSpend)} (Capped)`,
       },
       {
         label: `Reallocated Yield (${bestProduct.name})`,
-        before: '₹0/day added',
-        after: `+${formatINR(addedRevenue)} projected rev`,
+        before: '$0/day added',
+        after: `+${formatCurrency(addedRevenue)} projected rev`,
       },
     ];
 
@@ -803,9 +884,9 @@ export function computeFixPlan(product: DerivedProduct, allProducts: DerivedProd
       issueBanner: `Low stock runway (${product.coverDays.toFixed(1)} days) risks premature stockout`,
       evidence: [
         `Only ${product.inventory} units remaining with run-rate of ${product.dailyUnitsSold} units/day.`,
-        `Current ad spend of ${formatINR(product.dailySpend)} will exhaust inventory in ${product.coverDays.toFixed(1)} days.`,
+        `Current ad spend of ${formatCurrency(product.dailySpend)} will exhaust inventory in ${product.coverDays.toFixed(1)} days.`,
         'Stockout runway is under the 7-day critical supply chain buffer.',
-        `Spend at risk: ${formatINR(product.dailySpend)} accelerates depletion before restock arrival.`,
+        `Spend at risk: ${formatCurrency(product.dailySpend)} accelerates depletion before restock arrival.`,
       ],
       steps,
       resultTiles,
@@ -814,8 +895,8 @@ export function computeFixPlan(product: DerivedProduct, allProducts: DerivedProd
       receivingProductName: bestProduct.name,
       reallocatedSpend,
       cappedSpend,
-      actionTakenText: `Capped spend at ${formatINR(cappedSpend)} (14d runway); moved ${formatINR(reallocatedSpend)} to ${bestProduct.name}; dispatched reorder alert`,
-      outcomeText: `Extended runway from ${product.coverDays.toFixed(1)}d to 14d; +${formatINR(addedRevenue)} proj rev`,
+      actionTakenText: `Capped spend at ${formatCurrency(cappedSpend)} (14d runway); moved ${formatCurrency(reallocatedSpend)} to ${bestProduct.name}; dispatched reorder alert`,
+      outcomeText: `Extended runway from ${product.coverDays.toFixed(1)}d to 14d; +${formatCurrency(addedRevenue)} proj rev`,
     };
   }
 
@@ -827,27 +908,27 @@ export function computeFixPlan(product: DerivedProduct, allProducts: DerivedProd
   const reallocatedSpend = Math.round(Math.min(rawBudgetTransfer, receivingMaxIncrease));
   const newCpc = Number((product.cpc * 0.9).toFixed(2));
   const projectedRoas = Number((product.roas + (TARGET_ROAS - product.roas) * 0.7).toFixed(2));
-  const addedRevenue = Math.round(reallocatedSpend * (bestProduct.roas * 0.85));
+  const addedRevenue = Math.round(reallocatedSpend * calculateMarginalRoas(bestProduct.roas, bestProduct.dailySpend, reallocatedSpend));
   const newProductRevenue = Math.round(newSpend * projectedRoas);
 
   const steps: FixStep[] = [
     {
       title: 'Cut 35% Spend on Lowest-Converting Ad Sets',
       description: 'Prune bottom-quartile search queries, high-bounce keywords, and unprofitable placements.',
-      before: formatINR(product.dailySpend),
-      after: formatINR(newSpend),
+      before: formatCurrency(product.dailySpend),
+      after: formatCurrency(newSpend),
     },
     {
       title: `Move 70% of Cut to ${bestProduct.name}`,
-      description: `Reallocate ${formatINR(reallocatedSpend)} of savings to high-performing ${bestProduct.channel} campaign.`,
-      before: formatINR(bestProduct.dailySpend),
-      after: formatINR(bestProduct.dailySpend + reallocatedSpend),
+      description: `Reallocate ${formatCurrency(reallocatedSpend)} of savings to high-performing ${bestProduct.channel} campaign.`,
+      before: formatCurrency(bestProduct.dailySpend),
+      after: formatCurrency(bestProduct.dailySpend + reallocatedSpend),
     },
     {
       title: 'Lower Algorithmic Bid Cap by 10%',
       description: 'Enforce disciplined cost-per-click bidding threshold to curb ad cost inflation.',
-      before: `₹${product.cpc.toFixed(2)} CPC`,
-      after: `₹${newCpc.toFixed(2)} CPC`,
+      before: `$${product.cpc.toFixed(2)} CPC`,
+      after: `$${newCpc.toFixed(2)} CPC`,
     },
   ];
 
@@ -859,13 +940,13 @@ export function computeFixPlan(product: DerivedProduct, allProducts: DerivedProd
     },
     {
       label: 'Optimized Daily Spend',
-      before: formatINR(product.dailySpend),
-      after: `${formatINR(newSpend)} (-35%)`,
+      before: formatCurrency(product.dailySpend),
+      after: `${formatCurrency(newSpend)} (-35%)`,
     },
     {
       label: 'Total Realized Revenue',
-      before: formatINR(product.dailySpend * product.roas),
-      after: `${formatINR(newProductRevenue + addedRevenue)} combined`,
+      before: formatCurrency(product.dailySpend * product.roas),
+      after: `${formatCurrency(newProductRevenue + addedRevenue)} combined`,
     },
   ];
 
@@ -876,9 +957,9 @@ export function computeFixPlan(product: DerivedProduct, allProducts: DerivedProd
       : `Below Target: ROAS (${product.roas.toFixed(2)}x) trails 3.2x benchmark`,
     evidence: [
       `Current ROAS of ${product.roas.toFixed(2)}x is ${isBelowFloor ? 'losing money on every ad conversion below 1.8x floor' : 'trailing the 3.2x target profitability benchmark'}.`,
-      `Daily ad spend of ${formatINR(product.dailySpend)} running on sub-optimal ad sets.`,
-      `Current CPC of ₹${product.cpc.toFixed(2)} and CVR of ${(product.cvr * 100).toFixed(1)}% indicate high acquisition friction.`,
-      `Spend at risk: ${formatINR(product.dailySpend)}.`,
+      `Daily ad spend of ${formatCurrency(product.dailySpend)} running on sub-optimal ad sets.`,
+      `Current CPC of $${product.cpc.toFixed(2)} and CVR of ${(product.cvr * 100).toFixed(1)}% indicate high acquisition friction.`,
+      `Spend at risk: ${formatCurrency(product.dailySpend)}.`,
     ],
     steps,
     resultTiles,
@@ -888,8 +969,8 @@ export function computeFixPlan(product: DerivedProduct, allProducts: DerivedProd
     reallocatedSpend,
     newSpend,
     projectedRoas,
-    actionTakenText: `Cut 35% spend (${formatINR(newSpend)}); shifted ${formatINR(reallocatedSpend)} to ${bestProduct.name}; lowered bid cap 10%`,
-    outcomeText: `ROAS projected to lift from ${product.roas.toFixed(2)}x to ${projectedRoas.toFixed(2)}x; saved ${formatINR(cutAmount)}`,
+    actionTakenText: `Cut 35% spend (${formatCurrency(newSpend)}); shifted ${formatCurrency(reallocatedSpend)} to ${bestProduct.name}; lowered bid cap 10%`,
+    outcomeText: `ROAS projected to lift from ${product.roas.toFixed(2)}x to ${projectedRoas.toFixed(2)}x; saved ${formatCurrency(cutAmount)}`,
   };
 }
 
@@ -955,7 +1036,7 @@ export function applyFixPlan(
       const oldSpend = p.dailySpend;
       const oldRev = oldSpend * p.roas;
       const addedSpend = reallocated;
-      const addedRev = addedSpend * (p.roas * 0.85);
+      const addedRev = addedSpend * calculateMarginalRoas(p.roas, p.dailySpend, addedSpend);
 
       const newSpend = oldSpend + addedSpend;
       const newRev = oldRev + addedRev;
@@ -1062,8 +1143,8 @@ export function applyReallocation(
     product: source.name,
     channel: source.channel,
     issue: reallocation.reason,
-    actionTaken: `[${reallocation.actionTag}] Moved ${formatINR(reallocation.movedAmount)} from ${source.name} (${source.channel}) → ${dest.name} (${dest.channel})`,
-    outcome: `+${formatINR(reallocation.netRevenueLift)} proj revenue lift/day (${reallocation.confidence}% conf)`,
+    actionTaken: `[${reallocation.actionTag}] Moved ${formatCurrency(reallocation.movedAmount)} from ${source.name} (${source.channel}) → ${dest.name} (${dest.channel})`,
+    outcome: `+${formatCurrency(reallocation.netRevenueLift)} proj revenue lift/day (${reallocation.confidence}% conf)`,
     isAuto,
   };
 

@@ -29,11 +29,11 @@ class DuckDBClient:
             self.conn = duckdb.connect(db_path)
             self.read_only = False
             self.init_schema()
-        except duckdb.IOException:
+        except (duckdb.IOException, duckdb.TransactionException, duckdb.Error):
             try:
                 self.conn = duckdb.connect(db_path, read_only=True)
                 self.read_only = True
-            except duckdb.IOException:
+            except (duckdb.IOException, duckdb.TransactionException, duckdb.Error):
                 self.conn = duckdb.connect(":memory:")
                 self.read_only = False
                 self.init_schema()

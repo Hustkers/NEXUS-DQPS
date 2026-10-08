@@ -15,7 +15,7 @@ export function generateBestChoiceExplanation(
   config: CampaignConfig
 ): BestChoiceExplanation {
   const ev = best.evaluation!;
-  const curSym = ev.modelMetadata.currency === 'INR' ? '₹' : '$';
+  const curSym = '$';
 
   return {
     strategyId: best.strategyId,
@@ -139,7 +139,7 @@ export function rankAndEvaluateAll(
     ev.rank = rank;
 
     const betterCpaThan = cpaVals.filter((c) => c > ev.expectedCpa).length;
-    const currencySym = ev.modelMetadata.currency === 'INR' ? '₹' : '$';
+    const currencySym = '$';
 
     if (rank <= top3Count) {
       ev.status = 'SELECTED';
@@ -248,12 +248,12 @@ export function compareStrategies(
       lowestCpa: {
         strategyId: bestCpa.strategyId,
         strategyName: bestCpa.strategyName,
-        value: `₹${bestCpa.expectedCpa.toLocaleString()}`
+        value: `$${bestCpa.expectedCpa.toLocaleString()}`
       },
       highestRevenue: {
         strategyId: bestRev.strategyId,
         strategyName: bestRev.strategyName,
-        value: `₹${bestRev.expectedRevenue.toLocaleString()}`
+        value: `$${bestRev.expectedRevenue.toLocaleString()}`
       },
       lowestRisk: {
         strategyId: lowestRisk.strategyId,

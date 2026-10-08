@@ -7,11 +7,11 @@ import {
   IconChartBar,
   IconX,
   IconCheck,
-  IconSparkles,
+  IconAdjustments,
+  IconReportAnalytics,
   IconArrowRight,
   IconAlertTriangle,
   IconDatabase,
-  IconBolt,
   IconCpu,
   IconTrendingUp,
   IconChartPie,
@@ -114,32 +114,16 @@ export function ProductAnalysisModal({
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md animate-in fade-in-0 duration-200'>
       {/* Container */}
-      <div className='relative flex flex-col w-full max-w-6xl max-h-[94vh] overflow-hidden rounded-2xl border border-zinc-800 bg-[#07090e] shadow-2xl text-zinc-100'>
+      <div className='relative flex flex-col w-full max-w-6xl max-h-[94vh] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-2xl text-zinc-100'>
         {/* Top Diagnostic Phase Header */}
-        <div className='flex flex-wrap items-center justify-between border-b border-zinc-800/80 px-4 sm:px-6 py-3.5 bg-zinc-950/90 gap-3'>
+        <div className='flex flex-wrap items-center justify-between border-b border-zinc-800/80 px-4 sm:px-6 py-3.5 bg-zinc-950 gap-3'>
           <div className='flex items-center gap-3'>
-            <div className='relative flex size-3 items-center justify-center'>
-              <span
-                className={cn(
-                  'absolute size-3 rounded-full opacity-75 animate-ping',
-                  analysisStage === 'analysing' ? 'bg-cyan-400' : 'bg-emerald-400'
-                )}
-              />
-              <span
-                className={cn(
-                  'size-2 rounded-full',
-                  analysisStage === 'analysing' ? 'bg-cyan-400' : 'bg-emerald-400'
-                )}
-              />
+            <div className='flex size-3 items-center justify-center'>
+              <span className='size-2 rounded-full bg-zinc-300' />
             </div>
             <div>
               <div className='flex items-center gap-2'>
-                <span
-                  className={cn(
-                    'text-xs font-mono font-bold uppercase tracking-wider',
-                    analysisStage === 'analysing' ? 'text-cyan-400' : 'text-emerald-400'
-                  )}
-                >
+                <span className='text-xs font-mono font-bold uppercase tracking-wider text-zinc-200'>
                   {analysisStage === 'analysing'
                     ? '1. ANALYSING PHASE (SCANNING DELIVERY ARCS)'
                     : '2. ANALYSIS COMPLETED (RL AD ALLOCATION & SALES PULSE)'}
@@ -148,13 +132,13 @@ export function ProductAnalysisModal({
                 <span className='text-xs font-mono text-zinc-400 hidden sm:inline'>
                   {analysisStage === 'analysing'
                     ? 'Cross-Channel Latency & Audience Exploration'
-                    : 'High Sales in Red • Decreasingly Yellow • No Grey'}
+                    : 'Regional Sales Telemetry & Interaction Velocity'}
                 </span>
               </div>
               <p className='text-[11px] font-mono text-zinc-500 mt-0.5'>
                 {analysisStage === 'analysing'
-                  ? 'Source: GitHub Globe WebGL Engine (github.com/globe)'
-                  : 'Source: Cobe Globe Pulse + Thompson Multi-Armed Bandit RL Agent'}
+                  ? 'Source: WebGL Ad Delivery Engine'
+                  : 'Source: Interaction Telemetry + Thompson Bandit RL'}
               </p>
             </div>
           </div>
@@ -178,11 +162,11 @@ export function ProductAnalysisModal({
                 className={cn(
                   'px-2 py-1 rounded transition-all font-semibold flex items-center gap-1',
                   viewSection === 'globe'
-                    ? 'bg-zinc-800 text-cyan-300'
+                    ? 'bg-zinc-800 text-zinc-100'
                     : 'text-zinc-500 hover:text-zinc-300'
                 )}
               >
-                <IconWorld className='size-3' />
+                <IconWorld className='size-3 text-zinc-400' />
                 3D Globe
               </button>
               <button
@@ -190,11 +174,11 @@ export function ProductAnalysisModal({
                 className={cn(
                   'px-2 py-1 rounded transition-all font-semibold flex items-center gap-1',
                   viewSection === 'rl_analytics'
-                    ? 'bg-zinc-800 text-emerald-300'
+                    ? 'bg-zinc-800 text-zinc-100'
                     : 'text-zinc-500 hover:text-zinc-300'
                 )}
               >
-                <IconCpu className='size-3' />
+                <IconCpu className='size-3 text-zinc-400' />
                 RL Analytics
               </button>
             </div>
@@ -206,7 +190,7 @@ export function ProductAnalysisModal({
                 className={cn(
                   'px-2.5 py-1 rounded-md transition-all font-semibold',
                   analysisStage === 'analysing'
-                    ? 'bg-cyan-950 text-cyan-300 border border-cyan-800/60'
+                    ? 'bg-zinc-800 text-zinc-100 border border-zinc-700'
                     : 'text-zinc-500 hover:text-zinc-300'
                 )}
               >
@@ -217,7 +201,7 @@ export function ProductAnalysisModal({
                 className={cn(
                   'px-2.5 py-1 rounded-md transition-all font-semibold',
                   analysisStage === 'completed'
-                    ? 'bg-rose-950 text-rose-300 border border-rose-800/60'
+                    ? 'bg-zinc-800 text-zinc-100 border border-zinc-700'
                     : 'text-zinc-500 hover:text-zinc-300'
                 )}
               >
@@ -231,7 +215,7 @@ export function ProductAnalysisModal({
                 'font-mono text-xs px-2.5 py-0.5 hidden sm:inline-flex',
                 isCritical
                   ? 'border-rose-500/40 text-rose-400 bg-rose-950/30'
-                  : 'border-emerald-500/40 text-emerald-400 bg-emerald-950/30'
+                  : 'border-zinc-700 text-zinc-300 bg-zinc-900/50'
               )}
             >
               {isStockout ? 'CRITICAL STOCKOUT' : isCritical ? 'ANOMALY DETECTED' : 'HEALTHY PACE'}
@@ -257,13 +241,13 @@ export function ProductAnalysisModal({
                   <div className='flex items-center gap-2'>
                     {analysisStage === 'analysing' ? (
                       <>
-                        <IconWorld className='size-4 text-cyan-400 animate-spin duration-7000' />
+                        <IconWorld className='size-4 text-zinc-400' />
                         <span className='font-bold text-zinc-200'>GLOBAL AD DELIVERY ARCS (ANALYSING PHASE)</span>
                       </>
                     ) : (
                       <>
-                        <span className='size-2 rounded-full bg-rose-500 animate-pulse' />
-                        <span className='font-bold text-rose-300'>RL CUSTOMER INTERACTION &amp; SALES PULSE</span>
+                        <span className='size-2 rounded-full bg-zinc-400' />
+                        <span className='font-bold text-zinc-200'>RL CUSTOMER INTERACTION &amp; SALES PULSE</span>
                       </>
                     )}
                   </div>
@@ -292,20 +276,20 @@ export function ProductAnalysisModal({
                 {analysisStage === 'completed' ? (
                   <div className='w-full flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-zinc-900 font-mono text-[10px]'>
                     <div className='flex items-center gap-1.5 text-zinc-300'>
-                      <span className='size-2 rounded-full bg-red-500 ring-2 ring-red-500/20' />
-                      <span>High Sales &amp; Intent: US East/West (78% P_conv)</span>
+                      <span className='size-2 rounded-full bg-zinc-100 ring-1 ring-zinc-700' />
+                      <span>High Intent: US East/West (78% P_conv)</span>
                     </div>
                     <div className='flex items-center gap-1.5 text-zinc-300'>
-                      <span className='size-2 rounded-full bg-orange-500' />
+                      <span className='size-2 rounded-full bg-zinc-400' />
                       <span>EMEA (56% P_conv)</span>
                     </div>
                     <div className='flex items-center gap-1.5 text-zinc-300'>
-                      <span className='size-2 rounded-full bg-yellow-400' />
+                      <span className='size-2 rounded-full bg-zinc-500' />
                       <span>APAC (44% P_conv)</span>
                     </div>
-                    <div className='flex items-center gap-1.5 text-cyan-400'>
-                      <span className='size-2 rounded-full bg-cyan-400' />
-                      <span>Low Prob: Suppressed (Zero Grey)</span>
+                    <div className='flex items-center gap-1.5 text-zinc-400'>
+                      <span className='size-2 rounded-full bg-zinc-700' />
+                      <span>Suppressed (Underperforming)</span>
                     </div>
                   </div>
                 ) : (
@@ -315,28 +299,28 @@ export function ProductAnalysisModal({
                         <PlatformLogo platform='meta' size={11} className='shrink-0' />
                         <span>META ADS</span>
                       </div>
-                      <div className='text-cyan-400 font-bold'>US-East / SF</div>
+                      <div className='text-zinc-200 font-bold'>US-East / SF</div>
                     </div>
                     <div className='p-1.5 rounded bg-zinc-900/50 border border-zinc-800/60 flex flex-col items-center justify-center gap-0.5'>
                       <div className='flex items-center gap-1 text-zinc-400 font-semibold'>
                         <PlatformLogo platform='google' size={11} className='shrink-0' />
                         <span>GOOGLE ADS</span>
                       </div>
-                      <div className='text-blue-400 font-bold'>EU / London</div>
+                      <div className='text-zinc-200 font-bold'>EU / London</div>
                     </div>
                     <div className='p-1.5 rounded bg-zinc-900/50 border border-zinc-800/60 flex flex-col items-center justify-center gap-0.5'>
                       <div className='flex items-center gap-1 text-zinc-400 font-semibold'>
                         <PlatformLogo platform='amazon' size={11} className='shrink-0' />
                         <span>AMAZON DSP</span>
                       </div>
-                      <div className='text-amber-400 font-bold'>APAC / Tokyo</div>
+                      <div className='text-zinc-200 font-bold'>APAC / Tokyo</div>
                     </div>
                     <div className='p-1.5 rounded bg-zinc-900/50 border border-zinc-800/60 flex flex-col items-center justify-center gap-0.5'>
                       <div className='flex items-center gap-1 text-zinc-400 font-semibold'>
                         <PlatformLogo platform='shopify' size={11} className='shrink-0' />
                         <span>SHOPIFY D2C</span>
                       </div>
-                      <div className='text-emerald-400 font-bold'>SEA / Singapore</div>
+                      <div className='text-zinc-200 font-bold'>SEA / Singapore</div>
                     </div>
                   </div>
                 )}
@@ -425,7 +409,7 @@ export function ProductAnalysisModal({
                   <Button
                     onClick={handleMitigate}
                     disabled={isExecuting}
-                    className='flex-1 font-mono text-xs font-bold bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg shadow-cyan-600/20'
+                    className='flex-1 font-mono text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 text-zinc-950'
                   >
                     <IconArrowRight className='size-3.5 mr-1.5' />
                     {isExecuting ? 'Dispatching to Ad API...' : 'Execute RL Reallocation'}
@@ -458,13 +442,13 @@ export function ProductAnalysisModal({
               <span className='font-bold text-zinc-200 uppercase tracking-wider'>
                 Reinforcement Learning Closed-Loop Execution Pipeline
               </span>
-              <span className='text-emerald-400'>100% Autonomous Synchronized</span>
+              <span className='text-zinc-400 text-[11px]'>Status: Active</span>
             </div>
 
             <div className='grid grid-cols-1 sm:grid-cols-4 gap-3'>
               <div className='p-3 rounded-lg bg-zinc-900/60 border border-zinc-800/80'>
-                <div className='flex items-center gap-1.5 text-xs font-mono text-emerald-400'>
-                  <IconCheck className='size-3.5' />
+                <div className='flex items-center gap-1.5 text-xs font-mono text-zinc-200'>
+                  <IconCheck className='size-3.5 text-zinc-400' />
                   <span>1. Ingest Signals</span>
                 </div>
                 <p className='text-[11px] text-zinc-400 mt-1 font-sans'>
@@ -473,8 +457,8 @@ export function ProductAnalysisModal({
               </div>
 
               <div className='p-3 rounded-lg bg-zinc-900/60 border border-zinc-800/80'>
-                <div className='flex items-center gap-1.5 text-xs font-mono text-cyan-400'>
-                  <IconCheck className='size-3.5' />
+                <div className='flex items-center gap-1.5 text-xs font-mono text-zinc-200'>
+                  <IconCheck className='size-3.5 text-zinc-400' />
                   <span>2. Bandit Q-Policy</span>
                 </div>
                 <p className='text-[11px] text-zinc-400 mt-1 font-sans'>
@@ -483,7 +467,7 @@ export function ProductAnalysisModal({
               </div>
 
               <div className='p-3 rounded-lg bg-zinc-900/60 border border-zinc-800/80'>
-                <div className='flex items-center gap-1.5 text-xs font-mono text-cyan-400'>
+                <div className='flex items-center gap-1.5 text-xs font-mono text-zinc-300'>
                   <IconCheck className='size-3.5' />
                   <span>3. Ad Reallocation</span>
                 </div>
@@ -493,8 +477,8 @@ export function ProductAnalysisModal({
               </div>
 
               <div className='p-3 rounded-lg bg-zinc-900/60 border border-zinc-800/80'>
-                <div className='flex items-center gap-1.5 text-xs font-mono text-emerald-400'>
-                  <IconSparkles className='size-3.5 text-purple-400' />
+                <div className='flex items-center gap-1.5 text-xs font-mono text-zinc-300'>
+                  <IconReportAnalytics className='size-3.5 text-zinc-400' />
                   <span>4. Outcome Ledger</span>
                 </div>
                 <p className='text-[11px] text-zinc-400 mt-1 font-sans'>

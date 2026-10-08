@@ -233,7 +233,7 @@ export function ReallocationExecutionModal({
           </div>
 
           <p className='text-xs font-mono text-muted-foreground mt-1.5'>
-            Scipy Convex Optimization Directive • Shift ₹{Math.round(details.capitalMoved).toLocaleString('en-IN')}/day from {details.source.campaign} to {details.destination.productName}
+            Scipy Convex Optimization Directive • Shift ${Math.round(details.capitalMoved).toLocaleString('en-US')}/day from {details.source.campaign} to {details.destination.productName}
           </p>
         </div>
 
@@ -340,7 +340,7 @@ export function ReallocationExecutionModal({
               </div>
               <div className='text-[11px] text-[#8A8A8A] space-y-1 pt-1 border-t border-[#000000]'>
                 <div>
-                  <span className='text-[#FFFFFF] font-bold'>₹{Math.round(details.capitalMoved).toLocaleString('en-IN')}/day</span> reallocated
+                  <span className='text-[#FFFFFF] font-bold'>${Math.round(details.capitalMoved).toLocaleString('en-US')}/day</span> reallocated
                 </div>
                 <div className='flex items-center gap-2 text-xs'>
                   <span className='text-[#8A8A8A]'>FROM:</span>
@@ -430,7 +430,7 @@ export function ReallocationExecutionModal({
                   <div className='space-y-0.5 p-2 rounded bg-[#000000] border border-[#1A1A1A]'>
                     <span className='text-[10px] uppercase text-[#8A8A8A] block font-bold'>Current Allocation</span>
                     <span className='text-xs font-bold text-[#FFFFFF]'>
-                      ₹{Math.round(details.source.currentSpend).toLocaleString('en-IN')}/day
+                      ${Math.round(details.source.currentSpend).toLocaleString('en-US')}/day
                     </span>
                   </div>
 
@@ -438,7 +438,7 @@ export function ReallocationExecutionModal({
                   <div className='space-y-0.5 p-2 rounded bg-[#000000] border border-[#1A1A1A]'>
                     <span className='text-[10px] uppercase text-[#8A8A8A] block font-bold'>Recommended Action</span>
                     <span className='text-xs font-bold text-[#FFFFFF]'>
-                      REDUCE ₹{Math.round(details.capitalMoved).toLocaleString('en-IN')}/day
+                      REDUCE ${Math.round(details.capitalMoved).toLocaleString('en-US')}/day
                     </span>
                   </div>
 
@@ -457,7 +457,7 @@ export function ReallocationExecutionModal({
                   <div className='space-y-0.5 p-2 rounded bg-[#000000] border border-[#1A1A1A]'>
                     <span className='text-[10px] uppercase text-[#8A8A8A] block font-bold'>Budget Movement</span>
                     <span className='text-xs font-bold text-[#FFFFFF]'>
-                      +₹{Math.round(details.capitalMoved).toLocaleString('en-IN')}/day shift
+                      +${Math.round(details.capitalMoved).toLocaleString('en-US')}/day shift
                     </span>
                   </div>
 
@@ -465,7 +465,7 @@ export function ReallocationExecutionModal({
                   <div className='space-y-0.5 p-2 rounded bg-[#000000] border border-[#1A1A1A] md:col-span-2'>
                     <span className='text-[10px] uppercase text-[#8A8A8A] block font-bold'>Expected Impact</span>
                     <span className='text-xs font-bold text-[#FFFFFF]'>
-                      +₹{Math.round(details.expectedDailyLift).toLocaleString('en-IN')}/day margin lift • {details.predictedRoas.toFixed(2)}x Target ROAS (+{details.destination.roasDeltaPct.toFixed(1)}%)
+                      +${Math.round(details.expectedDailyLift).toLocaleString('en-US')}/day margin lift • {details.predictedRoas.toFixed(2)}x Target ROAS (+{details.destination.roasDeltaPct.toFixed(1)}%)
                     </span>
                   </div>
 

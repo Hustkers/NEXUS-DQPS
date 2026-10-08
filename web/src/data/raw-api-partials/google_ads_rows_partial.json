@@ -1,143 +1,217 @@
 [
   {
-    "customer_id": "842-194-0192",
+    "customer_id": "649-281-9920",
     "campaign": {
-      "id": "9935249409",
+      "resource_name": "customers/6492819920/campaigns/google-310805-137",
+      "id": "38380127",
       "name": "google-310805-137",
-      "advertisingChannelType": "PERFORMANCE_MAX",
       "status": "ENABLED",
+      "advertisingChannelType": "SEARCH",
       "biddingStrategyType": "TARGET_ROAS",
-      "targetRoas": 4.5
+      "targetRoas": 3.5
     },
     "campaign_budget": {
-      "id": "bg_9935201",
-      "amountMicros": 40000000,
-      "recommendedBudgetAmountMicros": 55000000,
-      "hasRecommendedBudget": true
+      "total_amount_micros": 24285540000,
+      "recommendedBudgetAmountMicros": 30356925000
     },
     "segments": {
-      "date": "2021-02-01",
-      "device": "MOBILE",
-      "dayOfWeek": "MONDAY"
+      "date": "2026-07-09"
     },
     "ad_group_criterion": {
-      "criterionId": "crit_88201",
       "qualityInfo": {
         "qualityScore": 9,
         "creativeQualityScore": "ABOVE_AVERAGE",
-        "postClickQualityScore": "ABOVE_AVERAGE",
+        "postClickQualityScore": "AVERAGE",
         "searchPredictedCtr": "ABOVE_AVERAGE"
       }
     },
     "metrics": {
-      "impressions": 166,
-      "clicks": 49,
-      "costMicros": 36150000,
-      "conversions": 1.7,
-      "conversionsValue": 327.61,
-      "averageCpc": 737755.0,
-      "ctr": 0.2952,
-      "interactionRate": 0.2952,
-      "searchImpressionShare": 0.742,
-      "searchBudgetLostImpressionShare": 0.176,
-      "searchRankLostImpressionShare": 0.082,
-      "searchTopImpressionShare": 0.814,
-      "searchAbsoluteTopImpressionShare": 0.655,
-      "crossDeviceConversions": 0.35
+      "impressions": 9054,
+      "clicks": 362,
+      "costMicros": 20237950000,
+      "conversions": 11.0,
+      "conversionsValue": 175945.0,
+      "averageCpc": 55.91,
+      "ctr": 0.04,
+      "interactionRate": 0.042,
+      "searchImpressionShare": 0.72,
+      "searchBudgetLostImpressionShare": 0.18,
+      "searchRankLostImpressionShare": 0.1,
+      "searchTopImpressionShare": 0.85,
+      "searchAbsoluteTopImpressionShare": 0.54,
+      "crossDeviceConversions": 1.65
     }
   },
   {
-    "customer_id": "842-194-0192",
+    "customer_id": "649-281-9920",
     "campaign": {
-      "id": "9935249410",
+      "resource_name": "customers/6492819920/campaigns/google-880848-005",
+      "id": "946238961",
       "name": "google-880848-005",
-      "advertisingChannelType": "SEARCH",
       "status": "ENABLED",
-      "biddingStrategyType": "MAXIMIZE_CONVERSIONS",
-      "targetRoas": null
+      "advertisingChannelType": "SEARCH",
+      "biddingStrategyType": "TARGET_ROAS",
+      "targetRoas": 3.5
     },
     "campaign_budget": {
-      "id": "bg_9935202",
-      "amountMicros": 25000000,
-      "recommendedBudgetAmountMicros": 25000000,
-      "hasRecommendedBudget": false
+      "total_amount_micros": 22342932000,
+      "recommendedBudgetAmountMicros": 27928665000
     },
     "segments": {
-      "date": "2021-02-03",
-      "device": "DESKTOP",
-      "dayOfWeek": "WEDNESDAY"
+      "date": "2026-07-09"
     },
     "ad_group_criterion": {
-      "criterionId": "crit_88202",
       "qualityInfo": {
-        "qualityScore": 8,
-        "creativeQualityScore": "AVERAGE",
-        "postClickQualityScore": "ABOVE_AVERAGE",
-        "searchPredictedCtr": "AVERAGE"
+        "qualityScore": 10,
+        "creativeQualityScore": "ABOVE_AVERAGE",
+        "postClickQualityScore": "AVERAGE",
+        "searchPredictedCtr": "ABOVE_AVERAGE"
       }
     },
     "metrics": {
-      "impressions": 170,
-      "clicks": 35,
-      "costMicros": 24570000,
-      "conversions": 1.2,
-      "conversionsValue": 209.57,
-      "averageCpc": 702000.0,
-      "ctr": 0.2059,
-      "interactionRate": 0.2059,
-      "searchImpressionShare": 0.615,
-      "searchBudgetLostImpressionShare": 0.052,
-      "searchRankLostImpressionShare": 0.333,
-      "searchTopImpressionShare": 0.720,
-      "searchAbsoluteTopImpressionShare": 0.485,
-      "crossDeviceConversions": 0.20
+      "impressions": 9583,
+      "clicks": 383,
+      "costMicros": 18619110000,
+      "conversions": 20.0,
+      "conversionsValue": 289900.0,
+      "averageCpc": 48.61,
+      "ctr": 0.04,
+      "interactionRate": 0.042,
+      "searchImpressionShare": 0.72,
+      "searchBudgetLostImpressionShare": 0.18,
+      "searchRankLostImpressionShare": 0.1,
+      "searchTopImpressionShare": 0.85,
+      "searchAbsoluteTopImpressionShare": 0.54,
+      "crossDeviceConversions": 3.0
     }
   },
   {
-    "customer_id": "842-194-0192",
+    "customer_id": "649-281-9920",
     "campaign": {
-      "id": "9935249411",
+      "resource_name": "customers/6492819920/campaigns/google-AH8050-100",
+      "id": "200813919",
       "name": "google-AH8050-100",
-      "advertisingChannelType": "SHOPPING",
       "status": "ENABLED",
+      "advertisingChannelType": "SEARCH",
       "biddingStrategyType": "TARGET_ROAS",
-      "targetRoas": 3.8
+      "targetRoas": 3.5
     },
     "campaign_budget": {
-      "id": "bg_9935203",
-      "amountMicros": 30000000,
-      "recommendedBudgetAmountMicros": 42000000,
-      "hasRecommendedBudget": true
+      "total_amount_micros": 12456012000,
+      "recommendedBudgetAmountMicros": 15570015000
     },
     "segments": {
-      "date": "2021-01-24",
-      "device": "MOBILE",
-      "dayOfWeek": "SUNDAY"
+      "date": "2026-07-09"
     },
     "ad_group_criterion": {
-      "criterionId": "crit_88203",
       "qualityInfo": {
         "qualityScore": 7,
-        "creativeQualityScore": "AVERAGE",
+        "creativeQualityScore": "ABOVE_AVERAGE",
         "postClickQualityScore": "AVERAGE",
-        "searchPredictedCtr": "AVERAGE"
+        "searchPredictedCtr": "ABOVE_AVERAGE"
       }
     },
     "metrics": {
-      "impressions": 191,
-      "clicks": 36,
-      "costMicros": 28190000,
-      "conversions": 1.3,
-      "conversionsValue": 219.19,
-      "averageCpc": 783055.0,
-      "ctr": 0.1885,
-      "interactionRate": 0.1885,
-      "searchImpressionShare": 0.582,
-      "searchBudgetLostImpressionShare": 0.285,
-      "searchRankLostImpressionShare": 0.133,
-      "searchTopImpressionShare": 0.695,
-      "searchAbsoluteTopImpressionShare": 0.410,
-      "crossDeviceConversions": 0.15
+      "impressions": 4013,
+      "clicks": 160,
+      "costMicros": 10380010000,
+      "conversions": 6.0,
+      "conversionsValue": 83970.0,
+      "averageCpc": 64.88,
+      "ctr": 0.04,
+      "interactionRate": 0.042,
+      "searchImpressionShare": 0.72,
+      "searchBudgetLostImpressionShare": 0.18,
+      "searchRankLostImpressionShare": 0.1,
+      "searchTopImpressionShare": 0.85,
+      "searchAbsoluteTopImpressionShare": 0.54,
+      "crossDeviceConversions": 0.8999999999999999
+    }
+  },
+  {
+    "customer_id": "649-281-9920",
+    "campaign": {
+      "resource_name": "customers/6492819920/campaigns/google-315122-001",
+      "id": "622342785",
+      "name": "google-315122-001",
+      "status": "ENABLED",
+      "advertisingChannelType": "SEARCH",
+      "biddingStrategyType": "TARGET_ROAS",
+      "targetRoas": 3.5
+    },
+    "campaign_budget": {
+      "total_amount_micros": 34527024000,
+      "recommendedBudgetAmountMicros": 43158780000
+    },
+    "segments": {
+      "date": "2026-07-09"
+    },
+    "ad_group_criterion": {
+      "qualityInfo": {
+        "qualityScore": 9,
+        "creativeQualityScore": "ABOVE_AVERAGE",
+        "postClickQualityScore": "AVERAGE",
+        "searchPredictedCtr": "ABOVE_AVERAGE"
+      }
+    },
+    "metrics": {
+      "impressions": 12524,
+      "clicks": 500,
+      "costMicros": 28772520000,
+      "conversions": 19.0,
+      "conversionsValue": 142405.0,
+      "averageCpc": 57.55,
+      "ctr": 0.04,
+      "interactionRate": 0.042,
+      "searchImpressionShare": 0.72,
+      "searchBudgetLostImpressionShare": 0.18,
+      "searchRankLostImpressionShare": 0.1,
+      "searchTopImpressionShare": 0.85,
+      "searchAbsoluteTopImpressionShare": 0.54,
+      "crossDeviceConversions": 2.85
+    }
+  },
+  {
+    "customer_id": "649-281-9920",
+    "campaign": {
+      "resource_name": "customers/6492819920/campaigns/google-CD4371-001",
+      "id": "882522593",
+      "name": "google-CD4371-001",
+      "status": "ENABLED",
+      "advertisingChannelType": "SEARCH",
+      "biddingStrategyType": "TARGET_ROAS",
+      "targetRoas": 3.5
+    },
+    "campaign_budget": {
+      "total_amount_micros": 38037372000,
+      "recommendedBudgetAmountMicros": 47546715000
+    },
+    "segments": {
+      "date": "2026-07-09"
+    },
+    "ad_group_criterion": {
+      "qualityInfo": {
+        "qualityScore": 10,
+        "creativeQualityScore": "ABOVE_AVERAGE",
+        "postClickQualityScore": "AVERAGE",
+        "searchPredictedCtr": "ABOVE_AVERAGE"
+      }
+    },
+    "metrics": {
+      "impressions": 16290,
+      "clicks": 651,
+      "costMicros": 31697810000,
+      "conversions": 20.0,
+      "conversionsValue": 279900.0,
+      "averageCpc": 48.69,
+      "ctr": 0.04,
+      "interactionRate": 0.042,
+      "searchImpressionShare": 0.72,
+      "searchBudgetLostImpressionShare": 0.18,
+      "searchRankLostImpressionShare": 0.1,
+      "searchTopImpressionShare": 0.85,
+      "searchAbsoluteTopImpressionShare": 0.54,
+      "crossDeviceConversions": 3.0
     }
   }
 ]

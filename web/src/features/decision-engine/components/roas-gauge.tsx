@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { PlatformLogo } from '@/components/icons/platform-logos';
 import {
-  formatINR,
+  formatCurrency,
   getChannelMeta,
   getProductFooterSummary,
   type ProductStatus,
@@ -43,7 +43,7 @@ export function RoasGauge({
   platform,
   inventory = 0,
   coverDays,
-  dailySpend = 25000,
+  dailySpend = 2500,
   currentRoas,
   targetRoas = 3.2,
   breakevenRoas = 1.8,
@@ -108,57 +108,57 @@ export function RoasGauge({
   const strokeDashoffset = circumference * (1 - percentage);
 
   // Status mapping & Color styling (white = healthy, amber = warning, red = critical, green = fixed)
-  let arcStrokeColor = '#FFFFFF';
+  let arcStrokeColor = '#FAFAFA';
   let statusLabel = 'TARGET MET';
-  let badgeClasses = 'bg-[#171717] text-white border-[#333333]';
+  let badgeClasses = 'bg-zinc-900 text-zinc-200 border-zinc-800';
 
   if (isFixed) {
     arcStrokeColor = '#10B981'; // Green
     statusLabel = 'FIXED';
-    badgeClasses = 'bg-emerald-950/70 text-emerald-300 border-emerald-700/70 font-bold';
+    badgeClasses = 'bg-zinc-900 text-emerald-400 border-zinc-800 font-medium';
   } else if (effectiveStatus === 'stockout') {
     arcStrokeColor = '#EF4444'; // Red
     statusLabel = 'STOCKOUT';
-    badgeClasses = 'bg-red-950/80 text-red-300 border-red-700/80 font-bold';
+    badgeClasses = 'bg-zinc-900 text-red-400 border-zinc-800 font-medium';
   } else if (effectiveStatus === 'below floor') {
     arcStrokeColor = '#EF4444'; // Red
     statusLabel = 'BELOW FLOOR';
-    badgeClasses = 'bg-red-950/80 text-red-300 border-red-700/80 font-bold';
+    badgeClasses = 'bg-zinc-900 text-red-400 border-zinc-800 font-medium';
   } else if (effectiveStatus === 'low stock') {
     arcStrokeColor = '#F59E0B'; // Amber
     statusLabel = 'LOW STOCK';
-    badgeClasses = 'bg-amber-950/80 text-amber-300 border-amber-700/80 font-semibold';
+    badgeClasses = 'bg-zinc-900 text-amber-400 border-zinc-800 font-medium';
   } else if (effectiveStatus === 'below target') {
     arcStrokeColor = '#F59E0B'; // Amber
     statusLabel = 'BELOW TARGET';
-    badgeClasses = 'bg-amber-950/80 text-amber-300 border-amber-700/80 font-semibold';
+    badgeClasses = 'bg-zinc-900 text-amber-400 border-zinc-800 font-medium';
   } else {
-    arcStrokeColor = '#FFFFFF'; // White
+    arcStrokeColor = '#FAFAFA'; // Neutral light
     statusLabel = 'TARGET MET';
-    badgeClasses = 'bg-[#141414] text-white border-[#2E2E2E] font-medium';
+    badgeClasses = 'bg-zinc-900 text-zinc-300 border-zinc-800 font-medium';
   }
 
   // Health score badge styling
   const healthBadgeStyle = isFixed
-    ? 'text-emerald-300 bg-emerald-950/60 border border-emerald-800/60 font-bold'
+    ? 'text-emerald-400 bg-zinc-900 border border-zinc-800 font-mono font-medium'
     : healthScore >= 75
-    ? 'text-white bg-[#171717] border border-[#2E2E2E] font-bold'
+    ? 'text-zinc-200 bg-zinc-900 border border-zinc-800 font-mono font-medium'
     : healthScore >= 50
-    ? 'text-amber-300 bg-amber-950/40 border border-amber-800/50 font-medium'
-    : 'text-red-300 bg-red-950/60 border border-red-800/60 font-bold';
+    ? 'text-amber-400 bg-zinc-900 border border-zinc-800 font-mono font-medium'
+    : 'text-red-400 bg-zinc-900 border border-zinc-800 font-mono font-medium';
 
   return (
     <div
       className={cn(
-        'relative flex flex-col justify-between rounded-xl border border-[#222222] bg-[#0E0E0E] p-4 transition-all duration-200 hover:border-[#404040] hover:bg-[#121212] font-mono shadow-sm min-h-[380px] min-w-0',
+        'relative flex flex-col justify-between rounded-xl border border-[#27272a] bg-[#121215] p-4 transition-all duration-200 hover:border-zinc-700 hover:bg-[#18181b] shadow-sm min-h-[380px] min-w-0 font-sans',
         className
       )}
     >
       {/* 1. PRODUCT + CHANNEL + STOCK & 2. HEALTH SCORE */}
-      <div className='flex w-full items-start justify-between gap-2 border-b border-[#1A1A1A] pb-3 mb-1'>
+      <div className='flex w-full items-start justify-between gap-2 border-b border-[#27272a] pb-3 mb-1'>
         <div className='flex items-start gap-2.5 min-w-0'>
           {photoUrl ? (
-            <div className='relative size-8 rounded bg-[#171717] overflow-hidden shrink-0 border border-[#222222] mt-0.5'>
+            <div className='relative size-8 rounded bg-zinc-900 overflow-hidden shrink-0 border border-zinc-800 mt-0.5'>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={photoUrl}
@@ -172,20 +172,20 @@ export function RoasGauge({
               type='button'
               onClick={onAnalyze}
               className={cn(
-                'text-xs font-semibold text-white line-clamp-2 leading-snug min-h-[2rem] text-left',
+                'text-xs font-semibold text-zinc-100 line-clamp-2 leading-snug min-h-[2rem] text-left font-sans',
                 onAnalyze && 'cursor-pointer hover:underline'
               )}
               title={displayName}
             >
               {displayName}
             </button>
-            <div className='flex items-center gap-1.5 mt-1 text-[10px] text-[#8A8A8A] flex-wrap'>
-              <span className={cn('inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[10px] font-semibold', channelMeta.badgeBg, channelMeta.badgeBorder, channelMeta.badgeText)}>
+            <div className='flex items-center gap-1.5 mt-1 text-[10px] text-zinc-400 flex-wrap'>
+              <span className={cn('inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[10px] font-medium font-sans', channelMeta.badgeBg, channelMeta.badgeBorder, channelMeta.badgeText)}>
                 <PlatformLogo platform={channelMeta.name.toLowerCase()} size={11} className='shrink-0' />
                 <span>{channelMeta.name}</span>
               </span>
-              <span>•</span>
-              <span className={cn('whitespace-nowrap font-medium', inventory <= 0 ? 'text-red-400 font-bold' : 'text-[#D4D4D4]')}>
+              <span className='text-zinc-600'>•</span>
+              <span className={cn('whitespace-nowrap font-mono tabular-nums text-[10px]', inventory <= 0 ? 'text-red-400 font-medium' : 'text-zinc-400')}>
                 {inventory <= 0 ? '0 in stock' : `${inventory} in stock`}
               </span>
             </div>
@@ -195,7 +195,7 @@ export function RoasGauge({
         {/* 2. Health Score */}
         <div
           className={cn(
-            'flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] shrink-0 font-bold',
+            'flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] shrink-0 font-mono tabular-nums',
             healthBadgeStyle
           )}
           title={`Health Score: ${healthScore}/100`}
@@ -205,7 +205,7 @@ export function RoasGauge({
         </div>
       </div>
 
-      {/* 3. SEMICIRCLE SVG GAUGE (white = healthy, amber = warning, red = critical, green = fixed) */}
+      {/* 3. SEMICIRCLE SVG GAUGE WITH NEEDLE INDICATOR */}
       <div className='relative flex flex-col items-center justify-center my-2'>
         <svg
           width={radius * 2 + strokeWidth * 2}
@@ -219,7 +219,7 @@ export function RoasGauge({
             } ${radius + strokeWidth}`}
             fill='none'
             stroke='currentColor'
-            className='text-muted/60 dark:text-muted/80'
+            className='text-zinc-800'
             strokeWidth={strokeWidth}
             strokeLinecap='round'
           />
@@ -240,7 +240,7 @@ export function RoasGauge({
                 y1={y1}
                 x2={x2}
                 y2={y2}
-                stroke='#737373'
+                stroke='#71717a'
                 strokeWidth='1.2'
                 strokeDasharray='2 2'
               />
@@ -263,7 +263,7 @@ export function RoasGauge({
                 y1={y1}
                 x2={x2}
                 y2={y2}
-                stroke='#A3A3A3'
+                stroke='#a1a1aa'
                 strokeWidth='1.5'
                 strokeDasharray='3 3'
               />
@@ -283,25 +283,57 @@ export function RoasGauge({
             className='transition-all duration-700 ease-out'
             strokeLinecap='round'
           />
+
+          {/* SVG Needle Pointer Indicator */}
+          {(() => {
+            const activeAngle = Math.PI * (1 - percentage);
+            const cx = radius + strokeWidth;
+            const cy = radius + strokeWidth;
+            // Needle points from hub to inside arc rim
+            const needleLength = radius - 8;
+            const tipX = cx + needleLength * Math.cos(activeAngle);
+            const tipY = cy - needleLength * Math.sin(activeAngle);
+            return (
+              <g className='transition-all duration-700 ease-out'>
+                <line
+                  x1={cx}
+                  y1={cy}
+                  x2={tipX}
+                  y2={tipY}
+                  stroke='#fafafa'
+                  strokeWidth='1.5'
+                  strokeLinecap='round'
+                />
+                <circle
+                  cx={cx}
+                  cy={cy}
+                  r='3'
+                  fill='#18181b'
+                  stroke='#fafafa'
+                  strokeWidth='1.5'
+                />
+              </g>
+            );
+          })()}
         </svg>
 
         {/* Center Readout: Paused or ROAS */}
         <div className='absolute bottom-0 flex flex-col items-center justify-center text-center'>
           {paused ? (
             <div className='flex flex-col items-center -mb-1'>
-              <span className='font-bold text-foreground tracking-wider text-base uppercase font-mono'>
+              <span className='font-semibold text-zinc-100 tracking-wider text-sm uppercase font-sans'>
                 Paused
               </span>
-              <span className='text-[10px] text-emerald-400 font-mono mt-0.5 truncate max-w-[140px]'>
+              <span className='text-[10px] text-emerald-400 font-mono tabular-nums mt-0.5 truncate max-w-[140px]'>
                 Restock: {restockUnitsOrdered ?? 0} units ordered
               </span>
             </div>
           ) : (
             <div className='flex flex-col items-center -mb-0.5'>
-              <span className='font-bold tracking-tight text-foreground text-xl font-mono'>
+              <span className='font-bold tracking-tight text-zinc-100 text-xl font-mono tabular-nums'>
                 {currentRoas.toFixed(2)}x
               </span>
-              <span className='text-[10px] text-[#8A8A8A] font-mono -mt-0.5'>
+              <span className='text-[10px] text-zinc-400 font-mono -mt-0.5'>
                 ROAS (0–6x)
               </span>
             </div>
@@ -310,17 +342,17 @@ export function RoasGauge({
       </div>
 
       {/* 4. SPEND/DAY + DAYS OF COVER */}
-      <div className='mt-3 flex w-full items-center justify-between text-xs text-[#A3A3A3] font-mono px-0.5'>
-        <span className='text-white font-medium'>
-          {formatINR(dailySpend)}
+      <div className='mt-3 flex w-full items-center justify-between text-xs px-0.5 font-mono tabular-nums'>
+        <span className='text-zinc-100 font-medium'>
+          {formatCurrency(dailySpend)}
         </span>
-        <span className={cn(effectiveCoverDays < 7 ? 'text-amber-500 font-semibold' : 'text-muted-foreground')}>
+        <span className={cn(effectiveCoverDays < 7 ? 'text-amber-400 font-medium' : 'text-zinc-400')}>
           {inventory <= 0 ? '0d cover' : `${effectiveCoverDays.toFixed(1)}d cover`}
         </span>
       </div>
 
       {/* 5. "1.8x floor · 3.2x target" */}
-      <div className='mt-1 flex w-full items-center justify-center text-[10px] font-mono text-[#737373]'>
+      <div className='mt-1 flex w-full items-center justify-center text-[10px] font-mono text-zinc-500'>
         <span>1.8x floor · 3.2x target</span>
       </div>
 
@@ -339,13 +371,13 @@ export function RoasGauge({
 
       {/* Real One-Line Data-Driven Footer Summary */}
       <div className='mt-2 w-full text-center px-1'>
-        <p className='text-[11px] text-[#8A8A8A] truncate font-mono' title={effectiveFooterSummary}>
+        <p className='text-[11px] text-zinc-400 truncate font-sans' title={effectiveFooterSummary}>
           {effectiveFooterSummary}
         </p>
       </div>
 
       {/* 7. FIX BUTTON / VIEW FIX BUTTON */}
-      <div className='mt-2.5 w-full pt-2 border-t border-[#1A1A1A]'>
+      <div className='mt-2.5 w-full pt-2 border-t border-[#27272a]'>
         {isFixed ? (
           <button
             type='button'
@@ -353,7 +385,7 @@ export function RoasGauge({
               e.stopPropagation();
               onViewFix?.();
             }}
-            className='w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg border border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono text-xs font-semibold uppercase tracking-wider hover:bg-emerald-500/20 active:scale-[0.97] transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400'
+            className='w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg border border-emerald-500/40 bg-emerald-500/10 text-emerald-400 font-sans text-xs font-medium uppercase tracking-wider hover:bg-emerald-500/20 active:scale-[0.97] transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-400'
           >
             <span>View fix</span>
           </button>
@@ -364,12 +396,12 @@ export function RoasGauge({
               e.stopPropagation();
               onFix?.();
             }}
-            className='w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-primary text-primary-foreground font-mono text-xs font-bold uppercase tracking-wider shadow-xs hover:brightness-110 active:brightness-95 active:scale-[0.97] transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
+            className='w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-zinc-100 text-zinc-900 font-sans text-xs font-semibold uppercase tracking-wider hover:bg-white active:scale-[0.97] transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400'
           >
             <span>Fix</span>
           </button>
         ) : (
-          <div className='w-full flex items-center justify-center py-1.5 text-[11px] text-emerald-400/80 font-mono'>
+          <div className='w-full flex items-center justify-center py-1.5 text-[11px] text-emerald-400/80 font-sans'>
             <span>● Healthy Pacing</span>
           </div>
         )}

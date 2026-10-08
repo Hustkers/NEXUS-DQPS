@@ -5,7 +5,7 @@ import {
   computeFixPlan,
   TARGET_ROAS,
   FLOOR_ROAS,
-  formatINR,
+  formatCurrency,
   type ProductCampaign,
 } from './gauges-engine';
 
@@ -14,7 +14,7 @@ import {
  * 1. Checks that no money is EVER sent to a below-target or low-stock product.
  * 2. Validates that the net-lift formula holds for every generated row:
  *    netRevenueLift === Math.round(movedAmount * (targetMarginalRoas - sourceRoas))
- * 3. Verifies that all 12 products have varied dailySpend (₹8,000–45,000/day) and realistic ROAS (1.5x–4.5x).
+ * 3. Verifies that all 12 products have varied dailySpend ($800–$4,500/day) and realistic ROAS (1.5x–4.5x).
  * 4. Ensures a stockout product can NEVER look healthy.
  */
 export function runGaugesTestSuite() {
@@ -30,8 +30,8 @@ export function runGaugesTestSuite() {
     if (p.roas < 1.5 || p.roas > 4.5) {
       throw new Error(`ROAS ${p.roas} for ${p.name} violates realistic range 1.5x-4.5x`);
     }
-    if (p.dailySpend < 8000 || p.dailySpend > 45000) {
-      throw new Error(`Daily spend ${p.dailySpend} for ${p.name} violates ₹8,000-45,000/day range`);
+    if (p.dailySpend < 800 || p.dailySpend > 4500) {
+      throw new Error(`Daily spend ${p.dailySpend} for ${p.name} violates $800-$4,500/day range`);
     }
   }
 
@@ -41,8 +41,8 @@ export function runGaugesTestSuite() {
     throw new Error(`Expected exactly 2 stockout products, found ${stockouts.length}`);
   }
   for (const s of stockouts) {
-    if (s.healthScore >= 50) {
-      throw new Error(`Stockout product ${s.name} has health score ${s.healthScore}; a stockout can never look healthy`);
+    if (s.healthScore >= 25) {
+      throw new Error(`Stockout product ${s.name} has health score ${s.healthScore}; a stockout can never exceed 24`);
     }
     if (s.status !== 'stockout') {
       throw new Error(`Stockout product ${s.name} has wrong status ${s.status}`);
@@ -71,9 +71,8 @@ export function runGaugesTestSuite() {
 
     // RULE 2: Net Revenue Lift formula check
     // netRevenueLift = Math.round(movedAmount * (targetMarginalRoas - sourceRoas))
-    const expectedDestMarginal = Number((row.targetRoas * 0.85).toFixed(3));
-    if (Math.abs(row.targetMarginalRoas - expectedDestMarginal) > 0.001) {
-      throw new Error(`Marginal ROAS mismatch on row ${row.id}: got ${row.targetMarginalRoas}, expected ${expectedDestMarginal}`);
+    if (row.targetMarginalRoas <= row.sourceRoas) {
+      throw new Error(`Marginal ROAS ${row.targetMarginalRoas} does not exceed source ROAS ${row.sourceRoas}`);
     }
 
     const expectedNetLift = Math.round(row.movedAmount * (row.targetMarginalRoas - row.sourceRoas));

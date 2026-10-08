@@ -217,16 +217,16 @@ export function StrategyEngineConsole() {
       : 0;
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-slate-50/50 dark:bg-[#07090e] text-foreground min-h-screen'>
+    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-background text-foreground min-h-screen font-mono'>
       {/* Header Banner */}
       <div className='flex flex-wrap items-center justify-between gap-4 border-b border-border/80 pb-4'>
         <div>
-          <h1 className='text-xl font-mono font-bold text-foreground uppercase tracking-tight flex items-center gap-2'>
-            <IconCpu className='size-5 text-cyan-500 dark:text-cyan-400' />
+          <h1 className='text-lg font-bold text-foreground uppercase tracking-tight flex items-center gap-2'>
+            <IconCpu className='size-5 text-muted-foreground' />
             AI Ad Campaign Recommendation &amp; Optimization Engine
           </h1>
-          <p className='text-xs font-mono text-muted-foreground mt-1'>
-            Personalized Ad Intelligence • Historical Calibration • 24 Candidate Strategies • Human Authorization Protocol
+          <p className='text-xs text-muted-foreground mt-1'>
+            Omnichannel Ad Intelligence • Historical Calibration • 24 Candidate Strategies • Human Authorization Protocol
           </p>
         </div>
 
@@ -246,7 +246,7 @@ export function StrategyEngineConsole() {
           <Button
             size='sm'
             onClick={() => setShowConfigForm(!showConfigForm)}
-            className='bg-cyan-500 hover:bg-cyan-400 text-black font-mono font-bold text-xs h-8 shadow-xs'
+            className='bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-mono font-medium text-xs h-8 rounded-md transition-colors'
           >
             {showConfigForm ? (
               <span className='flex items-center gap-1.5'>
@@ -297,8 +297,8 @@ export function StrategyEngineConsole() {
             <span className='text-sm font-mono font-bold text-foreground truncate block mt-0.5' title={campaign.campaignName}>
               {campaign.campaignName}
             </span>
-            <span className='text-[11px] font-mono text-cyan-400 block mt-1'>
-              Budget: ₹{campaign.totalBudget.toLocaleString()} • {campaign.campaignDuration}d
+            <span className='text-[11px] font-mono text-zinc-300 block mt-1'>
+              Budget: ${campaign.totalBudget.toLocaleString()} • {campaign.campaignDuration}d
             </span>
           </div>
 
@@ -306,7 +306,7 @@ export function StrategyEngineConsole() {
             <span className='text-[10px] font-mono uppercase text-muted-foreground tracking-wider block'>
               Top Recommended ROAS
             </span>
-            <span className='text-2xl font-mono font-bold text-emerald-400 block mt-0.5'>
+            <span className='text-2xl font-mono font-bold text-foreground block mt-0.5'>
               {topRoas.toFixed(2)}x
             </span>
             <span className='text-[11px] font-mono text-muted-foreground block mt-1'>
@@ -319,7 +319,7 @@ export function StrategyEngineConsole() {
               Top 3 Projected Revenue
             </span>
             <span className='text-2xl font-mono font-bold text-foreground block mt-0.5'>
-              ₹{blendedRevenue.toLocaleString()}
+              ${blendedRevenue.toLocaleString()}
             </span>
             <span className='text-[11px] font-mono text-muted-foreground block mt-1'>
               Portfolio gross return
@@ -334,7 +334,7 @@ export function StrategyEngineConsole() {
               {strategies.length} Distinct
             </span>
             <span className='text-[11px] font-mono text-muted-foreground block mt-1'>
-              Avg portfolio CPA: ₹{avgCpa.toLocaleString()}
+              Avg portfolio CPA: ${avgCpa.toLocaleString()}
             </span>
           </div>
         </div>

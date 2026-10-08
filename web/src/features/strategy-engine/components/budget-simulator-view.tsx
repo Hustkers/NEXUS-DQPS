@@ -31,9 +31,9 @@ export function BudgetSimulatorView({ strategies }: BudgetSimulatorViewProps) {
   const ev = currentStrategy?.evaluation;
   const baseBudget = currentStrategy?.budgetAllocation || 50000;
   const baseRoas = ev?.expectedRoas || 3.5;
-  const baseCpa = ev?.expectedCpa || 420;
+  const baseCpa = ev?.expectedCpa || 38.00;
   const baseCtr = ev?.expectedCtr || 0.035;
-  const baseCpc = ev?.expectedCpc || 4.2;
+  const baseCpc = ev?.expectedCpc || 2.15;
 
   // Diminishing returns state
   const [simulatedBudget, setSimulatedBudget] = useState<number>(baseBudget);
@@ -135,7 +135,7 @@ export function BudgetSimulatorView({ strategies }: BudgetSimulatorViewProps) {
           <div className='flex justify-between text-xs'>
             <span className='text-muted-foreground'>Simulated Spend:</span>
             <span className='text-base font-bold text-cyan-400'>
-              ₹{simulatedBudget.toLocaleString()}
+              ${simulatedBudget.toLocaleString()}
             </span>
           </div>
 
@@ -150,9 +150,9 @@ export function BudgetSimulatorView({ strategies }: BudgetSimulatorViewProps) {
           />
 
           <div className='flex justify-between text-[10px] text-muted-foreground'>
-            <span>₹10,000 (Conservative)</span>
-            <span>Baseline: ₹{baseBudget.toLocaleString()}</span>
-            <span>₹250,000 (Extreme Scale)</span>
+            <span>$10,000 (Conservative)</span>
+            <span>Baseline: ${baseBudget.toLocaleString()}</span>
+            <span>$250,000 (Extreme Scale)</span>
           </div>
         </div>
 
@@ -161,7 +161,7 @@ export function BudgetSimulatorView({ strategies }: BudgetSimulatorViewProps) {
           <div className='p-3 rounded-xl border border-border/60 bg-muted/10'>
             <span className='text-[10px] text-muted-foreground uppercase block'>Projected Revenue</span>
             <span className='text-lg font-bold text-foreground block mt-1'>
-              ₹{diminishingResult.revenue.toLocaleString()}
+              ${diminishingResult.revenue.toLocaleString()}
             </span>
           </div>
 
@@ -187,10 +187,10 @@ export function BudgetSimulatorView({ strategies }: BudgetSimulatorViewProps) {
           <div className='p-3 rounded-xl border border-border/60 bg-muted/10'>
             <span className='text-[10px] text-muted-foreground uppercase block'>Marginal CPA</span>
             <span className='text-lg font-bold text-foreground block mt-1'>
-              ₹{diminishingResult.cpa.toLocaleString()}
+              ${diminishingResult.cpa.toLocaleString()}
             </span>
             <span className='text-[10px] text-muted-foreground block mt-0.5'>
-              Base: ₹{baseCpa.toLocaleString()}
+              Base: ${baseCpa.toLocaleString()}
             </span>
           </div>
 
@@ -207,7 +207,7 @@ export function BudgetSimulatorView({ strategies }: BudgetSimulatorViewProps) {
           <div className='rounded-xl border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-300 flex items-start gap-2'>
             <IconAlertTriangle className='size-4 text-amber-400 shrink-0 mt-0.5' />
             <span>
-              Diminishing Returns Detected: Pushing spend past ₹{Math.round(baseBudget * 1.8).toLocaleString()} inflates CPA by +{Math.round(((diminishingResult.cpa - baseCpa) / baseCpa) * 100)}% because top metro high-intent search pools become exhausted. Recommendation: Diversify overflow budget into Amazon Sponsored Ads or Meta remarketing.
+              Diminishing Returns Detected: Pushing spend past ${Math.round(baseBudget * 1.8).toLocaleString()} inflates CPA by +{Math.round(((diminishingResult.cpa - baseCpa) / baseCpa) * 100)}% because top metro high-intent search pools become exhausted. Recommendation: Diversify overflow budget into Amazon Sponsored Ads or Meta remarketing.
             </span>
           </div>
         )}
@@ -323,7 +323,7 @@ export function BudgetSimulatorView({ strategies }: BudgetSimulatorViewProps) {
             <span className='text-[10px] text-muted-foreground uppercase block'>Adjusted CPA</span>
             <div className='flex items-baseline gap-2 mt-1'>
               <span className='text-xl font-bold text-foreground'>
-                ₹{whatIfResult.adjustedCpa.toLocaleString()}
+                ${whatIfResult.adjustedCpa.toLocaleString()}
               </span>
               <span className={`text-xs font-bold ${
                 whatIfResult.cpaDeltaPct <= 0 ? 'text-emerald-400' : 'text-rose-400'
@@ -336,7 +336,7 @@ export function BudgetSimulatorView({ strategies }: BudgetSimulatorViewProps) {
           <div className='p-3.5 rounded-xl border border-border/60 bg-muted/20'>
             <span className='text-[10px] text-muted-foreground uppercase block'>Adjusted Revenue</span>
             <span className='text-xl font-bold text-foreground block mt-1'>
-              ₹{whatIfResult.adjustedRevenue.toLocaleString()}
+              ${whatIfResult.adjustedRevenue.toLocaleString()}
             </span>
           </div>
 

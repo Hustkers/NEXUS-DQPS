@@ -123,7 +123,7 @@ export interface StrategyEvaluation {
     isModelEstimate: boolean;
     modelBasis: string;
     historicalCalibrated: boolean;
-    currency: 'INR' | 'USD';
+    currency: 'INR';
   };
   selectionReasons: string[];
   rejectionReasons: string[];

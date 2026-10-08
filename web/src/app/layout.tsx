@@ -1,5 +1,6 @@
 import Providers from '@/components/layout/providers';
 import { Toaster } from '@/components/ui/sonner';
+import { AppAiAssistant } from '@/features/ai-assistant';
 import { fontVariables } from '@/components/themes/font.config';
 import { DEFAULT_THEME, THEMES } from '@/components/themes/theme.config';
 import ThemeProvider from '@/components/themes/theme-provider';
@@ -82,7 +83,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body
         className={cn(
-          'bg-background overflow-x-hidden overscroll-none font-sans antialiased',
+          'bg-background font-sans antialiased',
           fontVariables
         )}
       >
@@ -99,6 +100,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <BackgroundShader />
               <Toaster />
               {children}
+              <AppAiAssistant />
             </Providers>
           </ThemeProvider>
         </NuqsAdapter>

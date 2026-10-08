@@ -120,6 +120,8 @@ class NexusMCPServer:
                     "asin": item.asin,
                     "unit_price_usd": item.retail_price,
                     "unit_cogs_usd": item.unit_cogs,
+                    "unit_price_inr": item.retail_price_inr,
+                    "unit_cogs_inr": item.unit_cogs_inr,
                     "unit_margin_usd": round(margin, 2),
                     "gross_margin_pct": round(margin_pct, 1),
                 })
