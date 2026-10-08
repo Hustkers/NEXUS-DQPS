@@ -178,7 +178,8 @@ export function PillarsCardsStack() {
 
   return (
     <ContainerScroll
-      className='w-full max-w-5xl mx-auto pt-4 space-y-20 pb-16'
+      className='w-full max-w-5xl mx-auto pt-4 space-y-20 pb-40'
+      style={{ minHeight: '280vh' }}
     >
       {cards.map((card, index) => {
         return (

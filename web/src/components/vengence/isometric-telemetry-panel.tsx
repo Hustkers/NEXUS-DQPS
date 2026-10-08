@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import {
   TerrainFigure,
   PlotFigure,
@@ -20,6 +21,7 @@ interface InstrumentSpec {
   badge: string;
   stat: string;
   statLabel: string;
+  href: string;
   component: React.ComponentType<{
     intensity?: number;
     className?: string;
@@ -38,6 +40,7 @@ const INSTRUMENTS: InstrumentSpec[] = [
     badge: 'HILL EQUATIONS',
     stat: '3.42x',
     statLabel: 'Marginal ROAS Inflection',
+    href: '/dashboard/gauges',
     component: TerrainFigure
   },
   {
@@ -49,6 +52,7 @@ const INSTRUMENTS: InstrumentSpec[] = [
     badge: 'SLSQP SOLVER',
     stat: '18ms',
     statLabel: 'Optimization Convergence',
+    href: '/dashboard/reallocations',
     component: PlotFigure
   },
   {
@@ -60,6 +64,7 @@ const INSTRUMENTS: InstrumentSpec[] = [
     badge: 'CAUSAL DAG',
     stat: '99.4%',
     statLabel: 'Root-Cause Confidence',
+    href: '/dashboard/anomalies',
     component: BranchesFigure
   },
   {
@@ -71,6 +76,7 @@ const INSTRUMENTS: InstrumentSpec[] = [
     badge: 'KILL-SWITCH',
     stat: '< 15m',
     statLabel: 'Intervention SLA',
+    href: '/dashboard/autonomous-engine',
     component: VaultFigure
   },
   {
@@ -82,6 +88,7 @@ const INSTRUMENTS: InstrumentSpec[] = [
     badge: 'GPU ENTROPY',
     stat: '99.8%',
     statLabel: 'Attribution Match Rate',
+    href: '/dashboard/fingerprint',
     component: PhosphorFigure
   },
   {
@@ -93,6 +100,7 @@ const INSTRUMENTS: InstrumentSpec[] = [
     badge: 'IMMUTABLE AUDIT',
     stat: '₹15.4k/w',
     statLabel: 'Protected Weekly Profit',
+    href: '/dashboard/ledger',
     component: RiffleFigure
   }
 ];
@@ -111,7 +119,7 @@ export function IsometricTelemetryPanel() {
       <div className='px-4 sm:px-6 py-3.5 border-b border-border/70 bg-muted/30 flex flex-wrap items-center justify-between gap-3'>
         <div className='flex items-center gap-2.5'>
           <div className='size-2.5 rounded-full bg-emerald-500 animate-pulse' />
-          <span className='font-mono text-xs font-bold tracking-wider uppercase text-foreground'>
+          <span className='font-orbitron text-xs font-bold tracking-wider uppercase text-foreground'>
             Tactile Telemetry Simulator
           </span>
           <span className='hidden sm:inline font-mono text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-semibold'>
@@ -121,8 +129,8 @@ export function IsometricTelemetryPanel() {
 
         {/* Live caption readout from Hairline figure */}
         <div className='flex items-center gap-2 font-mono text-[11px] text-muted-foreground'>
-          <span className='text-muted-foreground/60'>READOUT:</span>
-          <span className='px-2 py-0.5 rounded bg-background/80 border border-border/80 text-foreground font-semibold'>
+          <span className='text-muted-foreground/60 font-semibold'>READOUT:</span>
+          <span className='px-2.5 py-0.5 rounded-md bg-background/90 border border-border/80 text-foreground font-semibold shadow-xs'>
             {caption || 'rest state'}
           </span>
         </div>
@@ -133,7 +141,7 @@ export function IsometricTelemetryPanel() {
         {/* Left: Tab Selectors */}
         <div className='lg:col-span-4 p-4 sm:p-5 border-b lg:border-b-0 lg:border-r border-border/70 flex flex-col justify-between space-y-4 bg-muted/10'>
           <div className='space-y-1.5'>
-            <div className='font-mono text-[10px] uppercase font-bold text-muted-foreground px-2 pb-1'>
+            <div className='font-orbitron text-[10px] uppercase font-bold tracking-wider text-muted-foreground px-2 pb-1'>
               Select Engine Telemetry
             </div>
             {INSTRUMENTS.map((inst) => {
@@ -203,20 +211,28 @@ export function IsometricTelemetryPanel() {
           <div className='w-full flex items-start justify-between gap-4 mb-3'>
             <div>
               <div className='flex items-center gap-2 mb-1'>
-                <span className='font-mono text-xs font-extrabold uppercase px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20'>
+                <span className='font-orbitron text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20'>
                   {active.badge}
                 </span>
-                <h3 className='font-bold text-base sm:text-lg text-foreground'>
+                <h3 className='font-orbitron font-bold text-base sm:text-lg text-foreground'>
                   {active.name}
                 </h3>
               </div>
               <p className='text-xs text-muted-foreground max-w-md leading-relaxed'>
                 {active.description}
               </p>
+              <div className='mt-2.5'>
+                <Link
+                  href={active.href}
+                  className='inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-primary hover:text-primary/80 transition-colors group'
+                >
+                  <span>Launch {active.name.split(' ')[0]} in Cockpit →</span>
+                </Link>
+              </div>
             </div>
 
             <div className='text-right shrink-0 bg-muted/40 p-2.5 rounded-xl border border-border/70 hidden sm:block'>
-              <div className='font-mono text-xs font-extrabold text-foreground'>{active.stat}</div>
+              <div className='font-orbitron text-sm font-extrabold text-foreground'>{active.stat}</div>
               <div className='font-mono text-[9px] text-muted-foreground uppercase'>{active.statLabel}</div>
             </div>
           </div>
@@ -237,9 +253,12 @@ export function IsometricTelemetryPanel() {
               <span className='size-1.5 rounded-full bg-primary' />
               Move cursor across figure to deform geometry in real-time
             </span>
-            <span className='hidden sm:inline text-muted-foreground/60'>
-              Shared 60FPS RAF • Zero WebGL Overhead
-            </span>
+            <Link
+              href={active.href}
+              className='hidden sm:inline-flex items-center gap-1 text-[11px] font-mono font-semibold text-primary hover:underline'
+            >
+              <span>Inspect Live Module →</span>
+            </Link>
           </div>
         </div>
       </div>

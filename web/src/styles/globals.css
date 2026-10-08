@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap');
 @import 'tailwindcss';
+@source '../';
 
 @import 'tw-animate-css';
 
@@ -10,8 +10,94 @@
 @custom-variant data-horizontal (&[data-orientation='horizontal']);
 @custom-variant data-vertical (&[data-orientation='vertical']);
 
+@theme inline {
+  --font-orbitron: var(--font-orbitron, 'Orbitron', sans-serif);
+}
+
+@utility font-orbitron {
+  font-family: var(--font-orbitron, 'Orbitron', sans-serif);
+}
+
 @import './theme.css';
 @import './animated-footer.css';
+
+/* ==========================================================================
+   Vengence UI Typography Integration for NEXUS-D2C Dashboard
+   Signature high-tech Orbitron display styling across the entire dashboard shell,
+   views, cards, navigation, and Radix portals while preserving pure monospace
+   for raw code blocks and telemetry data tables.
+   ========================================================================== */
+
+html.vengence-dashboard-active,
+html.vengence-dashboard-active body,
+body.vengence-dashboard-active,
+.vengence-dashboard {
+  --font-sans: var(--font-orbitron, 'Orbitron', 'Space Grotesk', sans-serif) !important;
+  font-family: var(--font-orbitron, 'Orbitron', 'Space Grotesk', sans-serif) !important;
+}
+
+/* Ensure all typography across the dashboard inherits Orbitron */
+.vengence-dashboard,
+.vengence-dashboard *:not(pre):not(code):not(kbd):not(.font-mono):not([class*="font-mono"]):not([data-monospace]),
+body.vengence-dashboard-active *:not(pre):not(code):not(kbd):not(.font-mono):not([class*="font-mono"]):not([data-monospace]),
+[data-radix-popper-content-wrapper] *:not(pre):not(code):not(kbd):not(.font-mono):not([class*="font-mono"]),
+[data-slot="dialog-content"] *:not(pre):not(code):not(kbd):not(.font-mono):not([class*="font-mono"]),
+[data-slot="popover-content"] *:not(pre):not(code):not(kbd):not(.font-mono):not([class*="font-mono"]),
+[data-slot="dropdown-menu-content"] *:not(pre):not(code):not(kbd):not(.font-mono):not([class*="font-mono"]),
+[data-slot="sheet-content"] *:not(pre):not(code):not(kbd):not(.font-mono):not([class*="font-mono"]),
+[data-slot="drawer-content"] *:not(pre):not(code):not(kbd):not(.font-mono):not([class*="font-mono"]),
+[data-slot="tooltip-content"] *:not(pre):not(code):not(kbd):not(.font-mono):not([class*="font-mono"]),
+[data-slot="command"] *:not(pre):not(code):not(kbd):not(.font-mono):not([class*="font-mono"]) {
+  font-family: var(--font-orbitron, 'Orbitron', 'Space Grotesk', sans-serif);
+}
+
+/* Headings and card titles in Orbitron with Vengence UI tracking */
+.vengence-dashboard :where(h1, h2, h3, h4, h5, h6, [data-slot="card-title"]),
+body.vengence-dashboard-active :where(h1, h2, h3, h4, h5, h6, [data-slot="card-title"], [data-slot="dialog-title"], [data-slot="sheet-title"]),
+.vengence-dashboard h1, .vengence-dashboard h2, .vengence-dashboard h3, .vengence-dashboard h4,
+.vengence-dashboard [data-slot="card-title"],
+body.vengence-dashboard-active h1, body.vengence-dashboard-active h2, body.vengence-dashboard-active h3, body.vengence-dashboard-active h4,
+body.vengence-dashboard-active [data-slot="card-title"] {
+  font-family: var(--font-orbitron, 'Orbitron', sans-serif) !important;
+  letter-spacing: -0.02em;
+}
+
+/* Badges, pill tags, and uppercase labels */
+.vengence-dashboard :where([data-slot="badge"], .badge),
+body.vengence-dashboard-active :where([data-slot="badge"], .badge) {
+  font-family: var(--font-orbitron, 'Orbitron', sans-serif);
+  letter-spacing: 0.02em;
+}
+
+/* Buttons, tabs, and menu triggers */
+.vengence-dashboard :where(button, [role="tab"], [role="menuitem"], [data-slot="sidebar-menu-button"]),
+body.vengence-dashboard-active :where(button, [role="tab"], [role="menuitem"], [data-slot="sidebar-menu-button"]) {
+  font-family: var(--font-orbitron, 'Orbitron', sans-serif);
+}
+
+/* Table cells, metrics, KPI counters */
+.vengence-dashboard :where(td, th, [data-metric], .tabular-nums),
+body.vengence-dashboard-active :where(td, th, [data-metric], .tabular-nums) {
+  font-family: var(--font-orbitron, 'Orbitron', sans-serif);
+}
+
+/* KBar command search palette */
+body.vengence-dashboard-active [data-kbar-animator],
+body.vengence-dashboard-active .kbar-positioner,
+body.vengence-dashboard-active [role="combobox"] {
+  font-family: var(--font-orbitron, 'Orbitron', sans-serif);
+}
+
+/* Strict monospace protection for raw code blocks, SQL logs, json payload, kbd */
+.vengence-dashboard :where(pre, code, kbd, samp),
+.vengence-dashboard pre *,
+.vengence-dashboard code *,
+body.vengence-dashboard-active :where(pre, code, kbd, samp),
+body.vengence-dashboard-active pre *,
+body.vengence-dashboard-active code * {
+  font-family: var(--font-mono, 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace) !important;
+}
+
 
 @layer base {
   * {
@@ -19,13 +105,12 @@
   }
   html {
     @apply bg-background text-foreground;
-    max-width: 100%;
-    overflow-x: hidden;
+    overflow-y: auto;
+    scroll-behavior: smooth;
   }
   body {
     @apply bg-background text-foreground;
-    min-height: 100vh;
-    max-width: 100%;
+    min-height: 100dvh;
   }
 
   /* Global scrollbar styling to match ScrollArea */
@@ -793,3 +878,55 @@
     -webkit-text-fill-color: currentColor;
   }
 }
+
+/* StackedLogos - CSS Variables & Keyframe Animations */
+.stacked-logos {
+  --duration: 30;
+  --items: 4;
+  --lists: 4;
+  --stagger: 0;
+  --logo-width: 200px;
+  --mouse-x: 0px;
+  --mouse-y: 0px;
+}
+
+.stacked-logos:hover .stacked-logos__glow {
+  opacity: 1;
+}
+
+.stacked-logos:hover .stacked-logos__border-glow {
+  opacity: 1;
+}
+
+.stacked-logos__cell {
+  --base-delay: calc(sin((var(--index) / var(--lists)) * 45deg) * var(--stagger));
+}
+
+.stacked-logos__logo {
+  animation-name: stacked-logos-appear;
+  animation-duration: calc(var(--duration) * 1s);
+  animation-fill-mode: both;
+  animation-iteration-count: infinite;
+  animation-delay: calc((var(--duration) / var(--items)) * (var(--items) - var(--i)) * -1s + (var(--base-delay, 0) * 1s));
+}
+
+@keyframes stacked-logos-appear {
+  0%,
+  100% {
+    opacity: 0;
+    filter: blur(4px);
+  }
+
+  5%,
+  20% {
+    opacity: 1;
+    filter: blur(0);
+  }
+
+  25%,
+  100% {
+    opacity: 0;
+    filter: blur(4px);
+  }
+}
+
