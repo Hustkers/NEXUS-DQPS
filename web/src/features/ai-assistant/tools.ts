@@ -5,6 +5,7 @@
 
 import { approveDirective, fetchKPIOverview, fetchVertexAiStatus, OFFLINE_KPIS } from '@/lib/api-adapter';
 import { toast } from 'sonner';
+import type { AssistantGraphConfig } from './assistant-graph-renderer';
 
 export interface ToolDefinition {
   name: string;

@@ -10,7 +10,7 @@ import initialEngineState from '@/data/nexus-engine-state.json';
 interface ArchetypeDef {
   config_id: string;
   title: string;
-  platform: 'meta' | 'google' | 'amazon' | 'tiktok';
+  platform: 'meta' | 'google' | 'amazon' | 'shopify';
   objective: string;
   audience_segment: string;
   bidding_strategy: string;
@@ -87,7 +87,7 @@ const ARCHETYPES: ArchetypeDef[] = [
     platform: 'google',
     objective: 'Purchase / High Intent',
     audience_segment: "Exact Search Queries (e.g., 'Nike Air Max Buy')",
-    bidding_strategy: 'Target CPA (₹450 Ceiling)',
+    bidding_strategy: 'Target CPA ($12.50 Ceiling)',
     budget_weight: 0.8,
     cvr_mult: 1.55,
     cpm_mult: 1.4,

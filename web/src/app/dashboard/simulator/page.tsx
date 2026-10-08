@@ -368,12 +368,12 @@ function SimulationLabContent() {
         <div>
           <div className='flex items-center gap-2'>
             <Icons.sparkles className='size-5 text-indigo-600 dark:text-purple-400' />
-            <h1 className='text-xl font-bold uppercase tracking-tight text-foreground'>
-              Scenario Simulation Lab &amp; Decision Sandbox
+            <h1 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground font-sans'>
+              Scenario Simulator
             </h1>
           </div>
           <p className='text-xs text-muted-foreground mt-1'>
-            Autonomous Crisis Stress-Testing • Parameterized What-If Modeling • Scipy Response Curve Calibration
+            What-if crisis stress-testing, parameterized shocks, and Scipy curve calibration.
           </p>
         </div>
 

@@ -221,12 +221,12 @@ export function StrategyEngineConsole() {
       {/* Header Banner */}
       <div className='flex flex-wrap items-center justify-between gap-4 border-b border-border/80 pb-4'>
         <div>
-          <h1 className='text-lg font-bold text-foreground uppercase tracking-tight flex items-center gap-2'>
+          <h1 className='text-xl sm:text-2xl font-semibold text-foreground tracking-tight flex items-center gap-2 font-sans'>
             <IconCpu className='size-5 text-muted-foreground' />
-            AI Ad Campaign Recommendation &amp; Optimization Engine
+            Strategy Engine
           </h1>
           <p className='text-xs text-muted-foreground mt-1'>
-            Omnichannel Ad Intelligence • Historical Calibration • 24 Candidate Strategies • Human Authorization Protocol
+            Omnichannel candidate evaluation, historical calibration, and human-in-the-loop authorization.
           </p>
         </div>
 

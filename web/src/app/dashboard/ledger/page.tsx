@@ -34,8 +34,8 @@ export default function LedgerPage() {
       <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border/80 pb-3'>
         <div className='space-y-0.5'>
           <div className='flex items-center gap-2.5'>
-            <h1 className='text-lg md:text-xl font-mono font-bold text-foreground uppercase tracking-tight'>
-              DECISION LEDGER
+            <h1 className='text-xl sm:text-2xl font-semibold text-foreground tracking-tight font-sans'>
+              Decision Ledger
             </h1>
             <span className='inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'>
               <span className='h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse' />
