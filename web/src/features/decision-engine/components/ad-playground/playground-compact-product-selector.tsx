@@ -33,12 +33,12 @@ export function PlaygroundCompactProductSelector({
   );
 
   return (
-    <div className='relative font-mono'>
+    <div className='relative font-sans'>
       {/* Compact Main Card (Single selected product) */}
-      <div className='rounded-xl border border-border/80 bg-card p-4 transition-all duration-200 hover:border-cyan-500/30'>
-        <div className='flex items-center justify-between pb-2.5 mb-3 border-b border-border/60'>
-          <span className='text-[10px] uppercase font-bold tracking-widest text-muted-foreground flex items-center gap-1.5'>
-            <IconPackage className='size-3.5 text-cyan-500' />
+      <div className='rounded-xl border border-zinc-800 bg-[#121215] p-4 transition-all duration-200 hover:border-zinc-700'>
+        <div className='flex items-center justify-between pb-2.5 mb-3 border-b border-zinc-800'>
+          <span className='text-[10px] uppercase font-semibold tracking-wider text-zinc-400 flex items-center gap-1.5 font-sans'>
+            <IconPackage className='size-3.5 text-zinc-300' />
             TARGET PRODUCT
           </span>
 
@@ -48,15 +48,15 @@ export function PlaygroundCompactProductSelector({
               className={cn(
                 'size-2 rounded-full',
                 isStockout
-                  ? 'bg-rose-500 shadow-[0_0_8px_#f43f5e]'
+                  ? 'bg-rose-500'
                   : isLowStock
-                    ? 'bg-amber-400 shadow-[0_0_8px_#f59e0b]'
-                    : 'bg-emerald-400 shadow-[0_0_8px_#34d399]'
+                    ? 'bg-amber-400'
+                    : 'bg-emerald-400'
               )}
             />
             <span
               className={cn(
-                'text-[10px] font-bold uppercase tracking-wider',
+                'text-[10px] font-mono font-medium uppercase tracking-wider',
                 isStockout
                   ? 'text-rose-400'
                   : isLowStock
@@ -89,23 +89,23 @@ export function PlaygroundCompactProductSelector({
 
           {/* Product Meta */}
           <div className='flex-1 min-w-0'>
-            <h3 className='text-sm sm:text-base font-bold text-foreground truncate' title={selectedProduct.name}>
+            <h3 className='text-sm sm:text-base font-semibold text-zinc-100 truncate' title={selectedProduct.name}>
               {selectedProduct.name}
             </h3>
-            <p className='text-[11px] text-muted-foreground font-mono mt-0.5 truncate'>
+            <p className='text-[11px] text-zinc-400 font-mono mt-0.5 truncate'>
               SKU: {selectedProduct.sku} • {selectedProduct.category}
             </p>
 
-            <div className='flex flex-wrap items-center gap-3 mt-1.5 text-xs font-mono'>
-              <span className='font-bold text-foreground'>
-                ₹{selectedProduct.price.toLocaleString()}
+            <div className='flex flex-wrap items-center gap-3 mt-1.5 text-xs font-mono tabular-nums'>
+              <span className='font-semibold text-zinc-100'>
+                ${selectedProduct.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
-              <span className='text-muted-foreground'>•</span>
-              <span className={cn('font-semibold', isStockout ? 'text-rose-400 font-bold' : 'text-foreground/90')}>
+              <span className='text-zinc-500'>•</span>
+              <span className={cn('font-medium', isStockout ? 'text-rose-400 font-bold' : 'text-zinc-300')}>
                 {selectedProduct.inventory} units in stock
               </span>
-              <span className='text-muted-foreground'>•</span>
-              <span className='text-muted-foreground'>
+              <span className='text-zinc-500'>•</span>
+              <span className='text-zinc-400'>
                 {selectedProduct.grossMarginPct}% margin
               </span>
             </div>
@@ -218,11 +218,11 @@ export function PlaygroundCompactProductSelector({
                       </div>
 
                       <div className='min-w-0'>
-                        <div className='text-xs font-bold text-foreground truncate group-hover:text-cyan-400 transition-colors'>
+                        <div className='text-xs font-semibold text-zinc-100 truncate group-hover:text-zinc-300 transition-colors'>
                           {p.name}
                         </div>
-                        <div className='text-[10px] text-muted-foreground mt-0.5'>
-                          ₹{p.price.toLocaleString()} • {p.grossMarginPct}% margin
+                        <div className='text-[10px] text-zinc-400 mt-0.5 font-mono tabular-nums'>
+                          ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} • {p.grossMarginPct}% margin
                         </div>
                       </div>
                     </div>

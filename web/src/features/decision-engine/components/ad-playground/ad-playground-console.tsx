@@ -46,7 +46,7 @@ export function AdPlaygroundConsole() {
     audience: 'broad',
     creative: 'ugc_video',
     placement: 'auto',
-    platforms: ['meta', 'google', 'amazon', 'tiktok']
+    platforms: ['meta', 'google', 'amazon', 'shopify']
   }));
 
   const [result, setResult] = useState<AdPlaygroundResult>(() => {
@@ -60,7 +60,7 @@ export function AdPlaygroundConsole() {
       audience: 'broad',
       creative: 'ugc_video',
       placement: 'auto',
-      platforms: ['meta', 'google', 'amazon', 'tiktok']
+      platforms: ['meta', 'google', 'amazon', 'shopify']
     });
   });
 
@@ -113,21 +113,21 @@ export function AdPlaygroundConsole() {
   const isInventoryConstrained = result.candidates[0]?.stockout_risk;
 
   return (
-    <div className='flex flex-col gap-6 font-mono text-foreground'>
+    <div className='flex flex-col gap-6 font-sans text-zinc-100'>
       {/* 1. COMPACT HERO SECTION */}
-      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/80 pb-4'>
+      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-4'>
         <div>
           <div className='flex items-center gap-2.5'>
-            <span className='size-2 rounded-full bg-cyan-400 animate-pulse' />
-            <h1 className='text-xl sm:text-2xl font-bold uppercase tracking-tight text-foreground'>
+            <span className='size-2 rounded-full bg-zinc-400' />
+            <h1 className='text-xl sm:text-2xl font-bold uppercase tracking-tight text-zinc-100'>
               AD PLAYGROUND
             </h1>
-            <span className='text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded border border-cyan-500/30 bg-cyan-950/30 text-cyan-400'>
-              ● LIVE OPTIMIZER
+            <span className='text-[10px] font-mono font-medium tracking-wider px-2 py-0.5 rounded border border-zinc-800 bg-zinc-900 text-zinc-300'>
+              OPTIMIZER WORKBENCH
             </span>
           </div>
-          <p className='text-xs text-muted-foreground mt-1'>
-            Design a campaign. See what happens.
+          <p className='text-xs text-zinc-400 mt-1 font-sans'>
+            Simulate and evaluate campaign configurations on analytical Hill response curves.
           </p>
         </div>
 

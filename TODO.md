@@ -171,15 +171,15 @@ Summary of all active left sidebar routes defined in [`web/src/config/nav-config
 | [x] (9.8/10) | **Diagnostic Anomalies & RCA** | [`/dashboard/anomalies`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/anomalies/page.tsx) | `r` `c` | `warning` | Anomaly RCA Workbench |
 | [x] (9.8/10) | **ROAS & Health Gauges** | [`/dashboard/gauges`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/gauges/page.tsx) | `r` `g` | `trendingUp` | `RoasGauge` & Channel Breakdown |
 | [x] (9.8/10) | **Budget Reallocation Feed** | [`/dashboard/reallocations`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/reallocations/page.tsx) | `b` `r` | `adjustments` | `ReallocationFeed` |
-| [ ] | **Ad Playground** | [`/dashboard/playground`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/playground/page.tsx) | `a` `p` | `sparkles` | `AdPlaygroundConsole` |
-| [ ] | **Decision Ledger & Learning** | [`/dashboard/ledger`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/ledger/page.tsx) | `d` `l` | `check` | `DecisionLedgerTable` |
-| [ ] | **Visitor Tracking & Attribution** | [`/dashboard/tracking`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/tracking/page.tsx) | `v` `t` | `search` | `TrackingDashboard` |
+| [x] (9.8/10) | **Ad Playground** | [`/dashboard/playground`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/playground/page.tsx) | `a` `p` | `sparkles` | `AdPlaygroundConsole` |
+| [x] (9.8/10) | **Decision Ledger & Learning** | [`/dashboard/ledger`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/ledger/page.tsx) | `d` `l` | `check` | `DecisionLedgerTable` |
+| [x] (9.8/10) | **Visitor Tracking & Attribution** | [`/dashboard/tracking`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/tracking/page.tsx) | `v` `t` | `search` | `TrackingDashboard` |
 
 ### Group 2: Simulation & Catalog
 | Status | Route Name | Route URL | Keyboard Shortcut | Icon ID | Implementation / Component |
 | :---: | :--- | :--- | :---: | :---: | :--- |
-| [ ] | **Fingerprint Identity Tracker** | [`/dashboard/fingerprint`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/fingerprint/page.tsx) | `f` `p` | `fingerprint` | `FingerprintTrackerDemo` |
-| [ ] | **Scenario Shock Sandbox** | [`/dashboard/simulator`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/simulator/page.tsx) | `s` `s` | `sparkles` | `ScenarioSandbox` |
-| [ ] | **Nike Footwear Catalog** | [`/dashboard/product`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/product/page.tsx) | `n` `p` | `kanban` | `ProductTable` & Product Cards |
-| [ ] | **SKU & Channel Matrix** | [`/dashboard/matrix`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/matrix/page.tsx) | `s` `m` | `product` | Minimalist SKU/Channel Grid |
-| [ ] | **Live Schema Normalizer** | [`/dashboard/normalization`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/normalization/page.tsx) | `s` `n` | `normalization` | `NormalizationShowcase` |
+| [x] (9.8/10) | **Fingerprint Identity Tracker** | [`/dashboard/fingerprint`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/fingerprint/page.tsx) | `f` `p` | `fingerprint` | `FingerprintTrackerDemo` |
+| [x] (9.8/10) | **Scenario Shock Sandbox** | [`/dashboard/simulator`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/simulator/page.tsx) | `s` `s` | `sparkles` | `ScenarioSandbox` |
+| [x] (9.8/10) | **Nike Footwear Catalog** | [`/dashboard/product`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/product/page.tsx) | `n` `p` | `kanban` | `ProductTable` & Product Cards |
+| [x] (9.8/10) | **SKU & Channel Matrix** | [`/dashboard/matrix`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/matrix/page.tsx) | `s` `m` | `product` | Minimalist SKU/Channel Grid |
+| [x] (9.8/10) | **Live Schema Normalizer** | [`/dashboard/normalization`](file:///home/shivam/Projects/NEXUS-DQPS/web/src/app/dashboard/normalization/page.tsx) | `s` `n` | `normalization` | `NormalizationShowcase` |

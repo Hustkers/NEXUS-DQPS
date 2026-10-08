@@ -7,18 +7,29 @@ import {
   IconMicrophone,
   IconMessageChatbot,
   IconSearch,
+  IconChartLine,
   IconX,
   IconChevronDown,
 } from '@tabler/icons-react';
 import { AssistantSearch } from './assistant-search';
 import { AssistantVoice } from './assistant-voice';
 import { AssistantChat } from './assistant-chat';
+import { AssistantGraphsView } from './assistant-graphs-view';
 import { useAiAssistant } from './use-ai-assistant';
 import { Kbd } from '@/components/ui/kbd';
 
 export function AppAiAssistant() {
   const router = useRouter();
-  const { isOpen, activeTab, open, close, toggle, setActiveTab } = useAiAssistant();
+  const {
+    isOpen,
+    activeTab,
+    initialChatPrompt,
+    open,
+    close,
+    toggle,
+    setActiveTab,
+    setInitialChatPrompt,
+  } = useAiAssistant();
 
   // Keyboard Shortcuts: Cmd+K opens search; Cmd+J toggles assistant; Escape closes it
   useEffect(() => {
@@ -41,6 +52,9 @@ export function AppAiAssistant() {
       } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'j') {
         e.preventDefault();
         toggle();
+      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'g') {
+        e.preventDefault();
+        open('graphs');
       } else if (e.key === 'Escape' && isOpen) {
         close();
       }
@@ -82,7 +96,7 @@ export function AppAiAssistant() {
 
           {/* Mode Badges & Shortcut hint */}
           <div className="flex items-center gap-1.5 pl-1.5 border-l border-zinc-800 text-[10px] text-zinc-400 font-mono">
-            <span className="hidden sm:inline">Search &amp; Voice</span>
+            <span className="hidden sm:inline">Search · Voice · Graphs</span>
             <Kbd className="text-[9px] px-1 py-0 bg-zinc-800/80 border-zinc-700 text-zinc-300">
               ⌘K
             </Kbd>
@@ -95,7 +109,7 @@ export function AppAiAssistant() {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed bottom-18 sm:bottom-20 left-1/2 -translate-x-1/2 z-50 w-[94vw] max-w-lg md:max-w-xl rounded-2xl border border-zinc-800/90 bg-zinc-950/95 backdrop-blur-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_35px_rgba(16,185,129,0.12)] text-zinc-100 overflow-hidden flex flex-col origin-bottom animate-in fade-in slide-in-from-bottom-4 duration-200"
+          className="fixed bottom-18 sm:bottom-20 left-1/2 -translate-x-1/2 z-50 w-[94vw] max-w-lg md:max-w-2xl rounded-2xl border border-zinc-800/90 bg-zinc-950/95 backdrop-blur-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_35px_rgba(16,185,129,0.12)] text-zinc-100 overflow-hidden flex flex-col origin-bottom animate-in fade-in slide-in-from-bottom-4 duration-200"
         >
           {/* Top Header Bar */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 bg-zinc-900/60">
@@ -113,7 +127,7 @@ export function AppAiAssistant() {
               </div>
             </div>
 
-            {/* Tab Switcher: Search vs Voice vs Chat */}
+            {/* Tab Switcher: Search vs Voice vs Chat vs Graphs */}
             <div className="flex items-center gap-1 p-0.5 rounded-lg border border-zinc-800 bg-zinc-950/80">
               <button
                 type="button"
@@ -153,6 +167,19 @@ export function AppAiAssistant() {
                 <IconMessageChatbot className="size-3" />
                 <span>Chatbot</span>
               </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('graphs')}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-mono transition-all ${
+                  activeTab === 'graphs'
+                    ? 'bg-zinc-800 text-emerald-400 shadow-xs font-medium'
+                    : 'text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                <IconChartLine className="size-3" />
+                <span>Graphs</span>
+              </button>
             </div>
 
             {/* Close Button */}
@@ -170,14 +197,29 @@ export function AppAiAssistant() {
           <div className="flex-1 min-h-0 bg-zinc-950/50">
             {activeTab === 'search' && <AssistantSearch />}
             {activeTab === 'voice' && <AssistantVoice router={router} />}
-            {activeTab === 'chat' && <AssistantChat router={router} />}
+            {activeTab === 'chat' && (
+              <AssistantChat
+                router={router}
+                initialPrompt={initialChatPrompt}
+                onClearInitialPrompt={() => setInitialChatPrompt(undefined)}
+              />
+            )}
+            {activeTab === 'graphs' && (
+              <AssistantGraphsView
+                router={router}
+                onSwitchToChat={(prompt) => {
+                  setInitialChatPrompt(prompt);
+                  setActiveTab('chat');
+                }}
+              />
+            )}
           </div>
 
           {/* Footer Bar */}
           <div className="px-4 py-1.5 bg-zinc-900/40 border-t border-zinc-800/60 flex items-center justify-between text-[10px] font-mono text-zinc-400">
             <span className="flex items-center gap-1">
               <span className="size-1 rounded-full bg-emerald-500" />
-              Omnibar Search · ElevenLabs Voice · Vertex AI (ADC)
+              Omnibar Search · Voice · AI Chat · Realtime Telemetry Graphs
             </span>
             <button
               type="button"

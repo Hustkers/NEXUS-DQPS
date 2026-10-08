@@ -1,15 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { GithubGlobe } from '@/features/decision-engine/components/github-globe';
 import { GlobePulse } from '@/components/ui/cobe-globe-pulse';
 import { RLVisualAnalytics } from '@/features/decision-engine/components/rl-visual-analytics';
 import { ProductAnalysisModal, type ProductAnalysisTarget } from '@/features/decision-engine/components/product-analysis-modal';
-import { computeRLAdAllocation } from '@/lib/rl-ad-optimizer';
+import { CampaignSelectorModal } from '@/features/decision-engine/components/campaign-selector-modal';
+import { computeRLAdAllocation, HeadroomPolicyMode } from '@/lib/rl-ad-optimizer';
+import { PlatformLogo } from '@/components/icons/platform-logos';
 import initialEngineState from '@/data/nexus-engine-state.json';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { IconWorld, IconCpu, IconAdjustments } from '@tabler/icons-react';
+import { IconWorld, IconCpu, IconAdjustments, IconFilter } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 
@@ -19,8 +21,12 @@ export default function GlobeIntelligencePage() {
   const [activeGlobeView, setActiveGlobeView] = useState<'both' | 'arcs' | 'pulse'>('both');
   const [selectedProduct, setSelectedProduct] = useState<EngineCampaign>(initialEngineState.campaigns[0]);
   const [modalTarget, setModalTarget] = useState<ProductAnalysisTarget | null>(null);
+  const [isCampaignModalOpen, setIsCampaignModalOpen] = useState(false);
+  const [policyMode, setPolicyMode] = useState<HeadroomPolicyMode>('BALANCED');
+  const [isSyncingBackend, setIsSyncingBackend] = useState(false);
 
-  const rlData = React.useMemo(() => {
+  // Compute RL Bandit Allocation with active policy mode and campaign telemetry
+  const rlData = useMemo(() => {
     return computeRLAdAllocation({
       productName: selectedProduct.productName || selectedProduct.sku,
       sku: selectedProduct.sku,
@@ -28,9 +34,41 @@ export default function GlobeIntelligencePage() {
       spend: selectedProduct.currentDailySpend,
       roas: selectedProduct.roas,
       grossMarginPct: selectedProduct.marginPct,
-      inventory: selectedProduct.inventory
+      inventory: selectedProduct.inventory,
+      platform: selectedProduct.platform,
+      policyMode,
+      campaignId: selectedProduct.campaign,
+      targetRoas: selectedProduct.targetRoas,
+      breakevenRoas: selectedProduct.breakevenRoas,
     });
-  }, [selectedProduct]);
+  }, [selectedProduct, policyMode]);
+
+  // Backend Retrain Execution
+  const handleRetrainBackend = useCallback(async () => {
+    setIsSyncingBackend(true);
+    try {
+      await fetch('/api/rl-allocation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          campaignId: selectedProduct.campaign,
+          platform: selectedProduct.platform,
+          policyMode,
+          productName: selectedProduct.productName,
+          sku: selectedProduct.sku,
+          price: selectedProduct.price,
+          spend: selectedProduct.currentDailySpend,
+          roas: selectedProduct.roas,
+          grossMarginPct: selectedProduct.marginPct,
+          inventory: selectedProduct.inventory,
+        }),
+      });
+    } catch (err) {
+      console.warn('Backend sync error:', err);
+    } finally {
+      setIsSyncingBackend(false);
+    }
+  }, [selectedProduct, policyMode]);
 
   const isBoth = activeGlobeView === 'both';
   const stage1Size = isBoth ? 360 : 540;
@@ -107,29 +145,77 @@ export default function GlobeIntelligencePage() {
         </div>
       </div>
 
-      {/* Product Quick-Select Strip */}
-      <div className='flex items-center gap-2.5 overflow-x-auto pb-1 font-mono text-xs'>
-        <span className='text-zinc-500 text-[11px] uppercase tracking-wider shrink-0'>Active Models:</span>
-        {initialEngineState.campaigns.slice(0, 5).map((camp: EngineCampaign) => (
-          <button
-            key={camp.campaign}
-            onClick={() => setSelectedProduct(camp)}
-            className={cn(
-              'px-3 py-1.5 rounded-lg border transition-all flex items-center gap-2 shrink-0',
-              selectedProduct.sku === camp.sku
-                ? 'bg-zinc-800 border-zinc-600 text-zinc-100 shadow-sm'
-                : 'bg-zinc-950/80 border-border text-zinc-400 hover:border-zinc-700'
-            )}
+      {/* Omnichannel Campaign Command Strip & 40-Catalog Trigger */}
+      <div className='flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 p-3 rounded-xl border border-border bg-card/80 font-mono text-xs'>
+        {/* Active Selected Campaign Banner */}
+        <div className='flex items-center gap-3'>
+          {selectedProduct.photoUrl && (
+            <div className='relative size-10 rounded-lg overflow-hidden border border-zinc-800 bg-zinc-900 shrink-0'>
+              <Image src={selectedProduct.photoUrl} alt={selectedProduct.productName || selectedProduct.sku} fill sizes='40px' className='object-cover' />
+            </div>
+          )}
+          <div className='flex flex-col min-w-0'>
+            <div className='flex items-center gap-2'>
+              <PlatformLogo platform={selectedProduct.platform} size={14} />
+              <span className='font-bold text-zinc-100 truncate text-sm'>
+                {selectedProduct.productName || selectedProduct.sku}
+              </span>
+              <span className='text-[10px] text-zinc-400 px-1.5 py-0.2 rounded bg-zinc-900 border border-zinc-800'>
+                {selectedProduct.sku}
+              </span>
+              {(selectedProduct.inventory ?? 0) <= 0 ? (
+                <span className='text-[9px] px-1.5 py-0.2 rounded bg-rose-950/80 border border-rose-800 text-rose-300 font-bold'>
+                  0 Units (Stockout Shock)
+                </span>
+              ) : (
+                <span className='text-[9px] px-1.5 py-0.2 rounded bg-zinc-900 border border-zinc-800 text-zinc-400'>
+                  {selectedProduct.inventory} Units
+                </span>
+              )}
+            </div>
+            <div className='flex items-center gap-2 text-[11px] text-zinc-400 mt-0.5'>
+              <span className='uppercase text-zinc-500 font-semibold'>{selectedProduct.platform}</span>
+              <span>•</span>
+              <span>Spend: <span className='text-zinc-200 font-bold'>${selectedProduct.currentDailySpend?.toLocaleString()}/d</span></span>
+              <span>•</span>
+              <span>ROAS: <span className={cn('font-bold', selectedProduct.roas >= 3.2 ? 'text-emerald-400' : selectedProduct.roas < 1.8 ? 'text-rose-400' : 'text-amber-400')}>{selectedProduct.roas?.toFixed(2)}x</span></span>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Representative Switcher & Browse 40 Button */}
+        <div className='flex items-center gap-2 overflow-x-auto'>
+          {/* Quick representatives across platforms */}
+          <div className='hidden xl:flex items-center gap-1.5 text-[11px]'>
+            {initialEngineState.campaigns.slice(0, 4).map((c) => (
+              <button
+                key={c.campaign}
+                onClick={() => setSelectedProduct(c)}
+                className={cn(
+                  'px-2.5 py-1 rounded-lg border transition-all flex items-center gap-1.5 shrink-0',
+                  selectedProduct.campaign === c.campaign
+                    ? 'bg-zinc-800 border-zinc-600 text-zinc-100 shadow-sm'
+                    : 'bg-zinc-950/80 border-border text-zinc-400 hover:border-zinc-700'
+                )}
+              >
+                <PlatformLogo platform={c.platform} size={12} />
+                <span className='truncate max-w-[110px]'>{c.productName || c.sku}</span>
+              </button>
+            ))}
+          </div>
+
+          <Button
+            size='sm'
+            onClick={() => setIsCampaignModalOpen(true)}
+            className='bg-zinc-100 hover:bg-zinc-200 text-zinc-950 font-mono text-xs font-semibold shrink-0 gap-1.5'
           >
-            {camp.photoUrl && (
-              <div className='relative size-5 rounded overflow-hidden'>
-                <Image src={camp.photoUrl} alt={camp.productName} fill sizes='20px' className='object-cover' />
-              </div>
-            )}
-            <span className='font-bold'>{camp.productName || camp.sku}</span>
-            <span className='text-[10px] text-zinc-500'>${camp.currentDailySpend}/d</span>
-          </button>
-        ))}
+            <IconFilter className='size-3.5' />
+            <span>Browse All 40 Campaigns</span>
+            <Badge variant='outline' className='ml-1 text-[9px] border-zinc-400 bg-zinc-200 text-zinc-900'>
+              40 Active
+            </Badge>
+          </Button>
+        </div>
       </div>
 
       {/* Main 3D Globe Stage Grid */}
@@ -263,7 +349,12 @@ export default function GlobeIntelligencePage() {
           </Badge>
         </div>
 
-        <RLVisualAnalytics data={rlData} />
+        <RLVisualAnalytics
+          data={rlData}
+          onPolicyModeChange={setPolicyMode}
+          onRetrainBackend={handleRetrainBackend}
+          isLoading={isSyncingBackend}
+        />
       </div>
 
       {/* Deep-Dive Analysis Modal */}
@@ -271,6 +362,14 @@ export default function GlobeIntelligencePage() {
         product={modalTarget}
         isOpen={!!modalTarget}
         onClose={() => setModalTarget(null)}
+      />
+
+      {/* Omnichannel Campaign & Catalog Selector Modal */}
+      <CampaignSelectorModal
+        isOpen={isCampaignModalOpen}
+        onClose={() => setIsCampaignModalOpen(false)}
+        selectedCampaign={selectedProduct}
+        onSelectCampaign={(c) => setSelectedProduct(c)}
       />
     </div>
   );

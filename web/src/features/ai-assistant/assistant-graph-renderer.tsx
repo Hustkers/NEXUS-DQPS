@@ -18,7 +18,6 @@ import {
   IconChartLine,
   IconChartBar,
   IconTable,
-  IconChevronDown,
   IconChevronUp,
   IconTrendingUp,
   IconTrendingDown,

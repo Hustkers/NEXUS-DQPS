@@ -50,7 +50,12 @@ const INITIAL_MESSAGES: ChatMessage[] = [
   },
 ];
 
-export function AssistantChat({ onToolExecuted, router }: AssistantChatProps) {
+export function AssistantChat({
+  onToolExecuted,
+  router,
+  initialPrompt,
+  onClearInitialPrompt,
+}: AssistantChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
   const [inputValue, setInputValue] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -64,51 +69,67 @@ export function AssistantChat({ onToolExecuted, router }: AssistantChatProps) {
     }
   }, [messages, isProcessing]);
 
-  const handleSendMessage = async (textToSend?: string) => {
-    const text = (textToSend || inputValue).trim();
-    if (!text || isProcessing) return;
+  const handleSendMessage = React.useCallback(
+    async (textToSend?: string) => {
+      const text = (textToSend || inputValue).trim();
+      if (!text || isProcessing) return;
 
-    const userMessage: ChatMessage = {
-      id: `usr-${Date.now()}`,
-      sender: 'user',
-      text,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
-    setInputValue('');
-    setIsProcessing(true);
-
-    try {
-      const response = await executeAssistantTurn(text, router);
-
-      const assistantMessage: ChatMessage = {
-        id: `asst-${Date.now()}`,
-        sender: 'assistant',
-        text: response.replyText,
+      const userMessage: ChatMessage = {
+        id: `usr-${Date.now()}`,
+        sender: 'user',
+        text,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        toolCall: response.toolCall,
       };
 
-      setMessages((prev) => [...prev, assistantMessage]);
+      setMessages((prev) => [...prev, userMessage]);
+      setInputValue('');
+      setIsProcessing(true);
 
-      if (response.toolCall && onToolExecuted) {
-        onToolExecuted(response.toolCall.name, response.toolCall.result);
-      }
-    } catch (err: any) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `asst-err-${Date.now()}`,
+      try {
+        const response = await executeAssistantTurn(text, router);
+
+        const assistantMessage: ChatMessage = {
+          id: `asst-${Date.now()}`,
           sender: 'assistant',
-          text: `An error occurred while executing command: ${err.message}`,
+          text: response.replyText,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        },
-      ]);
-    } finally {
-      setIsProcessing(false);
+          toolCall: response.toolCall,
+          graph: response.graph,
+        };
+
+        setMessages((prev) => [...prev, assistantMessage]);
+
+        if (response.toolCall && onToolExecuted) {
+          onToolExecuted(response.toolCall.name, response.toolCall.result);
+        }
+      } catch (err: any) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `asst-err-${Date.now()}`,
+            sender: 'assistant',
+            text: `An error occurred while executing command: ${err.message}`,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          },
+        ]);
+      } finally {
+        setIsProcessing(false);
+      }
+    },
+    [inputValue, isProcessing, onToolExecuted, router]
+  );
+
+  useEffect(() => {
+    if (initialPrompt) {
+      const timer = setTimeout(() => {
+        handleSendMessage(initialPrompt);
+        if (onClearInitialPrompt) {
+          onClearInitialPrompt();
+        }
+      }, 0);
+      return () => clearTimeout(timer);
     }
-  };
+  }, [initialPrompt, handleSendMessage, onClearInitialPrompt]);
 
   const clearChat = () => {
     setMessages([
@@ -157,6 +178,13 @@ export function AssistantChat({ onToolExecuted, router }: AssistantChatProps) {
                 }`}
               >
                 <p className="whitespace-pre-wrap">{m.text}</p>
+
+                {/* Inline Graph Renderer (Line Charts & Bar Graphs) */}
+                {m.graph && (
+                  <div className="mt-2.5">
+                    <AssistantGraphRenderer config={m.graph} />
+                  </div>
+                )}
 
                 {/* Self-Contained Function Calling Visualization Card */}
                 {m.toolCall && (
@@ -214,22 +242,30 @@ export function AssistantChat({ onToolExecuted, router }: AssistantChatProps) {
         )}
       </div>
 
-      {/* Suggested Quick Function Calls */}
+      {/* Suggested Quick Function Calls & Telemetry Graphs */}
       <div className="px-3 py-1.5 border-t border-zinc-800/80 bg-zinc-950/60 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
         <button
-          onClick={() => handleSendMessage('Authorize reallocation directive')}
+          onClick={() => handleSendMessage('Show ROAS trend line chart')}
           className="shrink-0 flex items-center gap-1 px-2 py-1 rounded-md border border-emerald-900/50 bg-emerald-950/20 text-emerald-400 hover:bg-emerald-950/40 text-[10px] transition-colors"
         >
-          <IconBolt className="size-2.5" />
-          Authorize Reallocation
+          <IconChartLine className="size-2.5" />
+          ROAS Line Chart
         </button>
 
         <button
-          onClick={() => handleSendMessage('What is our blended ROAS?')}
+          onClick={() => handleSendMessage('Render bar graph of channel spend vs margin')}
           className="shrink-0 flex items-center gap-1 px-2 py-1 rounded-md border border-cyan-900/50 bg-cyan-950/20 text-cyan-400 hover:bg-cyan-950/40 text-[10px] transition-colors"
         >
           <IconChartBar className="size-2.5" />
-          Blended ROAS
+          Channel Bar Graph
+        </button>
+
+        <button
+          onClick={() => handleSendMessage('Authorize reallocation directive')}
+          className="shrink-0 flex items-center gap-1 px-2 py-1 rounded-md border border-amber-900/50 bg-amber-950/20 text-amber-400 hover:bg-amber-950/40 text-[10px] transition-colors"
+        >
+          <IconBolt className="size-2.5" />
+          Authorize Reallocation
         </button>
 
         <button

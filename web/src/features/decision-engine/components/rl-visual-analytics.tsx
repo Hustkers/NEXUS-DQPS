@@ -7,13 +7,7 @@ import {
   IconChartPie,
   IconChartBar,
   IconGitFork,
-  IconArrowRight,
-  IconCheck,
-  IconAlertTriangle,
-  IconFilter,
   IconSparkles,
-  IconBolt,
-  IconWorld,
   IconPlayerPlay
 } from '@tabler/icons-react';
 import { Badge } from '@/components/ui/badge';
@@ -28,26 +22,31 @@ import {
   PieChart,
   Pie,
   Cell,
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   Legend
 } from 'recharts';
-import type { RLOptimizationResult } from '@/lib/rl-ad-optimizer';
+import type { RLOptimizationResult, HeadroomPolicyMode } from '@/lib/rl-ad-optimizer';
+import { PlatformLogo } from '@/components/icons/platform-logos';
 
 interface RLVisualAnalyticsProps {
   data: RLOptimizationResult;
   onApplyAction?: (actionText: string) => void;
   className?: string;
+  onPolicyModeChange?: (mode: HeadroomPolicyMode) => void;
+  onRetrainBackend?: () => void;
+  isLoading?: boolean;
 }
 
 export function RLVisualAnalytics({
   data,
-  onApplyAction,
-  className
+  onApplyAction: _onApplyAction,
+  className,
+  onPolicyModeChange,
+  onRetrainBackend,
+  isLoading = false,
 }: RLVisualAnalyticsProps) {
   const [activeTab, setActiveTab] = useState<'flowchart' | 'graphs' | 'pie' | 'bars' | 'all'>('all');
   const [pieMode, setPieMode] = useState<'post' | 'pre'>('post');
@@ -57,6 +56,7 @@ export function RLVisualAnalytics({
   const handleRetrain = () => {
     setIsRetraining(true);
     setRetrainStep(1);
+    onRetrainBackend?.();
     let step = 1;
     const interval = setInterval(() => {
       step += 3;
@@ -71,6 +71,7 @@ export function RLVisualAnalytics({
   };
 
   const filteredLearningCurve = data.learningCurve.slice(0, retrainStep);
+  const currentMode = data.policyMode || 'BALANCED';
 
   return (
     <div className={cn('flex flex-col space-y-5 text-zinc-100', className)}>
@@ -88,6 +89,9 @@ export function RLVisualAnalytics({
               <Badge variant='outline' className='text-[10px] font-mono border-zinc-800 bg-zinc-900 text-zinc-300'>
                 Thompson Bandit Q-Policy
               </Badge>
+              {isLoading && (
+                <span className='size-2 rounded-full bg-emerald-400 animate-ping' />
+              )}
             </div>
             <p className='text-xs font-sans text-zinc-400 mt-0.5'>
               Maximizing profit by diverting ad spend away from low-probability regions into high-headroom zones
@@ -157,6 +161,73 @@ export function RLVisualAnalytics({
             <IconChartBar className='size-3.5 text-zinc-400' />
             Probability Bar Plot
           </button>
+        </div>
+      </div>
+
+      {/* Headroom Policy Mode & Primal-Dual Shadow Price Control Bar */}
+      <div className='flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border border-zinc-800 bg-zinc-950/90 font-mono text-xs'>
+        <div className='flex flex-wrap items-center gap-2'>
+          <span className='text-zinc-400 uppercase text-[10px] tracking-wider font-semibold mr-1'>
+            Headroom Policy Mode:
+          </span>
+          <button
+            onClick={() => onPolicyModeChange?.('BALANCED')}
+            className={cn(
+              'px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5',
+              currentMode === 'BALANCED'
+                ? 'bg-zinc-800 border-zinc-500 text-zinc-100 font-bold shadow-sm'
+                : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:border-zinc-700'
+            )}
+          >
+            <span className='size-1.5 rounded-full bg-emerald-400' />
+            <span>Balanced Q-Bandit</span>
+          </button>
+          <button
+            onClick={() => onPolicyModeChange?.('AGGRESSIVE_SCALE')}
+            className={cn(
+              'px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5',
+              currentMode === 'AGGRESSIVE_SCALE'
+                ? 'bg-zinc-800 border-zinc-500 text-zinc-100 font-bold shadow-sm'
+                : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:border-zinc-700'
+            )}
+          >
+            <span className='size-1.5 rounded-full bg-sky-400' />
+            <span>Aggressive Scale</span>
+          </button>
+          <button
+            onClick={() => onPolicyModeChange?.('DEFENSIVE_PRESERVATION')}
+            className={cn(
+              'px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5',
+              currentMode === 'DEFENSIVE_PRESERVATION'
+                ? 'bg-zinc-800 border-zinc-500 text-zinc-100 font-bold shadow-sm'
+                : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:border-zinc-700'
+            )}
+          >
+            <span className='size-1.5 rounded-full bg-amber-400' />
+            <span>Defensive Preservation</span>
+          </button>
+        </div>
+
+        {/* Dual Shadow Prices and Platform Live Signal */}
+        <div className='flex flex-wrap items-center gap-3 text-[11px]'>
+          <div className='flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-900 border border-zinc-800'>
+            <span className='text-zinc-500'>Dual Shadow Prices:</span>
+            <span className='font-bold text-zinc-200'>
+              λ_b={data.shadowPrices?.lambdaBudget?.toFixed(2) ?? '1.00'}
+            </span>
+            <span className='text-zinc-600'>•</span>
+            <span className={cn('font-bold', data.shadowPrices?.lambdaInventory > 10 ? 'text-rose-400 animate-pulse' : 'text-zinc-200')}>
+              λ_inv={data.shadowPrices?.lambdaInventory > 10 ? '∞ (KILL-SWITCH)' : data.shadowPrices?.lambdaInventory?.toFixed(2) ?? '1.05'}
+            </span>
+          </div>
+
+          {data.platformTelemetry && (
+            <div className='flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-900 border border-zinc-800 text-zinc-300'>
+              <PlatformLogo platform={data.platformTelemetry.platform} size={13} />
+              <span className='text-zinc-400'>{data.platformTelemetry.metric1Label}:</span>
+              <span className='font-bold text-zinc-200'>{data.platformTelemetry.metric1Value}</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -248,18 +319,12 @@ export function RLVisualAnalytics({
                   Regional Market Signals
                 </h6>
                 <ul className='space-y-1.5 text-[11px] font-sans text-zinc-400'>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-zinc-300'>•</span>
-                    <span>P(Sale) Posterior: <span className='font-mono tabular-nums'>North America 78%</span>, <span className='font-mono tabular-nums'>EMEA 56%</span></span>
-                  </li>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-zinc-500'>•</span>
-                    <span>Low Probability: <span className='font-mono tabular-nums'>LatAm 14%</span>, <span className='font-mono tabular-nums'>SEA 9%</span></span>
-                  </li>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-zinc-300'>•</span>
-                    <span>Stock levels &amp; CPM auction volatility</span>
-                  </li>
+                  {data.decisionFlow.stateIngestion.map((item, idx) => (
+                    <li key={idx} className='flex items-start gap-1.5'>
+                      <span className='text-zinc-300'>•</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
               <div className='mt-3 pt-2 border-t border-zinc-800 text-[10px] font-sans text-zinc-400'>
@@ -281,18 +346,12 @@ export function RLVisualAnalytics({
                   Marginal Headroom Optimization
                 </h6>
                 <ul className='space-y-1.5 text-[11px] font-sans text-zinc-400'>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-zinc-300'>•</span>
-                    <span>Computes dProfit / dSpend gradient</span>
-                  </li>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-zinc-300'>•</span>
-                    <span>Detects audience saturation saturation index</span>
-                  </li>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-zinc-300'>•</span>
-                    <span>Thompson Sampling Balances Exploit vs Explore</span>
-                  </li>
+                  {data.decisionFlow.banditPolicy.map((item, idx) => (
+                    <li key={idx} className='flex items-start gap-1.5'>
+                      <span className='text-zinc-300'>•</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
               <div className='mt-3 pt-2 border-t border-zinc-800 text-[10px] font-sans text-zinc-400'>
@@ -314,22 +373,16 @@ export function RLVisualAnalytics({
                   Ad Display Redistribution
                 </h6>
                 <ul className='space-y-1.5 text-[11px] font-sans text-zinc-400'>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-zinc-200 font-bold'>+</span>
-                    <span>Scale High Headroom: <span className='font-mono tabular-nums'>US (+68%)</span>, <span className='font-mono tabular-nums'>EU (+22%)</span></span>
-                  </li>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-zinc-500 font-bold'>-</span>
-                    <span>Suppress Low Probability: <span className='font-mono tabular-nums'>LatAm (-72%)</span>, <span className='font-mono tabular-nums'>SEA (-88%)</span></span>
-                  </li>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-zinc-300'>•</span>
-                    <span>Zero Ad Budget Burn on Stockouts</span>
-                  </li>
+                  {data.decisionFlow.actionExecution.map((item, idx) => (
+                    <li key={idx} className='flex items-start gap-1.5'>
+                      <span className='text-zinc-200 font-bold'>✓</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
               <div className='mt-3 pt-2 border-t border-zinc-800 text-[10px] font-sans text-zinc-400'>
-                Meta &amp; Google Ads Script API
+                {data.platform.toUpperCase()} API Dispatch
               </div>
             </div>
 
@@ -347,18 +400,12 @@ export function RLVisualAnalytics({
                   Profit Lift &amp; Policy Refit
                 </h6>
                 <ul className='space-y-1.5 text-[11px] font-sans text-zinc-400'>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-zinc-300'>✓</span>
-                    <span>Reward = ΔMargin$ − ΔSpend − Penalty</span>
-                  </li>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-zinc-300'>✓</span>
-                    <span>Thompson Beta priors updated with sales</span>
-                  </li>
-                  <li className='flex items-start gap-1.5'>
-                    <span className='text-zinc-300'>✓</span>
-                    <span>Append-only Decision Ledger Audit</span>
-                  </li>
+                  {data.decisionFlow.rewardFeedback.map((item, idx) => (
+                    <li key={idx} className='flex items-start gap-1.5'>
+                      <span className='text-zinc-300'>✓</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
               <div className='mt-3 pt-2 border-t border-zinc-800 text-[10px] font-sans text-zinc-400'>
@@ -427,7 +474,7 @@ export function RLVisualAnalytics({
                         fontFamily: 'monospace',
                         fontSize: '12px'
                       }}
-                      formatter={(value: any, name: any) => {
+                      formatter={(value: unknown, name: unknown) => {
                         const label = name === 'rlPolicyProfit' ? 'RL Adaptive Profit' : 'Static Baseline';
                         return [`$${Number(value).toLocaleString()}`, label];
                       }}
@@ -542,9 +589,9 @@ export function RLVisualAnalytics({
                         fontFamily: 'monospace',
                         fontSize: '11px'
                       }}
-                      formatter={(value: any, name: any) => [
+                      formatter={(value: unknown, name: unknown) => [
                         `$${Number(value).toLocaleString()}/day`,
-                        `${name}`
+                        `${String(name)}`
                       ]}
                     />
                   </PieChart>
@@ -625,9 +672,9 @@ export function RLVisualAnalytics({
                     fontFamily: 'monospace',
                     fontSize: '12px'
                   }}
-                  formatter={(value: any, name: any) => {
-                    if (name === 'conversionProbabilityPct') return [`${value}%`, 'Conversion Probability'];
-                    return [`${value} pts`, 'Expected Margin Score'];
+                  formatter={(value: unknown, name: unknown) => {
+                    if (name === 'conversionProbabilityPct') return [`${Number(value)}%`, 'Conversion Probability'];
+                    return [`${Number(value)} pts`, 'Expected Margin Score'];
                   }}
                 />
                 <Bar

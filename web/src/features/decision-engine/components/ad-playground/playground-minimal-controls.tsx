@@ -67,11 +67,11 @@ export function PlaygroundMinimalControls({
     { id: 'meta', label: 'Meta', color: '#3b82f6' },
     { id: 'google', label: 'Google', color: '#10b981' },
     { id: 'amazon', label: 'Amazon', color: '#f59e0b' },
-    { id: 'tiktok', label: 'TikTok', color: '#ec4899' }
+    { id: 'shopify', label: 'Shopify', color: '#a1a1aa' }
   ];
 
   const togglePlatform = (pId: string) => {
-    const current = constraints.platforms || ['meta', 'google', 'amazon', 'tiktok'];
+    const current = constraints.platforms || ['meta', 'google', 'amazon', 'shopify'];
     let updated: string[];
     if (current.includes(pId)) {
       if (current.length === 1) return;
@@ -83,13 +83,13 @@ export function PlaygroundMinimalControls({
   };
 
   return (
-    <div className='rounded-xl border border-border/80 bg-card p-4 space-y-4 font-mono'>
-      <div className='flex items-center justify-between pb-2 border-b border-border/60'>
-        <span className='text-[10px] uppercase font-bold tracking-widest text-muted-foreground flex items-center gap-1.5'>
-          <IconCoins className='size-3.5 text-cyan-400' />
+    <div className='rounded-xl border border-zinc-800 bg-[#121215] p-4 space-y-4 font-sans'>
+      <div className='flex items-center justify-between pb-2 border-b border-zinc-800'>
+        <span className='text-[10px] uppercase font-semibold tracking-wider text-zinc-400 flex items-center gap-1.5'>
+          <IconCoins className='size-3.5 text-zinc-300' />
           CAMPAIGN CONFIGURATION
         </span>
-        <span className='text-[10px] text-muted-foreground font-mono'>
+        <span className='text-[10px] text-zinc-500 font-sans'>
           Live what-if controls
         </span>
       </div>
@@ -97,14 +97,14 @@ export function PlaygroundMinimalControls({
       {/* 1. Daily Budget Slider (Centerpiece interaction) */}
       <div className='space-y-2'>
         <div className='flex items-center justify-between'>
-          <span className='text-xs font-semibold text-foreground flex items-center gap-1.5'>
+          <span className='text-xs font-semibold text-zinc-200 flex items-center gap-1.5'>
             Daily Budget
           </span>
           <div className='flex items-baseline gap-1.5'>
-            <span className='text-base font-bold text-cyan-400 tracking-tight'>
-              ₹{dailyBudget.toLocaleString()}
+            <span className='text-base font-semibold text-zinc-100 font-mono tabular-nums tracking-tight'>
+              ${dailyBudget.toLocaleString()}
             </span>
-            <span className='text-[10px] text-muted-foreground'>/ day</span>
+            <span className='text-[10px] text-zinc-400 font-sans'>/ day</span>
           </div>
         </div>
 
@@ -115,13 +115,13 @@ export function PlaygroundMinimalControls({
           step={250}
           value={dailyBudget}
           onChange={(e) => handleBudgetChange(Number(e.target.value))}
-          className='w-full h-1.5 bg-muted/60 rounded-lg appearance-none cursor-pointer accent-cyan-400'
+          className='w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-zinc-300'
         />
 
-        <div className='flex justify-between text-[10px] text-muted-foreground'>
-          <span>₹500/day</span>
-          <span>₹5,000</span>
-          <span>₹10,000/day</span>
+        <div className='flex justify-between text-[10px] text-zinc-500 font-mono tabular-nums'>
+          <span>$500/day</span>
+          <span>$5,000</span>
+          <span>$10,000/day</span>
         </div>
       </div>
 
@@ -193,11 +193,11 @@ export function PlaygroundMinimalControls({
           <select
             value={constraints.duration_days}
             onChange={(e) => onChangeConstraints({ ...constraints, duration_days: Number(e.target.value) })}
-            className='w-full px-2.5 py-1.5 rounded-lg border border-border/80 bg-background text-xs font-mono text-foreground focus:outline-none focus:border-cyan-500 cursor-pointer'
+            className='w-full px-2.5 py-1.5 rounded-lg border border-zinc-800 bg-zinc-900 text-xs font-mono text-zinc-200 focus:outline-none focus:border-zinc-600 cursor-pointer'
           >
             {durationOptions.map((days) => (
               <option key={days} value={days}>
-                {days} Days (₹{(dailyBudget * days).toLocaleString()} total)
+                {days} Days (${(dailyBudget * days).toLocaleString()} total)
               </option>
             ))}
           </select>
@@ -209,10 +209,10 @@ export function PlaygroundMinimalControls({
         <button
           type='button'
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className='flex items-center justify-between w-full text-[11px] text-muted-foreground hover:text-foreground py-1 border-t border-border/60 transition-colors'
+          className='flex items-center justify-between w-full text-[11px] text-zinc-400 hover:text-zinc-200 py-1 border-t border-zinc-800 transition-colors'
         >
-          <span className='font-bold uppercase tracking-wider flex items-center gap-1'>
-            <IconShieldCheck className='size-3.5 text-cyan-400' />
+          <span className='font-semibold uppercase tracking-wider flex items-center gap-1 font-sans'>
+            <IconShieldCheck className='size-3.5 text-zinc-300' />
             Advanced Guardrails &amp; Channels
           </span>
           {showAdvanced ? (
@@ -223,15 +223,15 @@ export function PlaygroundMinimalControls({
         </button>
 
         {showAdvanced && (
-          <div className='mt-2.5 space-y-3 pt-2 text-xs border-t border-border/40'>
+          <div className='mt-2.5 space-y-3 pt-2 text-xs border-t border-zinc-800/80'>
             {/* Target ROAS Floor */}
             <div className='space-y-1.5'>
               <div className='flex items-center justify-between'>
-                <span className='text-[11px] text-muted-foreground flex items-center gap-1'>
-                  <IconGauge className='size-3 text-emerald-400' />
+                <span className='text-[11px] text-zinc-400 flex items-center gap-1 font-sans'>
+                  <IconGauge className='size-3 text-zinc-300' />
                   Target ROAS Floor
                 </span>
-                <span className='font-bold text-foreground'>
+                <span className='font-mono font-medium text-zinc-100'>
                   {constraints.target_roas_floor.toFixed(1)}x
                 </span>
               </div>
@@ -242,28 +242,28 @@ export function PlaygroundMinimalControls({
                 step={0.1}
                 value={constraints.target_roas_floor}
                 onChange={(e) => onChangeConstraints({ ...constraints, target_roas_floor: Number(e.target.value) })}
-                className='w-full h-1 bg-muted/60 rounded-lg appearance-none cursor-pointer accent-emerald-400'
+                className='w-full h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-zinc-300'
               />
             </div>
 
             {/* Allowed Channel Platforms */}
             <div className='space-y-1.5'>
-              <span className='text-[10px] text-muted-foreground uppercase font-semibold'>
+              <span className='text-[10px] text-zinc-400 uppercase font-semibold font-sans'>
                 Allowed Platforms ({constraints.platforms?.length ?? 4}/4)
               </span>
               <div className='grid grid-cols-4 gap-1.5'>
                 {allPlatforms.map((p) => {
-                  const isEnabled = (constraints.platforms ?? ['meta', 'google', 'amazon', 'tiktok']).includes(p.id);
+                  const isEnabled = (constraints.platforms ?? ['meta', 'google', 'amazon', 'shopify']).includes(p.id);
                   return (
                     <button
                       key={p.id}
                       type='button'
                       onClick={() => togglePlatform(p.id)}
                       className={cn(
-                        'py-1 rounded text-[10px] font-bold border transition-all',
+                        'py-1 rounded text-[10px] font-mono font-medium border transition-all',
                         isEnabled
-                          ? 'border-cyan-500/60 bg-cyan-950/20 text-cyan-400'
-                          : 'border-border/60 bg-muted/20 text-muted-foreground opacity-50'
+                          ? 'border-zinc-700 bg-zinc-800 text-zinc-100'
+                          : 'border-zinc-800 bg-zinc-900/40 text-zinc-500 opacity-50'
                       )}
                     >
                       {p.label}

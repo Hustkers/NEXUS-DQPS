@@ -22,8 +22,8 @@ export default async function Page(props: pageProps) {
 
   return (
     <PageContainer
-      pageTitle='Products'
-      pageDescription='Manage products (React Query + nuqs table pattern.)'
+      pageTitle='Product Catalog'
+      pageDescription='Omnichannel inventory levels, SKU pricing, and catalog synchronization.'
       infoContent={productInfoContent}
       pageHeaderAction={
         <div className='flex items-center gap-2'>
@@ -34,7 +34,7 @@ export default async function Page(props: pageProps) {
               'text-xs md:text-sm border-[#39FF14]/40 text-[#39FF14] hover:bg-[#39FF14]/10 hover:text-[#39FF14] font-mono'
             )}
           >
-            <Icons.bot className='mr-2 h-4 w-4 text-[#39FF14]' /> AI Strategy Engine
+            <Icons.bot className='mr-2 h-4 w-4 text-[#39FF14]' /> Strategy Engine
           </Link>
           <Link href='/dashboard/product/new' className={cn(buttonVariants(), 'text-xs md:text-sm')}>
             <Icons.add className='mr-2 h-4 w-4' /> Add New

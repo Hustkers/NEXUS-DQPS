@@ -3200,7 +3200,7 @@
     {
       "id": "ledg-1",
       "timestamp": "2026-10-06 14:32:10",
-      "decision": "Shift ,850/day from meta-315122-001 (Nike Air Force 1 stockout) -> google-CD4371-001 (React Infinity Flyknit)",
+      "decision": "Shift $1,850/day from meta-315122-001 (Nike Air Force 1 stockout) -> google-CD4371-001 (React Infinity Flyknit)",
       "expectedMargin": 3450.0,
       "realizedMargin": 3610.0,
       "variancePct": 4.7,
@@ -3212,7 +3212,7 @@
     {
       "id": "ledg-2",
       "timestamp": "2026-10-05 09:15:00",
-      "decision": "Scale meta-AH8050-100 (Nike Air Max 270) budget +20/day on high-intent conversion trend",
+      "decision": "Scale meta-AH8050-100 (Nike Air Max 270) budget +$920/day on high-intent conversion trend",
       "expectedMargin": 6800.0,
       "realizedMargin": 6590.0,
       "variancePct": -3.1,
@@ -3224,7 +3224,7 @@
     {
       "id": "ledg-3",
       "timestamp": "2026-10-04 18:45:22",
-      "decision": "Throttle amazon-849559-004 (Air Max 2017) spend -50/day due to competitor footwear discount",
+      "decision": "Throttle amazon-849559-004 (Air Max 2017) spend -$650/day due to competitor footwear discount",
       "expectedMargin": 1400.0,
       "realizedMargin": 1375.0,
       "variancePct": -1.8,
@@ -3240,17 +3240,17 @@
       "name": "Hero Air Force 1 '07 Stockout Shock",
       "description": "Top-selling hero shoe (Nike Air Force 1 '07, 65% gross margin) runs out of warehouse inventory. Ad spend keeps driving traffic to an empty product page.",
       "injectedEvent": "ERP inventory reaches 0 on SKU 315122-001",
-      "autonomousResponse": "Stockout Kill-Switch activates in <15 mins. Spend throttled -,200/day and diverted to Google Shopping React Infinity Flyknit (+3.6x ROAS).",
-      "expectedSavedWaste": "5,400 / week",
+      "autonomousResponse": "Stockout Kill-Switch activates in <15 mins. Spend throttled -$1,200/day and diverted to Google Shopping React Infinity Flyknit (+3.6x ROAS).",
+      "expectedSavedWaste": "$5,400 / week",
       "severity": "CRITICAL"
     },
     {
       "id": "scenario-cpm-spike",
       "name": "Meta Footwear Auction CPM Surge (+45%)",
-      "description": "Holiday sneaker flash sales drive Meta Advantage+ CPM from .50 to 4.20, compressing ROAS below the 1.8x break-even floor.",
+      "description": "Holiday sneaker flash sales drive Meta Advantage+ CPM from $18.50 to $24.20, compressing ROAS below the 1.8x break-even floor.",
       "injectedEvent": "Meta network sneaker auction inflation +45%",
-      "autonomousResponse": "ROAS drops below break-even. Engine pulls ,500/day from Meta and redistributes to Amazon Sponsored Products & Google PMax.",
-      "expectedSavedWaste": ",200 / week",
+      "autonomousResponse": "ROAS drops below break-even. Engine pulls $2,500/day from Meta and redistributes to Amazon Sponsored Products & Google PMax.",
+      "expectedSavedWaste": "$7,200 / week",
       "severity": "HIGH"
     },
     {
@@ -3259,7 +3259,7 @@
       "description": "Hero sneaker UGC video frequency exceeds 5.2. Hook rate collapses, CTR drops 60%, and customer acquisition cost (CAC) doubles.",
       "injectedEvent": "Creative fatigue wear-out on Meta Reels creative batch #4",
       "autonomousResponse": "Auto-pauses exhausted ad set, triggers creative refresh alert to Nike design studio, and reroutes spend to high-vitality Advantage+ Catalog.",
-      "expectedSavedWaste": ",200 / week",
+      "expectedSavedWaste": "$4,200 / week",
       "severity": "MEDIUM"
     },
     {
@@ -3268,7 +3268,7 @@
       "description": "Rival footwear seller launches aggressive 25% price drop on Amazon, lowering Nike Zoom Fly conversion rate from 4.8% to 2.8%.",
       "injectedEvent": "Marketplace conversion rate drops -35%",
       "autonomousResponse": "Optimizer re-solves scipy convex problem: shifts capital to Nike Direct Brand Search where gross margins are preserved at 68%.",
-      "expectedSavedWaste": ",800 / week",
+      "expectedSavedWaste": "$3,800 / week",
       "severity": "MEDIUM"
     }
   ]
