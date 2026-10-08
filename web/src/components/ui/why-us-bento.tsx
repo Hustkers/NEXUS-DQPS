@@ -1,16 +1,16 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import Image from "next/image";
 import {
   Database,
-  ChartLineUp,
-  Lightning,
+  TrendingUp as ChartLineUp,
+  Zap as Lightning,
   ShieldCheck,
   Rocket,
-  CaretRight,
-} from "@phosphor-icons/react";
+  ChevronRight as CaretRight,
+} from "lucide-react";
 import { IsometricBox01 } from "@/components/ui/isometric-box-01";
 import { IsometricBoxes02 } from "@/components/ui/isometric-boxes-02";
 import { cn } from "@/lib/utils";
@@ -272,7 +272,7 @@ export function WhyUsBento({
                   <React.Fragment key={id}>
                     <div className="flex flex-col items-center gap-1">
                       <div className="relative">
-                        <Icon size={20} weight="fill" className="text-foreground sm:w-5 sm:h-5" />
+                        <Icon size={20} className="text-foreground sm:w-5 sm:h-5" />
                         {i === PIPELINE_STEPS.length - 1 && (
                           <span className="absolute -inset-1 rounded-full bg-emerald-500/20 animate-ping" />
                         )}
@@ -284,7 +284,7 @@ export function WhyUsBento({
 
                     {i < PIPELINE_STEPS.length - 1 && (
                       <div className="text-muted-foreground/40 group-hover:text-primary transition-colors duration-300">
-                        <CaretRight size={10} weight="bold" />
+                        <CaretRight size={10} />
                       </div>
                     )}
                   </React.Fragment>

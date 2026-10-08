@@ -24,35 +24,35 @@ export default function ReallocationsPage() {
   }, []);
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#09090b] text-foreground min-h-screen font-sans'>
-      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-[#27272a] pb-4'>
+    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-background text-foreground min-h-screen font-sans'>
+      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-border/70 pb-4'>
         <div>
-          <h1 className='text-xl sm:text-2xl font-semibold text-zinc-100 tracking-tight flex items-center gap-2'>
-            <IconCpu className='size-5 text-zinc-300' />
+          <h1 className='text-xl sm:text-2xl font-semibold text-foreground tracking-tight flex items-center gap-2'>
+            <IconCpu className='size-5 text-foreground/80' />
             Budget Reallocations
           </h1>
-          <p className='text-xs text-zinc-400 mt-1'>
+          <p className='text-xs text-muted-foreground mt-1'>
             Autonomous Scipy convex optimizer budget shift proposals and execution ledger.
           </p>
         </div>
 
-        {/* View Switcher */}
-        <div className='flex items-center bg-[#121215] rounded-lg border border-[#27272a] p-1 text-xs'>
+        {/* View Switcher - Apple Segmented Control */}
+        <div className='flex items-center bg-muted/60 p-1 rounded-xl border border-border/70 text-xs shadow-2xs'>
           <button
             onClick={() => setActiveView('both')}
             className={cn(
-              'px-3 py-1.5 rounded transition-all font-medium flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400',
-              activeView === 'both' ? 'bg-zinc-100 text-zinc-900 shadow-xs' : 'text-zinc-400 hover:text-zinc-100'
+              'px-3 py-1.5 rounded-lg transition-all duration-150 font-medium flex items-center gap-1.5 active:scale-[0.96] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+              activeView === 'both' ? 'bg-background text-foreground font-semibold shadow-xs' : 'text-muted-foreground hover:text-foreground'
             )}
           >
-            <IconSparkles className='size-3.5 text-zinc-700' />
+            <IconSparkles className='size-3.5 text-foreground/70' />
             Unified View
           </button>
           <button
             onClick={() => setActiveView('rl_analytics')}
             className={cn(
-              'px-3 py-1.5 rounded transition-all font-medium flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400',
-              activeView === 'rl_analytics' ? 'bg-zinc-100 text-zinc-900 shadow-xs' : 'text-zinc-400 hover:text-zinc-100'
+              'px-3 py-1.5 rounded-lg transition-all duration-150 font-medium flex items-center gap-1.5 active:scale-[0.96] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+              activeView === 'rl_analytics' ? 'bg-background text-foreground font-semibold shadow-xs' : 'text-muted-foreground hover:text-foreground'
             )}
           >
             <IconCpu className='size-3.5' />
@@ -61,8 +61,8 @@ export default function ReallocationsPage() {
           <button
             onClick={() => setActiveView('feed')}
             className={cn(
-              'px-3 py-1.5 rounded transition-all font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400',
-              activeView === 'feed' ? 'bg-zinc-100 text-zinc-900 shadow-xs' : 'text-zinc-400 hover:text-zinc-100'
+              'px-3 py-1.5 rounded-lg transition-all duration-150 font-medium active:scale-[0.96] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
+              activeView === 'feed' ? 'bg-background text-foreground font-semibold shadow-xs' : 'text-muted-foreground hover:text-foreground'
             )}
           >
             Reallocation Directives
@@ -72,7 +72,7 @@ export default function ReallocationsPage() {
 
       {/* RL Analytics Suite */}
       {(activeView === 'both' || activeView === 'rl_analytics') && (
-        <div className='rounded-xl border border-[#27272a] bg-[#121215] p-4 sm:p-5 shadow-sm'>
+        <div className='relative rounded-2xl border border-border/80 bg-card p-4 sm:p-5 shadow-xs overflow-hidden before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/35 dark:before:via-white/10 before:to-transparent'>
           <RLVisualAnalytics data={rlData} />
         </div>
       )}

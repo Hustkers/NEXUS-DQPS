@@ -195,17 +195,17 @@ export function TrackingDashboard() {
             <span>Enforce Retention (30d)</span>
           </Button>
 
-          {/* Model Switcher */}
-          <div className="flex items-center gap-2 bg-muted p-1 rounded-lg border">
+          {/* Model Switcher - Apple Segmented Control */}
+          <div className="flex items-center bg-muted/60 p-1 rounded-xl border border-border/70 text-xs shadow-2xs">
             <button
               onClick={() => {
                 setModel('last_touch');
                 loadPerformance('last_touch');
               }}
               className={cn(
-                'px-3 py-1.5 text-xs font-medium rounded-md transition-all',
+                'px-3 py-1.5 rounded-lg transition-all duration-150 font-medium active:scale-[0.96] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
                 model === 'last_touch'
-                  ? 'bg-background text-foreground shadow-sm'
+                  ? 'bg-background text-foreground font-semibold shadow-xs'
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
@@ -217,9 +217,9 @@ export function TrackingDashboard() {
                 loadPerformance('first_touch');
               }}
               className={cn(
-                'px-3 py-1.5 text-xs font-medium rounded-md transition-all',
+                'px-3 py-1.5 rounded-lg transition-all duration-150 font-medium active:scale-[0.96] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
                 model === 'first_touch'
-                  ? 'bg-background text-foreground shadow-sm'
+                  ? 'bg-background text-foreground font-semibold shadow-xs'
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
