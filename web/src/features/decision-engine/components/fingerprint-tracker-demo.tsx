@@ -396,11 +396,11 @@ export function FingerprintTrackerDemo() {
                 Edge Online
               </span>
             </div>
-            <h1 className='text-2xl md:text-3xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50'>
-              Fingerprint Identity &amp; Cross-Platform Tracking
+            <h1 className='text-xl sm:text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50'>
+              Identity Graph
             </h1>
-            <p className='text-sm text-zinc-600 dark:text-zinc-400 max-w-3xl mt-1 leading-relaxed'>
-              Deterministic First-Party Edge Resolution, Asymmetric Walled-Garden Ingestion &amp; Shapley GAAP Deduplication.
+            <p className='text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 max-w-2xl mt-1 leading-normal'>
+              First-party edge resolution, cross-domain session stitching, and Shapley attribution.
             </p>
           </div>
 

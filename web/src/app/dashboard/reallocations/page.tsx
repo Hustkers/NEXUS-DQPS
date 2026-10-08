@@ -27,12 +27,12 @@ export default function ReallocationsPage() {
     <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#09090b] text-foreground min-h-screen font-sans'>
       <div className='flex flex-wrap items-center justify-between gap-4 border-b border-[#27272a] pb-4'>
         <div>
-          <h1 className='text-lg md:text-xl font-semibold text-zinc-100 uppercase tracking-tight flex items-center gap-2'>
+          <h1 className='text-xl sm:text-2xl font-semibold text-zinc-100 tracking-tight flex items-center gap-2'>
             <IconCpu className='size-5 text-zinc-300' />
-            Autonomous Budget Reallocation Feed &amp; RL Policy
+            Budget Reallocations
           </h1>
           <p className='text-xs text-zinc-400 mt-1'>
-            Reinforcement Learning Contextual Bandit • SLSQP Convex Solver • Stockout Suppression Kill-Switches
+            Autonomous Scipy convex optimizer budget shift proposals and execution ledger.
           </p>
         </div>
 
