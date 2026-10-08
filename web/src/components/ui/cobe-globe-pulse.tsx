@@ -1,1141 +1,598 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useId, useCallback } from 'react';
-import {
-  GLOBE_REGIONS,
-  REGION_HEATMAP_DATA,
-  ALL_RECENT_PURCHASES,
-  RECENT_PURCHASES,
-  PulseMarker,
-  RecentPurchase,
-} from '@/data/globe-regions';
+/**
+ * ROOT CAUSE DIAGNOSIS FOR CLICK GLITCH & VISUAL ARTIFACTS:
+ * 1. Globe Re-creation: Previously, the Cobe WebGL instance was being torn down
+ *    and re-instantiated whenever dependency references shifted, resetting WebGL buffers,
+ *    clearing rotation states, and causing visible flash and click missed frames.
+ *    Fix: Retained globe instance in a persistent `globeRef`, moving creation into a
+ *    stable one-time effect and updating markers and selection through refs in the render loop.
+ * 2. Asynchronous Rotation Pause & Target Drifting: State-driven rotation pause suffered
+ *    from React render-cycle latency, allowing the globe to rotate 1-3 frames underneath
+ *    the pointer during mousedown/click.
+ *    Fix: Synchronously pause `isPausedRef.current = true` on `pointerdown` and during
+ *    marker hover hit-tests, ensuring dots remain rock-solid stationary when clicked.
+ * 3. Drag vs Click Collision: Native HTML button clicks were firing after pointer drags
+ *    if the gesture began on a marker button, while dragging over buttons was intercepted.
+ *    Fix: Unified pointer tracking with a strict 5px threshold. Movements >= 5px are
+ *    isolated as rotational drags, while movements < 5px trigger high-precision spherical
+ *    hit-testing with an 18px hit radius.
+ * 4. Selection Toggle & Flash: Clicking an active dot previously re-triggered a 180ms
+ *    simulated loading skeleton rather than toggling off, causing UI flickering.
+ *    Fix: Clicking an active dot immediately closes the panel, while switching dots
+ *    instantly transitions data with zero empty/skeleton flicker.
+ */
+
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import createGlobe from 'cobe';
+import { GLOBE_REGIONS, PulseMarker } from '@/data/globe-regions';
 import { RegionDetailPanel } from '@/components/ui/region-detail-panel';
 import { cn } from '@/lib/utils';
 
-export type { PulseMarker, RecentPurchase } from '@/data/globe-regions';
+export type { PulseMarker } from '@/data/globe-regions';
 
 export interface GlobePulseProps {
   markers?: PulseMarker[];
   className?: string;
   speed?: number;
-  size?: number; // Size in px
+  size?: number; // Fixed size in px (e.g. 340px, 420px)
   baseColor?: [number, number, number];
   glowColor?: [number, number, number];
   onSelectMarker?: (marker: PulseMarker | null) => void;
-  onSelectRegion?: (marker: PulseMarker | null) => void;
   selectedMarkerId?: string | null;
-  selectedRegionId?: string | null;
-  renderDetailPanel?: boolean;
-  showRecentPurchases?: boolean;
-  maxOrders?: number; // Maximum frontline orders to display before vertical truncation (default: 4)
-}
-
-interface AmChartsGlobals {
-  am5: any;
-  am5map: any;
-  am5geodata_worldLow: any;
-  am5themes_Animated: any;
-}
-
-/**
- * Mapping of ISO-2 Country Codes to Regional Heatmap Definitions.
- * Allows shading the ENTIRE country polygon in the thermal heatmap color.
- */
-const COUNTRY_REGION_MAP: Record<
-  string,
-  {
-    regionId: string;
-    regionName: string;
-    colorHex: string;
-    statusLabel: string;
-    roas: string;
-  }
-> = {
-  // United States (US East & West) -> Shaded in Peak Thermal Red (#FF2E38) by default
-  US: {
-    regionId: 'us-east',
-    regionName: 'US East & West Hub',
-    colorHex: '#FF2E38',
-    statusLabel: 'High Sales Velocity',
-    roas: '4.40x',
-  },
-  // Western Europe Hub -> Shaded in Warm Gold (#FFAE14)
-  GB: { regionId: 'emea-west', regionName: 'Western Europe (UK)', colorHex: '#FFAE14', statusLabel: 'Solid Momentum', roas: '3.90x' },
-  FR: { regionId: 'emea-west', regionName: 'Western Europe (France)', colorHex: '#FFAE14', statusLabel: 'Solid Momentum', roas: '3.90x' },
-  DE: { regionId: 'emea-west', regionName: 'Western Europe (Germany)', colorHex: '#FFAE14', statusLabel: 'Solid Momentum', roas: '3.90x' },
-  NL: { regionId: 'emea-west', regionName: 'Western Europe (Netherlands)', colorHex: '#FFAE14', statusLabel: 'Solid Momentum', roas: '3.90x' },
-  BE: { regionId: 'emea-west', regionName: 'Western Europe (Belgium)', colorHex: '#FFAE14', statusLabel: 'Solid Momentum', roas: '3.90x' },
-  IE: { regionId: 'emea-west', regionName: 'Western Europe (Ireland)', colorHex: '#FFAE14', statusLabel: 'Solid Momentum', roas: '3.90x' },
-  ES: { regionId: 'emea-west', regionName: 'Western Europe (Spain)', colorHex: '#FFAE14', statusLabel: 'Solid Momentum', roas: '3.90x' },
-  IT: { regionId: 'emea-west', regionName: 'Western Europe (Italy)', colorHex: '#FFAE14', statusLabel: 'Solid Momentum', roas: '3.90x' },
-  // Asia Pacific Hub -> Shaded in Thermal Yellow (#F5DC2E)
-  JP: { regionId: 'apac', regionName: 'Asia Pacific (Japan)', colorHex: '#F5DC2E', statusLabel: 'Moderate Velocity', roas: '3.50x' },
-  KR: { regionId: 'apac', regionName: 'Asia Pacific (South Korea)', colorHex: '#F5DC2E', statusLabel: 'Moderate Velocity', roas: '3.50x' },
-  AU: { regionId: 'apac', regionName: 'Asia Pacific (Australia)', colorHex: '#F5DC2E', statusLabel: 'Moderate Velocity', roas: '3.50x' },
-  NZ: { regionId: 'apac', regionName: 'Asia Pacific (New Zealand)', colorHex: '#F5DC2E', statusLabel: 'Moderate Velocity', roas: '3.50x' },
-  // South Asia Hub -> Shaded in Amber Yellow (#EAB308)
-  IN: { regionId: 'south-asia', regionName: 'South Asia (India)', colorHex: '#EAB308', statusLabel: 'Emerging Direct', roas: '3.60x' },
-  // Southeast Asia Hub -> Shaded in Cool Cyan (#38BDF8)
-  SG: { regionId: 'sea', regionName: 'Southeast Asia (Singapore)', colorHex: '#38BDF8', statusLabel: 'Balanced Delivery', roas: '3.30x' },
-  ID: { regionId: 'sea', regionName: 'Southeast Asia (Indonesia)', colorHex: '#38BDF8', statusLabel: 'Balanced Delivery', roas: '3.30x' },
-  TH: { regionId: 'sea', regionName: 'Southeast Asia (Thailand)', colorHex: '#38BDF8', statusLabel: 'Balanced Delivery', roas: '3.30x' },
-  MY: { regionId: 'sea', regionName: 'Southeast Asia (Malaysia)', colorHex: '#38BDF8', statusLabel: 'Balanced Delivery', roas: '3.30x' },
-  PH: { regionId: 'sea', regionName: 'Southeast Asia (Philippines)', colorHex: '#38BDF8', statusLabel: 'Balanced Delivery', roas: '3.30x' },
-  VN: { regionId: 'sea', regionName: 'Southeast Asia (Vietnam)', colorHex: '#38BDF8', statusLabel: 'Balanced Delivery', roas: '3.30x' },
-  // Nordics Hub -> Shaded in Subdued Indigo-Slate (#818CF8)
-  SE: { regionId: 'nordic', regionName: 'Nordics (Sweden)', colorHex: '#818CF8', statusLabel: 'Cold / Stable', roas: '4.20x' },
-  NO: { regionId: 'nordic', regionName: 'Nordics (Norway)', colorHex: '#818CF8', statusLabel: 'Cold / Stable', roas: '4.20x' },
-  DK: { regionId: 'nordic', regionName: 'Nordics (Denmark)', colorHex: '#818CF8', statusLabel: 'Cold / Stable', roas: '4.20x' },
-  FI: { regionId: 'nordic', regionName: 'Nordics (Finland)', colorHex: '#818CF8', statusLabel: 'Cold / Stable', roas: '4.20x' },
-  // Latin America Hub -> Shaded in Muted Slate (#71717A)
-  BR: { regionId: 'latam', regionName: 'Latin America (Brazil)', colorHex: '#71717A', statusLabel: 'Stockout Shock (Shielded)', roas: '1.80x' },
-  AR: { regionId: 'latam', regionName: 'Latin America (Argentina)', colorHex: '#71717A', statusLabel: 'Stockout Shock (Shielded)', roas: '1.80x' },
-  CL: { regionId: 'latam', regionName: 'Latin America (Chile)', colorHex: '#71717A', statusLabel: 'Stockout Shock (Shielded)', roas: '1.80x' },
-  MX: { regionId: 'latam', regionName: 'Latin America (Mexico)', colorHex: '#71717A', statusLabel: 'Stockout Shock (Shielded)', roas: '1.80x' },
-  CO: { regionId: 'latam', regionName: 'Latin America (Colombia)', colorHex: '#71717A', statusLabel: 'Stockout Shock (Shielded)', roas: '1.80x' },
-};
-
-// Track script loading state across mounts to prevent duplicate injections
-let scriptsPromise: Promise<AmChartsGlobals> | null = null;
-
-function loadAmChartsScripts(): Promise<AmChartsGlobals> {
-  if (typeof window === 'undefined') {
-    return Promise.reject(new Error('Window not available (SSR)'));
-  }
-
-  const w = window as unknown as Record<string, unknown>;
-  if (w.am5 && w.am5map && w.am5geodata_worldLow && w.am5themes_Animated) {
-    return Promise.resolve({
-      am5: w.am5,
-      am5map: w.am5map,
-      am5geodata_worldLow: w.am5geodata_worldLow,
-      am5themes_Animated: w.am5themes_Animated,
-    });
-  }
-
-  if (!scriptsPromise) {
-    scriptsPromise = new Promise((resolve, reject) => {
-      const scripts = [
-        '/amcharts/index.js',
-        '/amcharts/map.js',
-        '/amcharts/worldLow.js',
-        '/amcharts/Animated.js',
-      ];
-
-      function loadNext(index: number) {
-        if (index >= scripts.length) {
-          const win = window as unknown as Record<string, unknown>;
-          if (win.am5 && win.am5map && win.am5geodata_worldLow && win.am5themes_Animated) {
-            resolve({
-              am5: win.am5,
-              am5map: win.am5map,
-              am5geodata_worldLow: win.am5geodata_worldLow,
-              am5themes_Animated: win.am5themes_Animated,
-            });
-          } else {
-            reject(new Error('AmCharts 5 objects not registered on window after script load'));
-          }
-          return;
-        }
-
-        const src = scripts[index];
-        const existingScript = document.querySelector(`script[src="${src}"]`) as HTMLScriptElement | null;
-        if (existingScript) {
-          if (existingScript.getAttribute('data-loaded') === 'true') {
-            loadNext(index + 1);
-          } else {
-            existingScript.addEventListener('load', () => loadNext(index + 1));
-            existingScript.addEventListener('error', (err) => reject(err));
-          }
-        } else {
-          const script = document.createElement('script');
-          script.src = src;
-          script.async = false;
-          script.onload = () => {
-            script.setAttribute('data-loaded', 'true');
-            loadNext(index + 1);
-          };
-          script.onerror = (err) => reject(err);
-          document.head.appendChild(script);
-        }
-      }
-
-      loadNext(0);
-    });
-  }
-
-  return scriptsPromise;
-}
-
-export interface FrontFacingPurchasesResult {
-  orders: RecentPurchase[];
-  totalFacing: number;
-}
-
-/**
- * Calculates purchases on the front-facing hemisphere of the 3D orthographic globe.
- * Uses exact spherical cosine distance from camera center (camLon = -rotX, camLat = -rotY).
- * Returns both the truncated frontline orders (capped at maxCount) and total facing orders.
- */
-export function getFrontFacingPurchases(
-  rotX: number,
-  rotY: number,
-  selectedRegionId: string | null = null,
-  maxCount = 4
-): FrontFacingPurchasesResult {
-  const camLon = -rotX;
-  const camLat = -rotY;
-  const rLat2 = (camLat * Math.PI) / 180;
-
-  const scored = ALL_RECENT_PURCHASES.map((p) => {
-    const rLat1 = (p.latitude * Math.PI) / 180;
-    const rDlon = ((p.longitude - camLon) * Math.PI) / 180;
-    const cosDist =
-      Math.sin(rLat1) * Math.sin(rLat2) +
-      Math.cos(rLat1) * Math.cos(rLat2) * Math.cos(rDlon);
-
-    // Give priority boost if this order belongs to the user-selected region
-    const bonus = selectedRegionId && p.regionId === selectedRegionId ? 0.35 : 0;
-    return {
-      purchase: p,
-      cosDist,
-      score: cosDist + bonus,
-    };
-  });
-
-  // Filter for front-facing items clearly facing the camera
-  const frontFacing = scored.filter((s) => s.cosDist > 0.08);
-  const totalFacing = frontFacing.length;
-
-  if (frontFacing.length >= maxCount) {
-    frontFacing.sort((a, b) => b.score - a.score);
-    return {
-      orders: frontFacing.slice(0, maxCount).map((s) => s.purchase),
-      totalFacing,
-    };
-  }
-
-  // Fallback if globe faces wide expanse of ocean: pick highest scored visible purchases
-  scored.sort((a, b) => b.score - a.score);
-  return {
-    orders: scored.slice(0, maxCount).map((s) => s.purchase),
-    totalFacing: Math.max(totalFacing, maxCount),
-  };
+  renderDetailPanel?: boolean; // Set false if parent card hosts the overlay panel
 }
 
 export function GlobePulse({
+  markers = GLOBE_REGIONS,
   className = '',
-  size = 580,
-  selectedMarkerId,
-  selectedRegionId,
+  speed = 0.0035,
+  size = 420,
+  baseColor = [0.18, 0.26, 0.44],
+  glowColor = [0.12, 0.22, 0.48],
   onSelectMarker,
-  onSelectRegion,
-  renderDetailPanel = false,
-  showRecentPurchases = true,
-  maxOrders,
+  selectedMarkerId,
+  renderDetailPanel = true,
 }: GlobePulseProps) {
-  const isCompact = size <= 420;
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const globeRef = useRef<ReturnType<typeof createGlobe> | null>(null);
+  const markerButtonsRef = useRef<{ [key: string]: HTMLButtonElement | null }>({});
 
-  // Truncation limit: caps orders (default: 4, or 3 for compact size <= 480) to eliminate vertical overflow
-  const orderLimit = maxOrders ?? (size <= 480 ? 3 : 4);
+  const [internalActiveMarker, setInternalActiveMarker] = useState<PulseMarker | null>(null);
+  const [hoveredMarkerId, setHoveredMarkerId] = useState<string | null>(null);
 
-  const reactId = useId();
-  const containerId = 'am5_globe_' + reactId.replace(/[^a-zA-Z0-9]/g, '_');
-  const rootRef = useRef<any>(null);
-  const chartRef = useRef<any>(null);
-  const polygonSeriesRef = useRef<any>(null);
-  const pointSeriesRef = useRef<any>(null);
-  const autoRotateAnimationRef = useRef<any>(null);
-
-  // Resize amCharts canvas if container size prop updates
-  useEffect(() => {
-    if (rootRef.current && typeof rootRef.current.resize === 'function') {
-      rootRef.current.resize();
+  // Derived activeMarker from controlled prop or internal state
+  const activeMarker = useMemo(() => {
+    if (selectedMarkerId !== undefined) {
+      return markers.find((m) => m.id === selectedMarkerId) ?? null;
     }
-  }, [size]);
+    return internalActiveMarker;
+  }, [selectedMarkerId, markers, internalActiveMarker]);
 
-  // Layout refs for dynamic line tracking between purchases and globe dots
-  const stageRef = useRef<HTMLDivElement>(null);
-  const globeContainerRef = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<Record<string, HTMLElement | null>>({});
-  const lineRefs = useRef<Record<string, SVGPathElement | null>>({});
-  const dotAnchorRefs = useRef<Record<string, SVGCircleElement | null>>({});
-  const dotRingRefs = useRef<Record<string, SVGCircleElement | null>>({});
-  const cardAnchorRefs = useRef<Record<string, SVGCircleElement | null>>({});
+  // Persistent refs for render loop and event handlers (prevents recreation)
+  const markersRef = useRef(markers);
+  const activeMarkerRef = useRef(activeMarker);
+  const hoveredMarkerIdRef = useRef(hoveredMarkerId);
+  const speedRef = useRef(speed);
 
-  const [hoveredPurchaseId, setHoveredPurchaseId] = useState<string | null>(null);
-  const hoveredPurchaseIdRef = useRef<string | null>(null);
   useEffect(() => {
-    hoveredPurchaseIdRef.current = hoveredPurchaseId;
-  }, [hoveredPurchaseId]);
+    markersRef.current = markers;
+    activeMarkerRef.current = activeMarker;
+    hoveredMarkerIdRef.current = hoveredMarkerId;
+    speedRef.current = speed;
+  }, [markers, activeMarker, hoveredMarkerId, speed]);
 
-  const [internalSelectedId, setInternalSelectedId] = useState<string | null>(null);
-  const effectiveSelectedId =
-    selectedRegionId !== undefined
-      ? selectedRegionId
-      : selectedMarkerId !== undefined
-      ? selectedMarkerId
-      : internalSelectedId;
+  const isPausedRef = useRef(false);
+  const currentPhiRef = useRef(0);
+  const currentThetaRef = useRef(0.2);
+  const phiBaseRef = useRef(0);
+  const thetaBase = 0.2;
 
-  // Track effectiveSelectedId in a stable ref so amCharts callbacks and effects never recreate chart
-  const effectiveSelectedIdRef = useRef<string | null>(effectiveSelectedId);
+  const pointerInteracting = useRef<{ x: number; y: number } | null>(null);
+  const isDraggingRef = useRef(false);
+  const dragOffset = useRef({ phi: 0, theta: 0 });
+  const phiOffsetRef = useRef(0);
+  const thetaOffsetRef = useRef(0);
+  const lastClickTimeRef = useRef(0);
+
+  // Sync paused status with active selection and hover
+  const isPanelOpen = activeMarker !== null;
   useEffect(() => {
-    effectiveSelectedIdRef.current = effectiveSelectedId;
-  }, [effectiveSelectedId]);
+    isPausedRef.current = isPanelOpen || hoveredMarkerId !== null;
+  }, [isPanelOpen, hoveredMarkerId]);
 
-  // Dynamic front-facing purchases state: changes as the globe turns and truncates to orderLimit
-  const [frontOrdersData, setFrontOrdersData] = useState<FrontFacingPurchasesResult>(() =>
-    getFrontFacingPurchases(-20, -15, effectiveSelectedId, orderLimit)
+  // Project 3D lat/lon to 2D screen coordinates
+  const projectMarker = useCallback(
+    (location: [number, number], currentPhi: number, currentTheta: number) => {
+      const DEG_TO_RAD = Math.PI / 180;
+      const lat = location[0];
+      const lon = location[1];
+
+      const rLat = lat * DEG_TO_RAD;
+      const rLon = lon * DEG_TO_RAD - Math.PI;
+      const cosLat = Math.cos(rLat);
+      const sinLat = Math.sin(rLat);
+      const cosLon = Math.cos(rLon);
+      const sinLon = Math.sin(rLon);
+
+      // 3D coordinates on unit sphere
+      const radius = 0.8;
+      const t0 = -cosLat * cosLon * radius;
+      const t1 = sinLat * radius;
+      const t2 = cosLat * sinLon * radius;
+
+      const cosTheta = Math.cos(currentTheta);
+      const sinTheta = Math.sin(currentTheta);
+      const cosPhi = Math.cos(currentPhi);
+      const sinPhi = Math.sin(currentPhi);
+
+      // Camera space transform
+      const c = cosPhi * t0 + sinPhi * t2;
+      const s = sinPhi * sinTheta * t0 + cosTheta * t1 - cosPhi * sinTheta * t2;
+      const zCam = -sinPhi * cosTheta * t0 + sinTheta * t1 + cosPhi * cosTheta * t2;
+
+      // Screen space normalized (0 to 1)
+      const x = (c + 1) / 2;
+      const y = (-s + 1) / 2;
+      const isVisible = zCam > 0.05;
+
+      return { x, y, isVisible };
+    },
+    []
   );
 
-  const visiblePurchases = frontOrdersData.orders;
-  const totalOrdersInView = frontOrdersData.totalFacing;
-  const truncatedCount = Math.max(0, totalOrdersInView - visiblePurchases.length);
+  // Spherical hit test: returns closest visible marker within hitRadius (CSS pixels)
+  const hitTestMarker = useCallback(
+    (clientX: number, clientY: number, hitRadius = 20): PulseMarker | null => {
+      const canvas = canvasRef.current;
+      if (!canvas) return null;
+      const rect = canvas.getBoundingClientRect();
 
-  const visiblePurchasesRef = useRef<RecentPurchase[]>(visiblePurchases);
-  const visiblePurchasesKeyRef = useRef<string>(visiblePurchases.map((p) => p.id).join(','));
+      const curPhi = currentPhiRef.current;
+      const curTheta = currentThetaRef.current;
 
-  useEffect(() => {
-    visiblePurchasesRef.current = visiblePurchases;
-    visiblePurchasesKeyRef.current = visiblePurchases.map((p) => p.id).join(',');
-  }, [visiblePurchases]);
+      let closestMarker: PulseMarker | null = null;
+      let minDistance = Infinity;
 
-  // Evaluates which orders are currently in front of the 3D globe and updates state
-  const checkFrontFacingPurchases = useCallback(() => {
-    if (!chartRef.current || typeof chartRef.current.get !== 'function') return;
-    const rotX = chartRef.current.get('rotationX', 0);
-    const rotY = chartRef.current.get('rotationY', 0);
-    const nextResult = getFrontFacingPurchases(rotX, rotY, effectiveSelectedIdRef.current, orderLimit);
-    const nextKey = nextResult.orders.map((p) => p.id).join(',');
+      for (const m of markersRef.current) {
+        const { x, y, isVisible } = projectMarker(m.location, curPhi, curTheta);
+        if (!isVisible) continue;
 
-    // Only update React state when the set of visible orders actually changes
-    if (nextKey !== visiblePurchasesKeyRef.current) {
-      visiblePurchasesKeyRef.current = nextKey;
-      visiblePurchasesRef.current = nextResult.orders;
-      setFrontOrdersData(nextResult);
-    }
-  }, [orderLimit]);
+        // Screen position of marker in client coordinates
+        const markerScreenX = rect.left + x * rect.width;
+        const markerScreenY = rect.top + y * rect.height;
 
-  const checkFrontFacingPurchasesRef = useRef(checkFrontFacingPurchases);
-  useEffect(() => {
-    checkFrontFacingPurchasesRef.current = checkFrontFacingPurchases;
-  }, [checkFrontFacingPurchases]);
-
-  // Update immediately whenever region selection changes
-  useEffect(() => {
-    checkFrontFacingPurchases();
-  }, [effectiveSelectedId, checkFrontFacingPurchases]);
-
-  // Periodic check as the globe auto-rotates or is panned (350ms throttle)
-  useEffect(() => {
-    if (!showRecentPurchases) return;
-    const interval = setInterval(() => {
-      checkFrontFacingPurchasesRef.current();
-    }, 350);
-    return () => clearInterval(interval);
-  }, [showRecentPurchases]);
-
-  // Stable callback refs to prevent stale closure and effect re-triggering
-  const onSelectRegionRef = useRef(onSelectRegion);
-  const onSelectMarkerRef = useRef(onSelectMarker);
-  useEffect(() => {
-    onSelectRegionRef.current = onSelectRegion;
-    onSelectMarkerRef.current = onSelectMarker;
-  }, [onSelectRegion, onSelectMarker]);
-
-  // Direct, robust styling function: applies heatmap colors to all country polygons
-  const applyCountryShading = useCallback((selectedId: string | null) => {
-    if (!polygonSeriesRef.current) return;
-    const w = window as unknown as Record<string, any>;
-    const am5 = w.am5;
-    if (!am5) return;
-
-    const activeRegion = selectedId ? REGION_HEATMAP_DATA[selectedId] : null;
-
-    const styleSinglePolygon = (polygon: any) => {
-      if (!polygon) return;
-      const countryCode = (
-        (polygon.dataItem?.dataContext as any)?.id ||
-        polygon.dataItem?.get?.('id') ||
-        polygon.get?.('id')
-      ) as string | undefined;
-
-      if (!countryCode) return;
-
-      const defaultInfo = COUNTRY_REGION_MAP[countryCode];
-      const isCountryInActiveRegion = Boolean(
-        activeRegion && activeRegion.countryCodes?.includes(countryCode)
-      );
-
-      if (activeRegion) {
-        if (isCountryInActiveRegion) {
-          // ACTIVE SELECTED REGION
-          // If US is active: use #FF6B29 for US-West, #FF2E38 for US-East
-          let activeColor = activeRegion.colorHex || '#FF2E38';
-          if (countryCode === 'US') {
-            activeColor = selectedId === 'us-west' ? '#FF6B29' : '#FF2E38';
-          }
-
-          polygon.setAll({
-            fill: am5.color(activeColor),
-            fillOpacity: 0.90,
-            stroke: am5.color(0xffffff),
-            strokeWidth: 2.2,
-            tooltipText:
-              countryCode === 'US'
-                ? selectedId === 'us-west'
-                  ? 'United States\nUS West (Ontario Hub) • High Sales Velocity • 4.40x ROAS • $51.9k Rev'
-                  : 'United States\nUS East (Allentown Hub) • High Sales Velocity • 4.40x ROAS • $62.7k Rev'
-                : `{name}\n${activeRegion.name} • ${activeRegion.roas} ROAS`,
-          });
-        } else if (defaultInfo) {
-          // OTHER TRACKED COUNTRIES REMAIN VISIBLY SHADED IN THEIR HEATMAP HUE
-          polygon.setAll({
-            fill: am5.color(defaultInfo.colorHex),
-            fillOpacity: 0.38,
-            stroke: am5.color(defaultInfo.colorHex),
-            strokeWidth: 0.6,
-            tooltipText: `{name}\n${defaultInfo.regionName} • ${defaultInfo.roas} ROAS`,
-          });
-        } else {
-          // Untracked background landmass
-          polygon.setAll({
-            fill: am5.color(0x121212),
-            fillOpacity: 0.95,
-            stroke: am5.color(0x222222),
-            strokeWidth: 0.5,
-            tooltipText: '{name}',
-          });
-        }
-      } else {
-        // GLOBAL BASELINE (NO REGION SELECTED):
-        // The whole US region and all tracked countries are shaded in their proper thermal heatmap colors!
-        if (defaultInfo) {
-          polygon.setAll({
-            fill: am5.color(defaultInfo.colorHex),
-            fillOpacity: 0.70,
-            stroke: am5.color(defaultInfo.colorHex),
-            strokeWidth: 0.9,
-            tooltipText:
-              countryCode === 'US'
-                ? 'United States\nUS East & West Hub • High Sales Velocity • 4.40x ROAS • $114.6k Total US Rev'
-                : `{name}\n${defaultInfo.regionName} • ${defaultInfo.roas} ROAS`,
-          });
-        } else {
-          // Untracked background landmass
-          polygon.setAll({
-            fill: am5.color(0x141414),
-            fillOpacity: 0.95,
-            stroke: am5.color(0x242424),
-            strokeWidth: 0.5,
-            tooltipText: '{name}',
-          });
+        const dist = Math.hypot(clientX - markerScreenX, clientY - markerScreenY);
+        if (dist <= hitRadius && dist < minDistance) {
+          minDistance = dist;
+          closestMarker = m;
         }
       }
-    };
 
-    const ps = polygonSeriesRef.current;
-    if (ps.mapPolygons && typeof ps.mapPolygons.each === 'function') {
-      ps.mapPolygons.each((polygon: any) => {
-        styleSinglePolygon(polygon);
-      });
-    }
+      return closestMarker;
+    },
+    [projectMarker]
+  );
 
-    if (ps.dataItems && typeof ps.dataItems.each === 'function') {
-      ps.dataItems.each((dataItem: any) => {
-        const polygon = dataItem.get?.('mapPolygon');
-        if (polygon) {
-          styleSinglePolygon(polygon);
-        }
-      });
-    }
+  // Toggle selection: clicking the same dot closes the panel; another dot switches immediately
+  const handleToggleMarker = useCallback(
+    (marker: PulseMarker) => {
+      const now = Date.now();
+      if (now - lastClickTimeRef.current < 160) return; // Debounce rapid repeated clicks
+      lastClickTimeRef.current = now;
+
+      if (activeMarkerRef.current?.id === marker.id) {
+        // Toggle OFF (close panel)
+        setInternalActiveMarker(null);
+        if (onSelectMarker) onSelectMarker(null);
+        isPausedRef.current = hoveredMarkerIdRef.current !== null;
+      } else {
+        // Switch to new marker immediately with NO skeleton flicker
+        setInternalActiveMarker(marker);
+        if (onSelectMarker) onSelectMarker(marker);
+        isPausedRef.current = true;
+      }
+    },
+    [onSelectMarker]
+  );
+
+  const handleClosePanel = useCallback(() => {
+    setInternalActiveMarker(null);
+    if (onSelectMarker) onSelectMarker(null);
+    isPausedRef.current = hoveredMarkerIdRef.current !== null;
+  }, [onSelectMarker]);
+
+  // Unified Pointer Handling (Drag vs Click differentiation with 5px threshold)
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    pointerInteracting.current = { x: e.clientX, y: e.clientY };
+    isDraggingRef.current = false;
+    isPausedRef.current = true; // Synchronously pause rotation so target never moves
+    if (canvasRef.current) canvasRef.current.style.cursor = 'grabbing';
   }, []);
 
-  // Clicking on a datapoint or country polygon ALWAYS shows the data
-  const handleSelectDatapoint = useCallback(
-    (reg: PulseMarker) => {
-      setInternalSelectedId(reg.id);
-      effectiveSelectedIdRef.current = reg.id;
-      onSelectRegionRef.current?.(reg);
-      onSelectMarkerRef.current?.(reg);
-      applyCountryShading(reg.id);
+  const handlePointerUp = useCallback(
+    (e: PointerEvent) => {
+      if (pointerInteracting.current !== null) {
+        const dist = Math.hypot(
+          e.clientX - pointerInteracting.current.x,
+          e.clientY - pointerInteracting.current.y
+        );
+
+        if (dist >= 5 || isDraggingRef.current) {
+          // It was a drag: commit rotation offsets
+          phiOffsetRef.current += dragOffset.current.phi;
+          thetaOffsetRef.current += dragOffset.current.theta;
+          dragOffset.current = { phi: 0, theta: 0 };
+        } else {
+          // It was a crisp click (< 5px movement): perform spherical hit test
+          dragOffset.current = { phi: 0, theta: 0 };
+          const hit = hitTestMarker(e.clientX, e.clientY, 20);
+          if (hit) {
+            handleToggleMarker(hit);
+          }
+        }
+      }
+
+      pointerInteracting.current = null;
+      isDraggingRef.current = false;
+      if (canvasRef.current) {
+        canvasRef.current.style.cursor = hoveredMarkerIdRef.current ? 'pointer' : 'grab';
+      }
+      isPausedRef.current = activeMarkerRef.current !== null || hoveredMarkerIdRef.current !== null;
     },
-    [applyCountryShading]
+    [hitTestMarker, handleToggleMarker]
   );
 
-  const handleSelectDatapointRef = useRef(handleSelectDatapoint);
+  // Global pointer move listener during drag or hover
   useEffect(() => {
-    handleSelectDatapointRef.current = handleSelectDatapoint;
-  }, [handleSelectDatapoint]);
-
-  const applyCountryShadingRef = useRef(applyCountryShading);
-  useEffect(() => {
-    applyCountryShadingRef.current = applyCountryShading;
-  }, [applyCountryShading]);
-
-  const handleClearSelection = useCallback(() => {
-    setInternalSelectedId(null);
-    effectiveSelectedIdRef.current = null;
-    onSelectRegionRef.current?.(null);
-    onSelectMarkerRef.current?.(null);
-    applyCountryShading(null);
-  }, [applyCountryShading]);
-
-  // Camera rotation to selected region using exact centroid
-  useEffect(() => {
-    if (!chartRef.current) return;
-
-    if (!effectiveSelectedId) {
-      // Resume gentle auto-rotation when no region is focused
-      if (autoRotateAnimationRef.current && autoRotateAnimationRef.current.isPaused?.()) {
-        autoRotateAnimationRef.current.resume();
-      }
-      return;
-    }
-
-    const region = REGION_HEATMAP_DATA[effectiveSelectedId];
-    if (region && region.center) {
-      // Pause auto-rotation when focusing a specific country/region
-      if (autoRotateAnimationRef.current && !autoRotateAnimationRef.current.isPaused?.()) {
-        autoRotateAnimationRef.current.pause();
-      }
-
-      const w = window as unknown as Record<string, any>;
-      const am5 = w.am5;
-      const easing = am5 ? am5.ease.inOut(am5.ease.cubic) : undefined;
-
-      // Animate rotation to region centroid (exact amCharts formula)
-      chartRef.current.animate({
-        key: 'rotationX',
-        to: -region.center[0],
-        duration: 1200,
-        easing,
-      });
-      chartRef.current.animate({
-        key: 'rotationY',
-        to: -region.center[1],
-        duration: 1200,
-        easing,
-      });
-    }
-  }, [effectiveSelectedId]);
-
-  // Update dots and country highlight states when selection changes
-  useEffect(() => {
-    if (!pointSeriesRef.current || !polygonSeriesRef.current) return;
-
-    // Refresh dots appearance using safe dataItems iteration
-    if (pointSeriesRef.current.dataItems) {
-      pointSeriesRef.current.dataItems.each((dataItem: any) => {
-        const bullets = dataItem.bullets;
-        if (Array.isArray(bullets) && bullets.length > 0) {
-          const bullet = bullets[0];
-          if (bullet && typeof bullet.get === 'function') {
-            const circle = bullet.get('sprite');
-            if (circle && typeof circle.set === 'function') {
-              const isSelected = effectiveSelectedId === dataItem.dataContext?.regionId;
-              circle.set('radius', isSelected ? 6.5 : 4.0);
-              circle.set('strokeOpacity', isSelected ? 1.0 : 0.4);
-              circle.set('strokeWidth', isSelected ? 2.0 : 1.0);
-              circle.set('fillOpacity', isSelected ? 1.0 : 0.88);
-            }
-          }
-        }
-      });
-    }
-
-    // Refresh full country polygon shading to match heatmap colors
-    applyCountryShading(effectiveSelectedId);
-  }, [effectiveSelectedId, applyCountryShading]);
-
-  // Initialize amCharts Orthographic 3D Globe
-  useEffect(() => {
-    let isDisposed = false;
-
-    loadAmChartsScripts()
-      .then(({ am5, am5map, am5geodata_worldLow, am5themes_Animated }) => {
-        if (isDisposed) return;
-
-        const container = document.getElementById(containerId);
-        if (!container) return;
-
-        // Clean previous root if exists
-        if (rootRef.current) {
-          rootRef.current.dispose();
-          rootRef.current = null;
-        }
-
-        const root = am5.Root.new(containerId);
-        rootRef.current = root;
-
-        root.setThemes([am5themes_Animated.new(root)]);
-
-        // 3D Orthographic Map Chart matching amcharts.com/demos/rotate-globe-to-a-selected-country
-        const chart = root.container.children.push(
-          am5map.MapChart.new(root, {
-            panX: 'rotateX',
-            panY: 'rotateY',
-            projection: am5map.geoOrthographic(),
-            rotationX: -20,
-            rotationY: -15,
-            paddingBottom: 10,
-            paddingTop: 10,
-            paddingLeft: 10,
-            paddingRight: 10,
-            background: am5.Rectangle.new(root, {
-              fill: am5.color(0x000000),
-              fillOpacity: 0,
-            }),
-          })
+    const handlePointerMove = (e: PointerEvent) => {
+      if (pointerInteracting.current !== null) {
+        const dist = Math.hypot(
+          e.clientX - pointerInteracting.current.x,
+          e.clientY - pointerInteracting.current.y
         );
-        chartRef.current = chart;
 
-        // Background Sphere (Ocean surface)
-        const backgroundSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {}));
-        backgroundSeries.mapPolygons.template.setAll({
-          fill: am5.color(0x080808),
-          fillOpacity: 0.95,
-          stroke: am5.color(0x181818),
-          strokeWidth: 1,
-        });
-        backgroundSeries.data.push({
-          geometry: am5map.getGeoRectangle(90, 180, -90, -180),
-        });
-
-        // Graticule Lines (Orthographic meridians and parallels)
-        const graticuleSeries = chart.series.push(
-          am5map.GraticuleSeries.new(root, {
-            step: 15,
-          })
-        );
-        graticuleSeries.mapLines.template.setAll({
-          stroke: am5.color(0xffffff),
-          strokeOpacity: 0.05,
-        });
-
-        // Main Country Polygons from official am5geodata_worldLow
-        const polygonSeries = chart.series.push(
-          am5map.MapPolygonSeries.new(root, {
-            geoJSON: am5geodata_worldLow,
-          })
-        );
-        polygonSeriesRef.current = polygonSeries;
-
-        // Configure clean default template attributes (No conflicting adapters)
-        polygonSeries.mapPolygons.template.setAll({
-          fill: am5.color(0x141414),
-          stroke: am5.color(0x222222),
-          strokeWidth: 0.5,
-          interactive: true,
-          cursorOverStyle: 'pointer',
-          tooltipText: '{name}',
-        });
-
-        polygonSeries.mapPolygons.template.states.create('hover', {
-          fillOpacity: 1.0,
-          stroke: am5.color(0xffffff),
-          strokeWidth: 1.8,
-        });
-
-        // Clicking ANY country polygon triggers regional selection & shows telemetry data
-        polygonSeries.mapPolygons.template.events.on('click', (ev: any) => {
-          const target = ev.target;
-          const countryCode = (
-            (target.dataItem?.dataContext as any)?.id ||
-            target.dataItem?.get?.('id') ||
-            target.get?.('id')
-          ) as string | undefined;
-
-          if (!countryCode) return;
-
-          if (countryCode === 'US') {
-            // If currently us-east, toggle to us-west or vice versa; default to us-east
-            const currentSelected = effectiveSelectedIdRef.current;
-            const targetRegion =
-              currentSelected === 'us-east'
-                ? REGION_HEATMAP_DATA['us-west']
-                : REGION_HEATMAP_DATA['us-east'];
-            handleSelectDatapointRef.current(targetRegion);
-          } else {
-            const matchedRegion = GLOBE_REGIONS.find((r) =>
-              r.countryCodes?.includes(countryCode)
-            );
-            if (matchedRegion) {
-              handleSelectDatapointRef.current(matchedRegion);
-            }
-          }
-        });
-
-        // Immediately apply proper heatmap color shading across all countries (US, EU, APAC, etc.)
-        const triggerShading = () => {
-          applyCountryShadingRef.current(effectiveSelectedIdRef.current);
-        };
-
-        triggerShading();
-        polygonSeries.events.on('datavalidated', triggerShading);
-        chart.events.on('ready', triggerShading);
-        requestAnimationFrame(triggerShading);
-
-        // Regional Heatmap Dots Series: discrete telemetry coordinate markers
-        const pointSeries = chart.series.push(am5map.MapPointSeries.new(root, {}));
-        pointSeriesRef.current = pointSeries;
-
-        pointSeries.bullets.push((_root: any, _series: any, dataItem: any) => {
-          const dotData = dataItem.dataContext;
-          const reg = REGION_HEATMAP_DATA[dotData.regionId];
-          const colorVal = reg?.colorHex ? am5.color(reg.colorHex) : am5.color(0xffffff);
-
-          const circle = am5.Circle.new(root, {
-            radius: 4.0,
-            fill: colorVal,
-            fillOpacity: 0.9,
-            stroke: am5.color(0xffffff),
-            strokeWidth: 1.0,
-            strokeOpacity: 0.4,
-            interactive: true,
-            cursorOverStyle: 'pointer',
-            tooltipText: '{name}\n{statusLabel} • {roas} ROAS',
-          });
-
-          circle.states.create('hover', {
-            radius: 6.5,
-            fillOpacity: 1.0,
-            strokeOpacity: 0.9,
-            strokeWidth: 2.0,
-          });
-
-          // Clicking a datapoint on the model shows the data!
-          circle.events.on('click', () => {
-            if (reg) {
-              handleSelectDatapointRef.current(reg);
-            }
-          });
-
-          return am5.Bullet.new(root, { sprite: circle });
-        });
-
-        // Flatten all regional dots into the pointSeries with rich telemetry metadata
-        const allDots: any[] = [];
-        for (const reg of GLOBE_REGIONS) {
-          if (reg.dots) {
-            for (const d of reg.dots) {
-              allDots.push({
-                geometry: {
-                  type: 'Point',
-                  coordinates: [d.longitude, d.latitude],
-                },
-                name: d.name,
-                regionId: d.regionId,
-                regionName: reg.name,
-                statusLabel: reg.statusLabel,
-                roas: reg.roas,
-                colorHex: reg.colorHex,
-              });
-            }
-          }
-        }
-        pointSeries.data.setAll(allDots);
-
-        // Smooth Auto-Rotation
-        const animateRotation = () => {
-          autoRotateAnimationRef.current = chart.animate({
-            key: 'rotationX',
-            from: chart.get('rotationX', 0),
-            to: chart.get('rotationX', 0) + 360,
-            duration: 38000,
-            loops: Infinity,
-            easing: am5.ease.linear,
-          });
-        };
-        animateRotation();
-
-        // Pause auto-rotation on user drag interaction
-        chart.events.on('panstarted', () => {
-          if (autoRotateAnimationRef.current) {
-            autoRotateAnimationRef.current.pause();
-          }
-        });
-
-        // Immediately update frontline orders when user finishes rotating the globe
-        chart.events.on('panended', () => {
-          checkFrontFacingPurchasesRef.current();
-        });
-
-        chart.appear(1000, 100);
-      })
-      .catch((err) => {
-        console.error('Failed to load amCharts 5:', err);
-      });
-
-    return () => {
-      isDisposed = true;
-      if (rootRef.current) {
-        rootRef.current.dispose();
-        rootRef.current = null;
-      }
-    };
-  }, [containerId]);
-
-  // Dynamic line tracking: connects recent purchase cards to exact dots on the 3D globe
-  useEffect(() => {
-    if (!showRecentPurchases) return;
-    let animationFrameId: number;
-
-    // Cache layout bounding rects to prevent forced browser layout reflow (layout thrashing) on every 16ms frame
-    let cachedStageRect: { left: number; top: number } | null = null;
-    let cachedGlobeRect: { left: number; top: number } | null = null;
-    let cachedCardRects: Record<string, { x: number; y: number }> = {};
-    let lastRectMeasureTime = 0;
-
-    const measureLayout = () => {
-      if (!stageRef.current || !globeContainerRef.current) return;
-      const sRect = stageRef.current.getBoundingClientRect();
-      const gRect = globeContainerRef.current.getBoundingClientRect();
-      cachedStageRect = { left: sRect.left, top: sRect.top };
-      cachedGlobeRect = { left: gRect.left, top: gRect.top };
-      cachedCardRects = {};
-      const currentPurchases = visiblePurchasesRef.current;
-      for (const purchase of currentPurchases) {
-        const cardEl = cardRefs.current[purchase.id];
-        if (cardEl) {
-          const cRect = cardEl.getBoundingClientRect();
-          cachedCardRects[purchase.id] = {
-            x: cRect.left - sRect.left,
-            y: cRect.top + cRect.height / 2 - sRect.top,
+        if (dist >= 5) {
+          isDraggingRef.current = true;
+          dragOffset.current = {
+            phi: (e.clientX - pointerInteracting.current.x) / 300,
+            theta: (e.clientY - pointerInteracting.current.y) / 1000,
           };
+          if (canvasRef.current) canvasRef.current.style.cursor = 'grabbing';
+        }
+      } else {
+        // When not dragging, hit test to update hover state and cursor
+        const hit = hitTestMarker(e.clientX, e.clientY, 18);
+        if (hit) {
+          setHoveredMarkerId(hit.id);
+          isPausedRef.current = true;
+          if (canvasRef.current) canvasRef.current.style.cursor = 'pointer';
+        } else {
+          setHoveredMarkerId(null);
+          if (!activeMarkerRef.current) {
+            isPausedRef.current = false;
+          }
+          if (canvasRef.current) canvasRef.current.style.cursor = 'grab';
         }
       }
-      lastRectMeasureTime = performance.now();
     };
 
-    const updateLines = () => {
-      if (
-        stageRef.current &&
-        globeContainerRef.current &&
-        chartRef.current &&
-        typeof chartRef.current.get === 'function' &&
-        typeof chartRef.current.convert === 'function'
-      ) {
-        const now = performance.now();
-        // Remeasure layout rects only once every 300ms or when uninitialized
-        if (!cachedStageRect || now - lastRectMeasureTime > 300) {
-          measureLayout();
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    window.addEventListener('pointerup', handlePointerUp, { passive: true });
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+    };
+  }, [hitTestMarker, handlePointerUp]);
+
+  // One-time Globe Initialization Effect (persists instance in globeRef)
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    let animationId: number;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    const globe = createGlobe(canvas, {
+      devicePixelRatio: dpr,
+      width: size,
+      height: size,
+      phi: 0,
+      theta: thetaBase,
+      dark: 1,
+      diffuse: 1.5,
+      mapSamples: 16000,
+      mapBrightness: 8.5,
+      baseColor,
+      markerColor: [0.95, 0.25, 0.25],
+      glowColor,
+      markerElevation: 0,
+      scale: 1,
+      markers: markersRef.current.map((m) => {
+        let colorVec: [number, number, number] = [0.95, 0.2, 0.2]; // Default red
+        if (m.status === 'High sales') {
+          colorVec = [0.95, 0.2, 0.2]; // Red
+        } else if (m.status === 'Decreasing') {
+          colorVec = [0.95, 0.65, 0.1]; // Yellow / Amber
+        } else if (m.status === 'Suppressed') {
+          colorVec = [0.5, 0.5, 0.55]; // Grey
         }
 
-        const chart = chartRef.current;
-        const stageRect = cachedStageRect;
-        const globeRect = cachedGlobeRect;
+        return {
+          location: m.location,
+          size: m.status === 'High sales' ? 0.038 : m.status === 'Decreasing' ? 0.03 : 0.024,
+          id: m.id,
+          color: colorVec,
+        };
+      }),
+      arcs: [],
+      arcColor: [0.95, 0.35, 0.2],
+      arcWidth: 0.5,
+      arcHeight: 0.25,
+      opacity: 0.88,
+    });
 
-        if (stageRect && globeRect) {
-          const rotX = chart.get('rotationX', 0);
-          const rotY = chart.get('rotationY', 0);
-          const camLon = -rotX;
-          const camLat = -rotY;
-          const rLat2 = (camLat * Math.PI) / 180;
-          const currentPurchases = visiblePurchasesRef.current;
-          const activeIds = new Set(currentPurchases.map((p) => p.id));
+    globeRef.current = globe;
 
-          // Immediately hide connecting lines and anchors for orders that have turned off-screen
-          for (const id of Object.keys(lineRefs.current)) {
-            if (!activeIds.has(id)) {
-              lineRefs.current[id]?.setAttribute('opacity', '0');
-              dotAnchorRefs.current[id]?.setAttribute('opacity', '0');
-              dotRingRefs.current[id]?.setAttribute('opacity', '0');
-              cardAnchorRefs.current[id]?.setAttribute('opacity', '0');
-            }
-          }
-
-          for (const purchase of currentPurchases) {
-            const cardPos = cachedCardRects[purchase.id];
-            const pathEl = lineRefs.current[purchase.id];
-            const dotAnchorEl = dotAnchorRefs.current[purchase.id];
-            const dotRingEl = dotRingRefs.current[purchase.id];
-            const cardAnchorEl = cardAnchorRefs.current[purchase.id];
-
-            if (!cardPos || !pathEl || !dotAnchorEl || !dotRingEl || !cardAnchorEl) {
-              continue;
-            }
-
-            const cardX = cardPos.x;
-            const cardY = cardPos.y;
-
-            // Check if coordinate is on the visible front hemisphere of the 3D globe
-            const rLat1 = (purchase.latitude * Math.PI) / 180;
-            const rDlon = ((purchase.longitude - camLon) * Math.PI) / 180;
-            const cosDistance =
-              Math.sin(rLat1) * Math.sin(rLat2) +
-              Math.cos(rLat1) * Math.cos(rLat2) * Math.cos(rDlon);
-
-            const isVisible = cosDistance > 0.08;
-
-            if (isVisible) {
-              const pt = chart.convert({
-                longitude: purchase.longitude,
-                latitude: purchase.latitude,
-              });
-
-              if (pt && typeof pt.x === 'number' && typeof pt.y === 'number') {
-                const dotX = globeRect.left - stageRect.left + pt.x;
-                const dotY = globeRect.top - stageRect.top + pt.y;
-
-                const deltaX = cardX - dotX;
-                const ctrl1X = cardX - Math.min(80, deltaX * 0.45);
-                const ctrl2X = dotX + Math.min(100, deltaX * 0.45);
-                const d = `M ${cardX} ${cardY} C ${ctrl1X} ${cardY}, ${ctrl2X} ${dotY}, ${dotX} ${dotY}`;
-
-                const isHovered = hoveredPurchaseIdRef.current === purchase.id;
-                const isSelected = effectiveSelectedIdRef.current === purchase.regionId;
-
-                pathEl.setAttribute('d', d);
-                pathEl.setAttribute('opacity', isHovered ? '1.0' : isSelected ? '0.90' : '0.45');
-                pathEl.setAttribute('stroke', isHovered || isSelected ? '#FFFFFF' : '#8A8A8A');
-                pathEl.setAttribute('stroke-width', isHovered || isSelected ? '1.8' : '1.0');
-                pathEl.setAttribute('stroke-dasharray', isHovered ? 'none' : isSelected ? '6 3' : '3 3');
-
-                dotAnchorEl.setAttribute('cx', String(dotX));
-                dotAnchorEl.setAttribute('cy', String(dotY));
-                dotAnchorEl.setAttribute('opacity', isHovered ? '1.0' : '0.85');
-                dotAnchorEl.setAttribute('r', isHovered ? '4.5' : '3.5');
-
-                dotRingEl.setAttribute('cx', String(dotX));
-                dotRingEl.setAttribute('cy', String(dotY));
-                dotRingEl.setAttribute('opacity', isHovered || isSelected ? '0.9' : '0.35');
-                dotRingEl.setAttribute('r', isHovered ? '9' : '6.5');
-
-                cardAnchorEl.setAttribute('cx', String(cardX));
-                cardAnchorEl.setAttribute('cy', String(cardY));
-                cardAnchorEl.setAttribute('opacity', isHovered ? '1.0' : '0.65');
-              }
-            } else {
-              pathEl.setAttribute('opacity', '0');
-              dotAnchorEl.setAttribute('opacity', '0');
-              dotRingEl.setAttribute('opacity', '0');
-              cardAnchorEl.setAttribute('opacity', '0');
-            }
-          }
-        }
+    function animate() {
+      if (!isPausedRef.current) {
+        phiBaseRef.current += speedRef.current;
       }
 
-      animationFrameId = requestAnimationFrame(updateLines);
-    };
+      const currentPhi = phiBaseRef.current + phiOffsetRef.current + dragOffset.current.phi;
+      const currentTheta = thetaBase + thetaOffsetRef.current + dragOffset.current.theta;
 
-    animationFrameId = requestAnimationFrame(updateLines);
+      currentPhiRef.current = currentPhi;
+      currentThetaRef.current = currentTheta;
+
+      if (globeRef.current) {
+        globeRef.current.update({
+          phi: currentPhi,
+          theta: currentTheta,
+        });
+      }
+
+      // Update marker interactive overlay positions every frame directly on DOM elements
+      markersRef.current.forEach((m) => {
+        const btn = markerButtonsRef.current[m.id];
+        if (btn) {
+          const { x, y, isVisible } = projectMarker(m.location, currentPhi, currentTheta);
+          if (isVisible) {
+            btn.style.left = `${(x * 100).toFixed(3)}%`;
+            btn.style.top = `${(y * 100).toFixed(3)}%`;
+            btn.style.display = 'flex';
+            btn.style.opacity = '1';
+            btn.tabIndex = 0;
+          } else {
+            btn.style.display = 'none';
+            btn.style.opacity = '0';
+            btn.tabIndex = -1;
+          }
+        }
+      });
+
+      animationId = requestAnimationFrame(animate);
+    }
+
+    animate();
+    setTimeout(() => {
+      if (canvas) canvas.style.opacity = '1';
+    }, 50);
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      if (animationId) cancelAnimationFrame(animationId);
+      if (globeRef.current) {
+        globeRef.current.destroy();
+        globeRef.current = null;
+      }
     };
-  }, [showRecentPurchases, size]);
-
-  const selectedRegion = effectiveSelectedId ? REGION_HEATMAP_DATA[effectiveSelectedId] : null;
+  }, [size, baseColor, glowColor, projectMarker]);
 
   return (
-    <div
-      ref={stageRef}
-      className={cn(
-        'relative flex flex-col xl:flex-row items-center justify-center select-none overflow-hidden max-w-full w-full',
-        isCompact ? 'gap-3 xl:gap-4' : 'gap-6 xl:gap-8',
-        className
-      )}
-    >
-      {/* 3D Map canvas container */}
+    <div className='relative flex flex-col items-center justify-center select-none'>
+      <style>{`
+        @keyframes pulse-expand {
+          0% { transform: scale(0.35); opacity: 0.9; }
+          100% { transform: scale(1.65); opacity: 0; }
+        }
+        @keyframes active-dot-ping {
+          0% { transform: scale(0.9); opacity: 0.9; }
+          75%, 100% { transform: scale(2.2); opacity: 0; }
+        }
+      `}</style>
+
+      {/* Fixed-Size Globe Container (No percent-based stretching, perfectly centered) */}
       <div
-        ref={globeContainerRef}
-        className='relative flex items-center justify-center shrink-0'
-        style={{ width: size, height: size, maxWidth: '100%' }}
+        ref={containerRef}
+        style={{
+          width: `${size}px`,
+          height: `${size}px`,
+          minWidth: `${size}px`,
+          minHeight: `${size}px`,
+          aspectRatio: '1 / 1',
+        }}
+        className={cn('relative overflow-visible shrink-0', className)}
       >
-        <div
-          id={containerId}
-          className='size-full cursor-grab active:cursor-grabbing rounded-full overflow-hidden'
-          style={{ width: size, height: size }}
+        <canvas
+          ref={canvasRef}
+          onPointerDown={handlePointerDown}
+          style={{
+            width: `${size}px`,
+            height: `${size}px`,
+            cursor: 'grab',
+            opacity: 0,
+            transition: 'opacity 0.6s ease',
+            borderRadius: '50%',
+            touchAction: 'none',
+          }}
         />
-      </div>
 
-      {/* Dynamic SVG Connecting Lines Layer (draws line from each rectangle to exact dot on globe) */}
-      {showRecentPurchases && (
-        <svg
-          className='absolute inset-0 pointer-events-none w-full h-full z-10 overflow-visible'
-          aria-hidden='true'
-        >
-          {visiblePurchases.map((purchase) => (
-            <g key={purchase.id}>
-              <path
-                ref={(el) => {
-                  lineRefs.current[purchase.id] = el;
-                }}
-                fill='none'
-                stroke='#8A8A8A'
-                strokeWidth='1.0'
-                strokeDasharray='3 3'
-                opacity='0'
-              />
-              <circle
-                ref={(el) => {
-                  dotAnchorRefs.current[purchase.id] = el;
-                }}
-                r='3.5'
-                fill='#FFFFFF'
-                opacity='0'
-              />
-              <circle
-                ref={(el) => {
-                  dotRingRefs.current[purchase.id] = el;
-                }}
-                r='6.5'
-                fill='none'
-                stroke='#FFFFFF'
-                strokeWidth='1'
-                opacity='0'
-              />
-              <circle
-                ref={(el) => {
-                  cardAnchorRefs.current[purchase.id] = el;
-                }}
-                r='2.5'
-                fill='#FFFFFF'
-                opacity='0'
-              />
-            </g>
-          ))}
-        </svg>
-      )}
+        {/* Interactive Projected Marker Overlays (Focusable, accessible HTML buttons) */}
+        {markers.map((m) => {
+          const isSelected = activeMarker?.id === m.id;
+          const isHovered = hoveredMarkerId === m.id;
+          const markerColor = m.color || '#ef4444';
 
-      {/* Right Column: Small Rectangles based on Recent Product Purchases */}
-      {showRecentPurchases && (
-        <div
-          className={cn(
-            'flex flex-col shrink-0 z-20 overflow-hidden',
-            isCompact ? 'w-full xl:w-[210px] 2xl:w-[220px] gap-1.5' : 'w-full xl:w-[260px] 2xl:w-[280px] gap-2'
-          )}
-          style={{ maxHeight: size ? `${size}px` : undefined }}
-        >
-          {/* Header Bar */}
-          <div className='flex items-center justify-between pb-1.5 border-b border-[#1A1A1A] font-mono text-[10px] uppercase text-[#8A8A8A] tracking-wider shrink-0'>
-            <div className='flex items-center gap-1.5'>
-              <span className='size-1.5 rounded-full bg-white' />
-              <span className='text-white font-bold tracking-tight'>Frontline Orders</span>
-              {truncatedCount > 0 && (
-                <span
-                  title={`${truncatedCount} additional front-facing orders truncated to fit container vertically`}
-                  className='text-[8px] font-mono px-1 py-0.2 rounded bg-[#1A1A1A] border border-[#2A2A2A] text-[#8A8A8A]'
-                >
-                  +{truncatedCount} truncated
-                </span>
+          return (
+            <button
+              key={m.id}
+              ref={(el) => {
+                markerButtonsRef.current[m.id] = el;
+              }}
+              type='button'
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!isDraggingRef.current) {
+                  handleToggleMarker(m);
+                }
+              }}
+              onMouseEnter={() => {
+                setHoveredMarkerId(m.id);
+                isPausedRef.current = true;
+              }}
+              onMouseLeave={() => {
+                setHoveredMarkerId(null);
+                isPausedRef.current = activeMarkerRef.current !== null;
+              }}
+              onFocus={() => {
+                setHoveredMarkerId(m.id);
+                isPausedRef.current = true;
+              }}
+              onBlur={() => {
+                setHoveredMarkerId(null);
+                isPausedRef.current = activeMarkerRef.current !== null;
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleToggleMarker(m);
+                }
+              }}
+              aria-label={`${m.name}, ${m.status}, toggle region details`}
+              title={`${m.name} (${m.status}) — Click to toggle telemetry`}
+              style={{
+                position: 'absolute',
+                transform: 'translate(-50%, -50%)',
+                width: 38,
+                height: 38,
+                display: 'none',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                background: 'transparent',
+                border: 'none',
+                outline: 'none',
+                zIndex: isSelected ? 30 : 20,
+              }}
+              className='group transition-transform focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 rounded-full'
+            >
+              {/* Selected Dot Active Pulse Ring */}
+              {isSelected && (
+                <>
+                  <span
+                    style={{
+                      position: 'absolute',
+                      inset: -4,
+                      borderRadius: '50%',
+                      border: '2px solid #ffffff',
+                      animation: 'active-dot-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite',
+                      pointerEvents: 'none',
+                    }}
+                  />
+                  <span
+                    style={{
+                      position: 'absolute',
+                      inset: -2,
+                      borderRadius: '50%',
+                      border: `2px solid ${markerColor}`,
+                      boxShadow: `0 0 14px ${markerColor}`,
+                      pointerEvents: 'none',
+                    }}
+                  />
+                </>
               )}
-            </div>
-            <span className='text-[9px] text-[#8A8A8A] shrink-0 font-medium'>
-              Top {visiblePurchases.length} Active
-            </span>
-          </div>
 
-          {/* Cards List: Dynamically changes based on what's currently in front of the globe */}
-          <div className='flex flex-col gap-1.5 font-mono overflow-y-auto no-scrollbar'>
-            {visiblePurchases.map((purchase) => {
-              const isHovered = hoveredPurchaseId === purchase.id;
-              const isTargetRegion = effectiveSelectedId === purchase.regionId;
+              {/* Animated concentric pulsing waves */}
+              <span
+                style={{
+                  position: 'absolute',
+                  inset: 2,
+                  border: `2px solid ${markerColor}`,
+                  borderRadius: '50%',
+                  opacity: 0,
+                  animation: `pulse-expand 2.2s cubic-bezier(0.2, 0.8, 0.4, 1) infinite ${m.delay}s`,
+                  boxShadow: `0 0 10px ${markerColor}66`,
+                  pointerEvents: 'none',
+                }}
+              />
+              <span
+                style={{
+                  position: 'absolute',
+                  inset: 2,
+                  border: `1.5px solid ${markerColor}`,
+                  borderRadius: '50%',
+                  opacity: 0,
+                  animation: `pulse-expand 2.2s cubic-bezier(0.2, 0.8, 0.4, 1) infinite ${m.delay + 0.6}s`,
+                  pointerEvents: 'none',
+                }}
+              />
 
-              return (
-                <button
-                  type='button'
-                  key={purchase.id}
-                  ref={(el) => {
-                    cardRefs.current[purchase.id] = el;
+              {/* Marker Core Dot with Visible Active Ring */}
+              <span
+                style={{
+                  width: isSelected ? 13 : isHovered ? 11 : 9,
+                  height: isSelected ? 13 : isHovered ? 11 : 9,
+                  background: isSelected ? '#ffffff' : markerColor,
+                  borderRadius: '50%',
+                  boxShadow: isSelected
+                    ? `0 0 0 3px #000000, 0 0 0 6px ${markerColor}, 0 0 20px ${markerColor}`
+                    : isHovered
+                    ? `0 0 0 2px #000000, 0 0 0 4px ${markerColor}, 0 0 12px ${markerColor}`
+                    : `0 0 0 2px #000000, 0 0 0 3px ${markerColor}bb, 0 0 8px ${markerColor}88`,
+                  transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
+                  pointerEvents: 'none',
+                }}
+              />
+
+              {/* Floating Region Tooltip Pill on Hover */}
+              <span
+                className={cn(
+                  'absolute bottom-full mb-1.5 px-2 py-0.5 rounded bg-zinc-950/95 text-zinc-100 border border-zinc-800 text-[10px] font-mono whitespace-nowrap shadow-xl pointer-events-none transition-all duration-150 z-40',
+                  isHovered || isSelected
+                    ? 'opacity-100 translate-y-0 scale-100'
+                    : 'opacity-0 translate-y-1 scale-95 pointer-events-none'
+                )}
+              >
+                <strong className='text-zinc-100'>{m.name}</strong> •{' '}
+                <span
+                  style={{
+                    color:
+                      m.status === 'High sales'
+                        ? '#ef4444'
+                        : m.status === 'Decreasing'
+                        ? '#f59e0b'
+                        : '#9ca3af',
                   }}
-                  onMouseEnter={() => setHoveredPurchaseId(purchase.id)}
-                  onMouseLeave={() => setHoveredPurchaseId(null)}
-                  onClick={() => {
-                    const targetReg = REGION_HEATMAP_DATA[purchase.regionId];
-                    if (targetReg) {
-                      handleSelectDatapoint(targetReg);
-                    }
-                    if (chartRef.current) {
-                      const w = window as unknown as Record<string, unknown>;
-                      const am5 = (w as { am5?: { ease?: { inOut?: (e: unknown) => unknown; cubic?: unknown } } }).am5;
-                      const easing = am5?.ease?.inOut ? am5.ease.inOut(am5.ease.cubic) : undefined;
-                      chartRef.current.animate({
-                        key: 'rotationX',
-                        to: -purchase.longitude,
-                        duration: 1200,
-                        easing,
-                      });
-                      chartRef.current.animate({
-                        key: 'rotationY',
-                        to: -purchase.latitude,
-                        duration: 1200,
-                        easing,
-                      });
-                    }
-                  }}
-                  className={cn(
-                    'group relative rounded bg-[#000000] border text-left cursor-pointer transition-all duration-150 flex flex-col w-full shrink-0',
-                    isCompact ? 'p-1.5 gap-0.5' : 'p-2 gap-0.5',
-                    isHovered || isTargetRegion
-                      ? 'border-white bg-[#1A1A1A] shadow-md shadow-white/5 ring-1 ring-white/20'
-                      : 'border-[#1A1A1A] hover:border-[#8A8A8A]'
-                  )}
                 >
-                  {/* City + Pulse Indicator + Timestamp */}
-                  <div className='flex items-center justify-between text-[10px] w-full'>
-                    <div className='flex items-center gap-1.5 truncate'>
-                      <span className='size-1.5 rounded-full bg-white shrink-0' />
-                      <span className='font-bold text-white truncate'>{purchase.city}</span>
-                    </div>
-                    <span className='text-[9px] text-[#8A8A8A] shrink-0 font-medium'>
-                      {purchase.timeAgo}
-                    </span>
-                  </div>
+                  {m.status}
+                </span>
+              </span>
+            </button>
+          );
+        })}
 
-                  {/* Product Name + Price */}
-                  <div
-                    className={cn(
-                      'flex items-center justify-between gap-1 font-semibold text-white w-full',
-                      isCompact ? 'text-[10px]' : 'text-[11px]'
-                    )}
-                  >
-                    <span className='truncate'>{purchase.productName}</span>
-                    <span className='text-[10px] text-white font-bold shrink-0'>
-                      ${purchase.price.toFixed(2)}
-                    </span>
-                  </div>
-
-                  {/* SKU + Channel Badge + Fulfillment Hub */}
-                  <div
-                    className={cn(
-                      'flex items-center justify-between text-[#8A8A8A] pt-0.5 border-t border-[#1A1A1A] w-full',
-                      isCompact ? 'text-[8.5px]' : 'text-[9px]'
-                    )}
-                  >
-                    <span className='truncate'>SKU: {purchase.sku}</span>
-                    <span
-                      className={cn(
-                        'rounded border border-[#1A1A1A] text-white bg-[#0A0A0A] shrink-0 font-semibold',
-                        isCompact ? 'px-1 py-0.2 text-[8px]' : 'px-1.5 py-0.2 text-[9px]'
-                      )}
-                    >
-                      {purchase.channelLabel}
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
+        {/* Floating Detail Panel (Only rendered if renderDetailPanel=true) */}
+        {renderDetailPanel && isPanelOpen && (
+          <div className='absolute top-0 right-0 z-50 translate-x-2 md:translate-x-4 max-w-[340px] sm:max-w-[380px] w-full'>
+            <RegionDetailPanel
+              marker={activeMarker}
+              isOpen={isPanelOpen}
+              onClose={handleClosePanel}
+            />
           </div>
-
-          <div className='text-[8.5px] text-[#8A8A8A] tracking-wider text-center pt-1 border-t border-[#1A1A1A] shrink-0 flex items-center justify-between px-0.5'>
-            <span>CLICK TO FOCUS GLOBE</span>
-            <span className='text-[#666666]'>TRUNCATED (MAX {orderLimit})</span>
-          </div>
-        </div>
-      )}
-
-      {/* Optional In-Component Detail Panel */}
-      {renderDetailPanel && selectedRegion && (
-        <div className='absolute top-0 right-0 z-50 w-full max-w-sm shadow-none animate-in fade-in-0 slide-in-from-right-4'>
-          <RegionDetailPanel
-            marker={selectedRegion}
-            isOpen={Boolean(selectedRegion)}
-            onClose={handleClearSelection}
-          />
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

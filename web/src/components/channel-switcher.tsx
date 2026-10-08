@@ -95,7 +95,7 @@ export function ChannelSwitcher() {
                 <SidebarMenuButton
                   size='lg'
                   tooltip={`Channel: ${channelInfo.name}`}
-                  className='h-10 rounded-xl border border-border/50 bg-background/60 hover:bg-muted/50 hover:border-border/80 text-foreground transition-all duration-200 shadow-2xs'
+                  className='h-10 rounded-xl border border-border/60 bg-background/70 hover:bg-muted/60 hover:border-border/80 text-foreground transition-all duration-150 active:scale-[0.96] shadow-2xs'
                 />
               }
             >
@@ -104,7 +104,7 @@ export function ChannelSwitcher() {
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-              className='w-64 rounded-xl bg-popover/95 backdrop-blur-md border-border/80 shadow-xl p-1.5'
+              className='w-64 rounded-2xl bg-popover/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-border/70 shadow-2xl p-1.5 overflow-hidden before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/35 dark:before:via-white/10 before:to-transparent'
               align='start'
               side='right'
               sideOffset={12}
@@ -151,7 +151,7 @@ export function ChannelSwitcher() {
       {/* Accordion Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className='relative flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors text-muted-foreground hover:bg-muted/60 hover:text-foreground group border border-border/40 hover:border-border/70'
+        className='relative flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-xs font-medium transition-all duration-150 active:scale-[0.97] text-muted-foreground hover:bg-muted/60 hover:text-foreground group border border-border/50 hover:border-border/80 shadow-2xs overflow-hidden before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/30 dark:before:via-white/10 before:to-transparent'
       >
         <span className='relative z-10 flex min-w-0 flex-1 items-center gap-2'>
           <span className='flex size-6 shrink-0 items-center justify-center rounded-md border border-border/60 bg-muted/40 text-foreground group-hover:border-primary/30 transition-colors'>

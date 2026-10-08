@@ -89,20 +89,20 @@ export default function GaugesPage() {
   };
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-[#09090b] text-foreground min-h-screen font-sans'>
+    <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-background text-foreground min-h-screen font-sans'>
       {/* Header Bar */}
-      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-[#27272a] pb-4'>
+      <div className='flex flex-wrap items-center justify-between gap-4 border-b border-border/70 pb-4'>
         <div>
           <div className='flex items-center gap-2'>
-            <Icons.trendingUp className='size-5 text-zinc-100' />
-            <h1 className='text-xl sm:text-2xl font-semibold text-zinc-100 tracking-tight'>
+            <Icons.trendingUp className='size-5 text-foreground' />
+            <h1 className='text-xl sm:text-2xl font-semibold text-foreground tracking-tight'>
               ROAS &amp; Health Gauges
             </h1>
-            <span className='text-[10px] bg-zinc-900 border border-zinc-800 text-zinc-400 px-2 py-0.5 rounded font-mono'>
+            <span className='text-[10px] bg-muted/60 border border-border/70 text-muted-foreground px-2 py-0.5 rounded-lg font-mono'>
               Nike Direct Account
             </span>
           </div>
-          <p className='text-xs text-zinc-400 mt-1'>
+          <p className='text-xs text-muted-foreground mt-1'>
             Autonomous Adstock Optimization • Semicircular Target Arcs (0–6x) • 1.8x Floor &amp; 3.2x Target
           </p>
         </div>
@@ -110,7 +110,7 @@ export default function GaugesPage() {
         <div className='flex items-center gap-2'>
           <button
             onClick={handleResetToDefaults}
-            className='px-3 py-1.5 rounded-lg border border-[#27272a] bg-[#121215] hover:bg-zinc-800 text-[11px] text-zinc-400 hover:text-zinc-100 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 font-sans'
+            className='px-3 py-1.5 rounded-xl border border-border/80 bg-card hover:bg-muted/60 text-[11px] text-muted-foreground hover:text-foreground transition-all duration-150 active:scale-[0.96] shadow-2xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring font-sans'
             title='Reset campaigns and ledger to factory seed data'
           >
             Reset Seed Data
@@ -121,86 +121,86 @@ export default function GaugesPage() {
       {/* TOP DYNAMIC KPIS (all computed purely from data) */}
       <div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
         {/* Blended ROAS */}
-        <div className='rounded-xl border border-[#27272a] bg-[#121215] p-4 flex flex-col justify-between'>
-          <span className='text-[10px] text-zinc-400 uppercase font-medium'>
+        <div className='relative rounded-2xl border border-border/80 bg-card p-4 flex flex-col justify-between shadow-xs overflow-hidden before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/35 dark:before:via-white/10 before:to-transparent'>
+          <span className='text-[10px] text-muted-foreground uppercase font-medium'>
             Blended ROAS
           </span>
           <div className='mt-2 flex items-baseline gap-2 font-mono tabular-nums'>
-            <span className='text-2xl font-bold text-zinc-100 tracking-tight'>
+            <span className='text-2xl font-bold text-foreground tracking-tight'>
               {topKpis.blendedRoas.toFixed(2)}x
             </span>
-            <span className='text-[10px] text-emerald-400 font-medium font-sans'>
+            <span className='text-[10px] text-emerald-600 dark:text-emerald-400 font-medium font-sans'>
               {topKpis.blendedRoas >= 3.2 ? '● Target Met' : '○ Pacing'}
             </span>
           </div>
-          <span className='text-[10px] text-zinc-500 mt-1 font-sans'>
+          <span className='text-[10px] text-muted-foreground mt-1 font-sans'>
             Total Rev / Total Spend
           </span>
         </div>
 
         {/* Daily Ad Spend */}
-        <div className='rounded-xl border border-[#27272a] bg-[#121215] p-4 flex flex-col justify-between'>
-          <span className='text-[10px] text-zinc-400 uppercase font-medium'>
+        <div className='relative rounded-2xl border border-border/80 bg-card p-4 flex flex-col justify-between shadow-xs overflow-hidden before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/35 dark:before:via-white/10 before:to-transparent'>
+          <span className='text-[10px] text-muted-foreground uppercase font-medium'>
             Daily Ad Spend
           </span>
           <div className='mt-2 flex items-baseline gap-2 font-mono tabular-nums'>
-            <span className='text-2xl font-bold text-zinc-100 tracking-tight'>
+            <span className='text-2xl font-bold text-foreground tracking-tight'>
               {formatCurrency(topKpis.totalDailySpend)}
             </span>
           </div>
-          <span className='text-[10px] text-zinc-500 mt-1 font-sans'>
+          <span className='text-[10px] text-muted-foreground mt-1 font-sans'>
             Active Managed Capital
           </span>
         </div>
 
         {/* Open Issues */}
-        <div className='rounded-xl border border-[#27272a] bg-[#121215] p-4 flex flex-col justify-between'>
-          <span className='text-[10px] text-zinc-400 uppercase font-medium'>
+        <div className='relative rounded-2xl border border-border/80 bg-card p-4 flex flex-col justify-between shadow-xs overflow-hidden before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/35 dark:before:via-white/10 before:to-transparent'>
+          <span className='text-[10px] text-muted-foreground uppercase font-medium'>
             Open Issues
           </span>
           <div className='mt-2 flex items-baseline gap-2 font-mono tabular-nums'>
             <span
               className={cn(
                 'text-2xl font-bold tracking-tight',
-                topKpis.openIssuesCount > 0 ? 'text-amber-400' : 'text-emerald-400'
+                topKpis.openIssuesCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'
               )}
             >
               {topKpis.openIssuesCount}
             </span>
-            <span className='text-[10px] text-zinc-400 font-sans'>
+            <span className='text-[10px] text-muted-foreground font-sans'>
               {topKpis.openIssuesCount === 0 ? 'All Clear' : 'Requires Action'}
             </span>
           </div>
-          <span className='text-[10px] text-zinc-500 mt-1 font-sans'>
+          <span className='text-[10px] text-muted-foreground mt-1 font-sans'>
             Stockouts &amp; Sub-Floor Alerts
           </span>
         </div>
 
         {/* Spend at Risk */}
-        <div className='rounded-xl border border-[#27272a] bg-[#121215] p-4 flex flex-col justify-between'>
-          <span className='text-[10px] text-zinc-400 uppercase font-medium'>
+        <div className='relative rounded-2xl border border-border/80 bg-card p-4 flex flex-col justify-between shadow-xs overflow-hidden before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/35 dark:before:via-white/10 before:to-transparent'>
+          <span className='text-[10px] text-muted-foreground uppercase font-medium'>
             Spend at Risk
           </span>
           <div className='mt-2 flex items-baseline gap-2 font-mono tabular-nums'>
             <span
               className={cn(
                 'text-2xl font-bold tracking-tight',
-                topKpis.spendAtRisk > 0 ? 'text-red-400' : 'text-emerald-400'
+                topKpis.spendAtRisk > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'
               )}
             >
               {formatCurrency(topKpis.spendAtRisk)}
             </span>
           </div>
-          <span className='text-[10px] text-zinc-500 mt-1 font-sans'>
+          <span className='text-[10px] text-muted-foreground mt-1 font-sans'>
             In Un-optimized / Out-of-Stock Sets
           </span>
         </div>
       </div>
 
-      {/* FILTER CHIPS (All / Needs fix / Fixed) + CHANNELS */}
-      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-[#27272a] pb-3'>
+      {/* FILTER CHIPS (All / Needs fix / Fixed) + CHANNELS - Apple Segmented Controls */}
+      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border/70 pb-3'>
         {/* Filter Chips: All / Needs fix / Fixed */}
-        <div className='flex items-center gap-1.5 bg-[#121215] p-1 rounded-lg border border-[#27272a] text-xs'>
+        <div className='flex items-center gap-1 bg-muted/60 p-1 rounded-xl border border-border/70 text-xs shadow-2xs'>
           {(
             [
               { id: 'all', label: 'All Products' },
@@ -215,10 +215,10 @@ export default function GaugesPage() {
               key={chip.id}
               onClick={() => setFilterChip(chip.id)}
               className={cn(
-                'px-3 py-1.5 rounded-md transition-all text-xs font-sans focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400',
+                'px-3 py-1.5 rounded-lg transition-all duration-150 text-xs font-sans active:scale-[0.96] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
                 filterChip === chip.id
-                  ? 'bg-zinc-100 text-zinc-900 font-semibold shadow-xs'
-                  : 'text-zinc-400 hover:text-zinc-100'
+                  ? 'bg-background text-foreground font-semibold shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
               )}
             >
               {chip.label}
@@ -227,17 +227,17 @@ export default function GaugesPage() {
         </div>
 
         {/* Channel Filters */}
-        <div className='flex items-center gap-1 bg-[#121215] p-1 rounded-lg border border-[#27272a] text-xs font-medium'>
+        <div className='flex items-center gap-1 bg-muted/60 p-1 rounded-xl border border-border/70 text-xs font-medium shadow-2xs'>
           {(['all', 'meta', 'google', 'amazon', 'shopify'] as const).map(
             (channel) => (
               <button
                 key={channel}
                 onClick={() => setActiveChannel(channel)}
                 className={cn(
-                  'px-2.5 py-1 rounded-md transition-all text-[11px] uppercase font-mono focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400',
+                  'px-2.5 py-1 rounded-lg transition-all duration-150 text-[11px] uppercase font-mono active:scale-[0.96] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
                   activeChannel === channel
-                    ? 'bg-zinc-800 text-zinc-100 font-medium'
-                    : 'text-zinc-400 hover:text-zinc-100'
+                    ? 'bg-background text-foreground font-semibold shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
                 )}
               >
                 {channel}
@@ -249,8 +249,8 @@ export default function GaugesPage() {
 
       {/* GAUGES GRID */}
       {filteredProducts.length === 0 ? (
-        <div className='rounded-xl border border-[#27272a] bg-[#121215] p-12 text-center'>
-          <p className='text-sm text-zinc-400'>
+        <div className='rounded-2xl border border-border/80 bg-card p-12 text-center shadow-xs'>
+          <p className='text-sm text-muted-foreground'>
             No products match the selected filter criteria.
           </p>
           <button

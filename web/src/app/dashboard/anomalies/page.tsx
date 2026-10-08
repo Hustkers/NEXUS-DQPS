@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Icons } from '@/components/icons';
+import { cn } from '@/lib/utils';
 import { AnomalyCard, type AnomalyItem } from '@/features/decision-engine/components/anomaly-card';
 import { ProductAnalysisModal, type ProductAnalysisTarget } from '@/features/decision-engine/components/product-analysis-modal';
 import { ReallocationExecutionModal } from '@/features/decision-engine/components/reallocation-execution-modal';
@@ -168,16 +169,17 @@ export default function AnomaliesPage() {
           </p>
         </div>
 
-        <div className='flex items-center gap-1.5 bg-muted/40 p-1 rounded-lg border border-border text-xs font-mono'>
+        <div className='flex items-center gap-1 bg-muted/60 p-1 rounded-xl border border-border/70 text-xs font-mono shadow-2xs'>
           {(['ALL', 'CRITICAL', 'HIGH', 'WARNING'] as const).map((sev) => (
             <button
               key={sev}
               onClick={() => setFilterSeverity(sev)}
-              className={`px-3 py-1 rounded transition-all font-medium ${
+              className={cn(
+                'px-3 py-1.5 rounded-lg transition-all duration-150 font-semibold active:scale-[0.96] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
                 filterSeverity === sev
-                  ? 'bg-foreground text-background font-bold shadow-2xs'
+                  ? 'bg-background text-foreground shadow-xs'
                   : 'text-muted-foreground hover:text-foreground'
-              }`}
+              )}
             >
               {sev}
             </button>

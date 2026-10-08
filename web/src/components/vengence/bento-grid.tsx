@@ -4,6 +4,9 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { CardSpotlight } from './card-spotlight';
 
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
+
 export function BentoGrid({
   className,
   children
@@ -30,7 +33,9 @@ export function BentoGridItem({
   header,
   icon,
   tag,
-  badge
+  badge,
+  href,
+  actionText
 }: {
   className?: string;
   title?: string | React.ReactNode;
@@ -39,6 +44,8 @@ export function BentoGridItem({
   icon?: React.ReactNode;
   tag?: string;
   badge?: React.ReactNode;
+  href?: string;
+  actionText?: string;
 }) {
   return (
     <CardSpotlight
@@ -60,12 +67,23 @@ export function BentoGridItem({
           </div>
           {badge}
         </div>
-        <div className='font-sans font-bold text-foreground text-lg tracking-tight apple-title'>
+        <div className='font-orbitron font-bold text-foreground text-base sm:text-lg tracking-tight'>
           {title}
         </div>
         <div className='font-sans font-normal text-muted-foreground text-xs leading-relaxed'>
           {description}
         </div>
+        {href && (
+          <div className='pt-2 border-t border-border/50'>
+            <Link
+              href={href}
+              className='inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-primary hover:text-primary/80 transition-colors group/cta'
+            >
+              <span>{actionText || 'Explore in Cockpit →'}</span>
+              <ArrowRight className='size-3 group-hover/cta:translate-x-0.5 transition-transform' />
+            </Link>
+          </div>
+        )}
       </div>
     </CardSpotlight>
   );
