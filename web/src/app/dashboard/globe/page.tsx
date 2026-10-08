@@ -44,12 +44,12 @@ export default function GlobeIntelligencePage() {
         <div>
           <div className='flex items-center gap-2'>
             <IconWorld className='size-6 text-zinc-100' />
-            <h1 className='text-xl font-mono font-bold text-zinc-100 uppercase tracking-tight'>
-              3D Global Ad Delivery &amp; Customer Interaction Intelligence
+            <h1 className='text-xl sm:text-2xl font-semibold text-zinc-100 tracking-tight font-sans'>
+              Global Telemetry
             </h1>
           </div>
-          <p className='text-xs font-mono text-muted-foreground mt-1'>
-            WebGL Ad Delivery Arcs • Regional Telemetry &amp; Intent Pulse • Reinforcement Learning Bandit Allocation
+          <p className='text-xs text-muted-foreground mt-1'>
+            WebGL delivery arcs, regional intent pulse, and multi-armed bandit allocations mapped in real time.
           </p>
         </div>
 
