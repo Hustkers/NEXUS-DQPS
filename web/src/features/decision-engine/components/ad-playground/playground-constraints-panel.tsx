@@ -100,17 +100,19 @@ export function PlaygroundConstraintsPanel({
               ${(constraints.total_budget ?? 5000).toLocaleString()}
             </span>
           </div>
-          <input
-            type='range'
-            min={1000}
-            max={25000}
-            step={500}
-            value={constraints.total_budget ?? 5000}
-            onChange={(e) =>
-              onChangeConstraints({ ...constraints, total_budget: Number(e.target.value) })
-            }
-            className='w-full accent-cyan-500 cursor-pointer'
-          />
+          <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
+            <input
+              type='range'
+              min={1000}
+              max={25000}
+              step={500}
+              value={constraints.total_budget ?? 5000}
+              onChange={(e) =>
+                onChangeConstraints({ ...constraints, total_budget: Number(e.target.value) })
+              }
+              className='w-full accent-cyan-500 cursor-pointer h-1.5 bg-zinc-800 rounded-lg'
+            />
+          </div>
           <div className='flex justify-between text-[10px] text-muted-foreground'>
             <span>$1,000</span>
             <span>$12,500</span>

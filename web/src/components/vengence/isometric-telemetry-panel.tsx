@@ -189,16 +189,18 @@ export function IsometricTelemetryPanel() {
               <span>Dynamic Sensitivity</span>
               <span className='text-foreground font-bold'>{Math.round(intensity * 100)}%</span>
             </div>
-            <input
-              type='range'
-              min='0.1'
-              max='1.0'
-              step='0.05'
-              value={intensity}
-              aria-label='Telemetry dynamic sensitivity slider'
-              onChange={(e) => setIntensity(parseFloat(e.target.value))}
-              className='w-full accent-primary h-1 bg-muted rounded-lg cursor-pointer'
-            />
+            <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
+              <input
+                type='range'
+                min='0.1'
+                max='1.0'
+                step='0.05'
+                value={intensity}
+                aria-label='Telemetry dynamic sensitivity slider'
+                onChange={(e) => setIntensity(parseFloat(e.target.value))}
+                className='w-full accent-primary h-1 bg-zinc-800 rounded-lg cursor-pointer'
+              />
+            </div>
             <p className='text-[10px] font-mono text-muted-foreground/70 leading-tight'>
               Drag to adjust isometric motion deflection physics.
             </p>

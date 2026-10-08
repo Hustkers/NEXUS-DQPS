@@ -38,11 +38,17 @@ export function CampaignSelectorModal({
   const [searchQuery, setSearchQuery] = useState('');
   const [platformTab, setPlatformTab] = useState<'all' | 'meta' | 'google' | 'amazon' | 'shopify'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'healthy' | 'stockout' | 'surplus'>('all');
+  const [skuFilter, setSkuFilter] = useState<'all' | '310805-137' | '942851-002' | '315122-001'>('all');
 
   const filteredCampaigns = useMemo(() => {
     return campaigns.filter((c) => {
       // Platform filter
       if (platformTab !== 'all' && c.platform.toLowerCase() !== platformTab) {
+        return false;
+      }
+
+      // SKU specific filter
+      if (skuFilter !== 'all' && c.sku !== skuFilter) {
         return false;
       }
 
@@ -155,61 +161,85 @@ export function CampaignSelectorModal({
           </div>
         </div>
 
-        {/* Status Filter Pills */}
-        <div className='px-4 py-2 border-b border-zinc-900 bg-zinc-950/60 flex items-center justify-between text-[11px] font-mono shrink-0'>
-          <div className='flex items-center gap-1.5 overflow-x-auto'>
-            <span className='text-zinc-500 uppercase tracking-wider text-[10px] mr-1'>Inventory Status:</span>
+        {/* Status & SKU Quick-Filter Strip */}
+        <div className='px-4 py-2 border-b border-zinc-900 bg-zinc-950/60 flex flex-col md:flex-row md:items-center justify-between gap-2 text-[11px] font-mono shrink-0'>
+          <div className='flex items-center gap-1.5 flex-wrap'>
+            <span className='text-zinc-500 uppercase tracking-wider text-[10px] mr-1'>Filter Catalog:</span>
             <button
-              onClick={() => setStatusFilter('all')}
+              onClick={() => { setStatusFilter('all'); setSkuFilter('all'); }}
               className={cn(
                 'px-2 py-0.5 rounded border transition-colors',
-                statusFilter === 'all'
-                  ? 'bg-zinc-800 text-zinc-200 border-zinc-700'
+                statusFilter === 'all' && skuFilter === 'all'
+                  ? 'bg-zinc-800 text-zinc-200 border-zinc-700 font-semibold'
                   : 'bg-zinc-900/50 text-zinc-500 border-zinc-800/80 hover:text-zinc-300'
               )}
             >
-              All Statuses
+              All (40)
             </button>
             <button
-              onClick={() => setStatusFilter('healthy')}
+              onClick={() => { setStatusFilter('stockout'); setSkuFilter('all'); }}
               className={cn(
                 'px-2 py-0.5 rounded border transition-colors flex items-center gap-1',
-                statusFilter === 'healthy'
-                  ? 'bg-emerald-950/60 text-emerald-300 border-emerald-800'
+                statusFilter === 'stockout' && skuFilter === 'all'
+                  ? 'bg-rose-950/60 text-rose-300 border-rose-800 font-semibold'
+                  : 'bg-zinc-900/50 text-zinc-500 border-zinc-800/80 hover:text-zinc-300'
+              )}
+            >
+              <IconAlertTriangle className='size-3 text-rose-400' />
+              All Stockouts (0 Units)
+            </button>
+            <button
+              onClick={() => { setSkuFilter('310805-137'); setStatusFilter('all'); }}
+              className={cn(
+                'px-2 py-0.5 rounded border transition-colors flex items-center gap-1',
+                skuFilter === '310805-137'
+                  ? 'bg-rose-950/70 text-rose-200 border-rose-700 font-semibold'
+                  : 'bg-zinc-900/50 text-zinc-400 border-zinc-800 hover:text-zinc-200'
+              )}
+            >
+              <span className='size-1.5 rounded-full bg-rose-500 animate-pulse' />
+              Stockout: AJ10 (310805-137)
+            </button>
+            <button
+              onClick={() => { setSkuFilter('942851-002'); setStatusFilter('all'); }}
+              className={cn(
+                'px-2 py-0.5 rounded border transition-colors flex items-center gap-1',
+                skuFilter === '942851-002'
+                  ? 'bg-rose-950/70 text-rose-200 border-rose-700 font-semibold'
+                  : 'bg-zinc-900/50 text-zinc-400 border-zinc-800 hover:text-zinc-200'
+              )}
+            >
+              <span className='size-1.5 rounded-full bg-rose-500 animate-pulse' />
+              Stockout: Pegasus 35 (942851-002)
+            </button>
+            <button
+              onClick={() => { setSkuFilter('315122-001'); setStatusFilter('all'); }}
+              className={cn(
+                'px-2 py-0.5 rounded border transition-colors flex items-center gap-1',
+                skuFilter === '315122-001'
+                  ? 'bg-sky-950/70 text-sky-200 border-sky-700 font-semibold'
+                  : 'bg-zinc-900/50 text-zinc-400 border-zinc-800 hover:text-zinc-200'
+              )}
+            >
+              <span className='size-1.5 rounded-full bg-sky-400' />
+              Surplus: AF1 (315122-001 • 520u)
+            </button>
+            <button
+              onClick={() => { setStatusFilter('healthy'); setSkuFilter('all'); }}
+              className={cn(
+                'px-2 py-0.5 rounded border transition-colors flex items-center gap-1',
+                statusFilter === 'healthy' && skuFilter === 'all'
+                  ? 'bg-emerald-950/60 text-emerald-300 border-emerald-800 font-semibold'
                   : 'bg-zinc-900/50 text-zinc-500 border-zinc-800/80 hover:text-zinc-300'
               )}
             >
               <span className='size-1.5 rounded-full bg-emerald-400' />
               Healthy Inventory
             </button>
-            <button
-              onClick={() => setStatusFilter('surplus')}
-              className={cn(
-                'px-2 py-0.5 rounded border transition-colors flex items-center gap-1',
-                statusFilter === 'surplus'
-                  ? 'bg-sky-950/60 text-sky-300 border-sky-800'
-                  : 'bg-zinc-900/50 text-zinc-500 border-zinc-800/80 hover:text-zinc-300'
-              )}
-            >
-              <span className='size-1.5 rounded-full bg-sky-400' />
-              Surplus (500+)
-            </button>
-            <button
-              onClick={() => setStatusFilter('stockout')}
-              className={cn(
-                'px-2 py-0.5 rounded border transition-colors flex items-center gap-1',
-                statusFilter === 'stockout'
-                  ? 'bg-rose-950/60 text-rose-300 border-rose-800'
-                  : 'bg-zinc-900/50 text-zinc-500 border-zinc-800/80 hover:text-zinc-300'
-              )}
-            >
-              <IconAlertTriangle className='size-3 text-rose-400' />
-              Stockout Shock (0 Units)
-            </button>
           </div>
 
-          <span className='text-zinc-500 hidden sm:inline'>
-            Showing {filteredCampaigns.length} of {campaigns.length} Active Campaigns
+          <span className='text-zinc-500 hidden sm:inline whitespace-nowrap text-[10px]'>
+            Anchor: $1 = ₹84 • {filteredCampaigns.length} Active Campaigns
           </span>
         </div>
 
@@ -288,7 +318,8 @@ export function CampaignSelectorModal({
                           {camp.productName || camp.sku}
                         </h4>
                         <div className='flex items-center gap-2 mt-0.5 text-[11px] text-zinc-400'>
-                          <span>${camp.price?.toLocaleString()}</span>
+                          <span className='font-bold text-zinc-200'>${camp.price?.toLocaleString()}</span>
+                          <span className='text-zinc-500 text-[10px]'>(₹{Math.round((camp.price ?? 0) * 84).toLocaleString('en-IN')})</span>
                           <span>•</span>
                           <span className='text-zinc-500'>{camp.category || 'Footwear'}</span>
                         </div>
@@ -300,9 +331,14 @@ export function CampaignSelectorModal({
                   <div className='pt-2 mt-2 border-t border-zinc-900 text-[10px] flex flex-col gap-1.5 w-full'>
                     <div className='flex items-center justify-between w-full'>
                       <span className='text-zinc-500'>Daily Spend:</span>
-                      <span className='font-bold text-zinc-200'>
-                        ${camp.currentDailySpend?.toLocaleString()}/d
-                      </span>
+                      <div className='text-right'>
+                        <span className='font-bold text-zinc-200'>
+                          ${camp.currentDailySpend?.toLocaleString()}/d
+                        </span>
+                        <span className='text-zinc-500 text-[9px] ml-1'>
+                          (₹{Math.round((camp.currentDailySpend ?? 0) * 84).toLocaleString('en-IN')}/d)
+                        </span>
+                      </div>
                     </div>
 
                     <div className='flex items-center justify-between w-full'>
@@ -330,6 +366,17 @@ export function CampaignSelectorModal({
                         </span>
                       )}
                     </div>
+
+                    {/* Stockout Bleed & Shadow Price Protection Notice */}
+                    {isStockout && (
+                      <div className='flex items-center justify-between text-[9px] text-rose-300 bg-rose-950/50 px-2 py-1 rounded border border-rose-900/60 mt-0.5'>
+                        <span className='flex items-center gap-1 font-mono'>
+                          <span className='size-1 rounded-full bg-rose-500 animate-ping' />
+                          &lambda;_inv = 999.0
+                        </span>
+                        <span className='font-bold'>Bleed Prevented: $840/d (₹70,560/d)</span>
+                      </div>
+                    )}
                   </div>
                 </button>
               );

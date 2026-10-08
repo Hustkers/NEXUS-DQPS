@@ -101,19 +101,21 @@ export function StrategySelector({
                 <span>Budget Reallocation Shift:</span>
                 <span className='font-bold text-foreground'>{inputs.customBudgetShiftPct ?? 50}%</span>
               </div>
-              <input
-                type='range'
-                min={0}
-                max={100}
-                value={inputs.customBudgetShiftPct ?? 50}
-                onChange={(e) =>
-                  onChangeInputs({
-                    ...inputs,
-                    customBudgetShiftPct: parseInt(e.target.value) || 0
-                  })
-                }
-                className='w-full accent-primary h-1 bg-border rounded-lg'
-              />
+              <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
+                <input
+                  type='range'
+                  min={0}
+                  max={100}
+                  value={inputs.customBudgetShiftPct ?? 50}
+                  onChange={(e) =>
+                    onChangeInputs({
+                      ...inputs,
+                      customBudgetShiftPct: parseInt(e.target.value) || 0
+                    })
+                  }
+                  className='w-full accent-primary h-1 bg-zinc-800 rounded-lg'
+                />
+              </div>
             </div>
 
             <div className='space-y-1'>
@@ -121,19 +123,21 @@ export function StrategySelector({
                 <span>Direct Spend Reduction:</span>
                 <span className='font-bold text-foreground'>{inputs.customSpendReductionPct ?? 25}%</span>
               </div>
-              <input
-                type='range'
-                min={0}
-                max={100}
-                value={inputs.customSpendReductionPct ?? 25}
-                onChange={(e) =>
-                  onChangeInputs({
-                    ...inputs,
-                    customSpendReductionPct: parseInt(e.target.value) || 0
-                  })
-                }
-                className='w-full accent-primary h-1 bg-border rounded-lg'
-              />
+              <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
+                <input
+                  type='range'
+                  min={0}
+                  max={100}
+                  value={inputs.customSpendReductionPct ?? 25}
+                  onChange={(e) =>
+                    onChangeInputs({
+                      ...inputs,
+                      customSpendReductionPct: parseInt(e.target.value) || 0
+                    })
+                  }
+                  className='w-full accent-primary h-1 bg-zinc-800 rounded-lg'
+                />
+              </div>
             </div>
           </div>
         </div>
