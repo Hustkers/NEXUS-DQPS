@@ -40,6 +40,15 @@ const nextConfig: NextConfig = {
     });
     return config;
   },
+  async redirects() {
+    return [
+      {
+        source: '/dashboard/ad-playground',
+        destination: '/dashboard/playground',
+        permanent: false,
+      },
+    ];
+  },
   async rewrites() {
     return [
       {
