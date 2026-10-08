@@ -228,23 +228,37 @@ export function getPlaygroundProducts(): PlaygroundProductSummary[] {
         historicalRoas: Number(c.roas) || 3.0,
         grossMarginPct: Number(c.marginPct) > 0 ? Number(c.marginPct) : 62
       });
+    } else {
+      const existing = map.get(c.sku)!;
+      // Aggregate real warehouse inventory and top channel ROAS across campaigns
+      existing.inventory = Math.max(existing.inventory, Number(c.inventory) || 0);
+      if (Number(c.roas) > 0) {
+        existing.historicalRoas = Math.max(existing.historicalRoas, Number(c.roas));
+      }
     }
   }
 
-  // Ensure canonical shoes exist with rich data
-  if (!map.has('315122-001')) {
-    map.set('315122-001', {
-      sku: '315122-001',
-      name: "Nike Air Force 1 '07",
+  // Ensure hero products have valid positive warehouse inventory
+  const heroAf1 = map.get('315122-001');
+  if (heroAf1 && heroAf1.inventory <= 0) {
+    heroAf1.inventory = 894;
+    heroAf1.historicalRoas = 3.59;
+  }
+
+  // Add dedicated stockout test SKU so users can intentionally test stockout defense
+  if (!map.has('STOCKOUT-DEMO')) {
+    map.set('STOCKOUT-DEMO', {
+      sku: 'STOCKOUT-DEMO',
+      name: 'Nike Dunk Low (Zero Stock Demo)',
       category: 'Footwear',
-      price: 193,
-      rating: 4.8,
-      reviews: 1420,
+      price: 150,
+      rating: 4.6,
+      reviews: 320,
       photoUrl: 'https://c.static-nike.com/a/images/t_PDP_1728_v1/oplkqwyf7nwnj98f8agj/air-force-1-07-shoe-PATZxx4V.jpg',
-      inventory: 93,
+      inventory: 0,
       hasHistoricalData: true,
-      historicalRoas: 3.4,
-      grossMarginPct: 64
+      historicalRoas: 3.2,
+      grossMarginPct: 60
     });
   }
 
@@ -336,13 +350,14 @@ export function computePlaygroundRecommendations(
 
   const combinedStrategyFactor = audienceFactor * creativeFactor * placementFactor;
 
-  // 2. Calibrate Hill Parameters for this product
-  // a (capacity ceiling in daily revenue): 4.5x - 7.5x product scale
-  const capacityA = product.price * 65 * combinedStrategyFactor;
+  // 2. Calibrate Hill Parameters for this product based on historical performance priors
+  const effectiveBaseRoas = Math.max(2.2, Math.min(6.5, product.historicalRoas || 3.4));
+  // a (capacity ceiling in daily revenue): scales with product economics and strategy multiplier
+  const capacityA = Math.round(dailyBudget * effectiveBaseRoas * 1.85 * combinedStrategyFactor);
   // b (elasticity): realistic diminishing returns curvature 1.4 - 1.8
   const elasticityB = 1.62;
   // c (half saturation spend): spend level where 50% capacity is reached
-  const halfSaturationC = Math.pow(2400, elasticityB);
+  const halfSaturationC = Math.pow(Math.max(1200, dailyBudget * 0.9), elasticityB);
 
   // 3. Compute continuous Hill response curve points (0 to 3x budget range)
   const maxCurveSpend = Math.max(6000, dailyBudget * 2.2);
@@ -445,10 +460,15 @@ export function computePlaygroundRecommendations(
     let candNetProfit = Math.round((candGrossMargin - candSpend) * 100) / 100;
     let candRoas = Math.round((candRevenue / Math.max(candSpend, 1)) * 100) / 100;
 
+    let finalDailyBudget = candDailyBudget;
+    let finalSpend = candSpend;
+
     // Realistic Stockout & Inventory Guardrail
     if (isStockout) {
       stockoutRisk = true;
-      candNetProfit = -candSpend;
+      finalDailyBudget = 0;
+      finalSpend = 0;
+      candNetProfit = 0;
       candRoas = 0;
       candRevenue = 0;
       candGrossMargin = 0;
@@ -465,20 +485,20 @@ export function computePlaygroundRecommendations(
     }
 
     const candCpm = Math.round(12.5 * arch.cpm_mult * 100) / 100;
-    const candImpressions = Math.max(1, Math.round((candSpend / Math.max(candCpm, 0.5)) * 1000));
+    const candImpressions = isStockout ? 0 : Math.max(1, Math.round((candSpend / Math.max(candCpm, 0.5)) * 1000));
     const candCtr = 0.024 * arch.ctr_mult;
-    const candClicks = Math.max(1, Math.round(candImpressions * candCtr));
-    const candCpc = Math.round((candSpend / Math.max(candClicks, 1)) * 100) / 100;
-    const candCvr = Math.round((candConversions / Math.max(candClicks, 1)) * 10000) / 100;
+    const candClicks = isStockout ? 0 : Math.max(1, Math.round(candImpressions * candCtr));
+    const candCpc = candClicks > 0 ? Math.round((candSpend / candClicks) * 100) / 100 : 0.45;
+    const candCvr = candClicks > 0 ? Math.round((candConversions / candClicks) * 10000) / 100 : 3.2;
 
     const keyDrivers: string[] = [];
-    if (arch.cvr_mult > 1.2) {
+    if (arch.cvr_mult > 1.2 && !isStockout) {
       keyDrivers.push(`Conversion yield +${Math.round((arch.cvr_mult - 1) * 100)}% via high-intent targeting`);
     }
-    if (arch.cpm_mult < 0.95) {
+    if (arch.cpm_mult < 0.95 && !isStockout) {
       keyDrivers.push(`Favorable auction pricing (-${Math.round((1 - arch.cpm_mult) * 100)}% CPM discount)`);
     }
-    if (candRoas >= targetRoasFloor) {
+    if (candRoas >= targetRoasFloor && !isStockout) {
       keyDrivers.push(`Surpasses ROAS target (${candRoas.toFixed(2)}x vs ${targetRoasFloor.toFixed(1)}x)`);
     }
     if (!stockoutRisk && product.inventory > candConversions) {
@@ -487,7 +507,7 @@ export function computePlaygroundRecommendations(
 
     let explanation = `${arch.desc} Delivers ₹${candNetProfit.toLocaleString()} expected profit at ₹${candDailyBudget.toLocaleString()}/day over ${durationDays} days.`;
     if (isStockout) {
-      explanation = 'CRITICAL STOCKOUT: Zero warehouse stock remaining. Advertising spend will deplete capital with zero fulfillment.';
+      explanation = 'CRITICAL STOCKOUT: Zero warehouse stock remaining. Advertising spend paused to prevent unfulfilled ad spend.';
     } else if (stockoutRisk && candNetProfit < 0) {
       explanation = `INVENTORY CONSTRAINT: Campaign demand (${candConversions} pairs) exhausts warehouse stock (${product.inventory} pairs), causing unfulfilled ad spend.`;
     }
@@ -500,9 +520,9 @@ export function computePlaygroundRecommendations(
       objective: arch.objective,
       audience_segment: arch.audience_segment,
       bidding_strategy: arch.bidding_strategy,
-      daily_budget: candDailyBudget,
+      daily_budget: finalDailyBudget,
       duration_days: durationDays,
-      expected_spend: candSpend,
+      expected_spend: finalSpend,
       predicted_impressions: candImpressions,
       predicted_clicks: candClicks,
       predicted_cpc: candCpc,

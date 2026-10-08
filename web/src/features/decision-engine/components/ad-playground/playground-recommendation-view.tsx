@@ -68,11 +68,11 @@ export function PlaygroundRecommendationView({
 
               <div className='text-left sm:text-right shrink-0'>
                 <span className='text-lg font-black text-foreground'>
-                  ₹{bestCandidate.daily_budget.toLocaleString()}
+                  ₹{isStockout ? '0' : bestCandidate.daily_budget.toLocaleString()}
                   <span className='text-xs font-normal text-muted-foreground'>/day</span>
                 </span>
                 <div className='text-[11px] text-muted-foreground mt-0.5'>
-                  Total horizon spend: ₹{bestCandidate.expected_spend.toLocaleString()}
+                  {isStockout ? 'Spend paused due to zero warehouse inventory' : `Total horizon spend: ₹${bestCandidate.expected_spend.toLocaleString()}`}
                 </div>
               </div>
             </div>
