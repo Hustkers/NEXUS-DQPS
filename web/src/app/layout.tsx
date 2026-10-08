@@ -10,6 +10,7 @@ import { cookies } from 'next/headers';
 import NextTopLoader from 'nextjs-toploader';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import localFont from 'next/font/local';
+import BackgroundShader from '@/components/layout/background-shader';
 import '../styles/globals.css';
 
 const ranade = localFont({
@@ -26,6 +27,13 @@ const ranade = localFont({
     }
   ],
   variable: '--font-ranade',
+  display: 'swap'
+});
+
+const orbitron = localFont({
+  src: '../../public/fonts/orbitron/Orbitron-Variable.woff2',
+  variable: '--font-orbitron',
+  weight: '400 900',
   display: 'swap'
 });
 
@@ -78,6 +86,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang='en' suppressHydrationWarning data-theme={themeToApply}>
+      <head>
         <link rel='preconnect' href='https://api.fontshare.com' crossOrigin='anonymous' />
         <link rel='preconnect' href='https://cdn.fontshare.com' crossOrigin='anonymous' />
         <link
