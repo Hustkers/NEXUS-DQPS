@@ -38,12 +38,12 @@ export function AutonomousBudgetEngineHero({
           <div className='flex items-center gap-2 text-[11px] text-zinc-500 dark:text-zinc-400'>
             <span className='size-1.5 rounded-full bg-zinc-900 dark:bg-zinc-100' />
             <span className='font-semibold uppercase tracking-wider'>
-              Autonomous Ad Learning Engine
+              Learning Engine
             </span>
             <span className='text-zinc-400 dark:text-zinc-600'>•</span>
             <span>Accuracy: {modelAccuracyPct}%</span>
           </div>
-          <h2 className='text-lg sm:text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100'>
+          <h2 className='text-lg sm:text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 font-sans'>
             Capital Allocation &amp; Response Optimizer
           </h2>
           <p className='text-xs text-zinc-600 dark:text-zinc-400 max-w-2xl leading-relaxed'>

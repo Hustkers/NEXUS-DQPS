@@ -481,7 +481,7 @@ export function computePlaygroundRecommendations(
       keyDrivers.push(`Sufficient warehouse inventory (${product.inventory} units available)`);
     }
 
-    let explanation = `${arch.desc} Delivers ₹${candNetProfit.toLocaleString()} expected profit at ₹${candDailyBudget.toLocaleString()}/day over ${durationDays} days.`;
+    let explanation = `${arch.desc} Delivers $${candNetProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} expected profit at $${candDailyBudget.toLocaleString()}/day over ${durationDays} days.`;
     if (isStockout) {
       explanation = 'CRITICAL STOCKOUT: Zero warehouse stock remaining. Advertising spend will deplete capital with zero fulfillment.';
     } else if (stockoutRisk && candNetProfit < 0) {

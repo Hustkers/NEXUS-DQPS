@@ -15,9 +15,11 @@ import {
   IconChevronRight,
   IconBolt,
   IconChartBar,
+  IconChartLine,
   IconBox,
 } from '@tabler/icons-react';
 import { executeAssistantTurn } from './tools';
+import { AssistantGraphRenderer, type AssistantGraphConfig } from './assistant-graph-renderer';
 
 export interface ChatMessage {
   id: string;
@@ -29,11 +31,14 @@ export interface ChatMessage {
     args: any;
     result: any;
   };
+  graph?: AssistantGraphConfig;
 }
 
 interface AssistantChatProps {
   onToolExecuted?: (toolName: string, result: any) => void;
   router?: any;
+  initialPrompt?: string;
+  onClearInitialPrompt?: () => void;
 }
 
 const INITIAL_MESSAGES: ChatMessage[] = [
