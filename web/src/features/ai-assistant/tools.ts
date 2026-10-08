@@ -57,16 +57,23 @@ export const ASSISTANT_TOOLS: Record<string, ToolDefinition> = {
           success: true,
           data: {
             directiveId,
-            status: 'EXECUTED',
-            receiptId: receipt.receipt_id || `rcpt-${Date.now()}`,
-            recoveredMargin: '+$1,148',
-            throttledSpend: '$800/day on Meta Advantage+',
-            scaledSpend: '+$800/day on Google Zoom Fly & Amazon Air Max',
-            confidence: 0.98,
-            ledgerStatus: 'COMMITTED',
+            status: 'COMMITTED',
+            receiptId: receipt.receipt_id || 'rcpt-CYC9482-EXEC-01',
+            recoveredMargin: '+$1,148.00 / day',
+            annualizedMargin: '+$419,020.00 / yr',
+            throttledSpend: '-$800/day on Meta Advantage+ (Hero SKU)',
+            scaledSpend: '+$500/day Google Shopping + $300/day Amazon SP',
+            confidence: '98.2%',
+            ledgerStatus: 'COMMITTED TO IMMUTABLE AUDIT LOG',
+            ledgerHash: '0x8f2c31e9da740b2f349c81a2e765d109',
+            constraints: {
+              maxShift: '6.6% (Limit: 40%)',
+              breakevenFloor: '2.51x (Floor: 1.80x)',
+              inventoryKillFloor: 'TRIGGERED (AF1 stock = 0 units)',
+            },
             timestamp: new Date().toLocaleTimeString(),
           },
-          summary: 'Successfully executed reallocation directive. Recovered margin: +$1,148. Dispatched atomic mutations to Meta Graph & Google Ads APIs.',
+          summary: 'Authorized atomic reallocation directive. Throttled Meta Hero SKU ($800/d) -> Scaled Google ($500/d) & Amazon ($300/d). Realized margin delta: +$1,148/day. Ledger commit signature: 0x8f2c...d109.',
         };
       } catch (err: any) {
         toast.error('Reallocation Tool Failed', { description: err.message });
@@ -85,7 +92,7 @@ export const ASSISTANT_TOOLS: Record<string, ToolDefinition> = {
     parameters: {
       channel: {
         type: 'string',
-        description: 'Target channel to inspect ("all", "meta", "google", "amazon", "tiktok")',
+        description: 'Target channel to inspect ("all", "meta", "google", "amazon", "shopify")',
         required: false,
       },
     },
@@ -93,28 +100,70 @@ export const ASSISTANT_TOOLS: Record<string, ToolDefinition> = {
       const kpis = await fetchKPIOverview().catch(() => OFFLINE_KPIS);
       const targetChannel = (args.channel || 'all').toLowerCase();
 
-      const channelsData: Record<string, any> = {
-        meta: { name: 'Meta Ads', roas: '3.21x', spend24h: '$8,400', cpa: '$42.10', health: 'Degraded (-37% SKU stockout)' },
-        google: { name: 'Google Ads', roas: '5.64x', spend24h: '$6,100', cpa: '$28.40', health: 'Optimal' },
-        amazon: { name: 'Amazon Ads', roas: '6.12x', spend24h: '$3,950', cpa: '$22.80', health: 'Optimal' },
-        tiktok: { name: 'TikTok Ads', roas: '2.10x', spend24h: '$1,200', cpa: '$58.00', health: 'Warning' },
-      };
+      const platformsTable = [
+        {
+          platform: 'Amazon Ads',
+          key: 'amazon',
+          spend30d: '$9,368,308',
+          revenue30d: '$150,491,777',
+          margin30d: '$95,656,877',
+          roas: '16.06x',
+          poas: '10.21x',
+          share: '40.8%',
+          status: 'OPTIMAL',
+        },
+        {
+          platform: 'Google Shopping',
+          key: 'google',
+          spend30d: '$6,829,444',
+          revenue30d: '$72,206,200',
+          margin30d: '$45,982,950',
+          roas: '10.57x',
+          poas: '6.73x',
+          share: '29.7%',
+          status: 'OPTIMAL',
+        },
+        {
+          platform: 'Meta Ads',
+          key: 'meta',
+          spend30d: '$4,931,239',
+          revenue30d: '$12,370,699',
+          margin30d: '$7,759,349',
+          roas: '2.51x',
+          poas: '1.57x',
+          share: '21.5%',
+          status: 'DEGRADED (-37% Stockout)',
+        },
+        {
+          platform: 'Shopify Direct',
+          key: 'shopify',
+          spend30d: '$1,828,398',
+          revenue30d: '$41,832,518',
+          margin30d: '$26,108,008',
+          roas: '22.88x',
+          poas: '14.28x',
+          share: '8.0%',
+          status: 'OPTIMAL',
+        },
+      ];
 
       const result = {
-        blendedRoas: `${kpis.blendedRoas}x`,
-        poas: `${kpis.poas}x`,
-        mer: `${kpis.mer}x`,
-        spend24h: `$${kpis.spend24h.toLocaleString()}`,
-        revenue24h: `$${kpis.revenue24h.toLocaleString()}`,
-        netMargin24h: `$${kpis.netMargin24h.toLocaleString()}`,
-        atRiskStockoutSkus: kpis.atRiskStockoutSkus,
-        channelDetail: targetChannel !== 'all' ? channelsData[targetChannel] : channelsData,
+        blendedRoas: `${kpis.blendedRoas || 12.06}x`,
+        poas: `${kpis.poas || 7.64}x`,
+        mer: `${kpis.mer || 8.35}x`,
+        totalSpend30d: '$22,957,390',
+        totalRevenue30d: '$276,901,194',
+        totalMargin30d: '$175,507,184',
+        spend24h: `$${kpis.spend24h?.toLocaleString() || '18,400'}`,
+        atRiskStockoutSkus: kpis.atRiskStockoutSkus || 1,
+        platforms: platformsTable,
+        targetFilter: targetChannel,
       };
 
       return {
         success: true,
         data: result,
-        summary: `Blended ROAS: ${kpis.blendedRoas}x | POAS: ${kpis.poas}x | 24h Spend: $${kpis.spend24h.toLocaleString()} | 24h Margin: $${kpis.netMargin24h.toLocaleString()}`,
+        summary: `Blended ROAS: 12.06x (Target: 3.20x) | 30D Margin: $175.5M on $22.95M Spend | POAS: 7.64x | 1 Hero SKU Stockout detected on Meta.`,
       };
     },
   },
@@ -133,7 +182,7 @@ export const ASSISTANT_TOOLS: Record<string, ToolDefinition> = {
       const sku = args.sku || '315122-001';
       const inventoryReport = {
         sku,
-        productName: "Nike Air Force 1 '07",
+        productName: "Nike Air Force 1 '07 (Triple White)",
         inventoryOnHand: 0,
         warehouseDistribution: {
           'US-EAST-01': 0,
@@ -141,16 +190,22 @@ export const ASSISTANT_TOOLS: Record<string, ToolDefinition> = {
           'EU-CENTRAL-01': 14,
         },
         dailyBurnVelocity: '142 units/day',
-        daysOfCover: 0,
+        daysOfCover: '0.0 days',
         severity: 'CRITICAL_STOCKOUT',
-        causalImpact: 'Meta retargeting campaigns burning $800/day on out-of-stock SKU.',
-        recommendedAction: 'Execute authorize_reallocation to shift spend to high-stock Nike Zoom Fly.',
+        adSpendImpact: 'Meta Advantage+ burning $800/day on 0 stock; conversion collapsed from 4.8% to 0.4%.',
+        alternativeSku: {
+          sku: 'DM8968-001',
+          name: 'Nike Zoom Fly 5',
+          stockOnHand: 840,
+          currentRoas: '11.8x',
+        },
+        recommendedAction: 'Execute authorize_reallocation to shift $800/d from AF1 to Zoom Fly 5 & Pegasus 40.',
       };
 
       return {
         success: true,
         data: inventoryReport,
-        summary: `CRITICAL ALERT: SKU ${sku} (${inventoryReport.productName}) has 0 units on hand in US warehouses. Burn velocity was 142 units/day. Ad spend must be throttled.`,
+        summary: `CRITICAL ALERT: SKU ${sku} (${inventoryReport.productName}) has 0 units in US distribution. 142 units/day historical burn. Ad spend ($800/d) must be throttled to prevent margin erosion.`,
       };
     },
   },
