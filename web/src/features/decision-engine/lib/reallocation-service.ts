@@ -102,10 +102,41 @@ class ReallocationEngineService {
     if (anomaly.isReallocated) {
       // Find existing ledger entry or reallocation item if available
       const existingLedger = this.state.ledger.find((l) => l.id === anomaly.reallocationId);
+      
+      // Locate source & target campaigns to reconstruct receipt details
+      const sourceCamp = this.state.campaigns.find(
+        (c) => c.campaign === anomaly.campaign || (c.sku && c.sku === anomaly.sku && c.platform === anomaly.platform)
+      );
+      const existingRealloc = this.state.reallocations.find(
+        (r) => r.sourceCampaign === anomaly.campaign
+      );
+      const targetCamp = existingRealloc
+        ? this.state.campaigns.find((c) => c.campaign === existingRealloc.targetCampaign)
+        : this.state.campaigns.find((c) => c.campaign !== anomaly.campaign && (c.inventory ?? 0) > 50);
+
+      let details: ReallocationExecutionDetails | undefined;
+      if (existingRealloc) {
+        details = buildReallocationExecutionDetails(
+          existingRealloc,
+          this.state.campaigns,
+          anomaly.reallocationId || existingLedger?.id || `ledg-archived-${anomaly.id}`,
+          {
+            id: anomaly.id,
+            campaign: anomaly.campaign,
+            productName: anomaly.productName || sourceCamp?.productName,
+            severity: anomaly.severity,
+            zScore: anomaly.zScore,
+            rootCause: 'Reallocated Anomaly',
+            explanation: anomaly.explanation
+          }
+        );
+      }
+
       return {
         success: false,
         code: 'ALREADY_REALLOCATED',
-        message: `Anomaly on ${anomaly.campaign} has already been reallocated (${existingLedger?.timestamp || anomaly.reallocatedAt || 'completed'}). Decision ID: ${anomaly.reallocationId || 'ledg-archived'}`
+        message: `Anomaly on ${anomaly.campaign} has already been reallocated (${existingLedger?.timestamp || anomaly.reallocatedAt || 'completed'}). Decision ID: ${anomaly.reallocationId || 'ledg-archived'}`,
+        details
       };
     }
 
