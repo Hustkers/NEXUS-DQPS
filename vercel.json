@@ -2,5 +2,11 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "installCommand": "pnpm install --no-frozen-lockfile",
-  "buildCommand": "pnpm --dir web build && cp -r web/.next .next"
+  "buildCommand": "pnpm --dir web build && cp -r web/.next .next",
+  "rewrites": [
+    {
+      "source": "/dashboard/ad-playground",
+      "destination": "/dashboard/playground"
+    }
+  ]
 }
