@@ -742,6 +742,141 @@ export async function executeAssistantTurn(
   };
   graph?: AssistantGraphConfig;
 }> {
+  // 1. Send the request to the Python backend with real function calling on DATASET.md
+  try {
+    const res = await fetch('/api/ai/coach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: userInput }),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.reply) {
+        const firstTool =
+          data.tool_calls && data.tool_calls.length > 0
+            ? data.tool_calls[0]
+            : undefined;
+
+        // Process all executed tool calls and dispatch reactive UI mutations
+        if (data.tool_calls && Array.isArray(data.tool_calls)) {
+          for (const tc of data.tool_calls) {
+            const uiAction = tc.result?.ui_action;
+            if (uiAction && typeof window !== 'undefined') {
+              // Dispatch generic UI action
+              window.dispatchEvent(
+                new CustomEvent('nexus:ui_action', { detail: uiAction })
+              );
+
+              const { type, payload } = uiAction;
+              if (type === 'UPDATE_BUDGET') {
+                window.dispatchEvent(
+                  new CustomEvent('nexus:budget_updated', { detail: payload })
+                );
+                toast.success('Budget Updated', {
+                  description: `${payload.target}: $${payload.budget}/day`,
+                });
+              } else if (type === 'UPDATE_INVENTORY') {
+                window.dispatchEvent(
+                  new CustomEvent('nexus:inventory_updated', { detail: payload })
+                );
+                toast.success('Inventory Restocked', {
+                  description: `${payload.sku}: ${payload.quantity} units`,
+                });
+              } else if (type === 'TOGGLE_AUTOPILOT') {
+                window.dispatchEvent(
+                  new CustomEvent('nexus:autopilot_toggled', { detail: payload })
+                );
+                toast.info(
+                  payload.enabled
+                    ? 'Auto-Pilot Mode Engaged'
+                    : 'Auto-Pilot Mode Paused'
+                );
+              } else if (type === 'EXECUTE_REALLOCATION') {
+                window.dispatchEvent(
+                  new CustomEvent('nexus:directive_executed', {
+                    detail: {
+                      directiveId: payload.directiveId || 'dir_meta_hero_shoe',
+                      marginRecovery: 1148,
+                      timestamp: new Date().toISOString(),
+                    },
+                  })
+                );
+                toast.success('Budget Reallocation Executed', {
+                  description:
+                    'Throttled waste & recovered margin on Decision Ledger.',
+                });
+              } else if (type === 'UPDATE_STRATEGY') {
+                window.dispatchEvent(
+                  new CustomEvent('nexus:strategy_changed', { detail: payload })
+                );
+                toast.success('Strategy Updated', {
+                  description: `Optimization objective: ${payload.strategy}`,
+                });
+              } else if (type === 'INJECT_SCENARIO') {
+                window.dispatchEvent(
+                  new CustomEvent('nexus:scenario_injected', { detail: payload })
+                );
+                toast.warning('Scenario Injected', {
+                  description: `Simulated stress: ${payload.scenarioType}`,
+                });
+              } else if (type === 'FILTER_CHANNEL') {
+                window.dispatchEvent(
+                  new CustomEvent('nexus:channel_changed', { detail: payload })
+                );
+                toast.info(`Channel Switched: ${payload.channel.toUpperCase()}`);
+              } else if (type === 'NAVIGATE') {
+                toast.info(`Navigating to ${payload.path}`);
+                if (router && typeof router.push === 'function') {
+                  router.push(payload.path);
+                } else if (typeof window !== 'undefined') {
+                  window.location.href = payload.path;
+                }
+              } else if (type === 'SET_THEME') {
+                if (typeof document !== 'undefined') {
+                  if (payload.theme === 'light') {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.classList.add('light');
+                    localStorage.setItem('theme', 'light');
+                  } else {
+                    document.documentElement.classList.remove('light');
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                  }
+                }
+                toast.info(`Theme set to ${payload.theme}`);
+              } else if (type === 'APPLY_FIX') {
+                window.dispatchEvent(
+                  new CustomEvent('nexus:fix_applied', { detail: payload })
+                );
+                toast.success('Fix Applied', {
+                  description: `Mitigated risk for ${payload.productId}`,
+                });
+              }
+            }
+          }
+        }
+
+        return {
+          replyText: data.reply,
+          toolCall: firstTool
+            ? {
+                name: firstTool.name,
+                args: firstTool.args,
+                result: firstTool.result,
+              }
+            : undefined,
+          graph: data.graph as AssistantGraphConfig | undefined,
+        };
+      }
+    }
+  } catch (err) {
+    console.warn(
+      'AI Coach Python backend unreachable, engaging local heuristic fallback:',
+      err
+    );
+  }
+
   const text = userInput.trim().toLowerCase();
 
   // 1. CPM Queries (Cost Per Mille / 1000 Impressions)

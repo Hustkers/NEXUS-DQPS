@@ -1,8 +1,6 @@
 """FastAPI router for Google Cloud Vertex AI reasoning and LLM endpoints."""
 
-from __future__ import annotations
-
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
@@ -92,3 +90,35 @@ def generate_rca_explanation(req: RcaRequest) -> Dict[str, Any]:
         campaign_name=req.campaign_name,
         sku_id=req.sku_id,
     )
+
+
+class CoachRequest(BaseModel):
+    message: str = Field(..., description="User query or message sent to AI Coach")
+    history: Optional[list[dict[str, str]]] = Field(default_factory=list, description="Conversation history")
+
+
+class CoachResponse(BaseModel):
+    reply: str
+    tool_calls: list[dict[str, Any]] = Field(default_factory=list)
+    model: str
+    provider: str
+    graph: Optional[dict[str, Any]] = None
+
+
+CoachRequest.model_rebuild()
+CoachResponse.model_rebuild()
+
+
+@ai_router.post("/coach", response_model=CoachResponse)
+def coach_chat(req: CoachRequest) -> CoachResponse:
+    """Execute AI Coach conversation turn with function calling grounded in DATASET.md."""
+    from agents.coach import coach_service
+    res = coach_service.chat_turn(user_message=req.message, history=req.history)
+    return CoachResponse(
+        reply=res.get("reply", ""),
+        tool_calls=res.get("tool_calls", []),
+        model=res.get("model", "gemini-3.8-flash"),
+        provider=res.get("provider", "Google Cloud Vertex AI"),
+        graph=res.get("graph"),
+    )
+

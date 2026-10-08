@@ -15,7 +15,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PlatformLogo } from '@/components/icons/platform-logos';
 import { GithubGlobe } from './github-globe';
-import { GlobePulse } from '@/components/ui/cobe-globe-pulse';
 import { RLVisualAnalytics } from './rl-visual-analytics';
 import { computeRLAdAllocation } from '@/lib/rl-ad-optimizer';
 import { toast } from 'sonner';
@@ -73,26 +72,9 @@ export function ProductAnalysisModal({
   onClose,
   onMitigate
 }: ProductAnalysisModalProps) {
-  const [analysisStage, setAnalysisStage] = useState<'analysing' | 'completed'>('analysing');
-  const [viewSection, setViewSection] = useState<'all' | 'globe' | 'cm3_waterfall' | 'rl_analytics'>('all');
   const [freightZone, setFreightZone] = useState<'zone2' | 'zone8' | 'blended'>('blended');
   const [currencyView, setCurrencyView] = useState<'usd' | 'inr'>('usd');
   const [isExecuting, setIsExecuting] = useState(false);
-
-  // Automatically transition from "analysing" to "completed" after 2.2 seconds
-  React.useEffect(() => {
-    if (!isOpen) return;
-    const initialTimer = setTimeout(() => {
-      setAnalysisStage('analysing');
-    }, 0);
-    const timer = setTimeout(() => {
-      setAnalysisStage('completed');
-    }, 2200);
-    return () => {
-      clearTimeout(initialTimer);
-      clearTimeout(timer);
-    };
-  }, [isOpen]);
 
   // Compute RL ad allocation data for the product
   const rlData = useMemo(() => {
@@ -191,107 +173,24 @@ export function ProductAnalysisModal({
             <div>
               <div className='flex items-center gap-2'>
                 <span className='text-xs font-mono font-bold uppercase tracking-wider text-foreground'>
-                  {analysisStage === 'analysing'
-                    ? '1. ANALYSING PHASE (SCANNING DELIVERY ARCS)'
-                    : '2. ANALYSIS COMPLETED (RL AD ALLOCATION & SALES PULSE)'}
+                  ANALYSIS &amp; TELEMETRY OVERVIEW
                 </span>
                 <span className='text-muted-foreground/60 hidden sm:inline'>•</span>
                 <span className='text-xs font-mono text-muted-foreground hidden sm:inline'>
-                  {analysisStage === 'analysing'
-                    ? 'Cross-Channel Latency & Audience Exploration'
-                    : 'Regional Sales Telemetry & Interaction Velocity'}
+                  Cross-Channel Delivery Arcs, CM3 Waterfall &amp; RL Policy
                 </span>
               </div>
               <p className='text-[11px] font-mono text-muted-foreground mt-0.5'>
-                {analysisStage === 'analysing'
-                  ? 'Source: WebGL Ad Delivery Engine'
-                  : 'Source: Interaction Telemetry + Thompson Bandit RL'}
+                Source: WebGL Ad Delivery Engine • Reconciled ERP COGS • Thompson Bandit RL
               </p>
             </div>
           </div>
 
-          <div className='flex items-center gap-2'>
-            {/* View Section Toggles - Apple Segmented Control */}
-            <div className='flex items-center bg-muted/60 dark:bg-zinc-900 rounded-xl border border-border/70 p-0.5 text-[11px] font-mono shadow-2xs'>
-              <button
-                onClick={() => setViewSection('all')}
-                className={cn(
-                  'px-2.5 py-1 rounded-lg transition-all duration-150 font-semibold active:scale-[0.96]',
-                  viewSection === 'all'
-                    ? 'bg-background text-foreground shadow-xs'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
-                All Views
-              </button>
-              <button
-                onClick={() => setViewSection('globe')}
-                className={cn(
-                  'px-2.5 py-1 rounded-lg transition-all duration-150 font-semibold flex items-center gap-1 active:scale-[0.96]',
-                  viewSection === 'globe'
-                    ? 'bg-background text-foreground shadow-xs'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
-                <IconWorld className='size-3 text-muted-foreground' />
-                3D Globe
-              </button>
-              <button
-                onClick={() => setViewSection('cm3_waterfall')}
-                className={cn(
-                  'px-2.5 py-1 rounded-lg transition-all duration-150 font-semibold flex items-center gap-1 active:scale-[0.96]',
-                  viewSection === 'cm3_waterfall'
-                    ? 'bg-background text-foreground shadow-xs'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
-                <IconReceipt2 className='size-3 text-muted-foreground' />
-                CM3 Waterfall
-              </button>
-              <button
-                onClick={() => setViewSection('rl_analytics')}
-                className={cn(
-                  'px-2.5 py-1 rounded-lg transition-all duration-150 font-semibold flex items-center gap-1 active:scale-[0.96]',
-                  viewSection === 'rl_analytics'
-                    ? 'bg-background text-foreground shadow-xs'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
-                <IconCpu className='size-3 text-muted-foreground' />
-                RL Analytics
-              </button>
-            </div>
-
-            {/* Stage Selector - Apple Segmented Control */}
-            <div className='flex items-center bg-muted/60 dark:bg-zinc-900 rounded-xl border border-border/70 p-0.5 text-[11px] font-mono shadow-2xs'>
-              <button
-                onClick={() => setAnalysisStage('analysing')}
-                className={cn(
-                  'px-2.5 py-1 rounded-lg transition-all duration-150 font-semibold active:scale-[0.96]',
-                  analysisStage === 'analysing'
-                    ? 'bg-background text-foreground shadow-xs'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
-                Arcs
-              </button>
-              <button
-                onClick={() => setAnalysisStage('completed')}
-                className={cn(
-                  'px-2.5 py-1 rounded-lg transition-all duration-150 font-semibold active:scale-[0.96]',
-                  analysisStage === 'completed'
-                    ? 'bg-background text-foreground shadow-xs'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
-                RL Pulse
-              </button>
-            </div>
-
+          <div className='flex items-center gap-2.5'>
             <Badge
               variant='outline'
               className={cn(
-                'font-mono text-xs px-2.5 py-0.5 hidden sm:inline-flex rounded-lg',
+                'font-mono text-xs px-2.5 py-0.5 inline-flex rounded-lg',
                 isCritical
                   ? 'border-rose-500/40 text-rose-600 dark:text-rose-400 bg-rose-500/10'
                   : 'border-border/80 text-muted-foreground bg-muted/40'
@@ -309,101 +208,64 @@ export function ProductAnalysisModal({
           </div>
         </div>
 
-        {/* Modal Body */}
+        {/* Modal Body - Unified All-in-One View */}
         <div className='flex-1 overflow-y-auto p-4 sm:p-6 space-y-6'>
           {/* SECTION 1: 3D GLOBE & PRODUCT TELEMETRY */}
-          {(viewSection === 'all' || viewSection === 'globe') && (
-            <div className='grid grid-cols-1 lg:grid-cols-12 gap-6 items-start'>
-              {/* Left: 3D Globe View (Analysing Arcs OR Completed Sales Pulse) */}
-              <div className='lg:col-span-7 flex flex-col items-center justify-center rounded-xl border border-zinc-800/80 bg-zinc-950/70 p-4 relative overflow-hidden'>
-                <div className='w-full flex items-center justify-between text-xs font-mono text-zinc-400 mb-1 px-2'>
-                  <div className='flex items-center gap-2'>
-                    {analysisStage === 'analysing' ? (
-                      <>
-                        <IconWorld className='size-4 text-zinc-400' />
-                        <span className='font-bold text-zinc-200'>GLOBAL AD DELIVERY ARCS (ANALYSING PHASE)</span>
-                      </>
-                    ) : (
-                      <>
-                        <span className='size-2 rounded-full bg-zinc-400' />
-                        <span className='font-bold text-zinc-200'>RL CUSTOMER INTERACTION &amp; SALES PULSE</span>
-                      </>
-                    )}
-                  </div>
-                  <span className='text-[11px] text-zinc-500'>
-                    Interactive • Drag to rotate
-                  </span>
+          <div className='grid grid-cols-1 lg:grid-cols-12 gap-6 items-start'>
+            {/* Left: 3D Globe View (Global Ad Delivery Arcs) */}
+            <div className='lg:col-span-7 flex flex-col items-center justify-center rounded-xl border border-zinc-800/80 bg-zinc-950/70 p-4 relative overflow-hidden'>
+              <div className='w-full flex items-center justify-between text-xs font-mono text-zinc-400 mb-1 px-2'>
+                <div className='flex items-center gap-2'>
+                  <IconWorld className='size-4 text-zinc-400' />
+                  <span className='font-bold text-zinc-200'>GLOBAL AD DELIVERY ARCS &amp; TELEMETRY</span>
                 </div>
-
-                {/* The Globe: Switch between GitHub Globe and GlobePulse */}
-                <div className='w-full min-h-[340px] flex items-center justify-center overflow-x-auto'>
-                  {analysisStage === 'analysing' ? (
-                    <GithubGlobe
-                      size={320}
-                      activeSku={product.sku}
-                      activePlatform={product.platform}
-                      accentColor={isCritical ? [0.95, 0.35, 0.45] : [0.2, 0.85, 0.6]}
-                    />
-                  ) : (
-                    <div className='flex items-center justify-center'>
-                      <GlobePulse size={320} speed={0.0035} />
-                    </div>
-                  )}
-                </div>
-
-                {/* Legend & Channel Strip */}
-                {analysisStage === 'completed' ? (
-                  <div className='w-full flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-zinc-900 font-mono text-[10px]'>
-                    <div className='flex items-center gap-1.5 text-zinc-300'>
-                      <span className='size-2 rounded-full bg-zinc-100 ring-1 ring-zinc-700' />
-                      <span>High Intent: US East/West (78% P_conv)</span>
-                    </div>
-                    <div className='flex items-center gap-1.5 text-zinc-300'>
-                      <span className='size-2 rounded-full bg-zinc-400' />
-                      <span>EMEA (56% P_conv)</span>
-                    </div>
-                    <div className='flex items-center gap-1.5 text-zinc-300'>
-                      <span className='size-2 rounded-full bg-zinc-500' />
-                      <span>APAC (44% P_conv)</span>
-                    </div>
-                    <div className='flex items-center gap-1.5 text-zinc-400'>
-                      <span className='size-2 rounded-full bg-zinc-700' />
-                      <span>Suppressed (Underperforming)</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className='w-full grid grid-cols-4 gap-2 pt-3 border-t border-zinc-900 text-center font-mono text-[10px]'>
-                    <div className='p-1.5 rounded bg-zinc-900/50 border border-zinc-800/60 flex flex-col items-center justify-center gap-0.5'>
-                      <div className='flex items-center gap-1 text-zinc-400 font-semibold'>
-                        <PlatformLogo platform='meta' size={11} className='shrink-0' />
-                        <span>META ADS</span>
-                      </div>
-                      <div className='text-zinc-200 font-bold'>US-East / SF</div>
-                    </div>
-                    <div className='p-1.5 rounded bg-zinc-900/50 border border-zinc-800/60 flex flex-col items-center justify-center gap-0.5'>
-                      <div className='flex items-center gap-1 text-zinc-400 font-semibold'>
-                        <PlatformLogo platform='google' size={11} className='shrink-0' />
-                        <span>GOOGLE ADS</span>
-                      </div>
-                      <div className='text-zinc-200 font-bold'>EU / London</div>
-                    </div>
-                    <div className='p-1.5 rounded bg-zinc-900/50 border border-zinc-800/60 flex flex-col items-center justify-center gap-0.5'>
-                      <div className='flex items-center gap-1 text-zinc-400 font-semibold'>
-                        <PlatformLogo platform='amazon' size={11} className='shrink-0' />
-                        <span>AMAZON DSP</span>
-                      </div>
-                      <div className='text-zinc-200 font-bold'>APAC / Tokyo</div>
-                    </div>
-                    <div className='p-1.5 rounded bg-zinc-900/50 border border-zinc-800/60 flex flex-col items-center justify-center gap-0.5'>
-                      <div className='flex items-center gap-1 text-zinc-400 font-semibold'>
-                        <PlatformLogo platform='shopify' size={11} className='shrink-0' />
-                        <span>SHOPIFY D2C</span>
-                      </div>
-                      <div className='text-zinc-200 font-bold'>SEA / Singapore</div>
-                    </div>
-                  </div>
-                )}
+                <span className='text-[11px] text-zinc-500'>
+                  Interactive • Drag to rotate
+                </span>
               </div>
+
+              {/* The Globe */}
+              <div className='w-full min-h-[340px] flex items-center justify-center overflow-x-auto'>
+                <GithubGlobe
+                  size={320}
+                  activeSku={product.sku}
+                  activePlatform={product.platform}
+                  accentColor={isCritical ? [0.95, 0.35, 0.45] : [0.2, 0.85, 0.6]}
+                />
+              </div>
+
+              {/* Channel Strip & Regional PoPs */}
+              <div className='w-full grid grid-cols-4 gap-2 pt-3 border-t border-zinc-900 text-center font-mono text-[10px]'>
+                <div className='p-1.5 rounded bg-zinc-900/50 border border-zinc-800/60 flex flex-col items-center justify-center gap-0.5'>
+                  <div className='flex items-center gap-1 text-zinc-400 font-semibold'>
+                    <PlatformLogo platform='meta' size={11} className='shrink-0' />
+                    <span>META ADS</span>
+                  </div>
+                  <div className='text-zinc-200 font-bold'>US-East / SF</div>
+                </div>
+                <div className='p-1.5 rounded bg-zinc-900/50 border border-zinc-800/60 flex flex-col items-center justify-center gap-0.5'>
+                  <div className='flex items-center gap-1 text-zinc-400 font-semibold'>
+                    <PlatformLogo platform='google' size={11} className='shrink-0' />
+                    <span>GOOGLE ADS</span>
+                  </div>
+                  <div className='text-zinc-200 font-bold'>EU / London</div>
+                </div>
+                <div className='p-1.5 rounded bg-zinc-900/50 border border-zinc-800/60 flex flex-col items-center justify-center gap-0.5'>
+                  <div className='flex items-center gap-1 text-zinc-400 font-semibold'>
+                    <PlatformLogo platform='amazon' size={11} className='shrink-0' />
+                    <span>AMAZON DSP</span>
+                  </div>
+                  <div className='text-zinc-200 font-bold'>APAC / Tokyo</div>
+                </div>
+                <div className='p-1.5 rounded bg-zinc-900/50 border border-zinc-800/60 flex flex-col items-center justify-center gap-0.5'>
+                  <div className='flex items-center gap-1 text-zinc-400 font-semibold'>
+                    <PlatformLogo platform='shopify' size={11} className='shrink-0' />
+                    <span>SHOPIFY D2C</span>
+                  </div>
+                  <div className='text-zinc-200 font-bold'>SEA / Singapore</div>
+                </div>
+              </div>
+            </div>
 
               {/* Right: Product Card & RCA Factor Decomposition */}
               <div className='lg:col-span-5 flex flex-col justify-between h-full space-y-4'>
@@ -503,11 +365,9 @@ export function ProductAnalysisModal({
                 </div>
               </div>
             </div>
-          )}
 
-          {/* SECTION: CONTRIBUTION MARGIN 3 (CM3) WATERFALL (DATASET.MD §3.4) */}
-          {(viewSection === 'all' || viewSection === 'cm3_waterfall') && (
-            <div className='rounded-xl border border-zinc-800 bg-zinc-950/70 p-4 space-y-4 font-mono'>
+          {/* SECTION 2: CONTRIBUTION MARGIN 3 (CM3) WATERFALL (DATASET.MD §3.4) */}
+          <div className='rounded-xl border border-zinc-800 bg-zinc-950/70 p-4 space-y-4 font-mono'>
               <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-900 pb-3'>
                 <div className='flex items-center gap-2.5'>
                   <div className='size-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 shrink-0'>
@@ -725,19 +585,16 @@ export function ProductAnalysisModal({
                 </div>
               )}
             </div>
-          )}
 
-          {/* SECTION 2: REINFORCEMENT LEARNING VISUAL ANALYTICS (FLOWCHARTS, GRAPHS, PIE CHARTS, BAR PLOTS) */}
-          {(viewSection === 'all' || viewSection === 'rl_analytics') && (
-            <div className='pt-2'>
-              <RLVisualAnalytics
-                data={rlData}
-                onApplyAction={() => handleMitigate()}
-              />
-            </div>
-          )}
+          {/* SECTION 3: REINFORCEMENT LEARNING VISUAL ANALYTICS (FLOWCHARTS, GRAPHS, PIE CHARTS, BAR PLOTS) */}
+          <div className='pt-2'>
+            <RLVisualAnalytics
+              data={rlData}
+              onApplyAction={() => handleMitigate()}
+            />
+          </div>
 
-          {/* SECTION 3: CLOSED LOOP PIPELINE STEPS */}
+          {/* SECTION 4: CLOSED LOOP PIPELINE STEPS */}
           <div className='rounded-xl border border-zinc-800 bg-zinc-950/70 p-4'>
             <div className='flex items-center justify-between text-xs font-mono text-zinc-400 mb-3'>
               <span className='font-bold text-zinc-200 uppercase tracking-wider'>

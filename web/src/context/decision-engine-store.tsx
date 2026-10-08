@@ -111,43 +111,6 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // Compute derived products dynamically
-  const products = useMemo(() => {
-    return rawProducts.map((p) => deriveProduct(p));
-  }, [rawProducts]);
-
-  // Compute live reallocations feed dynamically from real product state
-  const reallocations = useMemo(() => {
-    return generateReallocations(products);
-  }, [products]);
-
-  // Top dynamic KPIs
-  const topKpis = useMemo(() => {
-    let totalSpend = 0;
-    let totalRev = 0;
-    let issues = 0;
-    let atRisk = 0;
-
-    for (const p of products) {
-      totalSpend += p.dailySpend;
-      totalRev += p.revenue;
-
-      const needsFix = !p.isFixed && p.status !== 'target met';
-      if (needsFix) {
-        issues += 1;
-        atRisk += p.dailySpend;
-      }
-    }
-
-    const blended = totalSpend > 0 ? totalRev / totalSpend : 0;
-    return {
-      blendedRoas: blended,
-      totalDailySpend: totalSpend,
-      openIssuesCount: issues,
-      spendAtRisk: atRisk,
-    };
-  }, [products]);
-
   // Action: Execute Fix from card
   const executeFix = useCallback((productId: string, plan: FixPlanSummary) => {
     setRawProducts((prev) => {
@@ -235,6 +198,194 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
       localStorage.removeItem(LOCAL_STORAGE_KEY_AUTOPILOT);
     } catch {}
   }, []);
+
+  // Listen for AI Coach operational events and UI actions
+  useEffect(() => {
+    const handleUiAction = (e: Event) => {
+      const customEvent = e as CustomEvent<{ type: string; payload: any }>;
+      const { type, payload } = customEvent.detail || {};
+
+      if (type === 'UPDATE_BUDGET') {
+        const { target, budget } = payload || {};
+        setRawProducts((prev) =>
+          prev.map((p) => {
+            if (
+              p.id === target ||
+              p.sku === target ||
+              p.name.toLowerCase().includes(String(target).toLowerCase())
+            ) {
+              return { ...p, dailySpend: Number(budget) };
+            }
+            return p;
+          })
+        );
+      } else if (type === 'UPDATE_INVENTORY') {
+        const { sku, quantity } = payload || {};
+        setRawProducts((prev) =>
+          prev.map((p) => {
+            if (
+              p.sku === sku ||
+              p.id === sku ||
+              p.name.toLowerCase().includes(String(sku).toLowerCase())
+            ) {
+              return {
+                ...p,
+                inventory: Number(quantity),
+                isFixed: Number(quantity) > 0 ? true : p.isFixed,
+                paused: Number(quantity) > 0 ? false : p.paused,
+              };
+            }
+            return p;
+          })
+        );
+      } else if (type === 'TOGGLE_AUTOPILOT') {
+        toggleAutoPilot(Boolean(payload?.enabled));
+      } else if (type === 'EXECUTE_REALLOCATION') {
+        executeAllReallocations();
+      } else if (type === 'APPLY_FIX') {
+        const { productId } = payload || {};
+        const targetProduct = rawProducts.find(
+          (p) => p.id === productId || p.sku === productId
+        );
+        if (targetProduct) {
+          executeFix(targetProduct.id, {
+            issueType: 'stockout',
+            issueBanner: `AI Coach Fix: ${targetProduct.name}`,
+            evidence: ['Automated mitigation policy executed by AI Coach'],
+            steps: [
+              {
+                title: 'Throttle Bleed & Restock',
+                description: 'Recover ad spend and rebalance inventory',
+                before: 'Active Bleed',
+                after: 'Protected Margin',
+              },
+            ],
+            resultTiles: [
+              { label: 'Margin Recovery', before: '-$840/d', after: '+$975/d' },
+            ],
+            projectionNote: 'Automated mitigation shift to protect contribution margin',
+            receivingProductId: 'prod-02',
+            receivingProductName: 'Nike Zoom Fly',
+            reallocatedSpend: 1148,
+            actionTakenText: 'Shifted capital to scale cluster',
+            outcomeText: 'Recovered margin and restored ROAS floor',
+          });
+        }
+      }
+    };
+
+    const handleBudgetUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<{
+        target: string;
+        budget: number;
+        channel?: string;
+      }>;
+      const { target, budget } = customEvent.detail || {};
+      if (target !== undefined && budget !== undefined) {
+        setRawProducts((prev) =>
+          prev.map((p) => {
+            if (
+              p.id === target ||
+              p.sku === target ||
+              p.name.toLowerCase().includes(String(target).toLowerCase())
+            ) {
+              return { ...p, dailySpend: Number(budget) };
+            }
+            return p;
+          })
+        );
+      }
+    };
+
+    const handleInventoryUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<{
+        sku: string;
+        quantity: number;
+      }>;
+      const { sku, quantity } = customEvent.detail || {};
+      if (sku && quantity !== undefined) {
+        setRawProducts((prev) =>
+          prev.map((p) => {
+            if (
+              p.sku === sku ||
+              p.id === sku ||
+              p.name.toLowerCase().includes(String(sku).toLowerCase())
+            ) {
+              return {
+                ...p,
+                inventory: Number(quantity),
+                isFixed: Number(quantity) > 0 ? true : p.isFixed,
+                paused: Number(quantity) > 0 ? false : p.paused,
+              };
+            }
+            return p;
+          })
+        );
+      }
+    };
+
+    const handleAutopilotToggle = (e: Event) => {
+      const customEvent = e as CustomEvent<{ enabled: boolean }>;
+      if (customEvent.detail?.enabled !== undefined) {
+        toggleAutoPilot(Boolean(customEvent.detail.enabled));
+      }
+    };
+
+    window.addEventListener('nexus:ui_action', handleUiAction);
+    window.addEventListener('nexus:budget_updated', handleBudgetUpdate);
+    window.addEventListener('nexus:inventory_updated', handleInventoryUpdate);
+    window.addEventListener('nexus:autopilot_toggled', handleAutopilotToggle);
+
+    return () => {
+      window.removeEventListener('nexus:ui_action', handleUiAction);
+      window.removeEventListener('nexus:budget_updated', handleBudgetUpdate);
+      window.removeEventListener(
+        'nexus:inventory_updated',
+        handleInventoryUpdate
+      );
+      window.removeEventListener(
+        'nexus:autopilot_toggled',
+        handleAutopilotToggle
+      );
+    };
+  }, [rawProducts, executeFix, executeAllReallocations, toggleAutoPilot]);
+
+  // Compute derived products dynamically
+  const products = useMemo(() => {
+    return rawProducts.map((p) => deriveProduct(p));
+  }, [rawProducts]);
+
+  // Compute live reallocations feed dynamically from real product state
+  const reallocations = useMemo(() => {
+    return generateReallocations(products);
+  }, [products]);
+
+  // Top dynamic KPIs
+  const topKpis = useMemo(() => {
+    let totalSpend = 0;
+    let totalRev = 0;
+    let issues = 0;
+    let atRisk = 0;
+
+    for (const p of products) {
+      totalSpend += p.dailySpend;
+      totalRev += p.revenue;
+
+      const needsFix = !p.isFixed && p.status !== 'target met';
+      if (needsFix) {
+        issues += 1;
+        atRisk += p.dailySpend;
+      }
+    }
+
+    const blended = totalSpend > 0 ? totalRev / totalSpend : 0;
+    return {
+      blendedRoas: blended,
+      totalDailySpend: totalSpend,
+      openIssuesCount: issues,
+      spendAtRisk: atRisk,
+    };
+  }, [products]);
 
   const value = useMemo(
     () => ({

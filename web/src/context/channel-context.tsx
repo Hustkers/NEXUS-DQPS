@@ -86,8 +86,34 @@ export function ChannelProvider({ children }: { children: React.ReactNode }) {
           setChannelState(saved);
         }
       }
+
+      const handleChannelChange = (e: Event) => {
+        const customEvent = e as CustomEvent<{ channel: AdChannel }>;
+        const ch = customEvent.detail?.channel;
+        if (ch && CHANNELS[ch]) {
+          setChannel(ch);
+        }
+      };
+
+      const handleUiAction = (e: Event) => {
+        const customEvent = e as CustomEvent<{ type: string; payload: any }>;
+        if (customEvent.detail?.type === 'FILTER_CHANNEL') {
+          const ch = customEvent.detail.payload?.channel as AdChannel;
+          if (ch && CHANNELS[ch]) {
+            setChannel(ch);
+          }
+        }
+      };
+
+      window.addEventListener('nexus:channel_changed', handleChannelChange);
+      window.addEventListener('nexus:ui_action', handleUiAction);
+
+      return () => {
+        window.removeEventListener('nexus:channel_changed', handleChannelChange);
+        window.removeEventListener('nexus:ui_action', handleUiAction);
+      };
     }
-  }, []);
+  }, [pathname]);
 
   const setChannel = (newChannel: AdChannel) => {
     setChannelState(newChannel);

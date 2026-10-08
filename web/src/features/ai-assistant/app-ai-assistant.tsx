@@ -130,6 +130,9 @@ export function AppAiAssistant() {
                 <span className="text-[9px] font-mono px-1.5 py-0.5 rounded border border-zinc-800 bg-zinc-900 text-zinc-400">
                   CYC-9482 · LIVE
                 </span>
+                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded border border-emerald-800/40 bg-emerald-950/30 text-emerald-400 font-semibold">
+                  gemini-3.8-flash
+                </span>
               </div>
             </div>
 
