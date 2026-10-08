@@ -15,3 +15,4 @@ export * from './cylinder-carousel';
 export * from './why-us-bento';
 export * from './highlight-grid';
 export * from './locomotive-hero-video';
+export * from './faq-accordion';

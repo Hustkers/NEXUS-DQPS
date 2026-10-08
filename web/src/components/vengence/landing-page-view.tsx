@@ -12,6 +12,7 @@ import { AnimatedFooter } from '@/components/ui/animated-footer';
 import { WhyUsBento } from './why-us-bento';
 import { HighlightGrid } from './highlight-grid';
 import { LocomotiveHeroVideo } from './locomotive-hero-video';
+import { FaqAccordion } from './faq-accordion';
 
 export function LandingPageView() {
   return (
@@ -296,6 +297,11 @@ export function LandingPageView() {
 
       {/* WHY US BENTO (CONFIGURED WITH ISOMETRIC VISUALS & TEAM AVATARS) */}
       <WhyUsBento />
+
+      {/* FREQUENTLY ASKED QUESTIONS (VENGENCE UI ACCORDION) */}
+      <section id='faq' className='py-16 md:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-16 relative z-10'>
+        <FaqAccordion />
+      </section>
 
       {/* CINEMATIC ASCII ANIMATED FOOTER (CONFIGURED WITH SHARED TOOLTIP TEAM AVATARS) */}
       <AnimatedFooter
