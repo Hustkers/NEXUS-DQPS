@@ -33,7 +33,7 @@ import {
   Tooltip,
   Legend
 } from 'recharts';
-import type { RLOptimizationResult, HeadroomPolicyMode } from '@/lib/rl-ad-optimizer';
+import { computeRLAdAllocation, type RLOptimizationResult, type HeadroomPolicyMode } from '@/lib/rl-ad-optimizer';
 import { PlatformLogo } from '@/components/icons/platform-logos';
 
 interface RLVisualAnalyticsProps {
@@ -46,13 +46,14 @@ interface RLVisualAnalyticsProps {
 }
 
 export function RLVisualAnalytics({
-  data,
+  data: propData,
   onApplyAction: _onApplyAction,
   className,
   onPolicyModeChange,
   onRetrainBackend,
   isLoading = false,
 }: RLVisualAnalyticsProps) {
+  const [selectedMode, setSelectedMode] = useState<HeadroomPolicyMode>(propData.policyMode || 'BALANCED');
   const [activeTab, setActiveTab] = useState<'flowchart' | 'graphs' | 'pie' | 'bars' | 'all'>('all');
   const [pieMode, setPieMode] = useState<'post' | 'pre'>('post');
   const [isRetraining, setIsRetraining] = useState(false);
@@ -75,7 +76,43 @@ export function RLVisualAnalytics({
     }, 80);
   };
 
-  const currentMode = data.policyMode || 'BALANCED';
+  React.useEffect(() => {
+    if (propData.policyMode && propData.policyMode !== selectedMode) {
+      setSelectedMode(propData.policyMode);
+    }
+  }, [propData.policyMode]);
+
+  const data = React.useMemo(() => {
+    if (propData.policyMode === selectedMode) {
+      return propData;
+    }
+    return computeRLAdAllocation({
+      productName: propData.productName,
+      sku: propData.sku,
+      spend: propData.totalCurrentSpend,
+      inventory: propData.shadowPrices?.lambdaInventory > 10 ? 0 : 300,
+      platform: propData.platform,
+      policyMode: selectedMode,
+    });
+  }, [propData, selectedMode]);
+
+  const currentMode = selectedMode;
+
+  const handleModeSelect = (mode: HeadroomPolicyMode) => {
+    setSelectedMode(mode);
+    onPolicyModeChange?.(mode);
+    toast.info(
+      `Headroom Policy Mode: ${mode === 'AGGRESSIVE_SCALE' ? 'Aggressive Scale' : mode === 'DEFENSIVE_PRESERVATION' ? 'Defensive Preservation' : 'Balanced Q-Bandit'}`,
+      {
+        description:
+          mode === 'AGGRESSIVE_SCALE'
+            ? 'Prioritizing impression share capture (+95% headroom scale, ε=8%)'
+            : mode === 'DEFENSIVE_PRESERVATION'
+            ? 'Safeguarding liquidity floor (-80% risk-zone purge, ε=2%)'
+            : 'Standard Thompson Sampling Q-Bandit balanced allocation (ε=5%)',
+      }
+    );
+  };
   const [isDispatching, setIsDispatching] = useState(false);
   const [lastDispatchReceipt, setLastDispatchReceipt] = useState<string | null>(null);
 
@@ -209,7 +246,7 @@ export function RLVisualAnalytics({
             Headroom Policy Mode:
           </span>
           <button
-            onClick={() => onPolicyModeChange?.('BALANCED')}
+            onClick={() => handleModeSelect('BALANCED')}
             className={cn(
               'px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5',
               currentMode === 'BALANCED'
@@ -221,7 +258,7 @@ export function RLVisualAnalytics({
             <span>Balanced Q-Bandit</span>
           </button>
           <button
-            onClick={() => onPolicyModeChange?.('AGGRESSIVE_SCALE')}
+            onClick={() => handleModeSelect('AGGRESSIVE_SCALE')}
             className={cn(
               'px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5',
               currentMode === 'AGGRESSIVE_SCALE'
@@ -233,7 +270,7 @@ export function RLVisualAnalytics({
             <span>Aggressive Scale</span>
           </button>
           <button
-            onClick={() => onPolicyModeChange?.('DEFENSIVE_PRESERVATION')}
+            onClick={() => handleModeSelect('DEFENSIVE_PRESERVATION')}
             className={cn(
               'px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5',
               currentMode === 'DEFENSIVE_PRESERVATION'

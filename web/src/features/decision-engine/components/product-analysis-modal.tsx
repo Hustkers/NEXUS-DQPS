@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { PlatformLogo } from '@/components/icons/platform-logos';
 import { GithubGlobe } from './github-globe';
 import { RLVisualAnalytics } from './rl-visual-analytics';
-import { computeRLAdAllocation } from '@/lib/rl-ad-optimizer';
+import { computeRLAdAllocation, type HeadroomPolicyMode } from '@/lib/rl-ad-optimizer';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -74,6 +74,7 @@ export function ProductAnalysisModal({
 }: ProductAnalysisModalProps) {
   const [freightZone, setFreightZone] = useState<'zone2' | 'zone8' | 'blended'>('blended');
   const [currencyView, setCurrencyView] = useState<'usd' | 'inr'>('usd');
+  const [policyMode, setPolicyMode] = useState<HeadroomPolicyMode>('BALANCED');
   const [isExecuting, setIsExecuting] = useState(false);
 
   // Compute RL ad allocation data for the product
@@ -86,9 +87,10 @@ export function ProductAnalysisModal({
       spend: product.spend,
       roas: product.roas,
       grossMarginPct: product.grossMarginPct,
-      inventory: product.inventory
+      inventory: product.inventory,
+      policyMode,
     });
-  }, [product]);
+  }, [product, policyMode]);
 
   // Compute Itemized Contribution Margin 3 (CM3) Waterfall from DATASET.md §3.4
   const cm3Data = useMemo(() => {
@@ -330,7 +332,19 @@ export function ProductAnalysisModal({
                   </div>
 
                   <p className='text-xs text-zinc-300 leading-relaxed font-sans bg-zinc-900/60 p-3 rounded-lg border border-zinc-800/80'>
-                    The Reinforcement Learning agent detected <strong className='text-emerald-400'>high marginal headroom in North America</strong> (+68% ad spend) and <strong className='text-rose-400'>slashed low-probability spend in LatAm &amp; SEA</strong> to eliminate negative-ROAS capital bleed.
+                    {policyMode === 'AGGRESSIVE_SCALE' ? (
+                      <>
+                        The <strong className='text-sky-400'>Aggressive Scale Q-Bandit</strong> prioritizes capturing lost impression share (<strong className='text-emerald-400'>+95% scale in high-headroom zones</strong>) and expands discovery budget across unsaturated regions.
+                      </>
+                    ) : policyMode === 'DEFENSIVE_PRESERVATION' ? (
+                      <>
+                        The <strong className='text-amber-400'>Defensive Preservation Q-Bandit</strong> enforces strict breakeven floor (<strong className='text-rose-400'>-80% low-probability purge</strong>) to safeguard cash liquidity and maximize gross contribution.
+                      </>
+                    ) : (
+                      <>
+                        The <strong className='text-emerald-400'>Balanced Q-Bandit</strong> detected high marginal headroom in North America (<strong className='text-emerald-400'>+68% ad spend</strong>) and <strong className='text-rose-400'>slashed low-probability spend in LatAm &amp; SEA</strong> to eliminate negative-ROAS capital bleed.
+                      </>
+                    )}
                   </p>
 
                   <div className='grid grid-cols-2 gap-2 text-xs font-mono'>
@@ -590,6 +604,7 @@ export function ProductAnalysisModal({
           <div className='pt-2'>
             <RLVisualAnalytics
               data={rlData}
+              onPolicyModeChange={setPolicyMode}
               onApplyAction={() => handleMitigate()}
             />
           </div>

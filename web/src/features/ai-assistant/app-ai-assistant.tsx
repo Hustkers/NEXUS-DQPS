@@ -105,12 +105,21 @@ export function AppAiAssistant() {
         </button>
       </div>
 
+      {/* Backdrop blur when Coach Window is open */}
+      {isOpen && (
+        <div
+          onClick={close}
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-200 animate-in fade-in"
+          aria-hidden="true"
+        />
+      )}
+
       {/* Enlarged Minimalist Assistant Window */}
       {isOpen && (
         <div
           role="dialog"
           aria-modal="true"
-          className={`fixed z-50 rounded-xl border border-zinc-800 bg-zinc-950 text-zinc-100 shadow-2xl overflow-hidden flex flex-col transition-all duration-200 animate-in fade-in ${
+          className={`fixed z-50 rounded-xl border border-zinc-700/80 bg-zinc-950/95 backdrop-blur-md text-zinc-100 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.95)] ring-1 ring-white/10 overflow-hidden flex flex-col transition-all duration-200 animate-in fade-in zoom-in-95 ${
             isMaximized
               ? 'inset-3 sm:inset-6 w-auto h-auto max-w-none max-h-none'
               : 'bottom-16 sm:bottom-20 left-1/2 -translate-x-1/2 w-[96vw] max-w-5xl h-[720px] max-h-[88vh]'

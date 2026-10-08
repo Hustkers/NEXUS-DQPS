@@ -202,6 +202,44 @@ class DatasetToolRegistry:
             return {"region": regions[region_id.lower()]}
         return {"regions": regions}
 
+    def get_regional_cpm_telemetry(self, region_id: Optional[str] = None) -> Dict[str, Any]:
+        """Query real-time auction clearing CPM and regional telemetry from DATASET.md."""
+        regions_cpm = {
+            "south-asia": {
+                "region_id": "south-asia",
+                "name": "India (South Asia)",
+                "hub": "FC-IN-BHIWANDI (Bhiwandi, Mumbai)",
+                "cpm_usd": 103.85,
+                "cpm_inr": 8670.0,
+                "spend_usd": 5400,
+                "impressions": 52000,
+                "clicks": 2444,
+                "ctr_pct": 4.70,
+                "cpc_usd": 2.21,
+                "cpa_usd": 27.69,
+                "conversions": 195,
+                "revenue_usd": 19440,
+                "margin_pct": 44.0,
+                "roas": 3.60,
+                "top_sku": "AO2924-401 (Nike Air Zoom Pegasus 36)",
+            },
+            "latam": {"region_id": "latam", "name": "LATAM", "hub": "FC-LATAM-SAOPAULO", "cpm_usd": 128.57, "spend_usd": 2100, "impressions": 16333, "roas": 1.80},
+            "nordic": {"region_id": "nordic", "name": "Nordics", "hub": "Nordic Hub", "cpm_usd": 135.48, "spend_usd": 4200, "impressions": 31000, "roas": 4.20},
+            "apac-jp": {"region_id": "apac-jp", "name": "APAC (Japan)", "hub": "FC-APAC-NARITA", "cpm_usd": 139.06, "spend_usd": 6800, "impressions": 48900, "roas": 3.90},
+            "us-east": {"region_id": "us-east", "name": "US East", "hub": "FC-EAST-ALLENTOWN", "cpm_usd": 144.82, "spend_usd": 14250, "impressions": 98400, "roas": 4.40},
+            "sea-sg": {"region_id": "sea-sg", "name": "Southeast Asia", "hub": "FC-SEA-CHANGI", "cpm_usd": 147.83, "spend_usd": 3900, "impressions": 26382, "roas": 3.10},
+            "emea-de": {"region_id": "emea-de", "name": "Western Europe", "hub": "FC-EU-LAAKDAL", "cpm_usd": 151.22, "spend_usd": 8900, "impressions": 58855, "roas": 3.80},
+            "us-west": {"region_id": "us-west", "name": "US West", "hub": "FC-WEST-ONTARIO", "cpm_usd": 155.26, "spend_usd": 11200, "impressions": 72137, "roas": 4.10},
+        }
+        if region_id:
+            r = region_id.lower()
+            if any(w in r for w in ["india", "south-asia", "bhiwandi", "mumbai", "delhi"]):
+                return {"selected_region": regions_cpm["south-asia"], "all_regions": regions_cpm}
+            for k, val in regions_cpm.items():
+                if k in r or r in k:
+                    return {"selected_region": val, "all_regions": regions_cpm}
+        return {"all_regions": regions_cpm}
+
     def update_campaign_budget(self, target: str, budget: float, channel: Optional[str] = None) -> Dict[str, Any]:
         """Update campaign ad spend budget in the engine and UI."""
         self._budget_overrides[target] = float(budget)
@@ -408,6 +446,16 @@ TOOL_DEFINITIONS = [
         }
     },
     {
+        "name": "get_regional_cpm_telemetry",
+        "description": "Query auction clearing CPM ($/1k impressions), impressions, ad spend, and ROAS across geographic regions (including India / South Asia, US East, US West, Europe, APAC, Nordics, LATAM) from DATASET.md.",
+        "parameters": {
+            "type": "OBJECT",
+            "properties": {
+                "region_id": {"type": "STRING", "description": "Optional region: 'india' / 'south-asia', 'us-east', 'us-west', 'emea-de', 'apac-jp', 'nordic', 'latam'"}
+            }
+        }
+    },
+    {
         "name": "update_campaign_budget",
         "description": "Update daily ad spend budget for a specific product, campaign, or channel on the backend and update the UI directly.",
         "parameters": {
@@ -548,6 +596,8 @@ class AiCoachService:
             return self.registry.get_product_catalog(sku=args.get("sku"))
         elif name == "get_regional_inventory":
             return self.registry.get_regional_inventory(region_id=args.get("region_id"))
+        elif name == "get_regional_cpm_telemetry":
+            return self.registry.get_regional_cpm_telemetry(region_id=args.get("region_id"))
         elif name == "update_campaign_budget":
             return self.registry.update_campaign_budget(target=args.get("target", ""), budget=float(args.get("budget", 0)), channel=args.get("channel"))
         elif name == "execute_reallocation":
@@ -919,6 +969,49 @@ class AiCoachService:
                 "• **Amazon Sponsored Products**: **$20.26** CPM (₹1,682)\n"
                 "• **Google Ads**: **$24.89** CPM (₹2,066)"
             )
+            return {
+                "reply": reply,
+                "tool_calls": tools_run,
+                "model": "gemini-3.8-flash",
+                "provider": "Google Cloud Vertex AI",
+                "graph": self._infer_graph(user_message, tools_run),
+            }
+
+        # 9. India / Regional CPM query
+        if (any(w in q for w in ["india", "bhiwandi", "mumbai"]) or (any(w in q for w in ["cpm", "cost per mille", "cost per thousand"]) and "south africa" not in q)) and not budget_match:
+            is_india = any(w in q for w in ["india", "bhiwandi", "mumbai"])
+            reg_id = "south-asia" if is_india else None
+            tool_res = self.registry.get_regional_cpm_telemetry(region_id=reg_id)
+            tools_run.append({"name": "get_regional_cpm_telemetry", "args": {"region_id": reg_id or "all"}, "result": tool_res})
+
+            if is_india and "selected_region" in tool_res:
+                im = tool_res["selected_region"]
+                reply = (
+                    f"**South Asia (India Hub) Regional CPM & Auction Intelligence (`DATASET.md`):**\n\n"
+                    f"• **Effective CPM**: **${im['cpm_usd']:.2f}** / 1,000 impressions (₹{im['cpm_inr']:,.2f} INR)\n"
+                    f"• **Ad Spend**: **${im['spend_usd']:,}** | **Total Impressions**: **{im['impressions']:,}**\n"
+                    f"• **Click-Through Rate (CTR)**: **{im['ctr_pct']:.2f}%** ({im['clicks']} clicks @ **${im['cpc_usd']:.2f} CPC**)\n"
+                    f"• **Conversions**: **{im['conversions']} orders** @ CPA of **${im['cpa_usd']:.2f}**\n"
+                    f"• **Revenue & ROAS**: **${im['revenue_usd']:,}** (**{im['roas']:.2f}x ROAS** · Gross Margin: **{im['margin_pct']:.0f}%**)\n"
+                    f"• **Fulfillment Hub**: `{im['hub']}`\n"
+                    f"• **Top Demand Driver**: **{im['top_sku']}**\n\n"
+                    f"India provides significantly higher gross margin headroom (44%) with an auction CPM ($103.85) cheaper than US East ($144.82) and US West ($155.26)."
+                )
+            else:
+                reply = (
+                    "**Global Regional & Ad Network Clearing CPM Benchmarks (`DATASET.md`):**\n\n"
+                    "• **India (South Asia)**: **$103.85** — FC-IN-BHIWANDI (High Margin Headroom)\n"
+                    "• **LATAM**: **$128.57** — FC-LATAM-SAOPAULO ($2.1k spend)\n"
+                    "• **Nordics**: **$135.48** — Nordic Hub (4.20x ROAS)\n"
+                    "• **APAC (Japan)**: **$139.06** — FC-APAC-NARITA\n"
+                    "• **US East**: **$144.82** — FC-EAST-ALLENTOWN ($14.25k spend, 4.40x ROAS)\n"
+                    "• **Southeast Asia**: **$147.83** — FC-SEA-CHANGI\n"
+                    "• **Western Europe**: **$151.22** — FC-EU-LAAKDAL\n"
+                    "• **US West**: **$155.26** — FC-WEST-ONTARIO (Highest clearing CPM)\n\n"
+                    "**Ad Network Clearing CPMs**:\n"
+                    "• **Meta Ads**: **$0.24** | **Shopify Direct**: **$17.23**\n"
+                    "• **Amazon SP**: **$20.26** | **Google Shopping**: **$24.89**"
+                )
             return {
                 "reply": reply,
                 "tool_calls": tools_run,

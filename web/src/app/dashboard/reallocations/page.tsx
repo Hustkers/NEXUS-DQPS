@@ -3,12 +3,13 @@
 import React, { useState } from 'react';
 import { ReallocationFeed } from '@/features/decision-engine/components/reallocation-feed';
 import { RLVisualAnalytics } from '@/features/decision-engine/components/rl-visual-analytics';
-import { computeRLAdAllocation } from '@/lib/rl-ad-optimizer';
+import { computeRLAdAllocation, type HeadroomPolicyMode } from '@/lib/rl-ad-optimizer';
 import { IconCpu, IconSparkles } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 
 export default function ReallocationsPage() {
   const [activeView, setActiveView] = useState<'feed' | 'rl_analytics' | 'both'>('both');
+  const [policyMode, setPolicyMode] = useState<HeadroomPolicyMode>('BALANCED');
 
   // Compute portfolio-level RL ad allocation
   const rlData = React.useMemo(() => {
@@ -19,9 +20,10 @@ export default function ReallocationsPage() {
       spend: 18450,
       roas: 2.95,
       grossMarginPct: 62,
-      inventory: 480
+      inventory: 480,
+      policyMode,
     });
-  }, []);
+  }, [policyMode]);
 
   return (
     <div className='flex flex-1 flex-col gap-6 p-4 md:p-6 bg-background text-foreground min-h-screen font-sans'>
@@ -73,7 +75,10 @@ export default function ReallocationsPage() {
       {/* RL Analytics Suite */}
       {(activeView === 'both' || activeView === 'rl_analytics') && (
         <div className='relative rounded-2xl border border-border/80 bg-card p-4 sm:p-5 shadow-xs overflow-hidden before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/35 dark:before:via-white/10 before:to-transparent'>
-          <RLVisualAnalytics data={rlData} />
+          <RLVisualAnalytics
+            data={rlData}
+            onPolicyModeChange={setPolicyMode}
+          />
         </div>
       )}
 
