@@ -949,14 +949,9 @@ body.vengence-dashboard-active code * {
 }
 
 /* ==========================================================================
-   StackedLogos Animation & Glow Rules
+   StackedLogos Glow Rules
    ========================================================================== */
 .stacked-logos {
-  --duration: 24;
-  --items: 4;
-  --lists: 6;
-  --stagger: 1.2;
-  --logo-width: 200px;
   --mouse-x: 0px;
   --mouse-y: 0px;
 }
@@ -967,65 +962,6 @@ body.vengence-dashboard-active code * {
 
 .stacked-logos:hover .stacked-logos__border-glow {
   opacity: 1;
-}
-
-.stacked-logos__item {
-  opacity: 0;
-  pointer-events: none;
-  animation-name: stacked-logos-appear;
-  animation-duration: calc(var(--duration, 24) * 1s);
-  animation-fill-mode: both;
-  animation-iteration-count: infinite;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: opacity, transform, filter;
-}
-
-@keyframes stacked-logos-appear {
-  0% {
-    opacity: 0;
-    transform: translateY(8px) scale(0.96);
-    filter: blur(4px);
-    pointer-events: none;
-  }
-  3% {
-    opacity: 1;
-    transform: translateY(0px) scale(1);
-    filter: blur(0px);
-    pointer-events: auto;
-  }
-  22% {
-    opacity: 1;
-    transform: translateY(0px) scale(1);
-    filter: blur(0px);
-    pointer-events: auto;
-  }
-  25% {
-    opacity: 0;
-    transform: translateY(-8px) scale(0.96);
-    filter: blur(4px);
-    pointer-events: none;
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-8px) scale(0.96);
-    filter: blur(4px);
-    pointer-events: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .stacked-logos__item {
-    animation: none !important;
-  }
-  .stacked-logos__item:first-child {
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    transform: none !important;
-    filter: none !important;
-  }
-  .stacked-logos__item:not(:first-child) {
-    display: none !important;
-  }
 }
 
 /* ==========================================================================

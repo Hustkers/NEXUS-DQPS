@@ -6,18 +6,20 @@ import { cn } from "@/lib/utils";
 /* =============================================================================
    StackedLogos Component (Full-Bleed Responsive Grid)
    
-   Multiple logo sets that animate in/out while stacked on top of each other.
+   Multiple logo sets that smoothly rotate while stacked on top of each other.
    Supports edge-to-edge full length spanning (extreme left to right) and
    dead-center alignment within every box.
    
-   Mathematically synchronized CSS animation guarantees that EXACTLY ONE brand
-   is visible at any given moment per cell, eliminating overlapping and smudged text.
+   State-controlled rotation guarantees that EXACTLY ONE brand is visible at any
+   moment per cell, making overlapping or smudged brand text physically impossible.
 ============================================================================= */
 
 export interface StackedLogosProps {
   /** Array of logo groups - each group is an array of React nodes */
   logoGroups: React.ReactNode[][];
-  /** Animation duration in seconds for a full cycle. Default: 24 */
+  /** Interval in milliseconds between logo rotations. Default: 3600 */
+  intervalMs?: number;
+  /** Animation duration in seconds (legacy prop). Default: 24 */
   duration?: number;
   /** Stagger factor for animation timing between groups. Default: 0 */
   stagger?: number;
@@ -29,11 +31,9 @@ export interface StackedLogosProps {
   className?: string;
 }
 
-/**
- * StackedLogos Component
- */
 export const StackedLogos = ({
   logoGroups,
+  intervalMs = 3600,
   duration = 24,
   stagger = 0,
   logoWidth = "200px",
@@ -45,13 +45,19 @@ export const StackedLogos = ({
   const containerRef = React.useRef<HTMLDivElement>(null);
   const gridRef = React.useRef<HTMLDivElement>(null);
 
-  // Stagger delays calculated in JavaScript to guarantee cross-browser timing precision
-  const baseDelays = React.useMemo(() => {
-    return logoGroups.map((_, groupIndex) => {
-      if (!stagger || columns <= 1) return 0;
-      return Math.sin((groupIndex / columns) * (Math.PI / 4)) * stagger;
-    });
-  }, [logoGroups, columns, stagger]);
+  // Controlled active index state guarantees zero overlapping brand rendering
+  const [activeStep, setActiveStep] = React.useState(0);
+  const [isPaused, setIsPaused] = React.useState(false);
+
+  React.useEffect(() => {
+    if (isPaused || itemCount <= 1) return;
+
+    const timer = setInterval(() => {
+      setActiveStep((prev) => (prev + 1) % itemCount);
+    }, intervalMs);
+
+    return () => clearInterval(timer);
+  }, [isPaused, itemCount, intervalMs]);
 
   // Track mouse position for radial border & background glow
   const handleMouseMove = React.useCallback(
@@ -71,98 +77,30 @@ export const StackedLogos = ({
   const cellHeight = 136;
   const colWidthCalc = fullWidth ? `calc(100% / ${columns})` : logoWidth;
 
-  // Keyframe percentages calculated for the exact number of items:
-  // For 4 items: p = 25% window per item. Fades in in 3%, stays solid for 19%, fades out in 3%.
-  const p = 100 / itemCount;
-  const fadeInEnd = Number((p * 0.12).toFixed(2));
-  const fadeOutStart = Number((p * 0.88).toFixed(2));
-  const fadeOutEnd = Number(p.toFixed(2));
-
   return (
     <div
       ref={containerRef}
-      className={cn("stacked-logos relative w-full overflow-hidden", className)}
+      className={cn("stacked-logos relative w-full overflow-hidden select-none", className)}
       style={
         {
-          "--duration": duration,
-          "--items": itemCount,
-          "--lists": columns,
-          "--stagger": stagger,
+          "--mouse-x": "0px",
+          "--mouse-y": "0px",
           "--logo-width": fullWidth ? colWidthCalc : logoWidth,
           "--cell-height": `${cellHeight}px`,
         } as React.CSSProperties
       }
       onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Self-contained animations ensuring zero smudging or overlapping */}
       <style
         dangerouslySetInnerHTML={{
           __html: `
             .stacked-logos:hover .stacked-logos__glow {
               opacity: 1;
             }
-
             .stacked-logos:hover .stacked-logos__border-glow {
               opacity: 1;
-            }
-
-            .stacked-logos__item {
-              opacity: 0;
-              pointer-events: none;
-              animation-name: stacked-logos-appear;
-              animation-duration: ${duration}s;
-              animation-fill-mode: both;
-              animation-iteration-count: infinite;
-              animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-              will-change: opacity, transform, filter;
-            }
-
-            @keyframes stacked-logos-appear {
-              0% {
-                opacity: 0;
-                transform: translateY(8px) scale(0.96);
-                filter: blur(4px);
-                pointer-events: none;
-              }
-              ${fadeInEnd}% {
-                opacity: 1;
-                transform: translateY(0px) scale(1);
-                filter: blur(0px);
-                pointer-events: auto;
-              }
-              ${fadeOutStart}% {
-                opacity: 1;
-                transform: translateY(0px) scale(1);
-                filter: blur(0px);
-                pointer-events: auto;
-              }
-              ${fadeOutEnd}% {
-                opacity: 0;
-                transform: translateY(-8px) scale(0.96);
-                filter: blur(4px);
-                pointer-events: none;
-              }
-              100% {
-                opacity: 0;
-                transform: translateY(-8px) scale(0.96);
-                filter: blur(4px);
-                pointer-events: none;
-              }
-            }
-
-            @media (prefers-reduced-motion: reduce) {
-              .stacked-logos__item {
-                animation: none !important;
-              }
-              .stacked-logos__item:first-child {
-                opacity: 1 !important;
-                pointer-events: auto !important;
-                transform: none !important;
-                filter: none !important;
-              }
-              .stacked-logos__item:not(:first-child) {
-                display: none !important;
-              }
             }
           `,
         }}
@@ -220,46 +158,35 @@ export const StackedLogos = ({
 
         {/* Logo Groups (Columns) */}
         {logoGroups.map((logos, groupIndex) => {
-          const baseDelay = baseDelays[groupIndex] || 0;
+          // Offsets each column so different brands display across the ribbon simultaneously
+          const currentVisibleIndex = (activeStep + groupIndex) % logos.length;
 
           return (
             <div
               key={groupIndex}
-              className="stacked-logos__cell relative grid min-h-[110px] sm:min-h-[128px] md:min-h-[136px]"
-              style={
-                {
-                  "--index": groupIndex,
-                  gridTemplate: "1fr / 1fr",
-                } as React.CSSProperties
-              }
+              className="stacked-logos__cell relative h-[120px] sm:h-[136px] w-full overflow-hidden flex items-center justify-center"
             >
               {/* Theme-aware vertical divider line */}
-              <div className="absolute top-0 bottom-0 right-0 w-px bg-border/60" />
+              <div className="absolute top-0 bottom-0 right-0 w-px bg-border/60 pointer-events-none" />
               {groupIndex === 0 && (
-                <div className="absolute top-0 bottom-0 left-0 w-px bg-border/60" />
+                <div className="absolute top-0 bottom-0 left-0 w-px bg-border/60 pointer-events-none" />
               )}
 
-              {/* Stacked rotating logos centered inside cell */}
+              {/* Stacked rotating logos centered inside cell with strict single-item visibility */}
               {logos.map((logo, logoIndex) => {
-                // Precise negative animation-delay: each item enters its active window sequentially
-                const itemDelay =
-                  (duration / itemCount) * (itemCount - logoIndex) * -1 +
-                  baseDelay;
+                const isCurrent = logoIndex === currentVisibleIndex;
 
                 return (
                   <div
                     key={logoIndex}
-                    className="stacked-logos__item col-start-1 row-start-1 flex items-center justify-center py-8 sm:py-10 md:py-12 px-3 sm:px-6 w-full h-full text-center select-none"
-                    data-logo
-                    style={
-                      {
-                        "--i": logoIndex,
-                        animationDelay: `${itemDelay.toFixed(3)}s`,
-                        WebkitAnimationDelay: `${itemDelay.toFixed(3)}s`,
-                      } as React.CSSProperties
-                    }
+                    className={cn(
+                      "absolute inset-0 flex items-center justify-center px-4 w-full h-full text-center select-none transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
+                      isCurrent
+                        ? "opacity-100 scale-100 translate-y-0 filter-none pointer-events-auto visible z-10"
+                        : "opacity-0 scale-95 translate-y-3 blur-[4px] pointer-events-none invisible z-0"
+                    )}
                   >
-                    <div className="stacked-logos__logo w-full flex items-center justify-center text-center">
+                    <div className="w-full flex items-center justify-center text-center">
                       {logo}
                     </div>
                   </div>

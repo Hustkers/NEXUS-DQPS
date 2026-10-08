@@ -145,6 +145,28 @@ export default function GlobeIntelligencePage() {
         </div>
       </div>
 
+      {/* Stockout Emergency Override Banner */}
+      {(selectedProduct.inventory ?? 0) <= 0 && (
+        <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl border border-rose-500/80 bg-rose-950/40 text-rose-200 font-mono text-xs animate-pulse'>
+          <div className='flex items-center gap-2.5'>
+            <span className='size-2.5 rounded-full bg-rose-500 animate-ping shrink-0' />
+            <span className='font-bold uppercase tracking-wider text-rose-300'>
+              PRISONER&apos;S DILEMMA OVERRIDE • STOCKOUT EMERGENCY (0 UNITS)
+            </span>
+            <span className='text-rose-400/80 hidden md:inline'>•</span>
+            <span className='text-rose-300 hidden md:inline'>
+              Dual Shadow Price: <code className='font-bold text-rose-100'>&lambda;_inv = 999.0</code> (Ad Spend Frozen)
+            </span>
+          </div>
+          <div className='flex items-center gap-2 text-rose-200 font-semibold shrink-0'>
+            <span className='text-zinc-400'>Bleed Protected:</span>
+            <span className='text-white font-bold bg-rose-900/80 px-2 py-0.5 rounded border border-rose-700'>
+              $840/day (₹70,560/d)
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Omnichannel Campaign Command Strip & 40-Catalog Trigger */}
       <div className='flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 p-3 rounded-xl border border-border bg-card/80 font-mono text-xs'>
         {/* Active Selected Campaign Banner */}
@@ -164,8 +186,9 @@ export default function GlobeIntelligencePage() {
                 {selectedProduct.sku}
               </span>
               {(selectedProduct.inventory ?? 0) <= 0 ? (
-                <span className='text-[9px] px-1.5 py-0.2 rounded bg-rose-950/80 border border-rose-800 text-rose-300 font-bold'>
-                  0 Units (Stockout Shock)
+                <span className='text-[9px] px-1.5 py-0.2 rounded bg-rose-950/80 border border-rose-800 text-rose-300 font-bold flex items-center gap-1'>
+                  <span className='size-1.5 rounded-full bg-rose-500 animate-ping shrink-0' />
+                  0 Units (Stockout Shock • &lambda;_inv = 999.0)
                 </span>
               ) : (
                 <span className='text-[9px] px-1.5 py-0.2 rounded bg-zinc-900 border border-zinc-800 text-zinc-400'>
@@ -173,10 +196,13 @@ export default function GlobeIntelligencePage() {
                 </span>
               )}
             </div>
-            <div className='flex items-center gap-2 text-[11px] text-zinc-400 mt-0.5'>
+            <div className='flex items-center gap-2 text-[11px] text-zinc-400 mt-0.5 flex-wrap'>
               <span className='uppercase text-zinc-500 font-semibold'>{selectedProduct.platform}</span>
               <span>•</span>
-              <span>Spend: <span className='text-zinc-200 font-bold'>${selectedProduct.currentDailySpend?.toLocaleString()}/d</span></span>
+              <span>
+                Spend: <span className='text-zinc-200 font-bold'>${selectedProduct.currentDailySpend?.toLocaleString()}/d</span>
+                <span className='text-zinc-500 text-[10px] ml-1'>(₹{(Math.round((selectedProduct.currentDailySpend ?? 0) * 84)).toLocaleString('en-IN')}/d)</span>
+              </span>
               <span>•</span>
               <span>ROAS: <span className={cn('font-bold', selectedProduct.roas >= 3.2 ? 'text-emerald-400' : selectedProduct.roas < 1.8 ? 'text-rose-400' : 'text-amber-400')}>{selectedProduct.roas?.toFixed(2)}x</span></span>
             </div>
@@ -187,7 +213,11 @@ export default function GlobeIntelligencePage() {
         <div className='flex items-center gap-2 overflow-x-auto'>
           {/* Quick representatives across platforms */}
           <div className='hidden xl:flex items-center gap-1.5 text-[11px]'>
-            {initialEngineState.campaigns.slice(0, 4).map((c) => (
+            {(
+              ['meta-315122-001', 'amazon-310805-137', 'google-942851-002', 'shopify-AH8050-100']
+                .map((id) => initialEngineState.campaigns.find((c) => c.campaign === id))
+                .filter(Boolean) as EngineCampaign[]
+            ).map((c) => (
               <button
                 key={c.campaign}
                 onClick={() => setSelectedProduct(c)}
@@ -200,6 +230,9 @@ export default function GlobeIntelligencePage() {
               >
                 <PlatformLogo platform={c.platform} size={12} />
                 <span className='truncate max-w-[110px]'>{c.productName || c.sku}</span>
+                {c.inventory === 0 && (
+                  <span className='size-1.5 rounded-full bg-rose-500 animate-pulse' />
+                )}
               </button>
             ))}
           </div>

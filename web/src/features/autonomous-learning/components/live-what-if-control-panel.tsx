@@ -143,15 +143,17 @@ export function LiveWhatIfControlPanel({
               ${inputs.totalBudget.toLocaleString('en-US')}
             </span>
           </div>
-          <input
-            type='range'
-            min={40000}
-            max={350000}
-            step={5000}
-            value={inputs.totalBudget}
-            onChange={(e) => updateField('totalBudget', Number(e.target.value))}
-            className='w-full accent-zinc-900 dark:accent-zinc-100 h-1 bg-zinc-200 dark:bg-zinc-800 rounded cursor-pointer'
-          />
+          <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
+            <input
+              type='range'
+              min={40000}
+              max={350000}
+              step={5000}
+              value={inputs.totalBudget}
+              onChange={(e) => updateField('totalBudget', Number(e.target.value))}
+              className='w-full accent-zinc-900 dark:accent-zinc-100 h-1 bg-zinc-200 dark:bg-zinc-800 rounded cursor-pointer'
+            />
+          </div>
           <span className='text-[9px] text-zinc-500 font-mono block'>Operating range: $40k to $350k</span>
         </div>
 
@@ -163,15 +165,17 @@ export function LiveWhatIfControlPanel({
               {inputs.cpcShiftPct > 0 ? '+' : ''}{inputs.cpcShiftPct}%
             </span>
           </div>
-          <input
-            type='range'
-            min={-40}
-            max={80}
-            step={5}
-            value={inputs.cpcShiftPct}
-            onChange={(e) => updateField('cpcShiftPct', Number(e.target.value))}
-            className='w-full accent-zinc-900 dark:accent-zinc-100 h-1 bg-zinc-200 dark:bg-zinc-800 rounded cursor-pointer'
-          />
+          <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
+            <input
+              type='range'
+              min={-40}
+              max={80}
+              step={5}
+              value={inputs.cpcShiftPct}
+              onChange={(e) => updateField('cpcShiftPct', Number(e.target.value))}
+              className='w-full accent-zinc-900 dark:accent-zinc-100 h-1 bg-zinc-200 dark:bg-zinc-800 rounded cursor-pointer'
+            />
+          </div>
           <span className='text-[9px] text-zinc-500 block'>Auction bid competition</span>
         </div>
 
@@ -183,15 +187,17 @@ export function LiveWhatIfControlPanel({
               {inputs.cvrShiftPct > 0 ? '+' : ''}{inputs.cvrShiftPct}%
             </span>
           </div>
-          <input
-            type='range'
-            min={-50}
-            max={50}
-            step={5}
-            value={inputs.cvrShiftPct}
-            onChange={(e) => updateField('cvrShiftPct', Number(e.target.value))}
-            className='w-full accent-zinc-900 dark:accent-zinc-100 h-1 bg-zinc-200 dark:bg-zinc-800 rounded cursor-pointer'
-          />
+          <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
+            <input
+              type='range'
+              min={-50}
+              max={50}
+              step={5}
+              value={inputs.cvrShiftPct}
+              onChange={(e) => updateField('cvrShiftPct', Number(e.target.value))}
+              className='w-full accent-zinc-900 dark:accent-zinc-100 h-1 bg-zinc-200 dark:bg-zinc-800 rounded cursor-pointer'
+            />
+          </div>
           <span className='text-[9px] text-zinc-500 block'>Shopper checkout elasticity</span>
         </div>
 
@@ -203,15 +209,17 @@ export function LiveWhatIfControlPanel({
               {inputs.grossMarginShiftPct > 0 ? '+' : ''}{inputs.grossMarginShiftPct}%
             </span>
           </div>
-          <input
-            type='range'
-            min={-20}
-            max={20}
-            step={2}
-            value={inputs.grossMarginShiftPct}
-            onChange={(e) => updateField('grossMarginShiftPct', Number(e.target.value))}
-            className='w-full accent-zinc-900 dark:accent-zinc-100 h-1 bg-zinc-200 dark:bg-zinc-800 rounded cursor-pointer'
-          />
+          <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
+            <input
+              type='range'
+              min={-20}
+              max={20}
+              step={2}
+              value={inputs.grossMarginShiftPct}
+              onChange={(e) => updateField('grossMarginShiftPct', Number(e.target.value))}
+              className='w-full accent-zinc-900 dark:accent-zinc-100 h-1 bg-zinc-200 dark:bg-zinc-800 rounded cursor-pointer'
+            />
+          </div>
           <span className='text-[9px] text-zinc-500 block'>ERP unit COGS perturbation</span>
         </div>
 
@@ -223,15 +231,17 @@ export function LiveWhatIfControlPanel({
               {inputs.inventoryShockPct > 0 ? '+' : ''}{inputs.inventoryShockPct}%
             </span>
           </div>
-          <input
-            type='range'
-            min={-100}
-            max={50}
-            step={10}
-            value={inputs.inventoryShockPct}
-            onChange={(e) => updateField('inventoryShockPct', Number(e.target.value))}
-            className='w-full accent-zinc-900 dark:accent-zinc-100 h-1 bg-zinc-200 dark:bg-zinc-800 rounded cursor-pointer'
-          />
+          <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
+            <input
+              type='range'
+              min={-100}
+              max={50}
+              step={10}
+              value={inputs.inventoryShockPct}
+              onChange={(e) => updateField('inventoryShockPct', Number(e.target.value))}
+              className='w-full accent-zinc-900 dark:accent-zinc-100 h-1 bg-zinc-200 dark:bg-zinc-800 rounded cursor-pointer'
+            />
+          </div>
           <span className='text-[9px] text-zinc-500 block'>Warehouse buffer perturbation</span>
         </div>
 
@@ -243,15 +253,17 @@ export function LiveWhatIfControlPanel({
               {inputs.creativeFatigueDays} Days
             </span>
           </div>
-          <input
-            type='range'
-            min={0}
-            max={30}
-            step={1}
-            value={inputs.creativeFatigueDays}
-            onChange={(e) => updateField('creativeFatigueDays', Number(e.target.value))}
-            className='w-full accent-zinc-900 dark:accent-zinc-100 h-1 bg-zinc-200 dark:bg-zinc-800 rounded cursor-pointer'
-          />
+          <div className='px-1.5 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 shadow-inner flex items-center'>
+            <input
+              type='range'
+              min={0}
+              max={30}
+              step={1}
+              value={inputs.creativeFatigueDays}
+              onChange={(e) => updateField('creativeFatigueDays', Number(e.target.value))}
+              className='w-full accent-zinc-900 dark:accent-zinc-100 h-1 bg-zinc-200 dark:bg-zinc-800 rounded cursor-pointer'
+            />
+          </div>
           <span className='text-[9px] text-zinc-500 block'>Adstock wearout decay</span>
         </div>
       </div>
