@@ -95,7 +95,7 @@ export default function GaugesPage() {
         <div>
           <div className='flex items-center gap-2'>
             <Icons.trendingUp className='size-5 text-zinc-100' />
-            <h1 className='text-lg md:text-xl font-semibold text-zinc-100 uppercase tracking-tight'>
+            <h1 className='text-xl sm:text-2xl font-semibold text-zinc-100 tracking-tight'>
               ROAS &amp; Health Gauges
             </h1>
             <span className='text-[10px] bg-zinc-900 border border-zinc-800 text-zinc-400 px-2 py-0.5 rounded font-mono'>

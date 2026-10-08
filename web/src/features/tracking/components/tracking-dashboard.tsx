@@ -168,13 +168,13 @@ export function TrackingDashboard() {
       {/* Top Header & Attribution Switcher */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight">Visitor Tracking & Attribution Engine</h1>
-            <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 bg-emerald-500/10">
-              Zero Fingerprinting
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Visitor Attribution</h1>
+            <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 bg-emerald-500/10 text-[10px] font-mono">
+              Zero Fingerprint
             </Badge>
-            <Badge variant="outline" className="border-blue-500/30 text-blue-600 bg-blue-500/10">
-              SHA-256 Identity Stitching
+            <Badge variant="outline" className="border-blue-500/30 text-blue-600 bg-blue-500/10 text-[10px] font-mono">
+              SHA-256 Stitching
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground mt-1">

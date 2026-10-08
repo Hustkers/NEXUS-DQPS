@@ -158,13 +158,13 @@ export default function AnomaliesPage() {
       <div className='flex flex-wrap items-center justify-between gap-4 border-b border-border/80 pb-4'>
         <div>
           <div className='flex items-center gap-2'>
-            <Icons.warning className='size-5 text-foreground' />
-            <h1 className='text-xl font-mono font-bold text-foreground uppercase tracking-tight'>
-              Diagnostic Root-Cause Analysis (RCA) &amp; Anomalies
+            <Icons.warning className='size-5 text-amber-500' />
+            <h1 className='text-xl sm:text-2xl font-semibold text-foreground tracking-tight font-sans'>
+              Diagnostic Anomalies &amp; RCA
             </h1>
           </div>
-          <p className='text-xs font-mono text-muted-foreground mt-1'>
-            4-Week Rolling Empirical Baselines • IsolationForest &amp; Z-Score Attribution (|Z| &gt; 2.2)
+          <p className='text-xs text-muted-foreground mt-1'>
+            4-week rolling empirical baselines with IsolationForest and Z-score attribution (|Z| &gt; 2.2).
           </p>
         </div>
 
