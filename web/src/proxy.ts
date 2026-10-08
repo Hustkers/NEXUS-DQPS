@@ -1,10 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export default function proxy(request: NextRequest) {
-  if (request.nextUrl.pathname === '/dashboard/ad-playground') {
-    return NextResponse.rewrite(new URL('/dashboard/playground', request.url));
-  }
+export default function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
