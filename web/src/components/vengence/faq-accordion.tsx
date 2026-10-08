@@ -51,7 +51,7 @@ export const NEXUS_FAQ_ITEMS: FaqItem[] = [
 export function FaqAccordion({
   items = NEXUS_FAQ_ITEMS,
   title = 'Frequently Asked Questions',
-  badge = 'ARCHITECTURE & GOVERNANCE FAQ',
+  badge,
   subtitle = 'Clear answers on our deterministic solver, causal DAG root-cause attribution, zero-cookie hardware stitcher, and autonomous execution guardrails.',
   className,
   ...props
@@ -64,13 +64,8 @@ export function FaqAccordion({
 
   return (
     <div className={cn('w-full max-w-4xl mx-auto py-8 relative font-sans', className)} {...props}>
-      {(badge || title || subtitle) && (
+      {(title || subtitle) && (
         <div className='text-center max-w-3xl mx-auto mb-10 sm:mb-14'>
-          {badge && (
-            <div className='inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-primary text-xs font-mono tracking-wider uppercase mb-3'>
-              <span>●</span> {badge}
-            </div>
-          )}
           {title && (
             <h2 className='text-3xl md:text-4xl font-orbitron font-extrabold tracking-tight text-foreground mb-4'>
               {title}

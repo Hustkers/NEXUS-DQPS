@@ -17,6 +17,16 @@ import {
   BarChart,
   Bar
 } from 'recharts';
+import {
+  IconShare,
+  IconShieldCheck,
+  IconMathFunction,
+  IconTerminal
+} from '@tabler/icons-react';
+import { FingerprintNetworkGraph } from './fingerprint-network-graph';
+import { FingerprintEntropyLab } from './fingerprint-entropy-lab';
+import { FingerprintDefenseSimulator } from './fingerprint-defense-simulator';
+import { FingerprintStudentCodeLab } from './fingerprint-student-code-lab';
 
 /**
  * 1. DETERMINISTIC HARDWARE SIGNATURES
@@ -153,7 +163,9 @@ export function FingerprintTrackerDemo() {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [showTechnicalSignals, setShowTechnicalSignals] = useState<boolean>(false);
   const [showDataLineage, setShowDataLineage] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'visual' | 'graph' | 'telemetry' | 'code'>('visual');
+  const [activeTab, setActiveTab] = useState<
+    'ngraph' | 'entropy_lab' | 'defense' | 'journey' | 'code_lab' | 'telemetry' | 'code'
+  >('ngraph');
   const [copiedFp, setCopiedFp] = useState<boolean>(false);
 
   // Exact deterministic financial derivations from transaction fixture
@@ -1094,57 +1106,114 @@ export function FingerprintTrackerDemo() {
         {/* Tab navigation headers */}
         <div className='flex items-center gap-1 p-2 bg-[#000000] border-b border-[#8A8A8A]/30 text-xs font-mono overflow-x-auto'>
           <button
-            onClick={() => setActiveTab('visual')}
+            onClick={() => setActiveTab('ngraph')}
             className={cn(
-              'px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 shrink-0',
-              activeTab === 'visual'
-                ? 'bg-[#FFFFFF] text-[#000000] font-bold'
+              'px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 shrink-0 font-bold',
+              activeTab === 'ngraph'
+                ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20'
                 : 'text-[#8A8A8A] hover:text-[#FFFFFF] hover:bg-[#1A1A1A]'
             )}
           >
-            <Icons.laptop className='size-3.5' />
-            1. Screen Simulation ({currentStepData.shortStage})
+            <IconShare className='size-3.5 text-purple-300' />
+            1. Interactive N-Graph (DAG Topology)
           </button>
           <button
-            onClick={() => setActiveTab('graph')}
+            onClick={() => setActiveTab('entropy_lab')}
             className={cn(
-              'px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 shrink-0',
-              activeTab === 'graph'
-                ? 'bg-[#FFFFFF] text-[#000000] font-bold'
+              'px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 shrink-0 font-bold',
+              activeTab === 'entropy_lab'
+                ? 'bg-amber-600 text-white shadow-lg shadow-amber-500/20'
                 : 'text-[#8A8A8A] hover:text-[#FFFFFF] hover:bg-[#1A1A1A]'
             )}
           >
-            <Icons.topology className='size-3.5' />
-            2. Multi-Touch Identity Graph
+            <IconMathFunction className='size-3.5 text-amber-300' />
+            2. Student Entropy Lab (Live Browser Test)
+          </button>
+          <button
+            onClick={() => setActiveTab('defense')}
+            className={cn(
+              'px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 shrink-0 font-bold',
+              activeTab === 'defense'
+                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                : 'text-[#8A8A8A] hover:text-[#FFFFFF] hover:bg-[#1A1A1A]'
+            )}
+          >
+            <IconShieldCheck className='size-3.5 text-emerald-300' />
+            3. Privacy Defense Sandbox (Brave/Firefox/Tor)
+          </button>
+          <button
+            onClick={() => setActiveTab('journey')}
+            className={cn(
+              'px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 shrink-0 font-bold',
+              activeTab === 'journey'
+                ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/20'
+                : 'text-[#8A8A8A] hover:text-[#FFFFFF] hover:bg-[#1A1A1A]'
+            )}
+          >
+            <Icons.laptop className='size-3.5 text-cyan-300' />
+            4. Closed-Loop Journey ({currentStepData.shortStage})
+          </button>
+          <button
+            onClick={() => setActiveTab('code_lab')}
+            className={cn(
+              'px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 shrink-0 font-bold',
+              activeTab === 'code_lab'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                : 'text-[#8A8A8A] hover:text-[#FFFFFF] hover:bg-[#1A1A1A]'
+            )}
+          >
+            <IconTerminal className='size-3.5 text-indigo-300' />
+            5. Student Code &amp; Math Reference
           </button>
           <button
             onClick={() => setActiveTab('telemetry')}
             className={cn(
-              'px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 shrink-0',
+              'px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 shrink-0 font-bold',
               activeTab === 'telemetry'
-                ? 'bg-[#FFFFFF] text-[#000000] font-bold'
+                ? 'bg-[#FFFFFF] text-[#000000]'
                 : 'text-[#8A8A8A] hover:text-[#FFFFFF] hover:bg-[#1A1A1A]'
             )}
           >
             <Icons.code className='size-3.5' />
-            3. Telemetry Stream
+            6. DuckDB Telemetry
           </button>
           <button
             onClick={() => setActiveTab('code')}
             className={cn(
-              'px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 shrink-0',
+              'px-3.5 py-2 rounded-lg transition-colors flex items-center gap-2 shrink-0 font-bold',
               activeTab === 'code'
-                ? 'bg-[#FFFFFF] text-[#000000] font-bold'
+                ? 'bg-[#FFFFFF] text-[#000000]'
                 : 'text-[#8A8A8A] hover:text-[#FFFFFF] hover:bg-[#1A1A1A]'
             )}
           >
             <Icons.file className='size-3.5' />
-            4. Cookieless SDK &amp; SQL Query
+            7. Cookieless SDK &amp; SQL
           </button>
         </div>
 
-        {/* TAB 1: VISUAL SIMULATION VIEW */}
-        {activeTab === 'visual' && (
+        {/* TAB 1: INTERACTIVE MULTI-NODE N-GRAPH */}
+        {activeTab === 'ngraph' && (
+          <div className='p-5'>
+            <FingerprintNetworkGraph />
+          </div>
+        )}
+
+        {/* TAB 2: STUDENT ENTROPY LAB & LIVE IN-BROWSER EXTRACTOR */}
+        {activeTab === 'entropy_lab' && (
+          <div className='p-5'>
+            <FingerprintEntropyLab />
+          </div>
+        )}
+
+        {/* TAB 3: PRIVACY DEFENSE SIMULATOR (BRAVE/FIREFOX/TOR) */}
+        {activeTab === 'defense' && (
+          <div className='p-5'>
+            <FingerprintDefenseSimulator />
+          </div>
+        )}
+
+        {/* TAB 4: CLOSED-LOOP JOURNEY SIMULATION */}
+        {activeTab === 'journey' && (
           <div className='p-5 grid grid-cols-1 lg:grid-cols-12 gap-6'>
             {/* Screen Mock Container */}
             <div className='lg:col-span-7 flex flex-col gap-3'>
@@ -1395,96 +1464,10 @@ export function FingerprintTrackerDemo() {
           </div>
         )}
 
-        {/* TAB 2: MULTI-TOUCH IDENTITY GRAPH */}
-        {activeTab === 'graph' && (
-          <div className='p-6 font-mono'>
-            <div className='flex items-center justify-between pb-4 border-b border-[#8A8A8A]/30 mb-6'>
-              <div>
-                <h3 className='text-sm font-bold uppercase tracking-wider text-[#FFFFFF] flex items-center gap-2'>
-                  <Icons.topology className='size-4 text-[#FFFFFF]' />
-                  Identity Graph: Touchpoint Resolution Topology
-                </h3>
-                <p className='text-xs text-[#8A8A8A] font-sans mt-0.5'>
-                  Siloed walled-garden touchpoints bridged by continuous hardware entropy hash.
-                </p>
-              </div>
-              <Badge variant='outline' className='border-[#8A8A8A]/50 bg-[#000000] text-[#FFFFFF] text-xs font-mono'>
-                Hash: {selectedDevice.fingerprintId}
-              </Badge>
-            </div>
-
-            <div className='grid grid-cols-1 md:grid-cols-4 gap-4 py-4 relative'>
-              {/* Node 1 */}
-              <div className='rounded-lg border border-[#FFFFFF] bg-[#000000] p-4 text-center'>
-                <div className='size-10 rounded-full bg-[#1A1A1A] border border-[#8A8A8A] flex items-center justify-center mx-auto mb-2 text-[#FFFFFF]'>
-                  <Icons.youtube className='size-5' />
-                </div>
-                <span className='text-[10px] text-[#8A8A8A] font-bold uppercase'>Node 01</span>
-                <h4 className='text-xs font-bold text-[#FFFFFF] mt-0.5'>YouTube Impression</h4>
-                <p className='text-[10px] text-[#8A8A8A] mt-1'>Campaign: YT_AirMaxDn_Q4</p>
-                <div className='mt-2 pt-2 border-t border-[#8A8A8A]/30 text-[10px] text-[#FFFFFF]'>
-                  Cost: ₹{txn.youtubeImpressionCpmCost.toFixed(3)}
-                </div>
-              </div>
-
-              {/* Node 2 */}
-              <div className='rounded-lg border border-[#FFFFFF] bg-[#000000] p-4 text-center'>
-                <div className='size-10 rounded-full bg-[#1A1A1A] border border-[#8A8A8A] flex items-center justify-center mx-auto mb-2 text-[#FFFFFF]'>
-                  <Icons.externalLink className='size-5' />
-                </div>
-                <span className='text-[10px] text-[#8A8A8A] font-bold uppercase'>Node 02</span>
-                <h4 className='text-xs font-bold text-[#FFFFFF] mt-0.5'>YouTube Ad Click</h4>
-                <p className='text-[10px] text-[#8A8A8A] mt-1'>Dwell: 14.2s (No checkout)</p>
-                <div className='mt-2 pt-2 border-t border-[#8A8A8A]/30 text-[10px] text-[#FFFFFF]'>
-                  CPC: ₹{txn.youtubeClickCpcCost.toFixed(3)}
-                </div>
-              </div>
-
-              {/* Node 3 */}
-              <div className='rounded-lg border border-[#FFFFFF] bg-[#000000] p-4 text-center'>
-                <div className='size-10 rounded-full bg-[#1A1A1A] border border-[#8A8A8A] flex items-center justify-center mx-auto mb-2 text-[#FFFFFF]'>
-                  <Icons.amazon className='size-5' />
-                </div>
-                <span className='text-[10px] text-[#8A8A8A] font-bold uppercase'>Node 03</span>
-                <h4 className='text-xs font-bold text-[#FFFFFF] mt-0.5'>Amazon Search Visit</h4>
-                <p className='text-[10px] text-[#8A8A8A] mt-1'>0 UTMs • Direct typed</p>
-                <div className='mt-2 pt-2 border-t border-[#8A8A8A]/30 text-[10px] text-[#FFFFFF]'>
-                  ● Match: {selectedDevice.confidenceScore}% Identical
-                </div>
-              </div>
-
-              {/* Node 4 */}
-              <div className='rounded-lg border border-[#FFFFFF] bg-[#000000] p-4 text-center'>
-                <div className='size-10 rounded-full bg-[#1A1A1A] border border-[#8A8A8A] flex items-center justify-center mx-auto mb-2 text-[#FFFFFF]'>
-                  <Icons.cart className='size-5' />
-                </div>
-                <span className='text-[10px] text-[#8A8A8A] font-bold uppercase'>Node 04</span>
-                <h4 className='text-xs font-bold text-[#FFFFFF] mt-0.5'>Amazon 1-Click Buy</h4>
-                <p className='text-[10px] text-[#8A8A8A] mt-1'>Order #{txn.orderId}</p>
-                <div className='mt-2 pt-2 border-t border-[#8A8A8A]/30 text-[10px] text-[#FFFFFF] font-bold'>
-                  ₹{txn.grossRevenue.toFixed(2)} Attributed
-                </div>
-              </div>
-            </div>
-
-            <div className='mt-6 pt-4 border-t border-[#8A8A8A]/30 grid grid-cols-2 md:grid-cols-4 gap-3 text-xs'>
-              <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded p-2.5'>
-                <span className='text-[#8A8A8A] block text-[10px] uppercase'>Journey Latency</span>
-                <span className='text-[#FFFFFF] font-bold'>6 Hours 21 Minutes</span>
-              </div>
-              <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded p-2.5'>
-                <span className='text-[#8A8A8A] block text-[10px] uppercase'>Total Incurred Ad Spend</span>
-                <span className='text-[#FFFFFF] font-bold'>₹{txn.totalAttributedAdSpend.toFixed(3)}</span>
-              </div>
-              <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded p-2.5'>
-                <span className='text-[#8A8A8A] block text-[10px] uppercase'>Gross Attributed Value</span>
-                <span className='text-[#FFFFFF] font-bold'>₹{txn.grossRevenue.toFixed(2)}</span>
-              </div>
-              <div className='bg-[#000000] border border-[#8A8A8A]/40 rounded p-2.5'>
-                <span className='text-[#8A8A8A] block text-[10px] uppercase'>Attributed Lift Factor</span>
-                <span className='text-[#FFFFFF] font-bold'>{realizedRoas}x ROAS</span>
-              </div>
-            </div>
+        {/* TAB 5: STUDENT CODE & MATHEMATICAL REFERENCE */}
+        {activeTab === 'code_lab' && (
+          <div className='p-5'>
+            <FingerprintStudentCodeLab />
           </div>
         )}
 
