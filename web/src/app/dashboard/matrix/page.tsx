@@ -507,19 +507,18 @@ export default function SkuChannelMatrixPage() {
         </div>
       </div>
 
-      {/* 2. SECTION HEADER (Editorial Serif + Tight Line Height) */}
-      <div className='space-y-2 border-b border-[#EAEAEA] dark:border-[#262626] pb-6 w-full'>
-        <div className='flex items-center gap-2 text-xs font-mono uppercase tracking-[0.05em] text-[#787774]'>
+      {/* 2. SECTION HEADER (Clean Sans + Disciplined Scale) */}
+      <div className='space-y-1.5 border-b border-[#EAEAEA] dark:border-[#262626] pb-4 w-full'>
+        <div className='flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-[#787774]'>
           <span>Allocation Ledger</span>
           <span>/</span>
           <span>Footwear Analytics</span>
         </div>
-        <h1 className='text-3xl md:text-4xl font-serif text-[#111111] dark:text-[#FFFFFF] tracking-[-0.03em] leading-[1.1]'>
-          SKU Economics &amp; Channel Allocation Matrix
+        <h1 className='text-xl sm:text-2xl font-semibold text-[#111111] dark:text-[#FFFFFF] tracking-tight'>
+          SKU Allocation Matrix
         </h1>
-        <p className='text-sm text-[#787774] max-w-5xl leading-relaxed'>
-          Direct PostgreSQL telemetry linking ad performance across Meta, Google, Amazon, TikTok, and Shopify.
-          Monitors daily ad spend, ERP physical inventory, contribution margins, and live marginal ROAS.
+        <p className='text-xs sm:text-sm text-[#787774] max-w-3xl leading-normal'>
+          Unit economics and daily ad spend reconciled across Meta, Google, Amazon, and Shopify.
         </p>
       </div>
 

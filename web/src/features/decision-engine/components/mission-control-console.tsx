@@ -134,6 +134,23 @@ export function MissionControlConsole() {
   return (
     <div className='relative flex flex-1 min-w-0 max-w-full flex-col gap-6 md:gap-8 p-3.5 sm:p-5 md:p-8 bg-background text-foreground min-h-screen selection:bg-primary/20 selection:text-foreground'>
 
+      {/* 1. Page Header */}
+      <div className='flex flex-col gap-1 border-b border-border/50 pb-4'>
+        <div className='flex items-center justify-between gap-4'>
+          <div className='flex items-center gap-2.5'>
+            <h1 className='text-xl sm:text-2xl font-semibold tracking-tight text-foreground font-sans'>
+              Mission Control
+            </h1>
+            <span className='font-mono text-[10px] uppercase px-1.5 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold'>
+              Autonomous Loop Live
+            </span>
+          </div>
+        </div>
+        <p className='text-xs sm:text-sm text-muted-foreground max-w-2xl leading-normal'>
+          Real-time omnichannel telemetry, active anomaly detection, and autonomous capital allocation.
+        </p>
+      </div>
+
       {/* Flagship Product Feature Banner: Autonomous Learning & Live What-If Simulator */}
       <div className='rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 via-card to-card p-5 font-mono shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4'>
         <div className='space-y-1 max-w-2xl'>

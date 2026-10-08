@@ -35,14 +35,14 @@ export function OrgSwitcher() {
               <SidebarMenuButton
                 size='lg'
                 tooltip='NEXUS D2C • Nike Catalog'
-                className='h-12 rounded-xl border border-border/50 bg-background/60 hover:bg-muted/50 hover:border-border/80 text-foreground transition-all duration-200 shadow-2xs group data-popup-open:bg-muted/60 data-popup-open:border-border'
+                className='h-10 rounded-lg border border-border/50 bg-background/60 hover:bg-muted/50 hover:border-border/80 text-foreground transition-all duration-200 shadow-2xs group data-popup-open:bg-muted/60 data-popup-open:border-border'
               />
             }
           >
             {/* Sleek Aceternity-style Logo Icon */}
-            <div className='relative flex aspect-square size-8.5 shrink-0 items-center justify-center rounded-lg border border-border/80 bg-neutral-900 dark:bg-neutral-950 text-white shadow-xs group-hover:border-primary/40 transition-colors'>
-              <Icons.dashboard className='size-4 text-emerald-400 dark:text-emerald-400 group-hover:scale-105 transition-transform' />
-              <span className='absolute -top-0.5 -right-0.5 size-2 rounded-full bg-emerald-500 ring-2 ring-background animate-pulse' />
+            <div className='relative flex aspect-square size-7 shrink-0 items-center justify-center rounded-md border border-border/80 bg-neutral-900 dark:bg-neutral-950 text-white shadow-xs group-hover:border-primary/40 transition-colors'>
+              <Icons.dashboard className='size-3.5 text-emerald-400 dark:text-emerald-400 group-hover:scale-105 transition-transform' />
+              <span className='absolute -top-0.5 -right-0.5 size-1.5 rounded-full bg-emerald-500 ring-2 ring-background animate-pulse' />
             </div>
 
             {/* Typography & Brand Info */}

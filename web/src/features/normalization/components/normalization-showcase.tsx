@@ -203,14 +203,12 @@ export function NormalizationShowcase() {
               1:1 API Schemas
             </Badge>
           </div>
-          <h1 className='text-2xl font-mono font-bold text-foreground uppercase tracking-tight flex items-center gap-2.5 mt-2'>
-            <IconArrowsSplit2 className='size-6 text-cyan-500' />
-            Raw Ad API Partials &rarr; Canonical Normalization
+          <h1 className='text-xl sm:text-2xl font-semibold text-foreground tracking-tight flex items-center gap-2 mt-2 font-sans'>
+            <IconArrowsSplit2 className='size-5 text-cyan-500' />
+            Schema Normalizer
           </h1>
-          <p className='text-xs font-mono text-muted-foreground mt-1 max-w-3xl'>
-            Interactive demonstration of Section 1 data contracts. Ingests raw heterogeneous payloads (Meta Graph API,
-            Google Ads SearchStream, Amazon Ads v3, Shopify Webhooks) and reconciles them in real-time into the continuous-time
-            UnifiedCommerceRecord tensor.
+          <p className='text-xs text-muted-foreground mt-1 max-w-2xl leading-normal'>
+            Reconciles heterogeneous ad payloads (Meta, Google, Amazon, Shopify) into canonical UnifiedCommerceRecord records in real-time.
           </p>
         </div>
 

@@ -49,13 +49,13 @@ export default function AppSidebar() {
 
   return (
     <Sidebar collapsible='icon'>
-      <SidebarHeader className='group-data-[collapsible=icon]:pt-3 flex flex-col gap-2'>
+      <SidebarHeader className='group-data-[collapsible=icon]:pt-3 flex flex-col gap-1.5'>
         <OrgSwitcher />
         <ChannelSwitcher />
       </SidebarHeader>
       <SidebarContent className='overflow-x-hidden'>
         {filteredGroups.map((group) => (
-          <SidebarGroup key={group.label || 'ungrouped'} className='py-1.5'>
+          <SidebarGroup key={group.label || 'ungrouped'} className='py-1'>
             {group.label && (
               <SidebarGroupLabel className='font-mono text-[10px] uppercase tracking-wider text-muted-foreground font-semibold px-2'>
                 {group.label}
