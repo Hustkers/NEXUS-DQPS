@@ -56,6 +56,7 @@ export interface AssistantGraphConfig {
     trend?: 'up' | 'down' | 'neutral';
   };
   compact?: boolean;
+  height?: number;
   onAskAi?: (graphContext: string) => void;
 }
 
@@ -97,12 +98,12 @@ export function AssistantGraphRenderer({
   };
 
   const isCompact = config.compact ?? false;
-  const chartHeight = isCompact ? 180 : 220;
+  const chartHeight = config.height ?? (isCompact ? 190 : 250);
 
   return (
     <div
       className={cn(
-        'rounded-xl border border-zinc-800/90 bg-zinc-950/90 p-3 sm:p-3.5 font-mono text-zinc-100 shadow-lg space-y-2.5 overflow-hidden',
+        'rounded-lg border border-zinc-800 bg-zinc-950 p-3 sm:p-3.5 font-mono text-zinc-100 space-y-2.5 overflow-hidden',
         className
       )}
     >
