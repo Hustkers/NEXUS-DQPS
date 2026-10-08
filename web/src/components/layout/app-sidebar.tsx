@@ -53,11 +53,11 @@ export default function AppSidebar() {
             className='flex items-center gap-2 group text-foreground hover:opacity-90 transition-opacity rounded-md p-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
             title='NEXUS D2C — Return to Landing Page'
           >
-            <div className='bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 rounded-lg px-2 py-0.5 font-bold font-sans text-xs tracking-tight flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform'>
+            <div className='bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 rounded-lg px-2 py-0.5 font-black font-orbitron text-xs tracking-tight flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform'>
               NX
             </div>
             <div className='flex items-center gap-1.5 group-data-[collapsible=icon]:hidden'>
-              <span className='font-bold text-sm tracking-tight text-foreground font-sans'>
+              <span className='font-bold text-sm tracking-tight text-foreground font-orbitron'>
                 nexusdqps
               </span>
               <span className='text-[9px] font-mono px-1 py-0.2 rounded bg-muted text-muted-foreground group-hover:text-foreground transition-colors'>

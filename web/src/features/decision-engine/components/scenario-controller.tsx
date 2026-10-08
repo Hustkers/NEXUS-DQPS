@@ -69,7 +69,7 @@ export function ScenarioController({
         <div className='flex items-center justify-between border-b border-border/70 pb-3 mb-3.5'>
           <div className='flex items-center gap-2'>
             <Icons.sparkles className='size-3.5 text-primary' />
-            <h3 className='font-mono text-xs font-bold text-foreground uppercase tracking-wider'>
+            <h3 className='font-orbitron text-xs font-bold text-foreground uppercase tracking-wider'>
               Scenario Shock Testing Sandbox
             </h3>
           </div>
@@ -78,7 +78,7 @@ export function ScenarioController({
             size='sm'
             variant='outline'
             onClick={handleReset}
-            className='h-7 text-xs font-mono text-foreground border-border bg-muted/30 hover:bg-muted px-2.5 active:scale-[0.98]'
+            className='h-7 text-xs font-orbitron text-foreground border-border bg-muted/30 hover:bg-muted px-2.5 active:scale-[0.98]'
           >
             <Icons.clock className='mr-1.5 size-3 text-muted-foreground' />
             Reset Baseline
@@ -98,7 +98,7 @@ export function ScenarioController({
                 type='button'
                 onClick={() => handleTrigger(s)}
                 className={cn(
-                  'group flex flex-col justify-between text-left rounded-lg border p-3.5 transition-all active:scale-[0.98] min-h-[120px] font-mono',
+                  'group flex flex-col justify-between text-left rounded-lg border p-3.5 transition-all active:scale-[0.98] min-h-[120px] font-orbitron',
                   isActive
                     ? 'border-primary bg-primary/10 ring-1 ring-primary'
                     : 'border-border bg-muted/20 hover:border-foreground/40 hover:bg-muted/40'

@@ -119,7 +119,7 @@ export function IsometricTelemetryPanel() {
       <div className='px-4 sm:px-6 py-3.5 border-b border-border/70 bg-muted/30 flex flex-wrap items-center justify-between gap-3'>
         <div className='flex items-center gap-2.5'>
           <div className='size-2.5 rounded-full bg-emerald-500 animate-pulse' />
-          <span className='font-mono text-xs font-bold tracking-wider uppercase text-foreground'>
+          <span className='font-orbitron text-xs font-bold tracking-wider uppercase text-foreground'>
             Tactile Telemetry Simulator
           </span>
           <span className='hidden sm:inline font-mono text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-semibold'>
@@ -129,8 +129,8 @@ export function IsometricTelemetryPanel() {
 
         {/* Live caption readout from Hairline figure */}
         <div className='flex items-center gap-2 font-mono text-[11px] text-muted-foreground'>
-          <span className='text-muted-foreground/60'>READOUT:</span>
-          <span className='px-2 py-0.5 rounded bg-background/80 border border-border/80 text-foreground font-semibold'>
+          <span className='text-muted-foreground/60 font-semibold'>READOUT:</span>
+          <span className='px-2.5 py-0.5 rounded-md bg-background/90 border border-border/80 text-foreground font-semibold shadow-xs'>
             {caption || 'rest state'}
           </span>
         </div>
@@ -141,7 +141,7 @@ export function IsometricTelemetryPanel() {
         {/* Left: Tab Selectors */}
         <div className='lg:col-span-4 p-4 sm:p-5 border-b lg:border-b-0 lg:border-r border-border/70 flex flex-col justify-between space-y-4 bg-muted/10'>
           <div className='space-y-1.5'>
-            <div className='font-mono text-[10px] uppercase font-bold text-muted-foreground px-2 pb-1'>
+            <div className='font-orbitron text-[10px] uppercase font-bold tracking-wider text-muted-foreground px-2 pb-1'>
               Select Engine Telemetry
             </div>
             {INSTRUMENTS.map((inst) => {
@@ -211,10 +211,10 @@ export function IsometricTelemetryPanel() {
           <div className='w-full flex items-start justify-between gap-4 mb-3'>
             <div>
               <div className='flex items-center gap-2 mb-1'>
-                <span className='font-mono text-xs font-extrabold uppercase px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20'>
+                <span className='font-orbitron text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20'>
                   {active.badge}
                 </span>
-                <h3 className='font-bold text-base sm:text-lg text-foreground'>
+                <h3 className='font-orbitron font-bold text-base sm:text-lg text-foreground'>
                   {active.name}
                 </h3>
               </div>
@@ -232,7 +232,7 @@ export function IsometricTelemetryPanel() {
             </div>
 
             <div className='text-right shrink-0 bg-muted/40 p-2.5 rounded-xl border border-border/70 hidden sm:block'>
-              <div className='font-mono text-xs font-extrabold text-foreground'>{active.stat}</div>
+              <div className='font-orbitron text-sm font-extrabold text-foreground'>{active.stat}</div>
               <div className='font-mono text-[9px] text-muted-foreground uppercase'>{active.statLabel}</div>
             </div>
           </div>

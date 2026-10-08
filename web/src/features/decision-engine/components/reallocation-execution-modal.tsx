@@ -158,15 +158,12 @@ export function ReallocationExecutionModal({
                 id='reallocation-modal-title'
                 className='text-sm sm:text-base font-bold font-mono uppercase tracking-wider text-foreground'
               >
-                {executionState === 'analysis' && 'Auto-Reallocation Analysis'}
-                {executionState === 'executing' && 'Auto-Reallocation In Progress'}
-                {executionState === 'completed' && 'Auto-Reallocation Completed'}
-                {executionState === 'error' && 'Auto-Reallocation Aborted'}
+                BUDGET REALLOCATION
               </h2>
-              <span className='text-[10px] bg-muted border border-border text-muted-foreground px-1.5 py-0.5 rounded-lg font-mono font-bold'>
+              <span className='text-[10px] bg-muted border border-border text-muted-foreground px-2 py-0.5 rounded-md font-mono font-bold'>
                 {executionState === 'analysis' && '[ANALYSIS]'}
                 {executionState === 'executing' && '[EXECUTING]'}
-                {executionState === 'completed' && '[AUDITED]'}
+                {executionState === 'completed' && '[EXECUTED]'}
                 {executionState === 'error' && '[FAILED]'}
               </span>
             </div>
@@ -194,7 +191,7 @@ export function ReallocationExecutionModal({
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  Capital Flow
+                  Money Flow
                 </button>
                 <button
                   type='button'
@@ -234,92 +231,76 @@ export function ReallocationExecutionModal({
           </div>
 
           <p className='text-xs font-mono text-muted-foreground mt-1.5'>
-            Scipy Convex Optimization Directive • Shift ₹{Math.round(details.capitalMoved).toLocaleString('en-IN')}/day from {details.source.campaign} to {details.destination.productName}
+            Moving spend from an underperforming campaign to a higher-return opportunity.
           </p>
         </div>
 
         {/* Scrollable Content Body */}
         <div className='flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 space-y-4 overscroll-contain'>
           {/* ============================================================ */}
-          {/* PHASE 6: EXECUTION PROGRESS MODAL VIEW */}
+          {/* PHASE: EXECUTION PROGRESS MODAL VIEW */}
           {/* ============================================================ */}
           {executionState === 'executing' && (
             <div className='py-6 px-4 space-y-6'>
               <div className='text-center space-y-2'>
-                <div className='inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-muted border border-border text-xs font-mono text-foreground'>
-                  <Icons.spinner className='size-3.5 animate-spin text-foreground' />
-                  AUTO-REALLOCATION IN PROGRESS
+                <div className='inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-xs font-mono text-cyan-400'>
+                  <Icons.spinner className='size-3.5 animate-spin text-cyan-400' />
+                  BUDGET REALLOCATION IN PROGRESS
                 </div>
                 <p className='text-xs font-mono text-muted-foreground'>
-                  Executing deterministic capital rebalance for {details.source.campaign}
+                  Transferring ₹{Math.round(details.capitalMoved).toLocaleString('en-IN')}/day from {details.source.campaign} to {details.destination.productName}
                 </p>
               </div>
 
-              {/* Structured Step Progress */}
-              <div className='max-w-md mx-auto space-y-3 font-mono text-xs'>
-                {/* Step 1 */}
-                <div className='flex items-center gap-3 p-2.5 rounded-lg bg-card border border-border'>
-                  <span className='font-bold text-xs text-foreground'>
-                    {executionStep >= 1 ? '✓' : '○'}
+              {/* Structured Step Progress Timeline */}
+              <div className='max-w-md mx-auto space-y-2.5 font-mono text-xs'>
+                {/* Step 1: Decision selected */}
+                <div className='flex items-center gap-3 p-3 rounded-lg bg-card border border-border/80'>
+                  <span className='font-bold text-xs text-muted-foreground'>01</span>
+                  <span className={cn('flex-1 font-medium', executionStep >= 1 ? 'text-foreground font-bold' : 'text-muted-foreground')}>
+                    Decision selected
                   </span>
-                  <span className={executionStep >= 1 ? 'text-foreground font-bold' : 'text-muted-foreground'}>
-                    Anomaly validated
-                  </span>
-                  {executionStep === 1 && (
-                    <Icons.spinner className='size-3 animate-spin text-foreground ml-auto' />
-                  )}
+                  {executionStep > 1 && <Icons.check className='size-3.5 text-emerald-400 ml-auto' />}
+                  {executionStep === 1 && <Icons.spinner className='size-3.5 animate-spin text-cyan-400 ml-auto' />}
                 </div>
 
-                {/* Step 2 */}
-                <div className='flex items-center gap-3 p-2.5 rounded-lg bg-card border border-border'>
-                  <span className='font-bold text-xs text-foreground'>
-                    {executionStep >= 2 ? '✓' : executionStep === 1 ? '●' : '○'}
+                {/* Step 2: Source budget reduced */}
+                <div className='flex items-center gap-3 p-3 rounded-lg bg-card border border-border/80'>
+                  <span className='font-bold text-xs text-muted-foreground'>02</span>
+                  <span className={cn('flex-1 font-medium', executionStep >= 2 ? 'text-foreground font-bold' : 'text-muted-foreground')}>
+                    Source budget reduced (−₹{Math.round(details.capitalMoved).toLocaleString('en-IN')}/d)
                   </span>
-                  <span className={executionStep >= 2 ? 'text-foreground font-bold' : 'text-muted-foreground'}>
-                    Campaign analyzed
-                  </span>
-                  {executionStep === 2 && (
-                    <Icons.spinner className='size-3 animate-spin text-foreground ml-auto' />
-                  )}
+                  {executionStep > 2 && <Icons.check className='size-3.5 text-emerald-400 ml-auto' />}
+                  {executionStep === 2 && <Icons.spinner className='size-3.5 animate-spin text-cyan-400 ml-auto' />}
                 </div>
 
-                {/* Step 3 */}
-                <div className='flex items-center gap-3 p-2.5 rounded-lg bg-card border border-border'>
-                  <span className='font-bold text-xs text-foreground'>
-                    {executionStep >= 3 ? '✓' : executionStep === 2 ? '●' : '○'}
+                {/* Step 3: Destination budget increased */}
+                <div className='flex items-center gap-3 p-3 rounded-lg bg-card border border-border/80'>
+                  <span className='font-bold text-xs text-muted-foreground'>03</span>
+                  <span className={cn('flex-1 font-medium', executionStep >= 3 ? 'text-foreground font-bold' : 'text-muted-foreground')}>
+                    Destination budget increased (+₹{Math.round(details.capitalMoved).toLocaleString('en-IN')}/d)
                   </span>
-                  <span className={executionStep >= 3 ? 'text-foreground font-bold' : 'text-muted-foreground'}>
-                    Eligible targets evaluated
-                  </span>
-                  {executionStep === 3 && (
-                    <Icons.spinner className='size-3 animate-spin text-foreground ml-auto' />
-                  )}
+                  {executionStep > 3 && <Icons.check className='size-3.5 text-emerald-400 ml-auto' />}
+                  {executionStep === 3 && <Icons.spinner className='size-3.5 animate-spin text-cyan-400 ml-auto' />}
                 </div>
 
-                {/* Step 4 */}
-                <div className='flex items-center gap-3 p-2.5 rounded-lg bg-card border border-border'>
-                  <span className='font-bold text-xs text-foreground'>
-                    {executionStep >= 4 ? '✓' : executionStep === 3 ? '●' : '○'}
+                {/* Step 4: Allocation verified */}
+                <div className='flex items-center gap-3 p-3 rounded-lg bg-card border border-border/80'>
+                  <span className='font-bold text-xs text-muted-foreground'>04</span>
+                  <span className={cn('flex-1 font-medium', executionStep >= 4 ? 'text-foreground font-bold' : 'text-muted-foreground')}>
+                    Allocation verified
                   </span>
-                  <span className={executionStep >= 4 ? 'text-foreground font-bold' : 'text-muted-foreground'}>
-                    Applying allocation
-                  </span>
-                  {executionStep === 4 && (
-                    <Icons.spinner className='size-3 animate-spin text-foreground ml-auto' />
-                  )}
+                  {executionStep > 4 && <Icons.check className='size-3.5 text-emerald-400 ml-auto' />}
+                  {executionStep === 4 && <Icons.spinner className='size-3.5 animate-spin text-cyan-400 ml-auto' />}
                 </div>
 
-                {/* Step 5 */}
-                <div className='flex items-center gap-3 p-2.5 rounded-lg bg-card border border-border'>
-                  <span className='font-bold text-xs text-foreground'>
-                    {executionStep >= 5 ? '✓' : executionStep === 4 ? '●' : '○'}
+                {/* Step 5: Reallocation recorded */}
+                <div className='flex items-center gap-3 p-3 rounded-lg bg-card border border-border/80'>
+                  <span className='font-bold text-xs text-muted-foreground'>05</span>
+                  <span className={cn('flex-1 font-medium', executionStep >= 5 ? 'text-foreground font-bold' : 'text-muted-foreground')}>
+                    Reallocation recorded
                   </span>
-                  <span className={executionStep >= 5 ? 'text-foreground font-bold' : 'text-muted-foreground'}>
-                    Recording decision
-                  </span>
-                  {executionStep === 5 && (
-                    <Icons.spinner className='size-3 animate-spin text-foreground ml-auto' />
-                  )}
+                  {executionStep >= 5 && <Icons.check className='size-3.5 text-emerald-400 ml-auto' />}
                 </div>
               </div>
             </div>
@@ -361,21 +342,33 @@ export function ReallocationExecutionModal({
           {/* ERROR STATE */}
           {/* ============================================================ */}
           {executionState === 'error' && (
-            <div className='p-4 rounded-lg border border-rose-500/30 bg-card font-mono text-xs space-y-3'>
-              <div className='flex items-center gap-2 text-rose-600 dark:text-rose-400 font-bold'>
-                <Icons.warning className='size-4' />
-                <span>REALLOCATION ABORTED</span>
+            <div className='p-6 rounded-xl border border-rose-500/30 bg-rose-500/5 font-mono text-xs space-y-4 max-w-lg mx-auto my-6'>
+              <div className='flex items-center gap-2.5 text-rose-500 font-bold text-sm'>
+                <Icons.warning className='size-5' />
+                <span>REALLOCATION FAILED</span>
               </div>
-              <p className='text-xs text-muted-foreground leading-relaxed'>
-                {errorMessage || 'Unable to execute reallocation. Zero capital moved.'}
-              </p>
-              <div className='pt-2 flex justify-end'>
+              <div className='space-y-1.5 pt-1 border-t border-rose-500/20'>
+                <span className='text-[10px] text-muted-foreground uppercase font-bold tracking-wider'>Reason:</span>
+                <p className='text-xs text-foreground leading-relaxed font-mono bg-background/50 p-2.5 rounded-lg border border-border/60'>
+                  {errorMessage || 'Unable to execute reallocation. Zero capital moved.'}
+                </p>
+              </div>
+              <div className='pt-2 flex items-center justify-end gap-2'>
                 <Button
                   size='sm'
+                  variant='outline'
                   onClick={onClose}
-                  className='text-xs font-mono bg-foreground text-background hover:bg-foreground/80'
+                  className='text-xs font-mono h-8 border border-border text-foreground hover:bg-muted'
                 >
                   Close
+                </Button>
+                <Button
+                  size='sm'
+                  onClick={handleConfirm}
+                  className='text-xs font-mono h-8 bg-rose-500 hover:bg-rose-600 text-white font-bold'
+                >
+                  <Icons.refresh className='mr-1.5 size-3' />
+                  Retry
                 </Button>
               </div>
             </div>
@@ -386,6 +379,9 @@ export function ReallocationExecutionModal({
           {/* ============================================================ */}
           {executionState !== 'executing' && executionState !== 'error' && activeTab === 'overview' && (
             <div className='space-y-4 pt-1'>
+              {/* Top Central Visual Money Flow */}
+              <ReallocationFlowAnimator details={details} />
+
               {/* Real Decision Explanation Grid */}
               <div className='rounded-lg border border-border bg-card p-4 font-mono text-xs space-y-3'>
                 <div className='flex items-center justify-between border-b border-border pb-2'>
@@ -400,7 +396,7 @@ export function ReallocationExecutionModal({
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-3 text-xs'>
                   {/* Anomaly */}
                   <div className='space-y-0.5 p-2 rounded-lg bg-background border border-border'>
-                    <span className='text-[10px] uppercase text-muted-foreground block font-bold'>Anomaly</span>
+                    <span className='text-[10px] uppercase text-muted-foreground block font-bold'>Anomaly Source</span>
                     <span className='text-xs font-bold text-foreground truncate block'>
                       {details.anomaly?.productName || details.source.productName} ({details.source.campaign})
                     </span>
@@ -484,6 +480,9 @@ export function ReallocationExecutionModal({
                   </div>
                 </div>
               </div>
+
+              {/* Before vs After Chart */}
+              <ReallocationBeforeAfterChart details={details} />
 
               {/* Why This Reallocation */}
               <ReallocationWhyBetter details={details} />

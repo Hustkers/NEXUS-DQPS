@@ -235,17 +235,17 @@ export function ExecutiveGraphBanner({
       {/* 1. Header Bar with Time Range Selector & Comparative Detail Toggle */}
       <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3'>
         <div className='flex items-center gap-2.5'>
-          <h2 className='font-mono text-xs font-bold uppercase tracking-wider text-foreground'>
+          <h2 className='font-orbitron text-xs font-bold uppercase tracking-wider text-foreground'>
             Executive Financial &amp; Efficiency Trajectories
           </h2>
-          <span className='font-mono text-[11px] text-muted-foreground'>
+          <span className='font-orbitron text-[11px] text-muted-foreground'>
             ({timeRange.toUpperCase()} Trailing •{' '}
             {channel === 'all' ? 'Blended Omnichannel' : channel.toUpperCase()})
           </span>
         </div>
         <div className='flex items-center gap-2'>
           {/* Timeframe pill selector */}
-          <div className='flex items-center rounded-lg border border-border bg-card p-0.5 text-[11px] font-mono shadow-2xs'>
+          <div className='flex items-center rounded-lg border border-border bg-card p-0.5 text-[11px] font-orbitron shadow-2xs'>
             {(['7d', '14d', '30d'] as const).map((r) => (
               <button
                 key={r}
@@ -266,7 +266,7 @@ export function ExecutiveGraphBanner({
           <button
             onClick={() => setExpandedMetric(expandedMetric ? null : 'roas')}
             className={cn(
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-mono transition-all active:scale-[0.98]',
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-orbitron transition-all active:scale-[0.98]',
               expandedMetric
                 ? 'bg-muted text-foreground border-border font-bold'
                 : 'bg-card border-border text-muted-foreground hover:text-foreground hover:bg-muted/40'
@@ -300,13 +300,13 @@ export function ExecutiveGraphBanner({
             {/* Card Header Content */}
             <div className='relative z-10'>
                 <div className='flex items-center justify-between'>
-                  <span className='font-mono text-[11px] uppercase tracking-wider text-muted-foreground'>
+                  <span className='font-orbitron text-[11px] uppercase tracking-wider text-muted-foreground'>
                     {card.title}
                   </span>
                   <Badge
                     variant='outline'
                     className={cn(
-                      'border px-1.5 py-0.5 text-[10px] font-mono font-bold',
+                      'border px-1.5 py-0.5 text-[10px] font-orbitron font-bold',
                       card.badgeSeverity === 'critical' &&
                         'border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 animate-pulse',
                       card.badgeSeverity === 'nominal' &&
@@ -326,7 +326,7 @@ export function ExecutiveGraphBanner({
                 <div className='mt-1.5 flex items-baseline justify-between'>
                   <span
                     className={cn(
-                      'font-mono text-2xl font-bold tracking-tight',
+                      'font-orbitron text-2xl font-bold tracking-tight',
                       card.badgeSeverity === 'critical'
                         ? 'text-rose-600 dark:text-rose-400'
                         : 'text-foreground'
@@ -334,7 +334,7 @@ export function ExecutiveGraphBanner({
                   >
                     {card.value}
                   </span>
-                  <span className='font-mono text-[11px] text-muted-foreground'>
+                  <span className='font-orbitron text-[11px] text-muted-foreground'>
                     {card.subtext}
                   </span>
                 </div>
@@ -380,7 +380,7 @@ export function ExecutiveGraphBanner({
               </div>
 
               {/* Card Footer Status */}
-              <div className='relative z-10 mt-1 flex items-center justify-between border-none pt-1.5 font-mono text-[10px] text-muted-foreground'>
+              <div className='relative z-10 mt-1 flex items-center justify-between border-none pt-1.5 font-orbitron text-[10px] text-muted-foreground'>
                 <span>{card.footerLabel}</span>
                 <span
                   className={cn(

@@ -152,12 +152,12 @@ export function ReallocationFeed({ className }: ReallocationFeedProps = {}) {
   const totalLiftAll = reallocations.reduce((acc, it) => acc + it.netRevenueLift, 0);
 
   return (
-    <div className={cn('rounded-xl border border-border bg-card p-4 sm:p-5 shadow-xs text-card-foreground font-mono min-w-0 max-w-full space-y-4', className)}>
+    <div className={cn('rounded-xl border border-border bg-card p-4 sm:p-5 shadow-xs text-card-foreground font-orbitron min-w-0 max-w-full space-y-4', className)}>
       {/* Header */}
       <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border/70 pb-3'>
         <div className='flex items-center gap-2'>
           <Icons.adjustments className='size-4 text-primary' />
-          <h3 className='text-xs font-bold text-foreground uppercase tracking-wider'>
+          <h3 className='text-xs font-bold text-foreground font-orbitron uppercase tracking-wider'>
             Decision Feed
           </h3>
           <span className='px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold'>

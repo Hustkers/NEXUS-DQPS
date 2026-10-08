@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Icons } from '@/components/icons';
+import { IconFileText } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import type { ReallocationExecutionDetails } from '../types/reallocation-execution';
 
@@ -21,126 +22,114 @@ export function ReallocationExecutionReceipt({
   const { source, destination, capitalMoved, expectedDailyLift, predictedRoas, ledgerRecord } = details;
 
   return (
-    <div className={cn('rounded border border-[#8A8A8A] bg-[#1A1A1A] p-5 font-mono shadow-none text-[#FFFFFF] max-w-lg mx-auto', className)}>
+    <div className={cn('rounded-xl border border-border/80 bg-background/95 p-6 font-mono text-foreground max-w-lg mx-auto shadow-md', className)}>
       {/* Receipt Top Banner */}
-      <div className='flex items-center justify-between border-b border-dashed border-[#8A8A8A] pb-3 mb-4'>
+      <div className='flex items-center justify-between border-b border-dashed border-border/80 pb-3 mb-4'>
         <div className='flex items-center gap-2'>
-          <span className='text-xs font-mono font-bold text-[#FFFFFF]'>■</span>
-          <span className='text-[10px] uppercase tracking-widest text-[#8A8A8A] font-bold'>
-            NEXUS-DQPS AUDIT RECEIPT
+          <span className='size-2 rounded-full bg-emerald-500' />
+          <span className='text-[10px] uppercase tracking-widest text-muted-foreground font-bold'>
+            NEXUS REALLOCATION RECEIPT
           </span>
         </div>
-        <span className='text-[10px] text-[#8A8A8A] font-semibold'>
+        <span className='text-[11px] font-mono text-muted-foreground/80 font-semibold'>
           {ledgerRecord.id}
         </span>
       </div>
 
-      <div className='text-center space-y-1 mb-4 pb-3 border-b border-[#000000]'>
-        <div className='inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-[#FFFFFF] text-[#000000] text-xs font-bold uppercase tracking-wider font-mono'>
-          <Icons.check className='size-3.5 text-[#000000]' />
-          Capital Reallocation Executed
+      <div className='text-center space-y-1 mb-5 pb-3 border-b border-border/60'>
+        <div className='inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 text-xs font-bold uppercase tracking-wider font-mono'>
+          <Icons.check className='size-3.5' />
+          REALLOCATION COMPLETE
         </div>
-        <p className='text-[11px] text-[#8A8A8A] pt-1'>
-          Dispatched to Production Ad Delivery APIs &amp; Recorded in Decision Ledger
+        <p className='text-xs text-muted-foreground pt-1.5 leading-relaxed'>
+          Budget successfully transferred to higher-return campaign and recorded in closed-loop ledger.
         </p>
       </div>
 
       {/* Auditable Data Grid */}
-      <div className='space-y-2.5 text-xs font-mono'>
-        <div className='flex justify-between items-center py-1 border-b border-[#000000]'>
-          <span className='text-[#8A8A8A]'>Source Campaign:</span>
-          <span className='font-bold text-[#FFFFFF] text-right truncate max-w-[240px]'>
+      <div className='space-y-3 text-xs font-mono'>
+        <div className='flex justify-between items-start py-1 border-b border-border/40 gap-4'>
+          <span className='text-muted-foreground shrink-0'>Source:</span>
+          <span className='font-bold text-foreground text-right truncate max-w-[260px]'>
             {source.productName} ({source.campaign})
           </span>
         </div>
 
-        <div className='flex justify-between items-center py-1 border-b border-[#000000]'>
-          <span className='text-[#8A8A8A]'>Destination Campaign:</span>
-          <span className='font-bold text-[#FFFFFF] text-right truncate max-w-[240px]'>
+        <div className='flex justify-between items-start py-1 border-b border-border/40 gap-4'>
+          <span className='text-muted-foreground shrink-0'>Destination:</span>
+          <span className='font-bold text-emerald-500 dark:text-emerald-400 text-right truncate max-w-[260px]'>
             {destination.productName} ({destination.campaign})
           </span>
         </div>
 
-        <div className='flex justify-between items-center py-1 border-b border-[#000000]'>
-          <span className='text-[#8A8A8A]'>Capital Moved:</span>
-          <span className='font-bold text-[#FFFFFF]'>
+        <div className='flex justify-between items-center py-1 border-b border-border/40'>
+          <span className='text-muted-foreground'>Budget moved:</span>
+          <span className='font-bold text-foreground'>
             ₹{Math.round(capitalMoved).toLocaleString('en-IN')}/day
           </span>
         </div>
 
-        <div className='flex justify-between items-center py-1 border-b border-[#000000]'>
-          <span className='text-[#8A8A8A]'>Previous Allocation:</span>
-          <span className='font-medium text-[#8A8A8A]'>
-            ₹{Math.round(destination.currentSpend).toLocaleString('en-IN')}/day
-          </span>
-        </div>
-
-        <div className='flex justify-between items-center py-1 border-b border-[#000000]'>
-          <span className='text-[#8A8A8A]'>New Allocation:</span>
-          <span className='font-bold text-[#FFFFFF]'>
-            ₹{Math.round(destination.newSpend).toLocaleString('en-IN')}/day
-          </span>
-        </div>
-
-        <div className='flex justify-between items-center py-1 border-b border-[#000000]'>
-          <span className='text-[#8A8A8A]'>Expected Daily Lift:</span>
-          <span className='font-bold text-[#FFFFFF]'>
-            +₹{Math.round(expectedDailyLift).toLocaleString('en-IN')}/day
-          </span>
-        </div>
-
-        <div className='flex justify-between items-center py-1 border-b border-[#000000]'>
-          <span className='text-[#8A8A8A]'>Operating Target ROAS:</span>
-          <span className='font-bold text-[#FFFFFF]'>
+        <div className='flex justify-between items-center py-1 border-b border-border/40'>
+          <span className='text-muted-foreground'>Expected ROAS:</span>
+          <span className='font-bold text-emerald-500'>
             {predictedRoas.toFixed(2)}x
           </span>
         </div>
 
-        <div className='flex justify-between items-center py-1 border-b border-[#000000]'>
-          <span className='text-[#8A8A8A]'>Timestamp:</span>
-          <span className='text-[#8A8A8A] text-[11px]'>
+        <div className='flex justify-between items-center py-1 border-b border-border/40'>
+          <span className='text-muted-foreground'>Expected daily margin:</span>
+          <span className='font-bold text-foreground'>
+            +₹{Math.round(expectedDailyLift).toLocaleString('en-IN')}/day
+          </span>
+        </div>
+
+        <div className='flex justify-between items-center py-1 border-b border-border/40'>
+          <span className='text-muted-foreground'>Timestamp:</span>
+          <span className='text-muted-foreground text-[11px]'>
             {ledgerRecord.timestamp}
           </span>
         </div>
 
         <div className='flex justify-between items-center py-1'>
-          <span className='text-[#8A8A8A]'>Audit Status:</span>
-          <span className='font-bold bg-[#FFFFFF] text-[#000000] px-1.5 py-0.5 rounded text-[11px] flex items-center gap-1'>
-            <Icons.check className='size-3 text-[#000000]' />
-            EXECUTED ✓
+          <span className='text-muted-foreground'>Status:</span>
+          <span className='font-bold bg-emerald-500/15 border border-emerald-500/30 text-emerald-500 px-2 py-0.5 rounded text-[11px] flex items-center gap-1'>
+            <Icons.check className='size-3' />
+            EXECUTED
           </span>
         </div>
       </div>
 
       {/* Ledger Seal */}
-      <div className='mt-4 pt-3 border-t border-dashed border-[#8A8A8A] flex items-center justify-between text-[11px] bg-[#000000] p-2.5 rounded border border-[#1A1A1A]'>
-        <div className='flex items-center gap-1.5 text-[#8A8A8A]'>
-          <Icons.shieldCheck className='size-3.5 text-[#FFFFFF]' />
-          <span>Decision recorded in closed-loop ledger</span>
+      <div className='mt-5 pt-3 border-t border-dashed border-border/80 flex items-center justify-between text-[11px] bg-muted/20 p-2.5 rounded-lg border border-border/60'>
+        <div className='flex items-center gap-1.5 text-muted-foreground'>
+          <Icons.shieldCheck className='size-3.5 text-foreground' />
+          <span>Closed-loop verifiable audit trail</span>
         </div>
-        <span className='text-[10px] text-[#FFFFFF] font-bold px-1.5 py-0.5 rounded bg-[#1A1A1A] border border-[#8A8A8A]'>
+        <span className='text-[10px] text-foreground font-bold px-1.5 py-0.5 rounded bg-muted border border-border'>
           {ledgerRecord.id}
         </span>
       </div>
 
-      <div className='mt-4 pt-2 flex items-center justify-end gap-2'>
+      <div className='mt-5 pt-2 flex items-center justify-end gap-2'>
         {onViewLedger && (
           <button
             onClick={onViewLedger}
-            className='px-3 py-1.5 text-xs font-mono font-bold bg-[#000000] hover:bg-[#1A1A1A] text-[#FFFFFF] rounded border border-[#8A8A8A] transition-all'
+            className='px-3.5 py-1.5 text-xs font-mono font-bold bg-muted hover:bg-muted/80 text-foreground rounded-lg border border-border transition-all flex items-center gap-1.5'
           >
-            View in Decision Ledger →
+            <IconFileText className='size-3.5' />
+            <span>View Decision</span>
           </button>
         )}
         {onClose && (
           <button
             onClick={onClose}
-            className='px-3 py-1.5 text-xs font-mono font-bold bg-[#FFFFFF] hover:bg-[#8A8A8A] text-[#000000] rounded border-none transition-all'
+            className='px-3.5 py-1.5 text-xs font-mono font-bold bg-foreground text-background hover:bg-foreground/90 rounded-lg border-none transition-all'
           >
-            Close Receipt
+            Close
           </button>
         )}
       </div>
     </div>
   );
 }
+

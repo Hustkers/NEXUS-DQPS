@@ -30,3 +30,12 @@
   /* Apply font-family - will now resolve from html's [data-theme] variables */
   font-family: var(--font-sans);
 }
+
+/* Vengence UI Dashboard font override across all active themes */
+[data-theme].vengence-dashboard-active body,
+[data-theme] body.vengence-dashboard-active,
+.vengence-dashboard {
+  --font-sans: var(--font-orbitron, 'Orbitron', 'Space Grotesk', sans-serif) !important;
+  font-family: var(--font-orbitron, 'Orbitron', 'Space Grotesk', sans-serif) !important;
+}
+

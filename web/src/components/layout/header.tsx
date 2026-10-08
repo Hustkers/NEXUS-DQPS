@@ -21,10 +21,10 @@ export default function Header() {
           className='flex items-center gap-1.5 px-1.5 py-0.5 rounded-md hover:bg-muted/60 transition-colors group shrink-0'
           title='Return to NEXUS D2C Landing Page'
         >
-          <div className='bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 rounded px-1.5 py-0.2 font-bold font-sans text-xs tracking-tight flex items-center justify-center group-hover:scale-105 transition-transform'>
+          <div className='bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 rounded px-1.5 py-0.2 font-black font-orbitron text-xs tracking-tight flex items-center justify-center group-hover:scale-105 transition-transform'>
             NX
           </div>
-          <span className='font-bold text-xs tracking-tight text-foreground font-sans hidden md:inline'>
+          <span className='font-bold text-xs tracking-tight text-foreground font-orbitron hidden md:inline'>
             NEXUS D2C
           </span>
         </Link>

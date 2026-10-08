@@ -172,9 +172,10 @@ export function AnomalyCard({ anomaly, onMitigate, onAnalyze, onViewReceipt, isM
           <Button
             size='sm'
             onClick={() => onViewReceipt?.(anomaly) || onAnalyze?.(anomaly)}
-            className='flex-1 h-7 text-[10px] font-mono bg-foreground hover:bg-foreground/90 text-background font-bold uppercase tracking-wider'
+            className='flex-1 h-7 text-[10px] font-mono bg-emerald-500/15 border border-emerald-500/40 text-emerald-500 hover:bg-emerald-500/25 font-bold uppercase tracking-wider flex items-center justify-center gap-1 shadow-xs'
           >
-            View Receipt
+            <Icons.check className='size-3 text-emerald-500' />
+            <span>✓ Reallocated</span>
           </Button>
         ) : (
           <Button
