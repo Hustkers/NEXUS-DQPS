@@ -1,3 +1,4 @@
+@import url('https://api.fontshare.com/v2/css?f[]=ranade@100,300,400,500,700&display=swap');
 @import 'tailwindcss';
 @source '../';
 
@@ -72,17 +73,27 @@
 }
 
 @theme inline {
-  --font-ranade: 'Ranade', var(--font-ranade, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
-  --font-sans: 'Ranade', var(--font-ranade, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
-  --font-orbitron: 'Ranade', var(--font-ranade, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  --font-ranade: 'Ranade', ranade, var(--font-ranade, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  --font-sans: 'Ranade', ranade, var(--font-ranade, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  --font-orbitron: 'Ranade', ranade, var(--font-ranade, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  --font-space-grotesk: 'Ranade', ranade, var(--font-ranade, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  --font-clash-display: 'Ranade', ranade, var(--font-ranade, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
 }
 
 @utility font-ranade {
-  font-family: 'Ranade', var(--font-ranade, sans-serif);
+  font-family: 'Ranade', ranade, var(--font-ranade), sans-serif;
 }
 
 @utility font-orbitron {
-  font-family: 'Ranade', var(--font-ranade, sans-serif);
+  font-family: 'Ranade', ranade, var(--font-ranade), sans-serif;
+}
+
+@utility font-space-grotesk {
+  font-family: 'Ranade', ranade, var(--font-ranade), sans-serif;
+}
+
+@utility font-clash-display {
+  font-family: 'Ranade', ranade, var(--font-ranade), sans-serif;
 }
 
 @import './theme.css';
@@ -93,22 +104,20 @@
    ========================================================================== */
 
 :root {
-  --font-sans: 'Ranade', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-family: 'Ranade', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Ranade', ranade, var(--font-ranade), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Ranade', ranade, var(--font-ranade), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-html.vengence-dashboard-active,
-html.vengence-dashboard-active body,
-body.vengence-dashboard-active,
+html,
+body,
+[data-theme],
 .vengence-dashboard {
-  --font-sans: 'Ranade', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-  font-family: 'Ranade', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  --font-sans: 'Ranade', ranade, var(--font-ranade), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-family: 'Ranade', ranade, var(--font-ranade), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
-/* Ensure all typography across the dashboard inherits Ranade */
-.vengence-dashboard,
-.vengence-dashboard *:not(pre):not(code):not(kbd):not(.font-mono):not([class*="font-mono"]):not([data-monospace]),
-body.vengence-dashboard-active *:not(pre):not(code):not(kbd):not(.font-mono):not([class*="font-mono"]):not([data-monospace]),
+/* Ensure all typography across the entire website inherits Ranade */
+*:not(pre):not(code):not(kbd):not(.font-mono):not([class*="font-mono"]):not([data-monospace]),
 [data-radix-popper-content-wrapper] *:not(pre):not(code):not(kbd):not(.font-mono):not([class*="font-mono"]),
 [data-slot="dialog-content"] *:not(pre):not(code):not(kbd):not(.font-mono):not([class*="font-mono"]),
 [data-slot="popover-content"] *:not(pre):not(code):not(kbd):not(.font-mono):not([class*="font-mono"]),
@@ -117,17 +126,13 @@ body.vengence-dashboard-active *:not(pre):not(code):not(kbd):not(.font-mono):not
 [data-slot="drawer-content"] *:not(pre):not(code):not(kbd):not(.font-mono):not([class*="font-mono"]),
 [data-slot="tooltip-content"] *:not(pre):not(code):not(kbd):not(.font-mono):not([class*="font-mono"]),
 [data-slot="command"] *:not(pre):not(code):not(kbd):not(.font-mono):not([class*="font-mono"]) {
-  font-family: 'Ranade', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Ranade', ranade, var(--font-ranade), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* Headings and card titles in Ranade with clean tracking */
-.vengence-dashboard :where(h1, h2, h3, h4, h5, h6, [data-slot="card-title"]),
-body.vengence-dashboard-active :where(h1, h2, h3, h4, h5, h6, [data-slot="card-title"], [data-slot="dialog-title"], [data-slot="sheet-title"]),
-.vengence-dashboard h1, .vengence-dashboard h2, .vengence-dashboard h3, .vengence-dashboard h4,
-.vengence-dashboard [data-slot="card-title"],
-body.vengence-dashboard-active h1, body.vengence-dashboard-active h2, body.vengence-dashboard-active h3, body.vengence-dashboard-active h4,
-body.vengence-dashboard-active [data-slot="card-title"] {
-  font-family: 'Ranade', sans-serif !important;
+/* Headings and card titles in Ranade across all pages */
+:where(h1, h2, h3, h4, h5, h6, [data-slot="card-title"], [data-slot="dialog-title"], [data-slot="sheet-title"]),
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Ranade', ranade, var(--font-ranade), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   letter-spacing: -0.015em;
 }
 

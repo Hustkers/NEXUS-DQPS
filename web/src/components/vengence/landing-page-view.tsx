@@ -33,17 +33,21 @@ export function LandingPageView() {
       {/* 2. EXPANDABLE / AGENT BENTO GRID (FEATURES & ARCHITECTURE) */}
       <section id='features' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-muted/20 border-b border-border/60 scroll-mt-16 relative'>
         <span id='bento' className='absolute -top-20' />
-        <div className='text-center max-w-3xl mx-auto mb-14'>
-          <div className='font-mono text-xs font-bold text-primary uppercase tracking-widest mb-2'>
-            CORE SYSTEM PILLARS
+        <div className='max-w-7xl mx-auto w-full mb-10 sm:mb-14'>
+          <div className='flex flex-col md:flex-row md:items-end md:justify-between gap-4 pb-5 border-b border-border/60'>
+            <div className='space-y-2 max-w-5xl'>
+              <div className='flex items-center gap-2 font-mono text-[11px] sm:text-xs font-bold text-primary uppercase tracking-[0.2em]'>
+                <span className='inline-block size-1.5 rounded-full bg-primary animate-pulse' />
+                CORE SYSTEM PILLARS
+              </div>
+              <h2 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-orbitron font-black tracking-tight text-foreground uppercase leading-[1.06]'>
+                Engineered for Ground-Truth Profitability
+              </h2>
+            </div>
+            <div className='font-mono text-[11px] sm:text-xs text-muted-foreground tracking-widest uppercase shrink-0 pb-1'>
+              [ 04 CORE PILLARS &bull; DUAL-ENGINE ]
+            </div>
           </div>
-          <h2 className='text-3xl md:text-4xl font-orbitron font-extrabold tracking-tight text-foreground mb-4'>
-            Engineered for Ground-Truth Profitability
-          </h2>
-          <p className='text-sm md:text-base text-muted-foreground leading-relaxed'>
-            Why generic LLM agents fail: LLMs cannot perform multi-variable bounded convex optimization reliably.
-            NEXUS decouples mathematical rigor from narrative root-cause diagnostics.
-          </p>
         </div>
 
         <PillarsCardsStack />
@@ -52,16 +56,21 @@ export function LandingPageView() {
       {/* 3. 4-PHASE ARCHITECTURAL FLOW (STACK & PIPELINE) */}
       <section id='stack' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-16 relative'>
         <span id='pipeline' className='absolute -top-20' />
-        <div className='text-center max-w-3xl mx-auto mb-16'>
-          <div className='font-mono text-xs font-bold text-primary uppercase tracking-widest mb-2'>
-            CLOSED LOOP EXECUTION
+        <div className='w-full mb-10 sm:mb-14'>
+          <div className='flex flex-col md:flex-row md:items-end md:justify-between gap-4 pb-5 border-b border-border/60'>
+            <div className='space-y-2 max-w-5xl'>
+              <div className='flex items-center gap-2 font-mono text-[11px] sm:text-xs font-bold text-primary uppercase tracking-[0.2em]'>
+                <span className='inline-block size-1.5 rounded-full bg-primary animate-pulse' />
+                CLOSED LOOP EXECUTION
+              </div>
+              <h2 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-orbitron font-black tracking-tight text-foreground uppercase leading-[1.06]'>
+                From Ingestion to Closed-Loop Ledger
+              </h2>
+            </div>
+            <div className='font-mono text-[11px] sm:text-xs text-muted-foreground tracking-widest uppercase shrink-0 pb-1'>
+              [ 4-PHASE LIFECYCLE &bull; ZERO FRICTION ]
+            </div>
           </div>
-          <h2 className='text-3xl md:text-4xl font-orbitron font-extrabold tracking-tight text-foreground mb-4'>
-            From Ingestion to Closed-Loop Ledger
-          </h2>
-          <p className='text-sm md:text-base text-muted-foreground leading-relaxed'>
-            How NEXUS operates from end-to-end without human friction while keeping full human-in-the-loop control.
-          </p>
         </div>
 
         <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
@@ -128,13 +137,21 @@ export function LandingPageView() {
       {/* 4. ISOMETRIC ALGORITHMIC TELEMETRY (TACTILE HAIRLINE COCKPIT) */}
       <section id='instruments' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-16 relative'>
         <span id='telemetry' className='absolute -top-20' />
-        <div className='text-center max-w-3xl mx-auto mb-12 sm:mb-16'>
-          <h2 className='text-3xl md:text-4xl font-orbitron font-extrabold tracking-tight text-foreground mb-4'>
-            Interactive Hairline Telemetry Cockpit
-          </h2>
-          <p className='text-sm md:text-base text-muted-foreground leading-relaxed max-w-2xl mx-auto'>
-            Pointer-reactive isometric wireframe instruments modeled from the mathematical core of NEXUS. Glide your cursor to deform geometry, inspect real-time readouts, and simulate algorithmic defense responses.
-          </p>
+        <div className='w-full mb-10 sm:mb-14'>
+          <div className='flex flex-col md:flex-row md:items-end md:justify-between gap-4 pb-5 border-b border-border/60'>
+            <div className='space-y-2 max-w-5xl'>
+              <div className='flex items-center gap-2 font-mono text-[11px] sm:text-xs font-bold text-primary uppercase tracking-[0.2em]'>
+                <span className='inline-block size-1.5 rounded-full bg-primary animate-pulse' />
+                TELEMETRY COCKPIT
+              </div>
+              <h2 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-orbitron font-black tracking-tight text-foreground uppercase leading-[1.06]'>
+                Interactive Hairline Telemetry Cockpit
+              </h2>
+            </div>
+            <div className='font-mono text-[11px] sm:text-xs text-muted-foreground tracking-widest uppercase shrink-0 pb-1'>
+              [ POINTER-REACTIVE &bull; 3D WIREFRAME ]
+            </div>
+          </div>
         </div>
         <IsometricTelemetryPanel />
       </section>
@@ -142,13 +159,21 @@ export function LandingPageView() {
       {/* DETERMINISTIC ENGINE TECH STACK HIGHLIGHT GRID */}
       <section className='py-12 sm:py-16 relative z-10 w-full'>
         <div className='mx-auto max-w-7xl px-4 md:px-8 lg:px-12 flex flex-col gap-6 sm:gap-8'>
-          <div className='flex flex-col items-center text-center space-y-3 mb-2'>
-            <h2 className='text-2xl sm:text-3xl md:text-4xl font-orbitron font-extrabold tracking-tight text-foreground'>
-              Engineered with Modern Full-Stack Precision
-            </h2>
-            <p className='text-sm sm:text-base text-muted-foreground max-w-2xl'>
-              Glide across the real-time DuckDB columnar analytics, SciPy KKT solvers, Next.js 16 architecture, and modern full-stack libraries powering NEXUS.
-            </p>
+          <div className='w-full mb-2'>
+            <div className='flex flex-col md:flex-row md:items-end md:justify-between gap-4 pb-5 border-b border-border/60'>
+              <div className='space-y-2 max-w-5xl'>
+                <div className='flex items-center gap-2 font-mono text-[11px] sm:text-xs font-bold text-primary uppercase tracking-[0.2em]'>
+                  <span className='inline-block size-1.5 rounded-full bg-primary animate-pulse' />
+                  STACK ARCHITECTURE
+                </div>
+                <h2 className='text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-orbitron font-black tracking-tight text-foreground uppercase leading-[1.06]'>
+                  Engineered with Modern Full-Stack Precision
+                </h2>
+              </div>
+              <div className='font-mono text-[11px] sm:text-xs text-muted-foreground tracking-widest uppercase shrink-0 pb-1'>
+                [ NEXT.JS 16 &bull; DUCKDB &bull; SCIPY ]
+              </div>
+            </div>
           </div>
 
           <HighlightGrid />

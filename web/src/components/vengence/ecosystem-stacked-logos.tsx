@@ -285,17 +285,22 @@ export const fullBleedLogoGroups: React.ReactNode[][] = [
 export function EcosystemStackedLogos() {
   return (
     <section className="py-12 sm:py-16 md:py-20 border-b border-border/60 bg-muted/10 relative overflow-hidden w-full">
-      {/* Centered Editorial Section Header */}
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center mb-8 sm:mb-12">
-        <div className="font-mono text-[11px] font-bold text-primary uppercase tracking-widest mb-2.5">
-          GLOBAL AD DECISION ECOSYSTEM
+      {/* Bold Statement Header: Spans left to right across the website */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full mb-10 sm:mb-14">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 pb-5 border-b border-border/60">
+          <div className="space-y-2 max-w-5xl">
+            <div className="flex items-center gap-2 font-mono text-[11px] sm:text-xs font-bold text-primary uppercase tracking-[0.2em]">
+              <span className="inline-block size-1.5 rounded-full bg-primary animate-pulse" />
+              GLOBAL AD DECISION ECOSYSTEM
+            </div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-orbitron font-black tracking-tight text-foreground uppercase leading-[1.06]">
+              Integrated with Market Leaders &amp; Ad Networks
+            </h2>
+          </div>
+          <div className="font-mono text-[11px] sm:text-xs text-muted-foreground tracking-widest uppercase shrink-0 pb-1">
+            [ 24+ CHANNELS &bull; LIVE TELEMETRY ]
+          </div>
         </div>
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-orbitron font-extrabold tracking-tight text-foreground mb-3">
-          Integrated with Market Leaders &amp; Ad Networks
-        </h2>
-        <p className="text-xs sm:text-sm text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Autonomous multi-channel allocation, live attribution telemetry, and real-time bid execution across 24+ global consumer brands, marketplaces, and advertising platforms.
-        </p>
       </div>
 
       {/* FULL-BLEED GRID: Extends from extreme left to extreme right of the entire website */}

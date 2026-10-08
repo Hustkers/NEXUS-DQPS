@@ -75,14 +75,22 @@ export function WhyUsBento({
   return (
     <section className={cn("py-12 sm:py-16 relative z-10 w-full", className)}>
       <div className="mx-auto max-w-7xl px-4 md:px-8 lg:px-12 flex flex-col gap-6 sm:gap-8">
-        {/* Section Header */}
-        <div className="flex flex-col items-center text-center space-y-3 mb-2">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-orbitron font-extrabold tracking-tight text-foreground">
-            Why High-Growth Brands Run on NEXUS
-          </h2>
-          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl">
-            Autonomous multi-channel allocation, real-time causal telemetry, and deterministic mathematical solvers that replace manual guesswork.
-          </p>
+        {/* Bold Statement Header: Spans left to right across the website */}
+        <div className="w-full mb-2">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 pb-5 border-b border-border/60">
+            <div className="space-y-2 max-w-5xl">
+              <div className="flex items-center gap-2 font-mono text-[11px] sm:text-xs font-bold text-primary uppercase tracking-[0.2em]">
+                <span className="inline-block size-1.5 rounded-full bg-primary animate-pulse" />
+                ENTERPRISE ADVANTAGE
+              </div>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-orbitron font-black tracking-tight text-foreground uppercase leading-[1.06]">
+                Why High-Growth Brands Run on NEXUS
+              </h2>
+            </div>
+            <div className="font-mono text-[11px] sm:text-xs text-muted-foreground tracking-widest uppercase shrink-0 pb-1">
+              [ DETERMINISTIC SCALING &bull; ROAS PROTECTION ]
+            </div>
+          </div>
         </div>
 
         {/* Bento Grid */}
