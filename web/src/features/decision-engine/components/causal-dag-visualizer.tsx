@@ -23,6 +23,7 @@ interface DagNode {
   metricName: string;
   primaryValue: string;
   secondaryMetric: string;
+  hoverTelemetry?: string;
   status: 'nominal' | 'critical' | 'warning';
   detail: string;
   icon: React.ElementType;
@@ -37,16 +38,9 @@ interface CausalDagVisualizerProps {
 
 export function CausalDagVisualizer({ activeAnomaly = false }: CausalDagVisualizerProps) {
   const [selectedNode, setSelectedNode] = useState<string | null>('orders');
+  const [hoveredNode, setHoveredNode] = useState<string | null>(null);
 
-  // Exact coordinates:
-  // Node card: 220px wide, 74px tall
-  // Center X = 90 + 110 = 200
-  // y0: 16  -> bottom: 90
-  // y1: 122 -> bottom: 196
-  // y2: 228 -> bottom: 302
-  // y3: 334 -> bottom: 408
-  // y4: 440 -> bottom: 514
-  // Side Inventory card: at X: 390, Y: 175 (bottom: 249)
+  // Layout coordinates for SVG Canvas (centered at X=200, side branch at X=390):
   const nodes: DagNode[] = [
     {
       id: 'spend',
@@ -55,6 +49,7 @@ export function CausalDagVisualizer({ activeAnomaly = false }: CausalDagVisualiz
       metricName: 'Daily Budget Burn',
       primaryValue: '₹4,200/d',
       secondaryMetric: 'Steady-State Burn',
+      hoverTelemetry: 'Allocated budget evenly across Meta Advantage+ and Google Shopping.',
       status: 'nominal',
       detail: 'Daily budget allocated to campaign. Steady-state burn across connected ad networks.',
       icon: IconCoins,
@@ -68,6 +63,7 @@ export function CausalDagVisualizer({ activeAnomaly = false }: CausalDagVisualiz
       metricName: 'Traffic Volume',
       primaryValue: '5,616',
       secondaryMetric: '1.80% CTR Benchmark',
+      hoverTelemetry: 'High-intent product detail page sessions delivered from catalog campaigns.',
       status: 'nominal',
       detail: 'Ad creative click-through volume. Stable inbound traffic to footwear product landing page.',
       icon: IconPointer,
@@ -81,6 +77,9 @@ export function CausalDagVisualizer({ activeAnomaly = false }: CausalDagVisualiz
       metricName: 'Warehouse Buffer',
       primaryValue: activeAnomaly ? '0 units' : '420 units',
       secondaryMetric: activeAnomaly ? 'Depleted (Out of Stock)' : '24 days runway',
+      hoverTelemetry: activeAnomaly
+        ? 'Physical warehouse SKU count is at 0. Immediate stockout kill-switch required.'
+        : 'Sufficient buffer to support 24 days of projected order velocity.',
       status: activeAnomaly ? 'critical' : 'nominal',
       detail: activeAnomaly
         ? 'Stock depletion gate: Zero purchasable inventory available in distribution center.'
@@ -97,6 +96,9 @@ export function CausalDagVisualizer({ activeAnomaly = false }: CausalDagVisualiz
       metricName: 'Checkout CVR',
       primaryValue: activeAnomaly ? '0.12%' : '2.80%',
       secondaryMetric: activeAnomaly ? '−94% Anomaly Drop' : 'Nominal Benchmark',
+      hoverTelemetry: activeAnomaly
+        ? 'Traffic bounces without checkout because shoe sizes are out of stock.'
+        : 'Checkout conversion rate within historical 30-day equilibrium boundary.',
       status: activeAnomaly ? 'critical' : 'nominal',
       detail: activeAnomaly
         ? 'Conversion collapsed by -94% due to physical warehouse stock depletion.'
@@ -112,6 +114,9 @@ export function CausalDagVisualizer({ activeAnomaly = false }: CausalDagVisualiz
       metricName: 'Fulfilled Units',
       primaryValue: activeAnomaly ? '7 units' : '157 units',
       secondaryMetric: activeAnomaly ? '−96% Order Shortfall' : 'Target Met (100%)',
+      hoverTelemetry: activeAnomaly
+        ? 'Only 7 orders recorded vs expected 157 target units due to upstream stock gate.'
+        : 'Fulfillment operations on schedule across national distribution nodes.',
       status: activeAnomaly ? 'critical' : 'nominal',
       detail: activeAnomaly
         ? 'Severe order shortfall · −96% volume. Budget is being spent without sufficient fulfillment.'
@@ -127,6 +132,9 @@ export function CausalDagVisualizer({ activeAnomaly = false }: CausalDagVisualiz
       metricName: 'Net Daily Yield',
       primaryValue: activeAnomaly ? '-₹3,008' : '+₹5,140',
       secondaryMetric: activeAnomaly ? 'Deficit Loss Burn' : '+41% Margin Yield',
+      hoverTelemetry: activeAnomaly
+        ? 'Negative contribution margin of -₹3,008/day burns capital without generating gross margin.'
+        : 'Net daily margin yield of +₹5,140/day satisfies corporate capital return floor.',
       status: activeAnomaly ? 'critical' : 'nominal',
       detail: activeAnomaly
         ? 'Net daily margin deficit: -₹3,008 observed loss attributable to stockout ad burn.'
@@ -137,7 +145,13 @@ export function CausalDagVisualizer({ activeAnomaly = false }: CausalDagVisualiz
     }
   ];
 
-  const activeNodeData = nodes.find((n) => n.id === selectedNode);
+  const activeNodeData = nodes.find((n) => n.id === (hoveredNode || selectedNode));
+
+  // Determine connected edge highlights for hovered node
+  const isEdgeHighlighted = (from: string, to: string) => {
+    if (!hoveredNode) return false;
+    return hoveredNode === from || hoveredNode === to;
+  };
 
   return (
     <Card className='p-4 sm:p-5 border border-slate-800/80 bg-[#0B101B] shadow-lg rounded-xl text-card-foreground relative overflow-hidden min-w-0 max-w-full space-y-4'>
@@ -194,6 +208,9 @@ export function CausalDagVisualizer({ activeAnomaly = false }: CausalDagVisualiz
               <marker id='arrow-primary' viewBox='0 0 12 12' refX='9' refY='6' markerWidth='6' markerHeight='6' orient='auto'>
                 <path d='M 1 2 L 10 6 L 1 10 z' fill='#38BDF8' />
               </marker>
+              <marker id='arrow-highlight' viewBox='0 0 12 12' refX='9' refY='6' markerWidth='6' markerHeight='6' orient='auto'>
+                <path d='M 1 2 L 10 6 L 1 10 z' fill='#34D399' />
+              </marker>
               <marker id='arrow-secondary' viewBox='0 0 12 12' refX='9' refY='6' markerWidth='5' markerHeight='5' orient='auto'>
                 <path d='M 1 2 L 10 6 L 1 10 z' fill='#818CF8' />
               </marker>
@@ -220,68 +237,158 @@ export function CausalDagVisualizer({ activeAnomaly = false }: CausalDagVisualiz
             <path
               d='M 200 90 C 200 100, 200 110, 200 118'
               fill='none'
-              stroke='#38BDF8'
-              strokeWidth='2.5'
+              stroke={isEdgeHighlighted('spend', 'clicks') ? '#34D399' : '#38BDF8'}
+              strokeWidth={isEdgeHighlighted('spend', 'clicks') ? '3.5' : '2.5'}
               strokeLinecap='round'
-              markerEnd='url(#arrow-primary)'
+              markerEnd={isEdgeHighlighted('spend', 'clicks') ? 'url(#arrow-highlight)' : 'url(#arrow-primary)'}
             />
 
             {/* 2. Primary Spine Connector: CLICKS (200, 196) -> CONVERSION (200, 228) */}
             <path
               d='M 200 196 C 200 206, 200 216, 200 224'
               fill='none'
-              stroke={activeAnomaly ? '#F43F5E' : '#38BDF8'}
-              strokeWidth={activeAnomaly ? '3' : '2.5'}
-              strokeDasharray={activeAnomaly ? '5 3' : undefined}
-              className={activeAnomaly ? 'animate-pulse' : undefined}
+              stroke={
+                isEdgeHighlighted('clicks', 'conversion')
+                  ? '#34D399'
+                  : activeAnomaly
+                  ? '#F43F5E'
+                  : '#38BDF8'
+              }
+              strokeWidth={
+                isEdgeHighlighted('clicks', 'conversion')
+                  ? '3.5'
+                  : activeAnomaly
+                  ? '3'
+                  : '2.5'
+              }
+              strokeDasharray={activeAnomaly && !isEdgeHighlighted('clicks', 'conversion') ? '5 3' : undefined}
+              className={activeAnomaly && !isEdgeHighlighted('clicks', 'conversion') ? 'animate-pulse' : undefined}
               strokeLinecap='round'
-              markerEnd={activeAnomaly ? 'url(#arrow-critical)' : 'url(#arrow-primary)'}
+              markerEnd={
+                isEdgeHighlighted('clicks', 'conversion')
+                  ? 'url(#arrow-highlight)'
+                  : activeAnomaly
+                  ? 'url(#arrow-critical)'
+                  : 'url(#arrow-primary)'
+              }
             />
 
             {/* 3. Secondary Branch Connector: CLICKS (310, 159) -> INVENTORY (390, 212) */}
             <path
               d='M 310 159 C 352 159, 350 212, 386 212'
               fill='none'
-              stroke={activeAnomaly ? '#F43F5E' : '#818CF8'}
-              strokeWidth={activeAnomaly ? '2.5' : '1.5'}
+              stroke={
+                isEdgeHighlighted('clicks', 'inventory')
+                  ? '#34D399'
+                  : activeAnomaly
+                  ? '#F43F5E'
+                  : '#818CF8'
+              }
+              strokeWidth={
+                isEdgeHighlighted('clicks', 'inventory')
+                  ? '3'
+                  : activeAnomaly
+                  ? '2.5'
+                  : '1.5'
+              }
               strokeDasharray='4 4'
-              className={activeAnomaly ? 'animate-pulse' : undefined}
+              className={activeAnomaly && !isEdgeHighlighted('clicks', 'inventory') ? 'animate-pulse' : undefined}
               strokeLinecap='round'
-              markerEnd={activeAnomaly ? 'url(#arrow-critical)' : 'url(#arrow-secondary)'}
+              markerEnd={
+                isEdgeHighlighted('clicks', 'inventory')
+                  ? 'url(#arrow-highlight)'
+                  : activeAnomaly
+                  ? 'url(#arrow-critical)'
+                  : 'url(#arrow-secondary)'
+              }
             />
 
             {/* 4. Secondary Return Branch Connector: INVENTORY (390, 225) -> CONVERSION (310, 265) */}
             <path
               d='M 390 225 C 348 225, 352 265, 314 265'
               fill='none'
-              stroke={activeAnomaly ? '#F43F5E' : '#818CF8'}
-              strokeWidth={activeAnomaly ? '3' : '1.5'}
-              strokeDasharray={activeAnomaly ? '6 3' : '4 4'}
-              className={activeAnomaly ? 'animate-pulse' : undefined}
+              stroke={
+                isEdgeHighlighted('inventory', 'conversion')
+                  ? '#34D399'
+                  : activeAnomaly
+                  ? '#F43F5E'
+                  : '#818CF8'
+              }
+              strokeWidth={
+                isEdgeHighlighted('inventory', 'conversion')
+                  ? '3.5'
+                  : activeAnomaly
+                  ? '3'
+                  : '1.5'
+              }
+              strokeDasharray={activeAnomaly && !isEdgeHighlighted('inventory', 'conversion') ? '6 3' : '4 4'}
+              className={activeAnomaly && !isEdgeHighlighted('inventory', 'conversion') ? 'animate-pulse' : undefined}
               strokeLinecap='round'
-              markerEnd={activeAnomaly ? 'url(#arrow-critical)' : 'url(#arrow-secondary)'}
+              markerEnd={
+                isEdgeHighlighted('inventory', 'conversion')
+                  ? 'url(#arrow-highlight)'
+                  : activeAnomaly
+                  ? 'url(#arrow-critical)'
+                  : 'url(#arrow-secondary)'
+              }
             />
 
             {/* 5. Primary Spine Connector: CONVERSION (200, 302) -> ORDERS (200, 334) */}
             <path
               d='M 200 302 C 200 312, 200 322, 200 330'
               fill='none'
-              stroke={activeAnomaly ? '#F43F5E' : '#38BDF8'}
-              strokeWidth={activeAnomaly ? '2.5' : '2.5'}
-              strokeDasharray={activeAnomaly ? '5 3' : undefined}
+              stroke={
+                isEdgeHighlighted('conversion', 'orders')
+                  ? '#34D399'
+                  : activeAnomaly
+                  ? '#F43F5E'
+                  : '#38BDF8'
+              }
+              strokeWidth={
+                isEdgeHighlighted('conversion', 'orders')
+                  ? '3.5'
+                  : activeAnomaly
+                  ? '2.5'
+                  : '2.5'
+              }
+              strokeDasharray={activeAnomaly && !isEdgeHighlighted('conversion', 'orders') ? '5 3' : undefined}
               strokeLinecap='round'
-              markerEnd={activeAnomaly ? 'url(#arrow-critical)' : 'url(#arrow-primary)'}
+              markerEnd={
+                isEdgeHighlighted('conversion', 'orders')
+                  ? 'url(#arrow-highlight)'
+                  : activeAnomaly
+                  ? 'url(#arrow-critical)'
+                  : 'url(#arrow-primary)'
+              }
             />
 
             {/* 6. Primary Spine Connector: ORDERS (200, 408) -> MARGIN (200, 440) */}
             <path
               d='M 200 408 C 200 418, 200 428, 200 436'
               fill='none'
-              stroke={activeAnomaly ? '#F43F5E' : '#38BDF8'}
-              strokeWidth={activeAnomaly ? '2.5' : '2.5'}
-              strokeDasharray={activeAnomaly ? '5 3' : undefined}
+              stroke={
+                isEdgeHighlighted('orders', 'margin')
+                  ? '#34D399'
+                  : activeAnomaly
+                  ? '#F43F5E'
+                  : '#38BDF8'
+              }
+              strokeWidth={
+                isEdgeHighlighted('orders', 'margin')
+                  ? '3.5'
+                  : activeAnomaly
+                  ? '2.5'
+                  : '2.5'
+              }
+              strokeDasharray={activeAnomaly && !isEdgeHighlighted('orders', 'margin') ? '5 3' : undefined}
               strokeLinecap='round'
-              markerEnd={activeAnomaly ? 'url(#arrow-critical)' : 'url(#arrow-primary)'}
+              markerEnd={
+                isEdgeHighlighted('orders', 'margin')
+                  ? 'url(#arrow-highlight)'
+                  : activeAnomaly
+                  ? 'url(#arrow-critical)'
+                  : 'url(#arrow-primary)'
+              }
             />
           </svg>
 
@@ -289,6 +396,7 @@ export function CausalDagVisualizer({ activeAnomaly = false }: CausalDagVisualiz
           {nodes.map((node) => {
             const isCritical = node.status === 'critical';
             const isSelected = selectedNode === node.id;
+            const isHovered = hoveredNode === node.id;
             const IconComponent = node.icon;
 
             return (
@@ -296,14 +404,17 @@ export function CausalDagVisualizer({ activeAnomaly = false }: CausalDagVisualiz
                 key={node.id}
                 type='button'
                 onClick={() => setSelectedNode(node.id)}
+                onMouseEnter={() => setHoveredNode(node.id)}
+                onMouseLeave={() => setHoveredNode(null)}
                 style={{ left: `${node.x}px`, top: `${node.y}px` }}
                 className={cn(
-                  'absolute w-[220px] p-2.5 rounded-xl border text-left cursor-pointer transition-all duration-150',
+                  'absolute w-[220px] p-2.5 rounded-xl border text-left cursor-pointer transition-all duration-200 select-none',
                   isCritical
-                    ? 'bg-rose-950/40 border-rose-500 shadow-lg shadow-rose-950/50 ring-2 ring-rose-500/80 scale-[1.02]'
-                    : 'bg-[#0F1626]/95 backdrop-blur-sm shadow-md border-slate-800/90 hover:border-slate-600',
-                  node.isSideBranch && !isCritical && 'border-indigo-800/70 hover:border-indigo-600/80 border-dashed',
-                  isSelected && (isCritical ? 'ring-2 ring-rose-400' : 'ring-2 ring-emerald-500/70 border-emerald-500/50')
+                    ? 'bg-rose-950/40 border-rose-500 shadow-lg shadow-rose-950/50 ring-2 ring-rose-500/80'
+                    : 'bg-[#0F1626]/95 backdrop-blur-sm shadow-md border-slate-800/90 hover:border-slate-500',
+                  node.isSideBranch && !isCritical && 'border-indigo-800/70 hover:border-indigo-500 border-dashed',
+                  isSelected && (isCritical ? 'ring-2 ring-rose-400' : 'ring-2 ring-emerald-500/80 border-emerald-500/60'),
+                  isHovered && '-translate-y-0.5 shadow-xl shadow-cyan-950/30'
                 )}
               >
                 {/* Top Row: Stage Number & Status Indicator */}
@@ -349,14 +460,14 @@ export function CausalDagVisualizer({ activeAnomaly = false }: CausalDagVisualiz
                   </div>
                 </div>
 
-                {/* Bottom Row: Secondary Metric */}
+                {/* Bottom Row: Secondary Metric or Hover Telemetry Hint */}
                 <div className='mt-1 pt-1 border-t border-slate-800/60 flex items-center justify-between text-[10px]'>
-                  <span className={isCritical ? 'text-rose-400 font-semibold text-[9px]' : 'text-slate-400 text-[9px]'}>
-                    {node.secondaryMetric}
+                  <span className={cn('text-[9px] truncate', isCritical ? 'text-rose-400 font-semibold' : 'text-slate-400')}>
+                    {isHovered && node.hoverTelemetry ? node.hoverTelemetry : node.secondaryMetric}
                   </span>
-                  {node.isSideBranch && (
-                    <span className='text-[9px] font-medium text-indigo-400/90 uppercase tracking-tight'>
-                      Supply Constraint
+                  {node.isSideBranch && !isHovered && (
+                    <span className='text-[9px] font-medium text-indigo-400/90 uppercase tracking-tight shrink-0 ml-1'>
+                      Supply Gate
                     </span>
                   )}
                 </div>
