@@ -178,11 +178,10 @@ export function PillarsCardsStack() {
 
   return (
     <ContainerScroll
-      className='w-full max-w-5xl mx-auto pt-4'
-      style={{ paddingBottom: '90vh' }}
+      className='w-full max-w-5xl mx-auto pt-4 space-y-20 pb-40'
+      style={{ minHeight: '280vh' }}
     >
       {cards.map((card, index) => {
-        const isLast = index === cards.length - 1;
         return (
           <CardSticky
             key={card.id}
@@ -191,11 +190,8 @@ export function PillarsCardsStack() {
             incrementZ={10}
             baseTop={88}
             className='w-full'
-            style={{
-              marginBottom: isLast ? '0px' : '45vh'
-            }}
           >
-            <div className='rounded-3xl border border-border/80 bg-card dark:bg-zinc-950 shadow-2xl p-6 sm:p-8 md:p-10 transition-all duration-300 relative overflow-hidden group hover:border-primary/50'>
+            <div className='min-h-[460px] md:min-h-[410px] flex flex-col justify-between rounded-3xl border border-border/80 bg-card dark:bg-zinc-950 shadow-2xl p-6 sm:p-8 md:p-10 transition-all duration-300 relative overflow-hidden group hover:border-primary/50'>
               {/* Top Bar: Tag Badge & Big Step Index */}
               <div className='flex items-center justify-between gap-4 mb-4 sm:mb-6 border-b border-border/60 pb-4'>
                 <div className='flex items-center gap-3 flex-wrap'>
@@ -222,8 +218,8 @@ export function PillarsCardsStack() {
               </div>
 
               {/* Middle Grid: Title + Description on left, Hairline Instrument on right */}
-              <div className='grid grid-cols-1 lg:grid-cols-12 gap-6 items-start'>
-                <div className='lg:col-span-5 flex flex-col justify-between space-y-4'>
+              <div className='grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-1'>
+                <div className='lg:col-span-5 flex flex-col justify-between h-full space-y-4'>
                   <div>
                     <h3 className='font-orbitron font-bold text-xl sm:text-2xl text-foreground tracking-tight leading-snug mb-3 group-hover:text-primary transition-colors'>
                       {card.title}
@@ -233,7 +229,7 @@ export function PillarsCardsStack() {
                     </p>
                   </div>
 
-                  <div className='pt-2'>
+                  <div className='pt-2 mt-auto'>
                     <Link
                       href={card.href}
                       className='inline-flex items-center gap-2 text-xs sm:text-sm font-mono font-bold text-primary hover:text-primary/80 transition-colors group/link'
