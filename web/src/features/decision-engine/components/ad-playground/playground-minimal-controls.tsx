@@ -10,7 +10,8 @@ import {
   IconChevronDown,
   IconChevronUp,
   IconGauge,
-  IconShieldCheck
+  IconShieldCheck,
+  IconPlayerPlay
 } from '@tabler/icons-react';
 import type { AdPlaygroundConstraints } from '../../types/ad-playground-types';
 import { cn } from '@/lib/utils';
@@ -129,13 +130,14 @@ export function PlaygroundMinimalControls({
       <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1'>
         {/* Audience */}
         <div className='space-y-1.5'>
-          <label className='text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5'>
+          <label htmlFor='playground-audience' className='text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5'>
             <IconUsers className='size-3 text-blue-400' />
             Audience
           </label>
           <select
+            id='playground-audience'
             value={constraints.audience || 'broad'}
-            onChange={(e) => onChangeConstraints({ ...constraints, audience: e.target.value as any })}
+            onChange={(e) => onChangeConstraints({ ...constraints, audience: e.target.value as AdPlaygroundConstraints['audience'] })}
             className='w-full px-2.5 py-1.5 rounded-lg border border-border/80 bg-background text-xs font-mono text-foreground focus:outline-none focus:border-cyan-500 cursor-pointer'
           >
             {audienceOptions.map((opt) => (
@@ -148,13 +150,14 @@ export function PlaygroundMinimalControls({
 
         {/* Creative */}
         <div className='space-y-1.5'>
-          <label className='text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5'>
+          <label htmlFor='playground-creative' className='text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5'>
             <IconVideo className='size-3 text-emerald-400' />
             Creative Format
           </label>
           <select
+            id='playground-creative'
             value={constraints.creative || 'ugc_video'}
-            onChange={(e) => onChangeConstraints({ ...constraints, creative: e.target.value as any })}
+            onChange={(e) => onChangeConstraints({ ...constraints, creative: e.target.value as AdPlaygroundConstraints['creative'] })}
             className='w-full px-2.5 py-1.5 rounded-lg border border-border/80 bg-background text-xs font-mono text-foreground focus:outline-none focus:border-cyan-500 cursor-pointer'
           >
             {creativeOptions.map((opt) => (
@@ -167,13 +170,14 @@ export function PlaygroundMinimalControls({
 
         {/* Placement */}
         <div className='space-y-1.5'>
-          <label className='text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5'>
+          <label htmlFor='playground-placement' className='text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5'>
             <IconLayoutGrid className='size-3 text-purple-400' />
             Placement
           </label>
           <select
+            id='playground-placement'
             value={constraints.placement || 'auto'}
-            onChange={(e) => onChangeConstraints({ ...constraints, placement: e.target.value as any })}
+            onChange={(e) => onChangeConstraints({ ...constraints, placement: e.target.value as AdPlaygroundConstraints['placement'] })}
             className='w-full px-2.5 py-1.5 rounded-lg border border-border/80 bg-background text-xs font-mono text-foreground focus:outline-none focus:border-cyan-500 cursor-pointer'
           >
             {placementOptions.map((opt) => (
@@ -186,11 +190,12 @@ export function PlaygroundMinimalControls({
 
         {/* Duration */}
         <div className='space-y-1.5'>
-          <label className='text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5'>
+          <label htmlFor='playground-duration' className='text-[11px] font-semibold text-muted-foreground flex items-center gap-1.5'>
             <IconCalendar className='size-3 text-amber-400' />
             Horizon
           </label>
           <select
+            id='playground-duration'
             value={constraints.duration_days}
             onChange={(e) => onChangeConstraints({ ...constraints, duration_days: Number(e.target.value) })}
             className='w-full px-2.5 py-1.5 rounded-lg border border-border/80 bg-background text-xs font-mono text-foreground focus:outline-none focus:border-cyan-500 cursor-pointer'
@@ -274,6 +279,31 @@ export function PlaygroundMinimalControls({
             </div>
           </div>
         )}
+      </div>
+
+      {/* 4. Action Trigger in Controls */}
+      <div className='pt-2 border-t border-border/60 flex items-center justify-between'>
+        <span className='text-[10px] text-muted-foreground'>
+          {isCalculating ? 'Computing simulation...' : 'Live parameters active'}
+        </span>
+        <button
+          type='button'
+          onClick={onRunExperiment}
+          disabled={isCalculating}
+          className='px-3 py-1.5 rounded-lg bg-foreground text-background font-bold text-[11px] uppercase tracking-wider hover:bg-foreground/90 transition-all flex items-center gap-1.5 shadow-xs disabled:opacity-50 active:scale-95'
+        >
+          {isCalculating ? (
+            <>
+              <span className='size-2.5 border-2 border-background border-t-transparent rounded-full animate-spin' />
+              <span>Simulating...</span>
+            </>
+          ) : (
+            <>
+              <IconPlayerPlay className='size-3 fill-current' />
+              <span>Run Experiment</span>
+            </>
+          )}
+        </button>
       </div>
     </div>
   );

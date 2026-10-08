@@ -53,7 +53,7 @@ export const ThemeToggle = () => {
         aria-label='toggle theme'
         className='theme-btn group size-8 rounded-full border border-border/80 hover:bg-muted/80 p-0 inline-flex items-center justify-center transition-all'
       >
-        <SunDim className='theme-toggle-icon size-4.5 text-foreground/80' />
+        <MoonStar className='theme-toggle-icon size-4.5 text-foreground/80' />
       </Button>
     );
   }

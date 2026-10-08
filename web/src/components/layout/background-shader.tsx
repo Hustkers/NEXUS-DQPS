@@ -15,7 +15,7 @@ export function BackgroundShader() {
     () => false
   );
 
-  const isDark = !mounted || resolvedTheme === 'dark';
+  const isDark = mounted && resolvedTheme === 'dark';
 
   return (
     <div

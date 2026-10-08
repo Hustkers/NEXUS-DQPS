@@ -2,14 +2,12 @@
 
 import React, { useState } from 'react';
 import {
-  IconSparkles,
   IconCheck,
   IconChevronDown,
   IconChevronUp,
   IconArrowsExchange,
   IconAlertTriangle,
-  IconX,
-  IconScale
+  IconX
 } from '@tabler/icons-react';
 import { PlatformLogo } from '@/components/icons/platform-logos';
 import type { CandidateAdConfig, AdPlaygroundResult } from '../../types/ad-playground-types';
@@ -150,11 +148,13 @@ export function PlaygroundRecommendationView({
             const isTop = cand.rank === 1;
 
             return (
-              <div
+              <button
                 key={cand.config_id}
+                type='button'
                 onClick={() => setComparedCandidate(cand)}
+                aria-label={`Compare candidate ${cand.title}`}
                 className={cn(
-                  'flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer group text-xs',
+                  'w-full flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer group text-xs text-left',
                   isTop
                     ? 'border-emerald-500/50 bg-emerald-950/10 hover:border-emerald-500'
                     : 'border-border/60 bg-muted/20 hover:border-border hover:bg-muted/40'
@@ -194,7 +194,7 @@ export function PlaygroundRecommendationView({
                     {cand.predicted_net_profit < 0 ? '-' : ''}₹{Math.abs(cand.predicted_net_profit).toLocaleString()}
                   </span>
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>

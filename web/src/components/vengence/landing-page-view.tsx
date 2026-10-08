@@ -268,9 +268,6 @@ export function LandingPageView() {
       <section id='instruments' className='py-20 md:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-16 relative'>
         <span id='telemetry' className='absolute -top-20' />
         <div className='text-center max-w-3xl mx-auto mb-12 sm:mb-16'>
-          <div className='inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-primary text-xs font-mono tracking-wider uppercase mb-3'>
-            <span>●</span> TACTILE ALGORITHMIC TELEMETRY
-          </div>
           <h2 className='text-3xl md:text-4xl font-orbitron font-extrabold tracking-tight text-foreground mb-4'>
             Interactive Hairline Telemetry Cockpit
           </h2>
@@ -285,9 +282,6 @@ export function LandingPageView() {
       <section className='py-12 sm:py-16 relative z-10 w-full'>
         <div className='mx-auto max-w-7xl px-4 md:px-8 lg:px-12 flex flex-col gap-6 sm:gap-8'>
           <div className='flex flex-col items-center text-center space-y-3 mb-2'>
-            <div className='inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-primary text-xs font-mono tracking-wider uppercase'>
-              <span>●</span> DETERMINISTIC ENGINE &amp; TECH STACK
-            </div>
             <h2 className='text-2xl sm:text-3xl md:text-4xl font-orbitron font-extrabold tracking-tight text-foreground'>
               Engineered with Modern Full-Stack Precision
             </h2>
