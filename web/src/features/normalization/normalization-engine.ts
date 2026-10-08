@@ -203,11 +203,12 @@ export function normalizeGoogleAdsRow(item: any, inventoryMap: Record<string, nu
   };
 
   const costMicros = Number(item.metrics?.costMicros) || 0;
-  const spend = costMicros / 1000000;
+  const spend = (costMicros / 1000000) / 83.0;
   const impressions = Number(item.metrics?.impressions) || 0;
   const clicks = Number(item.metrics?.clicks) || 0;
   const conversions = Math.round(Number(item.metrics?.conversions) || 0);
-  const attributed_revenue = Number(item.metrics?.conversionsValue) || conversions * catalog.price;
+  const rawRevenue = Number(item.metrics?.conversionsValue);
+  const attributed_revenue = rawRevenue ? rawRevenue / 83.0 : conversions * catalog.price;
 
   const cpc = clicks > 0 ? spend / clicks : 0;
   const cpm = impressions > 0 ? (spend / impressions) * 1000 : 0;
@@ -282,11 +283,12 @@ export function normalizeAmazonSponsoredProducts(
     variantId: 'gid://shopify/ProductVariant/41001'
   };
 
-  const spend = Number(item.cost) || 0;
+  const spend = (Number(item.cost) || 0) / 83.0;
   const impressions = Number(item.impressions) || 0;
   const clicks = Number(item.clicks) || 0;
   const conversions = Number(item.attributedUnitsOrdered14d) || 0;
-  const attributed_revenue = Number(item.attributedSales14d) || conversions * catalog.price;
+  const rawRevenue = Number(item.attributedSales14d);
+  const attributed_revenue = rawRevenue ? rawRevenue / 83.0 : conversions * catalog.price;
 
   const cpc = clicks > 0 ? spend / clicks : 0;
   const cpm = impressions > 0 ? (spend / impressions) * 1000 : 0;
@@ -305,7 +307,8 @@ export function normalizeAmazonSponsoredProducts(
   const buy_box_win_pct = item.buyBoxWinPercentage != null
     ? Number((item.buyBoxWinPercentage * 100).toFixed(1))
     : 95.0;
-  const halo_attributed_revenue = Number(item.attributedSalesOtherSku14d) || 0;
+  const rawHalo = Number(item.attributedSalesOtherSku14d);
+  const halo_attributed_revenue = rawHalo ? rawHalo / 83.0 : 0;
   const net_contribution_margin = Math.max(0, gross_margin - spend);
   const poas = spend > 0 ? Number((gross_margin / spend).toFixed(2)) : undefined;
 

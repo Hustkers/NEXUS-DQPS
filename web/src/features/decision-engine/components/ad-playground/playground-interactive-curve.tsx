@@ -119,8 +119,8 @@ export function PlaygroundInteractiveCurve({
               {isStockout
                 ? '$0 (STOCKOUT)'
                 : currentProfit < 0
-                  ? `-$${Math.abs(currentProfit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                  : `$${currentProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                  ? `-$${Math.abs(currentProfit).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                  : `$${currentProfit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
             </div>
             <span className='text-[10px] text-zinc-500 block mt-0.5 font-sans'>
               {currentProfit < 0 ? 'Negative yield — reduce spend' : 'Net marginal contribution'}
@@ -344,7 +344,7 @@ export function PlaygroundInteractiveCurve({
           <div className='p-2.5 rounded-lg bg-zinc-900/40 border border-zinc-800'>
             <span className='text-[10px] text-zinc-400 block font-sans'>Daily Revenue</span>
             <span className='text-sm font-semibold font-mono tabular-nums text-zinc-100'>
-              ${(currentPoint?.revenue || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              ${(currentPoint?.revenue || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
           </div>
           <div className='p-2.5 rounded-lg bg-zinc-900/40 border border-zinc-800'>

@@ -141,7 +141,7 @@ export default function ExclusivePage() {
               <div className='grid grid-cols-2 gap-2 text-xs'>
                 <div className='p-2.5 rounded-lg border border-border/60 bg-card'>
                   <span className='text-muted-foreground block text-[10px]'>Avoided Budget Bleed</span>
-                  <strong className='text-emerald-500 text-sm font-bold'>+$1,48,200</strong>
+                  <strong className='text-emerald-500 text-sm font-bold'>+$148,200</strong>
                 </div>
                 <div className='p-2.5 rounded-lg border border-border/60 bg-card'>
                   <span className='text-muted-foreground block text-[10px]'>Tripped Circuit Breakers</span>

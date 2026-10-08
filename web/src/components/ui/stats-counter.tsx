@@ -51,7 +51,7 @@ export function StatsCounter({
   }, [springValue]);
 
   const formatted = useGrouping
-    ? displayValue.toLocaleString('en-IN', {
+    ? displayValue.toLocaleString('en-US', {
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals
       })

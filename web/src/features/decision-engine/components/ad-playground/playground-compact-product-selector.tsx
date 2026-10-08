@@ -98,7 +98,7 @@ export function PlaygroundCompactProductSelector({
 
             <div className='flex flex-wrap items-center gap-3 mt-1.5 text-xs font-mono tabular-nums'>
               <span className='font-semibold text-zinc-100'>
-                ${selectedProduct.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ${selectedProduct.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
               <span className='text-zinc-500'>•</span>
               <span className={cn('font-medium', isStockout ? 'text-rose-400 font-bold' : 'text-zinc-300')}>
@@ -222,7 +222,7 @@ export function PlaygroundCompactProductSelector({
                           {p.name}
                         </div>
                         <div className='text-[10px] text-zinc-400 mt-0.5 font-mono tabular-nums'>
-                          ${p.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} • {p.grossMarginPct}% margin
+                          ${p.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} • {p.grossMarginPct}% margin
                         </div>
                       </div>
                     </div>

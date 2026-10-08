@@ -74,20 +74,53 @@ function extractDirectiveDetails(item: any) {
   return { channel, productName, actionSummary };
 }
 
+export function getSurfaceMeta(item: any): { label: string; badgeClass: string } {
+  const surface = item.surface || (
+    item.id?.startsWith('ledg-rl') ? 'Product Analysis Modal' :
+    item.id?.startsWith('ledg-fix') ? 'Gauges & SKU Card' :
+    item.id?.startsWith('ledg-copilot') ? 'AI Copilot' :
+    item.id?.startsWith('ledg-restock') ? 'Inventory & ERP' :
+    item.id?.startsWith('ledg-auto') ? 'Autonomous Engine' :
+    item.id?.startsWith('ledg-strat') ? 'Strategy Engine' :
+    item.id?.startsWith('ledg-sim') ? 'Simulator' :
+    item.id?.startsWith('ledg-realloc') ? (item.isAuto ? 'AutoPilot Engine' : 'Reallocations') :
+    'Decision Engine'
+  );
+
+  let badgeClass = 'bg-zinc-900 text-zinc-300 border-zinc-700';
+  if (surface.includes('Gauges')) badgeClass = 'bg-blue-950/60 text-blue-300 border-blue-800/80';
+  else if (surface.includes('RL') || surface.includes('Product Analysis')) badgeClass = 'bg-cyan-950/60 text-cyan-300 border-cyan-800/80';
+  else if (surface.includes('Copilot')) badgeClass = 'bg-purple-950/60 text-purple-300 border-purple-800/80';
+  else if (surface.includes('Autonomous') || surface.includes('AutoPilot')) badgeClass = 'bg-emerald-950/60 text-emerald-300 border-emerald-800/80';
+  else if (surface.includes('Reallocation')) badgeClass = 'bg-indigo-950/60 text-indigo-300 border-indigo-800/80';
+  else if (surface.includes('Inventory') || surface.includes('ERP')) badgeClass = 'bg-amber-950/60 text-amber-300 border-amber-800/80';
+  else if (surface.includes('Simulator')) badgeClass = 'bg-rose-950/60 text-rose-300 border-rose-800/80';
+  else if (surface.includes('Strategy')) badgeClass = 'bg-violet-950/60 text-violet-300 border-violet-800/80';
+  else if (surface.includes('Anomalies')) badgeClass = 'bg-orange-950/60 text-orange-300 border-orange-800/80';
+
+  return { label: surface, badgeClass };
+}
+
 export function DecisionLedgerTable({ entries, className, showHeader = false }: DecisionLedgerTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSurface, setSelectedSurface] = useState<string>('ALL');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const filtered = entries.filter((item: any) => {
-    const text = (item.decision || item.actionTaken || item.product || '') + ' ' + (item.timestamp || '') + ' ' + (item.feedback || '');
+    const { label } = getSurfaceMeta(item);
+    if (selectedSurface !== 'ALL' && !label.toLowerCase().includes(selectedSurface.toLowerCase())) {
+      return false;
+    }
+    const text = (item.decision || item.actionTaken || item.product || '') + ' ' + (item.timestamp || '') + ' ' + (item.feedback || '') + ' ' + label;
     return text.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
   const handleExportCSV = () => {
-    const headers = ['ID', 'Timestamp', 'Product', 'Channel', 'Allocation Action', 'Expected Margin (USD)', 'Realized Margin (USD)', 'Variance (%)', 'Accuracy (%)', 'Confidence (%)', 'Status', 'Feedback'];
+    const headers = ['ID', 'Timestamp', 'Surface Origin', 'Product', 'Channel', 'Allocation Action', 'Expected Margin (USD)', 'Realized Margin (USD)', 'Variance (%)', 'Accuracy (%)', 'Confidence (%)', 'Status', 'Feedback'];
     const rows = filtered.map((e: any) => [
       e.id,
       e.timestamp,
+      `"${getSurfaceMeta(e).label.replace(/"/g, '""')}"`,
       `"${(e.product || '').replace(/"/g, '""')}"`,
       e.channel || 'meta',
       `"${(e.decision || e.actionTaken || 'Budget reallocated').replace(/"/g, '""')}"`,
@@ -157,30 +190,66 @@ export function DecisionLedgerTable({ entries, className, showHeader = false }: 
       )}
 
       {/* Filter and Export Toolbar */}
-      <div className='flex flex-wrap items-center justify-between gap-3 p-3 rounded-lg border border-zinc-800 bg-[#121215]'>
-        <div className='flex items-center gap-2 flex-1 max-w-sm'>
-          <Icons.search className='size-3.5 text-zinc-400 shrink-0' />
-          <input
-            type='text'
-            placeholder='Search directives (e.g. Meta, Shift, Air Max)...'
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className='w-full text-xs font-sans bg-transparent text-zinc-100 placeholder:text-zinc-500 focus:outline-hidden'
-          />
+      <div className='space-y-2.5 p-3 rounded-lg border border-zinc-800 bg-[#121215]'>
+        <div className='flex flex-wrap items-center justify-between gap-3'>
+          <div className='flex items-center gap-2 flex-1 max-w-sm'>
+            <Icons.search className='size-3.5 text-zinc-400 shrink-0' />
+            <input
+              type='text'
+              placeholder='Search directives (e.g. Meta, Shift, Air Max)...'
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className='w-full text-xs font-sans bg-transparent text-zinc-100 placeholder:text-zinc-500 focus:outline-hidden'
+            />
+          </div>
+          <div className='flex items-center gap-3'>
+            <Button
+              size='sm'
+              variant='outline'
+              onClick={handleExportCSV}
+              className='h-7 px-2.5 text-xs font-mono font-medium text-zinc-200 border-zinc-700 bg-zinc-800 hover:bg-zinc-700 active:scale-[0.98]'
+            >
+              <Icons.download className='size-3 mr-1.5' />
+              Export CSV
+            </Button>
+            <span className='text-xs font-mono tabular-nums text-zinc-400'>
+              {filtered.length} / {entries.length} decisions
+            </span>
+          </div>
         </div>
-        <div className='flex items-center gap-3'>
-          <Button
-            size='sm'
-            variant='outline'
-            onClick={handleExportCSV}
-            className='h-7 px-2.5 text-xs font-mono font-medium text-zinc-200 border-zinc-700 bg-zinc-800 hover:bg-zinc-700 active:scale-[0.98]'
-          >
-            <Icons.download className='size-3 mr-1.5' />
-            Export CSV
-          </Button>
-          <span className='text-xs font-mono tabular-nums text-zinc-400'>
-            {filtered.length} / {entries.length} decisions
+
+        {/* Surface Origin Filter Pills */}
+        <div className='flex flex-wrap items-center gap-1.5 pt-2 border-t border-zinc-850'>
+          <span className='text-[10px] uppercase font-mono tracking-wider text-zinc-500 mr-1'>
+            Surface:
           </span>
+          {[
+            { id: 'ALL', label: 'All Surfaces' },
+            { id: 'Gauges', label: 'Gauges & SKU' },
+            { id: 'Reallocation', label: 'Reallocations' },
+            { id: 'RL', label: 'RL Policy' },
+            { id: 'Copilot', label: 'AI Copilot' },
+            { id: 'Autonomous', label: 'AutoPilot' },
+            { id: 'Simulator', label: 'Simulator' },
+            { id: 'Anomalies', label: 'Anomalies' },
+          ].map((s) => {
+            const active = selectedSurface === s.id;
+            return (
+              <button
+                key={s.id}
+                type='button'
+                onClick={() => setSelectedSurface(s.id)}
+                className={cn(
+                  'px-2 py-0.5 rounded text-[10px] font-mono transition-colors border cursor-pointer',
+                  active
+                    ? 'bg-zinc-100 text-zinc-950 border-zinc-200 font-semibold'
+                    : 'bg-zinc-900/80 text-zinc-400 border-zinc-800 hover:text-zinc-200 hover:border-zinc-700'
+                )}
+              >
+                {s.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -200,7 +269,7 @@ export function DecisionLedgerTable({ entries, className, showHeader = false }: 
             Expected Margin
           </div>
           <div className='mt-1 text-base sm:text-lg font-mono tabular-nums font-semibold text-zinc-100'>
-            ${metrics.totalExpectedMargin.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 1 })}
+            ${metrics.totalExpectedMargin.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 1 })}
           </div>
         </div>
 
@@ -209,7 +278,7 @@ export function DecisionLedgerTable({ entries, className, showHeader = false }: 
             Realized Margin
           </div>
           <div className='mt-1 text-base sm:text-lg font-mono tabular-nums font-semibold text-zinc-100'>
-            ${metrics.totalRealizedMargin.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 1 })}
+            ${metrics.totalRealizedMargin.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 1 })}
           </div>
         </div>
 
@@ -234,6 +303,7 @@ export function DecisionLedgerTable({ entries, className, showHeader = false }: 
           <thead>
             <tr className='border-b border-zinc-800 bg-zinc-900/60 text-[11px] text-zinc-400 uppercase tracking-wider font-sans'>
               <th className='py-2.5 px-3.5 font-semibold'>Timestamp</th>
+              <th className='py-2.5 px-3.5 font-semibold'>Surface Origin</th>
               <th className='py-2.5 px-3.5 font-semibold'>Target Campaign</th>
               <th className='py-2.5 px-3.5 font-semibold'>Context / Expected</th>
               <th className='py-2.5 px-3.5 font-semibold'>Allocation Action</th>
@@ -244,7 +314,7 @@ export function DecisionLedgerTable({ entries, className, showHeader = false }: 
           <tbody className='divide-y divide-zinc-800'>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={6} className='py-6 text-center text-zinc-500 text-xs font-sans'>
+                <td colSpan={7} className='py-6 text-center text-zinc-500 text-xs font-sans'>
                   No audited decisions logged yet.
                 </td>
               </tr>
@@ -252,6 +322,7 @@ export function DecisionLedgerTable({ entries, className, showHeader = false }: 
               filtered.map((item: any) => {
                 const isAuto = item.isAuto || (item.actionTaken && item.actionTaken.includes('[Auto]'));
                 const { channel, productName, actionSummary } = extractDirectiveDetails(item);
+                const surfaceMeta = getSurfaceMeta(item);
                 const issueText = item.issue || (item.expectedMargin ? `Exp. Margin: $${item.expectedMargin.toLocaleString()}` : 'Algorithmic Optimization');
                 const outcomeText = item.outcome || (item.realizedMargin ? `$${item.realizedMargin.toLocaleString()} (${(item.confidence ? item.confidence * 100 : 95).toFixed(0)}% conf)` : 'Optimized');
                 const isExpanded = expandedId === item.id;
@@ -267,6 +338,11 @@ export function DecisionLedgerTable({ entries, className, showHeader = false }: 
                     >
                       <td className='py-3 px-3.5 text-zinc-400 text-[11px] whitespace-nowrap font-mono tabular-nums'>
                         {item.timestamp}
+                      </td>
+                      <td className='py-3 px-3.5 whitespace-nowrap'>
+                        <span className={cn('inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-medium border', surfaceMeta.badgeClass)}>
+                          {surfaceMeta.label}
+                        </span>
                       </td>
                       <td className='py-3 px-3.5 text-zinc-200 font-sans text-xs max-w-xs truncate font-medium'>
                         <span className='inline-flex items-center gap-1.5'>
@@ -298,7 +374,7 @@ export function DecisionLedgerTable({ entries, className, showHeader = false }: 
                     {/* Expandable Model Calibration & Learning Telemetry Drawer */}
                     {isExpanded && (
                       <tr className='bg-zinc-950/60'>
-                        <td colSpan={6} className='p-4 border-b border-zinc-800'>
+                        <td colSpan={7} className='p-4 border-b border-zinc-800'>
                           <div className='grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs font-sans'>
                             <div className='p-3 rounded-lg border border-zinc-800 bg-[#121215]'>
                               <span className='text-[10px] text-zinc-500 uppercase font-semibold block'>Accuracy Score</span>

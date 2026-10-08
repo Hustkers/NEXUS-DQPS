@@ -31,6 +31,7 @@ export interface DecisionEngineStoreState {
   executeAllReallocations: () => Promise<{ count: number; totalMoved: number; totalLift: number }>;
   toggleAutoPilot: (enabled: boolean) => void;
   resetToDefaults: () => void;
+  recordDecision: (entry: Partial<GaugesLedgerItem>) => void;
 }
 
 const LOCAL_STORAGE_KEY_PRODUCTS = 'nexus_shared_products_v4';
@@ -68,6 +69,44 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
         if (storedAutoPilot !== null) {
           setAutoPilotState(storedAutoPilot === 'true');
         }
+
+        // Merge decisions recorded on backend API
+        fetch('/api/ledger')
+          .then((r) => r.json())
+          .then((data) => {
+            if (data.success && Array.isArray(data.ledger)) {
+              setLedger((curr) => {
+                const map = new Map<string, GaugesLedgerItem>();
+                for (const item of curr) {
+                  map.set(item.id, item);
+                }
+                for (const item of data.ledger) {
+                  if (!map.has(item.id)) {
+                    map.set(item.id, {
+                      id: item.id,
+                      timestamp: item.timestamp,
+                      product: item.product || 'Portfolio Catalog',
+                      channel: item.channel || 'Meta',
+                      issue: item.issue || 'Optimization Directive',
+                      actionTaken: item.actionTaken || item.decision || 'Algorithmic Optimization',
+                      outcome: item.outcome || 'Optimized',
+                      expectedMargin: item.expectedMargin,
+                      realizedMargin: item.realizedMargin,
+                      variancePct: item.variancePct,
+                      accuracyPct: item.accuracyPct,
+                      confidence: item.confidence,
+                      status: item.status,
+                      feedback: item.feedback,
+                      isAuto: item.isAuto,
+                      surface: item.surface || 'Decision Engine',
+                    });
+                  }
+                }
+                return Array.from(map.values());
+              });
+            }
+          })
+          .catch(() => {});
       }
     } catch {
       // Fallback cleanly to seed data
@@ -116,6 +155,13 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
     setRawProducts((prev) => {
       const { updatedProducts, newLedgerEntry } = applyFixPlan(prev, productId, plan);
       setLedger((currLedger) => [newLedgerEntry, ...currLedger]);
+      try {
+        fetch('/api/ledger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newLedgerEntry),
+        }).catch(() => {});
+      } catch {}
       return updatedProducts;
     });
   }, []);
@@ -125,6 +171,13 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
     setRawProducts((prev) => {
       const { updatedProducts, newLedgerEntry } = applyReallocation(prev, item, isAuto);
       setLedger((currLedger) => [newLedgerEntry, ...currLedger]);
+      try {
+        fetch('/api/ledger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newLedgerEntry),
+        }).catch(() => {});
+      } catch {}
       return updatedProducts;
     });
   }, []);
@@ -154,6 +207,17 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
 
     setRawProducts(currentCatalog);
     setLedger((currLedger) => [...newEntries, ...currLedger]);
+
+    for (const entry of newEntries) {
+      try {
+        fetch('/api/ledger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(entry),
+        }).catch(() => {});
+      } catch {}
+    }
+
     return { count, totalMoved, totalLift };
   }, [rawProducts]);
 
@@ -181,6 +245,15 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
 
         if (newEntries.length > 0) {
           setLedger((currLedger) => [...newEntries, ...currLedger]);
+          for (const entry of newEntries) {
+            try {
+              fetch('/api/ledger', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(entry),
+              }).catch(() => {});
+            } catch {}
+          }
         }
         return currentCatalog;
       });
@@ -197,6 +270,50 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
       localStorage.removeItem(LOCAL_STORAGE_KEY_LEDGER);
       localStorage.removeItem(LOCAL_STORAGE_KEY_AUTOPILOT);
     } catch {}
+  }, []);
+
+  // Action: Record arbitrary decision from any surface into the unified ledger
+  const recordDecision = useCallback((entry: Partial<GaugesLedgerItem>) => {
+    if (!entry) return;
+    const now = new Date();
+    const timeFormatted = `${now.toISOString().slice(0, 10)} ${now.toTimeString().slice(0, 8)}`;
+    const newEntry: GaugesLedgerItem = {
+      id: entry.id || `ledg-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+      timestamp: entry.timestamp || timeFormatted,
+      product: entry.product || 'Portfolio Catalog',
+      channel: (entry.channel as any) || 'Meta',
+      issue: entry.issue || 'Optimization Directive',
+      actionTaken: entry.actionTaken || 'Budget optimization executed',
+      outcome: entry.outcome || 'Optimized',
+      isAuto: Boolean(entry.isAuto),
+      expectedMargin: entry.expectedMargin,
+      realizedMargin: entry.realizedMargin,
+      variancePct: entry.variancePct,
+      accuracyPct: entry.accuracyPct ?? 94.8,
+      confidence: entry.confidence ?? 0.95,
+      status: entry.status || 'COMMITTED',
+      feedback: entry.feedback || 'Decision committed to immutable closed-loop ledger.',
+      surface: entry.surface || 'Decision Engine',
+    };
+
+    setLedger((curr) => {
+      const filtered = curr.filter((l) => l.id !== newEntry.id);
+      return [newEntry, ...filtered];
+    });
+
+    try {
+      fetch('/api/ledger', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newEntry),
+      }).catch(() => {});
+    } catch {}
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('nexus:ledger_entry_added', { detail: newEntry })
+      );
+    }
   }, []);
 
   // Listen for AI Coach operational events and UI actions
@@ -280,7 +397,7 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
         budget: number;
         channel?: string;
       }>;
-      const { target, budget } = customEvent.detail || {};
+      const { target, budget, channel } = customEvent.detail || {};
       if (target !== undefined && budget !== undefined) {
         setRawProducts((prev) =>
           prev.map((p) => {
@@ -289,6 +406,19 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
               p.sku === target ||
               p.name.toLowerCase().includes(String(target).toLowerCase())
             ) {
+              recordDecision({
+                id: `ledg-copilot-bgt-${Date.now().toString(36)}`,
+                product: p.name,
+                channel: (channel || p.channel) as any,
+                issue: 'Ad Spend Allocation Adjustment',
+                actionTaken: `Updated daily spend on ${p.name} to $${Number(budget).toLocaleString()}/day`,
+                outcome: 'Spend Pacing Rebalanced',
+                surface: 'AI Copilot & Controls',
+                expectedMargin: Math.round(Number(budget) * p.roas * 0.4),
+                realizedMargin: Math.round(Number(budget) * p.roas * 0.38),
+                status: 'COMMITTED',
+                feedback: `Direct ad spend adjustment applied to ${p.channel} Ads.`,
+              });
               return { ...p, dailySpend: Number(budget) };
             }
             return p;
@@ -311,6 +441,19 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
               p.id === sku ||
               p.name.toLowerCase().includes(String(sku).toLowerCase())
             ) {
+              recordDecision({
+                id: `ledg-restock-${Date.now().toString(36)}`,
+                product: p.name,
+                channel: p.channel,
+                issue: p.inventory <= 0 ? 'Stockout Shock Resolution' : 'Inventory Replenishment',
+                actionTaken: `Replenished ${quantity} units into ERP warehouse (${p.sku || p.id})`,
+                outcome: Number(quantity) > 0 ? 'Ad Kill-Switch Deactivated' : 'Zero Inventory Warning',
+                surface: 'Inventory & ERP System',
+                expectedMargin: Math.round(Number(quantity) * (p.msrp || 120) * 0.38),
+                realizedMargin: Math.round(Number(quantity) * (p.msrp || 120) * 0.36),
+                status: 'COMMITTED',
+                feedback: `Restock shipment logged. Inventory increased to ${quantity} units.`,
+              });
               return {
                 ...p,
                 inventory: Number(quantity),
@@ -327,14 +470,93 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
     const handleAutopilotToggle = (e: Event) => {
       const customEvent = e as CustomEvent<{ enabled: boolean }>;
       if (customEvent.detail?.enabled !== undefined) {
-        toggleAutoPilot(Boolean(customEvent.detail.enabled));
+        const enabled = Boolean(customEvent.detail.enabled);
+        toggleAutoPilot(enabled);
+        recordDecision({
+          id: `ledg-auto-${Date.now().toString(36)}`,
+          product: 'Cross-Portfolio Engine',
+          channel: 'Omnichannel',
+          issue: enabled ? 'Autonomous Execution Engaged' : 'Manual Oversight Restored',
+          actionTaken: enabled ? 'Engaged Auto-Pilot automated convex reallocations' : 'Paused Auto-Pilot mode',
+          outcome: enabled ? 'Continuous Pacing Active' : 'Manual Pacing Active',
+          surface: 'Autonomous Engine',
+          status: 'COMMITTED',
+          feedback: enabled
+            ? 'AutoPilot engaged: recommendations with >=80% confidence execute automatically.'
+            : 'AutoPilot paused by operator.',
+        });
       }
+    };
+
+    const handleRecordDecision = (e: Event) => {
+      const customEvent = e as CustomEvent<Partial<GaugesLedgerItem>>;
+      if (customEvent.detail) {
+        recordDecision(customEvent.detail);
+      }
+    };
+
+    const handleStrategyChanged = (e: Event) => {
+      const customEvent = e as CustomEvent<{ strategy: string }>;
+      const { strategy } = customEvent.detail || {};
+      if (strategy) {
+        recordDecision({
+          id: `ledg-strat-${Date.now().toString(36)}`,
+          product: 'Global Portfolio',
+          channel: 'Omnichannel',
+          issue: 'Portfolio Strategy Shift',
+          actionTaken: `Switched optimization objective to "${strategy}"`,
+          outcome: 'Weights Recalibrated',
+          surface: 'Campaign Strategy Engine',
+          status: 'COMMITTED',
+          feedback: `Optimization objective shifted to ${strategy}. Bayesian prior weights adjusted.`,
+        });
+      }
+    };
+
+    const handleScenarioInjected = (e: Event) => {
+      const customEvent = e as CustomEvent<{ scenarioType: string; description?: string }>;
+      const { scenarioType, description } = customEvent.detail || {};
+      if (scenarioType) {
+        recordDecision({
+          id: `ledg-sim-${Date.now().toString(36)}`,
+          product: 'Simulated Portfolio',
+          channel: 'Omnichannel',
+          issue: `Scenario Stress: ${scenarioType}`,
+          actionTaken: description || `Injected stress test scenario: ${scenarioType}`,
+          outcome: 'Loss Mitigated',
+          surface: 'Simulator',
+          status: 'COMMITTED',
+          feedback: `Black-swan shock simulation resolved with dynamic shadow price pacing.`,
+        });
+      }
+    };
+
+    const handleDirectiveExecuted = (e: Event) => {
+      const customEvent = e as CustomEvent<{ directiveId?: string; marginRecovery?: number }>;
+      const { directiveId, marginRecovery } = customEvent.detail || {};
+      recordDecision({
+        id: directiveId || `ledg-dir-${Date.now().toString(36)}`,
+        product: 'Target Campaign Cluster',
+        channel: 'Meta',
+        issue: 'Budget Reallocation Execution',
+        actionTaken: 'Shifted capital to scale cluster and throttled low-ROAS bleed',
+        outcome: `+$${marginRecovery || 1148}/day recovered margin`,
+        surface: 'Reallocations Engine',
+        expectedMargin: marginRecovery || 1148,
+        realizedMargin: marginRecovery || 1148,
+        status: 'COMMITTED',
+        feedback: 'Reallocation directive executed via Copilot event dispatch.',
+      });
     };
 
     window.addEventListener('nexus:ui_action', handleUiAction);
     window.addEventListener('nexus:budget_updated', handleBudgetUpdate);
     window.addEventListener('nexus:inventory_updated', handleInventoryUpdate);
     window.addEventListener('nexus:autopilot_toggled', handleAutopilotToggle);
+    window.addEventListener('nexus:record_decision', handleRecordDecision);
+    window.addEventListener('nexus:strategy_changed', handleStrategyChanged);
+    window.addEventListener('nexus:scenario_injected', handleScenarioInjected);
+    window.addEventListener('nexus:directive_executed', handleDirectiveExecuted);
 
     return () => {
       window.removeEventListener('nexus:ui_action', handleUiAction);
@@ -347,8 +569,12 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
         'nexus:autopilot_toggled',
         handleAutopilotToggle
       );
+      window.removeEventListener('nexus:record_decision', handleRecordDecision);
+      window.removeEventListener('nexus:strategy_changed', handleStrategyChanged);
+      window.removeEventListener('nexus:scenario_injected', handleScenarioInjected);
+      window.removeEventListener('nexus:directive_executed', handleDirectiveExecuted);
     };
-  }, [rawProducts, executeFix, executeAllReallocations, toggleAutoPilot]);
+  }, [rawProducts, executeFix, executeAllReallocations, toggleAutoPilot, recordDecision]);
 
   // Compute derived products dynamically
   const products = useMemo(() => {
@@ -399,6 +625,7 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
       executeAllReallocations,
       toggleAutoPilot,
       resetToDefaults,
+      recordDecision,
     }),
     [
       products,
@@ -411,6 +638,7 @@ export function DecisionEngineProvider({ children }: { children: React.ReactNode
       executeAllReallocations,
       toggleAutoPilot,
       resetToDefaults,
+      recordDecision,
     ]
   );
 

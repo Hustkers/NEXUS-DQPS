@@ -33,7 +33,7 @@ function SparklineTooltip({ active, payload, label, unit = '', precision = 2 }: 
     const formatted =
       typeof val === 'number'
         ? precision === 0
-          ? val.toLocaleString()
+          ? val.toLocaleString('en-US')
           : val.toFixed(precision)
         : val;
     return (
@@ -529,7 +529,7 @@ export function ExecutiveGraphBanner({
                                     {p.name}:
                                   </span>
                                   <span className='font-bold text-foreground'>
-                                    ${p.value?.toLocaleString()}
+                                    ${p.value?.toLocaleString('en-US')}
                                   </span>
                                 </div>
                               ))}
@@ -649,7 +649,7 @@ export function ExecutiveGraphBanner({
                                 </span>
                                 <span className='font-bold text-foreground'>
                                   {expandedMetric === 'lift'
-                                    ? `+$${p.value?.toLocaleString()}`
+                                    ? `+$${p.value?.toLocaleString('en-US')}`
                                     : expandedMetric === 'stock'
                                     ? `${p.value}%`
                                     : `${p.value}x`}

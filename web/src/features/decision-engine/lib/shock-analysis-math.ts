@@ -113,16 +113,13 @@ function groupDigits(whole: string): string {
   return whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
-/** $1,234,567.89 — deterministic USD formatting. */
+import { formatCurrency as libFormatCurrency, formatINR as libFormatINR } from '@/lib/format';
+
 export function formatUSD(value: number): string {
-  const rounded = round2(value);
-  const sign = rounded < 0 ? '-' : '';
-  const parts = Math.abs(rounded).toFixed(2).split('.');
-  return `${sign}$${groupDigits(parts[0])}.${parts[1]}`;
+  return libFormatCurrency(value, { decimals: 2 });
 }
 
-/** Backward compatibility alias pointing to formatUSD. */
-export const formatInr = formatUSD;
+export const formatInr = libFormatINR;
 export const formatCurrency = formatUSD;
 
 // ---------------------------------------------------------------------------

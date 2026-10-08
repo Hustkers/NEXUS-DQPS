@@ -209,17 +209,28 @@ const ARCHETYPES: ArchetypeDef[] = [
   }
 ];
 
+const CANONICAL_MSRP: Record<string, number> = {
+  '310805-137': 192.71, '880848-005': 174.64, 'AH8050-100': 168.61, '315122-001': 87.89, 'CD4371-001': 168.61, 'AO2924-401': 154.18, 'BQ8928-011': 125.27, '942851-002': 132.47, '849559-004': 192.71, 'AT5405-001': 180.66, 'AQ2730-009': 149.95, '634835-108': 139.95
+};
+
 export function getPlaygroundProducts(): PlaygroundProductSummary[] {
   const campaigns = initialEngineState.campaigns || [];
   const map = new Map<string, PlaygroundProductSummary>();
 
   for (const c of campaigns) {
     if (!map.has(c.sku)) {
+      let usdPrice = Number(c.price) || 160;
+      if (CANONICAL_MSRP[c.sku]) {
+        usdPrice = CANONICAL_MSRP[c.sku];
+      } else if (usdPrice > 1000) {
+        usdPrice = Math.round((usdPrice / 83.0) * 100) / 100;
+      }
+      
       map.set(c.sku, {
         sku: c.sku,
         name: c.productName || c.sku,
         category: c.category || 'Footwear',
-        price: Number(c.price) || 160,
+        price: usdPrice,
         rating: Number(c.rating) || 4.5,
         reviews: Number(c.reviews) || 50,
         photoUrl: c.photoUrl || '',
@@ -337,8 +348,8 @@ export function computePlaygroundRecommendations(
   const combinedStrategyFactor = audienceFactor * creativeFactor * placementFactor;
 
   // 2. Calibrate Hill Parameters for this product
-  // a (capacity ceiling in daily revenue): 4.5x - 7.5x product scale
-  const capacityA = product.price * 65 * combinedStrategyFactor;
+  // a (capacity ceiling in daily revenue): realistic e-commerce scaling
+  const capacityA = product.price * 35 * combinedStrategyFactor;
   // b (elasticity): realistic diminishing returns curvature 1.4 - 1.8
   const elasticityB = 1.62;
   // c (half saturation spend): spend level where 50% capacity is reached
@@ -481,7 +492,7 @@ export function computePlaygroundRecommendations(
       keyDrivers.push(`Sufficient warehouse inventory (${product.inventory} units available)`);
     }
 
-    let explanation = `${arch.desc} Delivers $${candNetProfit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} expected profit at $${candDailyBudget.toLocaleString()}/day over ${durationDays} days.`;
+    let explanation = `${arch.desc} Delivers $${candNetProfit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} expected profit at $${candDailyBudget.toLocaleString()}/day over ${durationDays} days.`;
     if (isStockout) {
       explanation = 'CRITICAL STOCKOUT: Zero warehouse stock remaining. Advertising spend will deplete capital with zero fulfillment.';
     } else if (stockoutRisk && candNetProfit < 0) {

@@ -10,10 +10,10 @@ import { Icons } from '@/components/icons';
 import { billingInfoContent } from '@/config/infoconfig';
 
 const INVOICE_HISTORY = [
-  { id: 'INV-2026-10-092', date: 'Oct 01, 2026', amount: 79999, status: 'Paid', method: 'Visa •••• 4242' },
-  { id: 'INV-2026-09-081', date: 'Sep 01, 2026', amount: 79999, status: 'Paid', method: 'Visa •••• 4242' },
-  { id: 'INV-2026-08-074', date: 'Aug 01, 2026', amount: 79999, status: 'Paid', method: 'Visa •••• 4242' },
-  { id: 'INV-2026-07-063', date: 'Jul 01, 2026', amount: 24999, status: 'Paid', method: 'Visa •••• 4242' }
+  { id: 'INV-2026-10-092', date: 'Oct 01, 2026', amount: 7999, status: 'Paid', method: 'Visa •••• 4242' },
+  { id: 'INV-2026-09-081', date: 'Sep 01, 2026', amount: 7999, status: 'Paid', method: 'Visa •••• 4242' },
+  { id: 'INV-2026-08-074', date: 'Aug 01, 2026', amount: 7999, status: 'Paid', method: 'Visa •••• 4242' },
+  { id: 'INV-2026-07-063', date: 'Jul 01, 2026', amount: 2499, status: 'Paid', method: 'Visa •••• 4242' }
 ];
 
 export default function BillingPage() {
@@ -91,10 +91,10 @@ export default function BillingPage() {
               </Badge>
               <CardTitle className='text-xl font-bold font-sans'>Autonomous Pro</CardTitle>
               <CardDescription className='text-xs'>
-                For high-velocity DTC brands spending $5L - $20L/mo.
+                For high-velocity DTC brands spending $50k - $250k/mo.
               </CardDescription>
               <div className='pt-3 font-mono'>
-                <span className='text-3xl font-bold text-foreground'>$24,999</span>
+                <span className='text-3xl font-bold text-foreground'>$2,499</span>
                 <span className='text-xs text-muted-foreground'> / month</span>
               </div>
             </CardHeader>
@@ -140,10 +140,10 @@ export default function BillingPage() {
               </Badge>
               <CardTitle className='text-xl font-bold font-sans'>Autonomous Enterprise</CardTitle>
               <CardDescription className='text-xs'>
-                For omnichannel enterprises spending $20L - $1Cr+/mo.
+                For omnichannel enterprises spending $250k - $1M+/mo.
               </CardDescription>
               <div className='pt-3 font-mono'>
-                <span className='text-3xl font-bold text-foreground'>$79,999</span>
+                <span className='text-3xl font-bold text-foreground'>$7,999</span>
                 <span className='text-xs text-muted-foreground'> / month</span>
               </div>
             </CardHeader>

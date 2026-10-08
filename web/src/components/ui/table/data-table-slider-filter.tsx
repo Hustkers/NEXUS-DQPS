@@ -77,7 +77,7 @@ export function DataTableSliderFilter<TData>({ column, title }: DataTableSliderF
   }, [columnFilterValue, min, max]);
 
   const formatValue = React.useCallback((value: number) => {
-    return value.toLocaleString(undefined, { maximumFractionDigits: 0 });
+    return value.toLocaleString('en-US', { maximumFractionDigits: 0 });
   }, []);
 
   const onFromInputChange = React.useCallback(

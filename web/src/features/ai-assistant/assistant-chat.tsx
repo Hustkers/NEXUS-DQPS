@@ -28,6 +28,8 @@ import {
 import { executeAssistantTurn } from './tools';
 import { AssistantGraphRenderer, type AssistantGraphConfig } from './assistant-graph-renderer';
 import { toast } from 'sonner';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export interface ChatMessage {
   id: string;
@@ -246,8 +248,50 @@ export function AssistantChat({
                   </div>
 
                   {/* Editorial Text Statement */}
-                  <div className="text-[11px] font-sans text-zinc-300 leading-relaxed">
-                    <p className="whitespace-pre-wrap">{m.text}</p>
+                  <div className="text-[11px] font-sans text-zinc-300 leading-relaxed markdown-body">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
+                        strong: ({ children }) => <strong className="font-semibold text-zinc-100">{children}</strong>,
+                        em: ({ children }) => <em className="italic text-zinc-200">{children}</em>,
+                        ul: ({ children }) => <ul className="list-disc pl-4 space-y-1 my-2 text-zinc-300">{children}</ul>,
+                        ol: ({ children }) => <ol className="list-decimal pl-4 space-y-1 my-2 text-zinc-300">{children}</ol>,
+                        li: ({ children }) => <li className="leading-relaxed pl-0.5">{children}</li>,
+                        code: ({ children, className }) => {
+                          const isInline = !className;
+                          return isInline ? (
+                            <code className="px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700/60 font-mono text-[10px] text-emerald-400">
+                              {children}
+                            </code>
+                          ) : (
+                            <code className="block p-2.5 rounded bg-zinc-950 border border-zinc-800 font-mono text-[10px] text-zinc-200 overflow-x-auto my-2">
+                              {children}
+                            </code>
+                          );
+                        },
+                        h1: ({ children }) => <h1 className="text-sm font-bold text-zinc-100 mt-2 mb-1">{children}</h1>,
+                        h2: ({ children }) => <h2 className="text-xs font-bold text-zinc-100 mt-2 mb-1">{children}</h2>,
+                        h3: ({ children }) => <h3 className="text-xs font-semibold text-zinc-200 mt-1.5 mb-1">{children}</h3>,
+                        blockquote: ({ children }) => (
+                          <blockquote className="border-l-2 border-emerald-500/50 pl-3 italic text-zinc-400 my-2">
+                            {children}
+                          </blockquote>
+                        ),
+                        table: ({ children }) => (
+                          <div className="overflow-x-auto my-2 rounded border border-zinc-800">
+                            <table className="w-full text-left border-collapse text-[10px]">{children}</table>
+                          </div>
+                        ),
+                        thead: ({ children }) => <thead className="bg-zinc-800/60 text-zinc-200 font-medium">{children}</thead>,
+                        tbody: ({ children }) => <tbody className="divide-y divide-zinc-800/50">{children}</tbody>,
+                        tr: ({ children }) => <tr className="hover:bg-zinc-800/30 transition-colors">{children}</tr>,
+                        th: ({ children }) => <th className="p-2 border-b border-zinc-800 font-semibold">{children}</th>,
+                        td: ({ children }) => <td className="p-2 text-zinc-300">{children}</td>,
+                      }}
+                    >
+                      {m.text}
+                    </ReactMarkdown>
                   </div>
 
                   {/* SPECIALIZED DATA-BACKED PANELS ACCORDING TO EXECUTED TOOL */}

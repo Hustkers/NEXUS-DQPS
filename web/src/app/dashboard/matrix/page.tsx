@@ -243,6 +243,105 @@ export default function SkuChannelMatrixPage() {
     fetchMatrixData();
   }, [fetchMatrixData]);
 
+  // Real-time event listeners for live mutations dispatched by AI Coach or other components
+  useEffect(() => {
+    const handleInventoryUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<{ sku: string; quantity: number }>;
+      const { sku, quantity } = customEvent.detail || {};
+      if (sku && quantity !== undefined) {
+        setData((prev) => {
+          if (!prev) return prev;
+          const cleanSku = String(sku).trim().toLowerCase();
+          const updatedCampaigns = prev.campaigns.map((c) => {
+            const matchesSku =
+              c.sku.toLowerCase() === cleanSku ||
+              c.productName.toLowerCase().includes(cleanSku) ||
+              cleanSku.includes(c.sku.toLowerCase());
+            if (matchesSku) {
+              const newInv = Number(quantity);
+              return {
+                ...c,
+                inventory: newInv,
+                roasStatus: newInv === 0 ? 'CRITICAL_KILL' : c.roasStatus === 'CRITICAL_KILL' ? 'OPTIMAL' : c.roasStatus,
+              };
+            }
+            return c;
+          });
+
+          const stockouts = new Set(updatedCampaigns.filter((c) => c.inventory === 0).map((c) => c.sku));
+
+          return {
+            ...prev,
+            campaigns: updatedCampaigns,
+            summary: {
+              ...prev.summary,
+              stockoutCount: stockouts.size,
+            },
+          };
+        });
+      }
+    };
+
+    const handleBudgetUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<{ target: string; budget: number; channel?: string }>;
+      const { target, budget, channel } = customEvent.detail || {};
+      if (target !== undefined && budget !== undefined) {
+        setData((prev) => {
+          if (!prev) return prev;
+          const cleanTarget = String(target).trim().toLowerCase();
+          const updatedCampaigns = prev.campaigns.map((c) => {
+            const matches =
+              c.sku.toLowerCase() === cleanTarget ||
+              c.productName.toLowerCase().includes(cleanTarget) ||
+              c.campaign.toLowerCase().includes(cleanTarget);
+            const matchesChannel = !channel || channel === 'all' || c.platform.toLowerCase() === channel.toLowerCase();
+            if (matches && matchesChannel) {
+              return {
+                ...c,
+                currentDailySpend: Number(budget),
+              };
+            }
+            return c;
+          });
+
+          const totalSpend = updatedCampaigns.reduce((acc, c) => acc + c.currentDailySpend, 0);
+          const totalRevenue = updatedCampaigns.reduce((acc, c) => acc + c.currentDailyRevenue, 0);
+          const blendedRoas = totalSpend > 0 ? totalRevenue / totalSpend : 0;
+
+          return {
+            ...prev,
+            campaigns: updatedCampaigns,
+            summary: {
+              ...prev.summary,
+              totalSpend: Math.round(totalSpend * 100) / 100,
+              blendedRoas: Math.round(blendedRoas * 100) / 100,
+            },
+          };
+        });
+      }
+    };
+
+    const handleGenericUiAction = (e: Event) => {
+      const customEvent = e as CustomEvent<{ type: string; payload: any }>;
+      const { type, payload } = customEvent.detail || {};
+      if (type === 'UPDATE_INVENTORY') {
+        handleInventoryUpdate(new CustomEvent('nexus:inventory_updated', { detail: payload }));
+      } else if (type === 'UPDATE_BUDGET') {
+        handleBudgetUpdate(new CustomEvent('nexus:budget_updated', { detail: payload }));
+      }
+    };
+
+    window.addEventListener('nexus:inventory_updated', handleInventoryUpdate);
+    window.addEventListener('nexus:budget_updated', handleBudgetUpdate);
+    window.addEventListener('nexus:ui_action', handleGenericUiAction);
+
+    return () => {
+      window.removeEventListener('nexus:inventory_updated', handleInventoryUpdate);
+      window.removeEventListener('nexus:budget_updated', handleBudgetUpdate);
+      window.removeEventListener('nexus:ui_action', handleGenericUiAction);
+    };
+  }, []);
+
   // Click outside listener for dropdown
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -529,7 +628,7 @@ export default function SkuChannelMatrixPage() {
             Total Daily Spend
           </div>
           <div className='text-2xl font-mono font-semibold tracking-tight text-[#111111] dark:text-[#FFFFFF]'>
-            ${summary.totalSpend.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            ${summary.totalSpend.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
           <div className='text-[10px] font-mono text-[#787774]'>
             Across {data?.totalCampaigns ?? 0} active channels
@@ -541,7 +640,7 @@ export default function SkuChannelMatrixPage() {
             Attributed Revenue
           </div>
           <div className='text-2xl font-mono font-semibold tracking-tight text-[#111111] dark:text-[#FFFFFF]'>
-            ${summary.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            ${summary.totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
           <div className='text-[10px] font-mono text-[#346538]'>
             Trailing 24h reconciled
@@ -836,7 +935,7 @@ export default function SkuChannelMatrixPage() {
 
                         {/* Unit Price */}
                         <td className='py-3 px-3 text-right tabular-nums text-[#111111] dark:text-[#FFFFFF]'>
-                          ${p.price.toFixed(2)}
+                          {p.price > 1000 ? `$${(p.price / 83).toFixed(2)} / ₹${p.price.toLocaleString('en-IN')}` : `$${p.price.toFixed(2)}`}
                         </td>
 
                         {/* Gross Margin */}

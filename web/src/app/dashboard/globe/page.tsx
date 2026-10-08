@@ -200,8 +200,8 @@ export default function GlobeIntelligencePage() {
               <span className='uppercase text-zinc-500 font-semibold'>{selectedProduct.platform}</span>
               <span>•</span>
               <span>
-                Spend: <span className='text-zinc-200 font-bold'>${selectedProduct.currentDailySpend?.toLocaleString()}/d</span>
-                <span className='text-zinc-500 text-[10px] ml-1'>(₹{(Math.round((selectedProduct.currentDailySpend ?? 0) * 84)).toLocaleString('en-IN')}/d)</span>
+                Spend: <span className='text-zinc-200 font-bold'>${((selectedProduct.currentDailySpend ?? 0) > 1000 ? (selectedProduct.currentDailySpend ?? 0) / 83 : (selectedProduct.currentDailySpend ?? 0)).toLocaleString('en-US', { maximumFractionDigits: 2 })}/d</span>
+                <span className='text-zinc-500 text-[10px] ml-1'>(₹{Math.round((selectedProduct.currentDailySpend ?? 0) > 1000 ? (selectedProduct.currentDailySpend ?? 0) : (selectedProduct.currentDailySpend ?? 0) * 84).toLocaleString('en-IN')}/d)</span>
               </span>
               <span>•</span>
               <span>ROAS: <span className={cn('font-bold', selectedProduct.roas >= 3.2 ? 'text-emerald-400' : selectedProduct.roas < 1.8 ? 'text-rose-400' : 'text-amber-400')}>{selectedProduct.roas?.toFixed(2)}x</span></span>
@@ -378,7 +378,7 @@ export default function GlobeIntelligencePage() {
             </h2>
           </div>
           <Badge variant='outline' className='font-mono text-xs border-zinc-700 bg-zinc-900 text-zinc-200'>
-            Expected Lift: +${rlData.totalProjectedProfitLift.toLocaleString()}
+            Expected Lift: +${rlData.totalProjectedProfitLift.toLocaleString('en-US')}
           </Badge>
         </div>
 

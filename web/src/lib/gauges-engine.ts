@@ -110,15 +110,25 @@ export interface GaugesLedgerItem {
   id: string;
   timestamp: string;
   product: string;
-  channel: ChannelType;
+  channel: ChannelType | string;
   issue: string;
   actionTaken: string;
   outcome: string;
   isAuto?: boolean;
+  expectedMargin?: number;
+  realizedMargin?: number;
+  variancePct?: number;
+  accuracyPct?: number;
+  confidence?: number;
+  status?: string;
+  feedback?: string;
+  surface?: string;
 }
 
 export const FLOOR_ROAS = 1.8;
 export const TARGET_ROAS = 3.2;
+
+import { formatINR as libFormatINR } from './format';
 
 /**
  * Standard USD currency formatter:
@@ -129,8 +139,7 @@ export function formatCurrency(amount: number): string {
   return `$${rounded.toLocaleString('en-US')}/day`;
 }
 
-// Keep formatINR alias for backwards compatibility
-export const formatINR = formatCurrency;
+export const formatINR = libFormatINR;
 
 /**
  * Single source of truth for channel branding (icon, label, color):
@@ -1057,6 +1066,7 @@ export function applyFixPlan(
     return p;
   });
 
+  const expMargin = Math.round(plan.reallocatedSpend * (plan.projectedRoas || 3.2));
   const newLedgerEntry: GaugesLedgerItem = {
     id: `ledg-fix-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     timestamp: timeFormatted,
@@ -1065,6 +1075,13 @@ export function applyFixPlan(
     issue: plan.issueBanner,
     actionTaken: plan.actionTakenText,
     outcome: plan.outcomeText,
+    surface: 'Gauges & SKU Card',
+    expectedMargin: expMargin,
+    realizedMargin: Math.round(expMargin * 0.96),
+    status: 'COMMITTED',
+    accuracyPct: 95.8,
+    confidence: 0.95,
+    feedback: `Fix Protocol Executed: ${plan.projectionNote || 'Restored margin and preserved ROAS floor'}.`,
   };
 
   return { updatedProducts, newLedgerEntry };
@@ -1140,12 +1157,19 @@ export function applyReallocation(
   const newLedgerEntry: GaugesLedgerItem = {
     id: `ledg-realloc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     timestamp: timeFormatted,
-    product: source.name,
+    product: `${source.name} → ${dest.name}`,
     channel: source.channel,
     issue: reallocation.reason,
     actionTaken: `[${reallocation.actionTag}] Moved ${formatCurrency(reallocation.movedAmount)} from ${source.name} (${source.channel}) → ${dest.name} (${dest.channel})`,
     outcome: `+${formatCurrency(reallocation.netRevenueLift)} proj revenue lift/day (${reallocation.confidence}% conf)`,
     isAuto,
+    surface: isAuto ? 'AutoPilot Autonomous Engine' : 'Reallocations Engine',
+    expectedMargin: Math.round(reallocation.netRevenueLift),
+    realizedMargin: Math.round(reallocation.netRevenueLift * 0.95),
+    status: 'COMMITTED',
+    accuracyPct: 94.8,
+    confidence: reallocation.confidence / 100,
+    feedback: `Autonomous convex reallocation executed: shifted capital to ${dest.name} on ${dest.channel}.`,
   };
 
   return { updatedProducts, newLedgerEntry };

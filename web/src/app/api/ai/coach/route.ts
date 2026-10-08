@@ -23,6 +23,22 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await res.json();
+
+    // Persist any inventory or budget mutations to matrix overrides
+    if (data && data.tool_calls && Array.isArray(data.tool_calls)) {
+      const { setInventoryOverride, setBudgetOverride } = await import('@/lib/matrix-overrides');
+      for (const tc of data.tool_calls) {
+        const uiAction = tc.result?.ui_action;
+        if (uiAction) {
+          if (uiAction.type === 'UPDATE_INVENTORY' && uiAction.payload?.sku) {
+            setInventoryOverride(String(uiAction.payload.sku), Number(uiAction.payload.quantity));
+          } else if (uiAction.type === 'UPDATE_BUDGET' && uiAction.payload?.target) {
+            setBudgetOverride(String(uiAction.payload.target), Number(uiAction.payload.budget));
+          }
+        }
+      }
+    }
+
     return NextResponse.json(data);
   } catch (error: any) {
     return NextResponse.json(

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import initialEngineState from '@/data/nexus-engine-state.json';
+import { matrixOverrides, setInventoryOverride, setBudgetOverride } from '@/lib/matrix-overrides';
 
 export interface CampaignData {
   id?: number;
@@ -128,6 +129,21 @@ export async function GET(request: NextRequest) {
         updatedAt: r.updatedAt ? new Date(r.updatedAt).toISOString() : new Date().toISOString()
       }));
 
+      // Apply in-memory persistent matrixOverrides
+      campaigns.forEach((c) => {
+        const inv = matrixOverrides.inventory[c.sku] ?? matrixOverrides.inventory[c.sku.toLowerCase()];
+        if (inv !== undefined) {
+          c.inventory = inv;
+          if (inv > 0 && c.roasStatus === 'CRITICAL_KILL') {
+            c.roasStatus = 'OPTIMAL';
+          }
+        }
+        const bg = matrixOverrides.budget[c.sku] ?? matrixOverrides.budget[c.campaign];
+        if (bg !== undefined) {
+          c.currentDailySpend = bg;
+        }
+      });
+
       // Compute aggregated summary from live data
       const totalSpend = campaigns.reduce((acc, c) => acc + c.currentDailySpend, 0);
       const totalRevenue = campaigns.reduce((acc, c) => acc + c.currentDailyRevenue, 0);
@@ -184,21 +200,38 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const totalSpend = filteredBackup.reduce((acc, c) => acc + c.currentDailySpend, 0);
-    const totalRevenue = filteredBackup.reduce((acc, c) => acc + c.currentDailyRevenue, 0);
+    // Apply in-memory persistent matrixOverrides
+    const patchedBackup = filteredBackup.map((item) => {
+      const c = { ...item };
+      const inv = matrixOverrides.inventory[c.sku] ?? matrixOverrides.inventory[c.sku.toLowerCase()];
+      if (inv !== undefined) {
+        c.inventory = inv;
+        if (inv > 0 && c.roasStatus === 'CRITICAL_KILL') {
+          c.roasStatus = 'OPTIMAL';
+        }
+      }
+      const bg = matrixOverrides.budget[c.sku] ?? matrixOverrides.budget[c.campaign];
+      if (bg !== undefined) {
+        c.currentDailySpend = bg;
+      }
+      return c;
+    });
+
+    const totalSpend = patchedBackup.reduce((acc, c) => acc + c.currentDailySpend, 0);
+    const totalRevenue = patchedBackup.reduce((acc, c) => acc + c.currentDailyRevenue, 0);
     const blendedRoas = totalSpend > 0 ? totalRevenue / totalSpend : 0;
-    const uniqueSkus = new Set(filteredBackup.map((c) => c.sku));
-    const stockouts = new Set(filteredBackup.filter((c) => c.inventory === 0).map((c) => c.sku));
-    const avgHealth = filteredBackup.reduce((acc, c) => acc + c.healthScore, 0) / (filteredBackup.length || 1);
+    const uniqueSkus = new Set(patchedBackup.map((c) => c.sku));
+    const stockouts = new Set(patchedBackup.filter((c) => c.inventory === 0).map((c) => c.sku));
+    const avgHealth = patchedBackup.reduce((acc, c) => acc + c.healthScore, 0) / (patchedBackup.length || 1);
 
     const fallbackResponse: MatrixApiResponse = {
       status: 'fallback',
       database: 'PostgreSQL 16.4 (Offline/Fallback Mode)',
       latencyMs,
       timestamp: new Date().toISOString(),
-      totalCampaigns: filteredBackup.length,
+      totalCampaigns: patchedBackup.length,
       totalSkus: uniqueSkus.size,
-      campaigns: filteredBackup,
+      campaigns: patchedBackup,
       summary: {
         totalSpend: Math.round(totalSpend * 100) / 100,
         totalRevenue: Math.round(totalRevenue * 100) / 100,
@@ -233,6 +266,10 @@ export async function POST(request: NextRequest) {
     const params: any[] = [campaignName];
 
     if (typeof inventory === 'number') {
+      setInventoryOverride(campaignName, inventory);
+      if (body.sku) {
+        setInventoryOverride(body.sku, inventory);
+      }
       params.push(inventory);
       updates.push(`inventory_units = $${params.length}`);
     }

@@ -318,8 +318,8 @@ export function CampaignSelectorModal({
                           {camp.productName || camp.sku}
                         </h4>
                         <div className='flex items-center gap-2 mt-0.5 text-[11px] text-zinc-400'>
-                          <span className='font-bold text-zinc-200'>${camp.price?.toLocaleString()}</span>
-                          <span className='text-zinc-500 text-[10px]'>(₹{Math.round((camp.price ?? 0) * 84).toLocaleString('en-IN')})</span>
+                          <span className='font-bold text-zinc-200'>${((camp.price ?? 0) > 1000 ? (camp.price ?? 0) / 83 : (camp.price ?? 0)).toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>
+                          <span className='text-zinc-500 text-[10px]'>(₹{Math.round((camp.price ?? 0) > 1000 ? (camp.price ?? 0) : (camp.price ?? 0) * 84).toLocaleString('en-IN')})</span>
                           <span>•</span>
                           <span className='text-zinc-500'>{camp.category || 'Footwear'}</span>
                         </div>
@@ -333,10 +333,10 @@ export function CampaignSelectorModal({
                       <span className='text-zinc-500'>Daily Spend:</span>
                       <div className='text-right'>
                         <span className='font-bold text-zinc-200'>
-                          ${camp.currentDailySpend?.toLocaleString()}/d
+                          ${((camp.currentDailySpend ?? 0) > 1000 ? (camp.currentDailySpend ?? 0) / 83 : (camp.currentDailySpend ?? 0)).toLocaleString('en-US', { maximumFractionDigits: 2 })}/d
                         </span>
                         <span className='text-zinc-500 text-[9px] ml-1'>
-                          (₹{Math.round((camp.currentDailySpend ?? 0) * 84).toLocaleString('en-IN')}/d)
+                          (₹{Math.round((camp.currentDailySpend ?? 0) > 1000 ? (camp.currentDailySpend ?? 0) : (camp.currentDailySpend ?? 0) * 84).toLocaleString('en-IN')}/d)
                         </span>
                       </div>
                     </div>

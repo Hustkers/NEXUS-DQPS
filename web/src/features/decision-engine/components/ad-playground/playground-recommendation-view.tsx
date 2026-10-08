@@ -99,8 +99,8 @@ export function PlaygroundRecommendationView({
                   {isStockout
                     ? '$0'
                     : bestCandidate.predicted_net_profit < 0
-                      ? `-$${Math.abs(bestCandidate.predicted_net_profit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                      : `$${bestCandidate.predicted_net_profit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                      ? `-$${Math.abs(bestCandidate.predicted_net_profit).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                      : `$${bestCandidate.predicted_net_profit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                 </div>
               </div>
 
@@ -191,7 +191,7 @@ export function PlaygroundRecommendationView({
                       cand.predicted_net_profit < 0 ? 'text-rose-400' : 'text-zinc-200'
                     )}
                   >
-                    {cand.predicted_net_profit < 0 ? '-' : ''}${Math.abs(cand.predicted_net_profit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {cand.predicted_net_profit < 0 ? '-' : ''}${Math.abs(cand.predicted_net_profit).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
               </div>
@@ -262,7 +262,7 @@ export function PlaygroundRecommendationView({
                   </div>
                   <div className='flex justify-between'>
                     <span className='font-sans text-zinc-400'>Net Profit:</span>
-                    <span className='font-mono tabular-nums font-semibold text-zinc-100'>${bestCandidate.predicted_net_profit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    <span className='font-mono tabular-nums font-semibold text-zinc-100'>${bestCandidate.predicted_net_profit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                   <div className='flex justify-between'>
                     <span className='font-sans text-zinc-400'>Daily Budget:</span>
@@ -293,7 +293,7 @@ export function PlaygroundRecommendationView({
                   </div>
                   <div className='flex justify-between'>
                     <span className='font-sans text-zinc-400'>Net Profit:</span>
-                    <span className='font-mono tabular-nums font-semibold text-zinc-100'>${comparedCandidate.predicted_net_profit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    <span className='font-mono tabular-nums font-semibold text-zinc-100'>${comparedCandidate.predicted_net_profit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                   <div className='flex justify-between'>
                     <span className='font-sans text-zinc-400'>Daily Budget:</span>
@@ -312,7 +312,7 @@ export function PlaygroundRecommendationView({
               <span className='text-zinc-400'>Incremental Advantage of #1:</span>
               <div className='flex items-center gap-3 font-mono tabular-nums'>
                 <span className='font-semibold text-zinc-100'>
-                  +${(bestCandidate.predicted_net_profit - comparedCandidate.predicted_net_profit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} expected profit
+                  +${(bestCandidate.predicted_net_profit - comparedCandidate.predicted_net_profit).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} expected profit
                 </span>
                 <span className='font-semibold text-zinc-300'>
                   +{(bestCandidate.predicted_roas - comparedCandidate.predicted_roas).toFixed(2)}x ROAS

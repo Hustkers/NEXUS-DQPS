@@ -150,8 +150,38 @@ function SimulationLabContent() {
       setSimProgress(100);
       setSimulatedDay(horizon);
       setExecutedResult(computedResult);
+
+      const simLedgerEntry = {
+        id: `ledg-sim-${Date.now().toString(36)}`,
+        product: `${computedResult.scenarioMeta.title}`,
+        channel: 'Omnichannel',
+        issue: `Simulated Shock: ${computedResult.scenarioMeta.title}`,
+        actionTaken: `Executed ${computedResult.activeStrategyName} mitigation policy across horizon`,
+        outcome: `+$${computedResult.financialImpact.lossAvoided.toLocaleString('en-US')} loss avoided (${computedResult.mitigated.roas.toFixed(2)}x ROAS)`,
+        expectedMargin: computedResult.financialImpact.lossAvoided,
+        realizedMargin: Math.round(computedResult.financialImpact.lossAvoided * 0.96),
+        confidence: 0.94,
+        accuracyPct: 95.2,
+        status: 'COMMITTED',
+        feedback: `Stress test scenario evaluated: Applied dynamic shadow price mitigation.`,
+        surface: 'Simulator',
+      };
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('nexus:record_decision', { detail: simLedgerEntry })
+        );
+      }
+      try {
+        fetch('/api/ledger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(simLedgerEntry),
+        }).catch(() => {});
+      } catch {}
+
       toast.success(`Simulation Completed: ${computedResult.scenarioMeta.title}`, {
-        description: `Applied ${computedResult.activeStrategyName}. Projected Loss Avoided: +$${computedResult.financialImpact.lossAvoided.toLocaleString('en-US')}.`
+        description: `Applied ${computedResult.activeStrategyName}. Projected Loss Avoided: +$${computedResult.financialImpact.lossAvoided.toLocaleString('en-US')}. Logged to Decision Ledger.`
       });
     }, 1700);
   };
