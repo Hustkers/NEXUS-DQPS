@@ -272,7 +272,7 @@ export function WhyUsBento({
                   <React.Fragment key={id}>
                     <div className="flex flex-col items-center gap-1">
                       <div className="relative">
-                        <Icon size={20} weight="fill" className="text-foreground sm:w-5 sm:h-5" />
+                        <Icon size={20} className="text-foreground sm:w-5 sm:h-5" />
                         {i === PIPELINE_STEPS.length - 1 && (
                           <span className="absolute -inset-1 rounded-full bg-emerald-500/20 animate-ping" />
                         )}
@@ -284,7 +284,7 @@ export function WhyUsBento({
 
                     {i < PIPELINE_STEPS.length - 1 && (
                       <div className="text-muted-foreground/40 group-hover:text-primary transition-colors duration-300">
-                        <CaretRight size={10} weight="bold" />
+                        <CaretRight size={10} />
                       </div>
                     )}
                   </React.Fragment>
