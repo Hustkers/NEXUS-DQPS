@@ -4,8 +4,6 @@ import React, { useState } from 'react';
 import {
   IconChevronDown,
   IconChevronUp,
-  IconCode,
-  IconInfoCircle,
   IconCpu
 } from '@tabler/icons-react';
 import type { AdPlaygroundResult } from '../../types/ad-playground-types';

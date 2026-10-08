@@ -223,7 +223,7 @@ export function getPlaygroundProducts(): PlaygroundProductSummary[] {
         rating: Number(c.rating) || 4.5,
         reviews: Number(c.reviews) || 50,
         photoUrl: c.photoUrl || '',
-        inventory: Number(c.inventory) ?? 0,
+        inventory: Number(c.inventory) || 0,
         hasHistoricalData: true,
         historicalRoas: Number(c.roas) || 3.0,
         grossMarginPct: Number(c.marginPct) > 0 ? Number(c.marginPct) : 62
@@ -383,11 +383,16 @@ export function computePlaygroundRecommendations(
     });
   }
 
+  const isMissingInventory = product.inventory == null || isNaN(product.inventory);
+  const isStockout = isMissingInventory || product.inventory <= 0;
+
   // Tag points closest to operating point, optimal, and saturation
   let closestCurrentIdx = 0;
   let minDiffCurrent = Infinity;
   let closestOptimalIdx = 0;
   let minDiffOptimal = Infinity;
+
+  const targetOptimalSpend = isStockout ? 0 : optimalSpend;
 
   curvePoints.forEach((pt, idx) => {
     const diffCur = Math.abs(pt.spend - dailyBudget);
@@ -395,7 +400,7 @@ export function computePlaygroundRecommendations(
       minDiffCurrent = diffCur;
       closestCurrentIdx = idx;
     }
-    const diffOpt = Math.abs(pt.spend - optimalSpend);
+    const diffOpt = Math.abs(pt.spend - targetOptimalSpend);
     if (diffOpt < minDiffOptimal) {
       minDiffOptimal = diffOpt;
       closestOptimalIdx = idx;
@@ -412,8 +417,6 @@ export function computePlaygroundRecommendations(
     archetypes = archetypes.filter((a) => allowed.has(a.platform));
   }
 
-  const isMissingInventory = product.inventory == null || isNaN(product.inventory);
-  const isStockout = isMissingInventory || product.inventory <= 0;
   const candidates: CandidateAdConfig[] = [];
 
   for (const arch of archetypes) {
@@ -597,7 +600,7 @@ export function computePlaygroundRecommendations(
       ? 'CRITICAL: Product currently has 0 inventory in warehouse stock. Do not launch campaigns.'
       : undefined,
     curve_points: curvePoints,
-    optimal_daily_spend: optimalSpend,
+    optimal_daily_spend: isStockout ? 0 : optimalSpend,
     saturation_daily_spend: saturationSpend,
     marginal_profit_at_operating_point: +(hillMarginalYield(dailyBudget, capacityA, elasticityB, halfSaturationC) * grossMarginRatio - 1).toFixed(2),
     is_profitable: isProfitable,

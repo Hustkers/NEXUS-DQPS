@@ -22,9 +22,9 @@ export async function GET(request: NextRequest) {
     const target_roas_floor = searchParams.get('target_roas_floor') ? Number(searchParams.get('target_roas_floor')) : 1.8;
     const stratParam = searchParams.get('strategy_focus');
     const strategy_focus = (stratParam === 'BALANCED' || stratParam === 'SCALE_VOLUME') ? stratParam : 'MAX_PROFIT';
-    const audience = searchParams.get('audience') as any;
-    const creative = searchParams.get('creative') as any;
-    const placement = searchParams.get('placement') as any;
+    const audience = searchParams.get('audience') as AdPlaygroundConstraints['audience'];
+    const creative = searchParams.get('creative') as AdPlaygroundConstraints['creative'];
+    const placement = searchParams.get('placement') as AdPlaygroundConstraints['placement'];
 
     const result = computePlaygroundRecommendations({
       sku,
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
           creative: body.creative,
           placement: body.placement
         }),
-        signal: AbortSignal.timeout(1500)
+        signal: AbortSignal.timeout(300)
       });
 
       if (pyRes.ok) {
