@@ -1,0 +1,77 @@
+/* ==========================================================================
+   NEXUS — navigation tweaks
+   The Resources dropdown lost its "Quick Tutorials" column, so its single
+   remaining column now spans the whole mega menu. These rules finish that
+   re-flow: the column's dividing border has nothing to divide, and the item
+   list spreads across the full breadth.
+   ========================================================================== */
+
+/* the Resources column is now the last (and only) panel column */
+.mega-nav__dropdown-inner > .mega-nav__panel-col.is-resources:last-child {
+  border-right: 0;
+}
+
+/* Webflow pins the two panel columns to half of the 4-track mega-menu grid:
+   `#w-node-ede124d2-…{grid-area:1/1/2/3}` for Resources and
+   `#w-node-_40fbd57d-…{grid-area:1/3/2/5}` for Quick Tutorials. With the
+   tutorials gone, Resources should take the whole width instead of sitting in
+   the left half. `:only-child` keeps the original split intact if a second
+   column is ever added back. */
+#w-node-ede124d2-0629-51ba-2d88-16180d086ba1-0d086b9f:only-child {
+  grid-area: 1 / 1 / 2 / 5;
+}
+
+/* ── Tools panel ───────────────────────────────────────────────────────────
+   Webflow lays the Tools dropdown out on a 4-track × 2-row grid:
+
+     #…57a1b { grid-area: 1/1/2/4 }   Tools          (cols 1-3, row 1)
+     #…57a43 { grid-area: 1/4/3/5 }   How it works   (col 4, rows 1-2)
+     #…57a4b { grid-area: 2/1/3/2 }   Extension      (col 1, row 2)
+     #…57a53 { grid-area: 2/2/3/3 }   Stores         (col 2, row 2)
+     #eb6dd0 { grid-area: 2/3/3/4 }   Theme          (col 3, row 2)
+
+   "How it works" and the Extension / Stores / Theme row are gone, so the tool
+   grid takes the whole panel. Four columns keep the original ~320 px item
+   width and spread the ten tools over three tidy rows. */
+
+#w-node-_9f377404-b9a0-8429-cde1-9b508fc57a1b-8fc57a19:only-child {
+  grid-area: 1 / 1 / 2 / 5;
+  border-bottom: 0;
+}
+
+.mega-nav__panel-col.is-products:only-child .mega-nav__panel-list._3-column {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: 1.5rem;
+}
+
+@media (max-width: 991px) {
+  /* the panel stacks on mobile - back to a single column reading order */
+  .mega-nav__panel-col.is-products:only-child .mega-nav__panel-list._3-column {
+    display: flex;
+    flex-flow: column;
+    row-gap: 0.5rem;
+  }
+}
+
+/* the five remaining items fill the width in a 3-up grid (the site's own
+   `.mega-nav__panel-list._3-column` handles the layout; this only widens the
+   gutters so the columns read as separate) */
+.mega-nav__panel-col.is-resources .mega-nav__panel-list._3-column {
+  column-gap: 2rem;
+}
+
+/* the descriptions can breathe now that the cells are wider */
+@media (min-width: 992px) {
+  .mega-nav__panel-col.is-resources .mega-nav__panel-link-desc {
+    white-space: nowrap;
+  }
+}
+
+/* mobile: the panel stacks, so keep the single-column rhythm */
+@media (max-width: 991px) {
+  .mega-nav__panel-col.is-resources .mega-nav__panel-list._3-column {
+    display: flex;
+    flex-flow: column;
+    row-gap: 0.5rem;
+  }
+}

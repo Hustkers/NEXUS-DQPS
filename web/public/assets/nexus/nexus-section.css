@@ -1,0 +1,127 @@
+/* ==========================================================================
+   NEXUS D2C — landing page "Live Decision Engine" section
+   Injected into the Nexus marketing site to surface the integrated console.
+   ========================================================================== */
+
+.nxsec {
+  position: relative;
+  background: #07090f;
+  color: #e8ebf2;
+  padding: 96px 0 104px;
+  overflow: hidden;
+}
+.nxsec::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(900px 420px at 18% -8%, rgba(51,85,255,.26), transparent 70%),
+    radial-gradient(760px 380px at 88% 8%, rgba(167,139,250,.16), transparent 70%);
+  pointer-events: none;
+}
+.nxsec > * { position: relative; }
+
+.nxsec-head { max-width: 760px; margin-bottom: 44px; }
+.nxsec-eyebrow {
+  display: inline-flex; align-items: center; gap: 9px;
+  font: 600 10.5px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .15em; text-transform: uppercase;
+  color: #9fb0ff;
+  border: 1px solid rgba(51,85,255,.38);
+  background: rgba(51,85,255,.11);
+  border-radius: 999px; padding: 8px 13px; margin-bottom: 22px;
+}
+.nxsec-eyebrow i {
+  width: 6px; height: 6px; border-radius: 99px; background: #4d6bff;
+  box-shadow: 0 0 0 4px rgba(77,107,255,.18);
+  display: block;
+}
+.nxsec h2 {
+  margin: 0 0 16px;
+  font-family: "Plus Jakarta Sans", Inter, sans-serif;
+  font-weight: 700; font-size: clamp(32px, 4.4vw, 54px);
+  line-height: 1.08; letter-spacing: -.03em;
+}
+.nxsec h2 em { font-style: normal; color: #4d6bff; }
+.nxsec-head p {
+  margin: 0; color: #98a1b5; font-size: 16.5px; line-height: 1.6; max-width: 62ch;
+}
+
+.nxsec-kpis {
+  display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; margin-bottom: 18px;
+}
+@media (max-width: 900px) { .nxsec-kpis { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+@media (max-width: 520px) { .nxsec-kpis { grid-template-columns: 1fr; } }
+
+.nxsec-kpi {
+  border: 1px solid #1e2431; border-radius: 14px; background: rgba(13,16,23,.82);
+  padding: 20px; backdrop-filter: blur(6px);
+}
+.nxsec-kpi .l {
+  font: 600 9.5px/1 ui-monospace, monospace; letter-spacing: .13em;
+  text-transform: uppercase; color: #5d6577;
+}
+.nxsec-kpi .v {
+  font-family: "Plus Jakarta Sans", Inter, sans-serif; font-weight: 700;
+  font-size: 30px; line-height: 1.1; letter-spacing: -.025em; margin: 12px 0 0;
+}
+.nxsec-kpi .s { font-size: 12px; color: #5d6577; margin-top: 8px; }
+.nxsec-kpi .t {
+  display: inline-block; margin-top: 12px;
+  font: 600 9.5px/1 ui-monospace, monospace; letter-spacing: .06em;
+  border-radius: 999px; padding: 5px 9px;
+}
+.nxsec-kpi .t.good { color: #6ee7b7; background: rgba(16,185,129,.13); }
+.nxsec-kpi .t.warn { color: #fcd34d; background: rgba(245,158,11,.13); }
+.nxsec-kpi .t.bad  { color: #fda4af; background: rgba(244,63,94,.13); }
+.nxsec-kpi .t.info { color: #a5b4fc; background: rgba(51,85,255,.15); }
+
+.nxsec-grid { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(0,1fr); gap: 14px; }
+@media (max-width: 980px) { .nxsec-grid { grid-template-columns: 1fr; } }
+
+.nxsec-panel {
+  border: 1px solid #1e2431; border-radius: 14px; background: rgba(13,16,23,.82);
+  padding: 22px; backdrop-filter: blur(6px);
+}
+.nxsec-panel h3 {
+  margin: 0 0 16px; font: 600 11px/1 ui-monospace, monospace;
+  letter-spacing: .13em; text-transform: uppercase; color: #8b93a7;
+}
+.nxsec-anom {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0; border-top: 1px solid #171c26;
+}
+.nxsec-anom:first-of-type { border-top: 0; }
+.nxsec-anom .dot { width: 8px; height: 8px; border-radius: 99px; flex: none; }
+.nxsec-anom .nm { font-size: 13.5px; font-weight: 600; }
+.nxsec-anom .ds { font-size: 11.5px; color: #5d6577; }
+.nxsec-anom .zs {
+  margin-left: auto; font: 600 11px/1 ui-monospace, monospace;
+  color: #8b93a7; border: 1px solid #1e2431; border-radius: 999px; padding: 5px 9px; white-space: nowrap;
+}
+.nxsec-anom .zs.hot { color: #fda4af; border-color: rgba(244,63,94,.36); background: rgba(244,63,94,.1); }
+
+.nxsec-bars { display: flex; flex-direction: column; gap: 13px; }
+.nxsec-bar-row { display: grid; grid-template-columns: 96px 1fr auto; gap: 12px; align-items: center; font-size: 12.5px; }
+.nxsec-bar-row .nm { color: #8b93a7; }
+.nxsec-bar-row .tr { height: 7px; border-radius: 99px; background: rgba(255,255,255,.06); overflow: hidden; }
+.nxsec-bar-row .tr i { display: block; height: 100%; border-radius: 99px; }
+.nxsec-bar-row .v { font: 500 11.5px/1 ui-monospace, monospace; color: #8b93a7; white-space: nowrap; }
+
+.nxsec-cta { margin-top: 18px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.nxsec-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  font: 600 14px/1 "Plus Jakarta Sans", Inter, sans-serif;
+  color: #fff; text-decoration: none;
+  background: #3355ff; border: 1px solid #3355ff; border-radius: 11px;
+  padding: 15px 22px;
+  box-shadow: 0 14px 34px -14px rgba(51,85,255,.95);
+  transition: transform .18s ease, background .18s ease;
+}
+.nxsec-btn:hover { background: #4d6bff; border-color: #4d6bff; transform: translateY(-1px); }
+.nxsec-btn.ghost {
+  background: transparent; border-color: #232b3a; color: #cfd6e6; box-shadow: none;
+}
+.nxsec-btn.ghost:hover { border-color: #3a4459; color: #fff; background: rgba(255,255,255,.03); }
+.nxsec-note { font-size: 12px; color: #5d6577; line-height: 1.6; }
+.nxsec-note b { color: #8b93a7; font-weight: 600; }
