@@ -1,0 +1,324 @@
+/* ==========================================================================
+   NEXUS — animated footer
+   Static port of the NEXUS-DQPS `animated-footer` component
+   (web/src/components/ui/animated-footer.tsx + web/src/styles/animated-footer.css).
+
+   Rendered in the light theme exactly as https://nexus-dqps.vercel.app/ shows it:
+     · white panel, blue ASCII art sampled from the two hand photographs
+     · a glassy top card: brand mark + title + tagline | team avatars
+     · a huge NEXUS wordmark that unmasks character-by-character
+     · a ruled bottom bar with the copyright line
+
+   The theme tokens live on :root under the upstream's own names, because the
+   upstream reads them from document.documentElement on every frame - that is
+   what lets a theme change repaint the ASCII art live.
+   ========================================================================== */
+
+:root {
+  --footer-line: #e4e4e7;
+  --footer-line-2: #e4e4e7;
+  --footer-line-highlight: rgba(255, 255, 255, 0.8);
+  --footer-ink: #09090b;
+  --footer-ink-2: #71717a;
+  --footer-ink-3: #71717a;
+  --footer-panel: #ffffff;
+  --footer-panel-2: #f4f4f5;
+  --footer-panel-glass: rgba(255, 255, 255, 0.85);
+  --footer-accent: #2563eb;
+  --footer-on-accent: #ffffff;
+  --footer-ascii-color: #1e40af;
+}
+
+.nxfoot {
+  --nx-line: var(--footer-line);
+  --nx-line-2: var(--footer-line-2);
+  --nx-ink: var(--footer-ink);
+  --nx-ink-2: var(--footer-ink-2);
+  --nx-ink-3: var(--footer-ink-3);
+  --nx-panel: var(--footer-panel);
+  --nx-panel-2: var(--footer-panel-2);
+  --nx-panel-glass: var(--footer-panel-glass);
+  --nx-accent: var(--footer-accent);
+  --nx-on-accent: var(--footer-on-accent);
+  --nx-ascii: var(--footer-ascii-color);
+  --nx-display: Ranade, "Plus Jakarta Sans", Inter, sans-serif;
+
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-top: 1px solid var(--nx-line);
+  margin-top: 80px;
+  padding: 56px 0 32px;
+  color: var(--nx-ink-2);
+  font-family: var(--nx-display);
+  font-size: 13.5px;
+  line-height: 1.5;
+  /* the page body carries a negative tracking; the reference footer does not */
+  letter-spacing: normal;
+  background: var(--nx-panel);
+  box-sizing: border-box;
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* ------------------------------------------------------------- container */
+.nxfoot__wrap { max-width: 1220px; margin: 0 auto; padding: 0 24px; width: 100%; }
+@media (max-width: 640px) { .nxfoot__wrap { padding: 0 16px; } }
+@media (max-width: 360px) { .nxfoot__wrap { padding: 0 10px; } }
+
+/* The page's inline Webflow style applies a "line height trim" to every <p>
+   (display: flow-root + negative-margin ::before/::after pseudo elements).
+   That trim is a Webflow layout trick and the reference footer does not use
+   it, so it is switched off inside the footer to keep the metrics identical. */
+.nxfoot p,
+.nxfoot h1, .nxfoot h2, .nxfoot h3,
+.nxfoot h4, .nxfoot h5, .nxfoot h6,
+.nxfoot blockquote { display: block; }
+.nxfoot p::before, .nxfoot p::after,
+.nxfoot h1::before, .nxfoot h1::after,
+.nxfoot h2::before, .nxfoot h2::after,
+.nxfoot h3::before, .nxfoot h3::after,
+.nxfoot h4::before, .nxfoot h4::after,
+.nxfoot h5::before, .nxfoot h5::after,
+.nxfoot h6::before, .nxfoot h6::after,
+.nxfoot blockquote::before, .nxfoot blockquote::after { content: none; }
+
+/* ------------------------------------------------------------- top card */
+.nxfoot__top {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 36px;
+  flex-wrap: wrap;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 30px 38px;
+  background: var(--nx-panel-glass);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--nx-line);
+  border-radius: 20px;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.08);
+}
+.nxfoot__brand { max-width: 460px; }
+.nxfoot__logo-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  text-decoration: none;
+}
+.nxfoot__logo-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--nx-ink);
+  color: var(--nx-panel);
+  border-radius: 7px;
+  font-family: var(--nx-display);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  transition: transform 0.3s ease;
+}
+.nxfoot__logo-row:hover .nxfoot__logo-mark { transform: scale(1.05); }
+.nxfoot__logo-title {
+  font-family: var(--nx-display);
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.5;
+  letter-spacing: -0.03em;
+  color: var(--nx-ink);
+}
+.nxfoot__tagline {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--nx-ink-2);
+}
+
+/* ---------------------------------------------------------- team avatars */
+.nxfoot__team {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+.nxfoot__avatars { display: flex; align-items: center; justify-content: center; }
+.nxfoot__avatar {
+  position: relative;
+  margin-left: -12px;
+  transition: transform 0.3s ease-out;
+  cursor: pointer;
+  outline: none;
+}
+.nxfoot__avatar:first-child { margin-left: 0; }
+.nxfoot__avatar:hover,
+.nxfoot__avatar:focus-visible { transform: translateY(-8px); z-index: 10; }
+.nxfoot__avatar img {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 3px solid #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+  display: block;
+}
+@media (min-width: 768px) {
+  .nxfoot__avatar img { width: 56px; height: 56px; }
+}
+.nxfoot__avatar:hover img { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); }
+.nxfoot__tip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px) scale(0.95);
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.7);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(229, 229, 229, 0.5);
+  border-radius: 12px;
+  color: #171717;
+  font-family: var(--nx-display);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  transition: opacity 0.18s ease, transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.18s ease;
+  z-index: 50;
+}
+.nxfoot__avatar:hover .nxfoot__tip,
+.nxfoot__avatar:focus-visible .nxfoot__tip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+/* ------------------------------------------------------------ ascii stage */
+.nxfoot__ascii-stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+  overflow: hidden;
+  z-index: 2;
+}
+.nxfoot__hand {
+  position: absolute;
+  top: 56%;
+  width: 50%;
+  min-width: 260px;
+  max-width: none;
+  transform: translateY(-50%);
+  will-change: transform;
+  pointer-events: auto;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+.nxfoot__hand:hover { opacity: 1; }
+.nxfoot__hand--left { left: 0; }
+.nxfoot__hand--right { right: 0; }
+.nxfoot__hand canvas { display: block; width: 100%; height: auto; pointer-events: auto; }
+
+/* --------------------------------------------------------- display stage */
+.nxfoot__display-stage {
+  position: relative;
+  z-index: 6;
+  margin-top: auto;
+  padding-top: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.nxfoot__display {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: clamp(2px, 0.6vw, 12px);
+  width: 100%;
+  margin: 0 0 20px;
+  overflow: hidden;
+  user-select: none;
+  font-family: var(--nx-display);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
+  line-height: 0.82;
+  font-size: clamp(3.5rem, 16vw, 14.5rem);
+}
+.nxfoot__char-wrap {
+  display: inline-block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.nxfoot__char {
+  display: inline-block;
+  color: var(--nx-ink);
+  /* visible by default: with no JavaScript the wordmark must still read.
+     `.is-armed` is only added by the script, and only while the footer is
+     still a viewport away, so the scroll reveal can play. */
+  transform: translateY(0);
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+.nxfoot.is-armed .nxfoot__char { transform: translateY(125%); }
+.nxfoot.is-revealed .nxfoot__char { transform: translateY(0%); }
+
+.nxfoot__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding-top: 18px;
+  border-top: 1px solid var(--nx-line-2);
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--nx-ink-3);
+  position: relative;
+  z-index: 10;
+  text-align: center;
+}
+
+/* ------------------------------------------------------------ responsive */
+@media (max-width: 900px) {
+  .nxfoot { min-height: 500px; padding: 44px 0 24px; margin-top: 72px; }
+  .nxfoot__top { flex-direction: column; align-items: stretch; gap: 28px; padding: 24px 28px; }
+  .nxfoot__team { justify-content: flex-start; }
+  .nxfoot__hand { width: 52%; opacity: 0.6; }
+}
+@media (max-width: 680px) {
+  .nxfoot { min-height: 440px; padding: 36px 0 20px; margin-top: 56px; }
+  .nxfoot__top { padding: 20px 18px; border-radius: 16px; }
+  .nxfoot__team { justify-content: center; }
+  .nxfoot__display {
+    font-size: clamp(1.6rem, 9.8vw, 3.2rem);
+    letter-spacing: -0.02em;
+    gap: clamp(1px, 0.4vw, 5px);
+    margin-bottom: 14px;
+  }
+  .nxfoot__hand { top: 66%; width: 52%; min-width: 130px; opacity: 0.3; }
+  .nxfoot__bottom { flex-direction: column; align-items: flex-start; gap: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nxfoot__char { transition: none; transform: translateY(0); }
+}
