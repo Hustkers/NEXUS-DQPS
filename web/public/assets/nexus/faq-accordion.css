@@ -1,0 +1,234 @@
+/* ==========================================================================
+   NEXUS — FAQ accordion
+   Port of the VengeanceUI `faq-accordion` registry component
+   (Ashutoshx7/VengeanceUI → public/r/faq-accordion.json) to static HTML/CSS/JS,
+   themed with this site's design tokens:
+     accent   #225aea   (--_color-theme---normal)
+     heading  "Plus Jakarta Sans"
+     body     Inter
+   ========================================================================== */
+
+.nxfaq {
+  position: relative;
+  background: #f7f9fd;
+  border-top: 1px solid rgba(34, 90, 234, 0.09);
+  overflow: hidden;
+  padding: 104px 0 112px;
+}
+.nxfaq::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(820px 380px at 14% 0%, rgba(34, 90, 234, 0.13), transparent 70%),
+    radial-gradient(700px 340px at 88% 6%, rgba(167, 139, 250, 0.12), transparent 72%);
+  pointer-events: none;
+}
+.nxfaq > * { position: relative; }
+
+/* ------------------------------------------------------------------ head */
+.nxfaq__head {
+  max-width: 56rem;
+  margin: 0 auto 44px;
+  text-align: center;
+  padding: 0 24px;
+}
+.nxfaq__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font: 600 10.5px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #1f47c9;
+  border: 1px solid rgba(34, 90, 234, 0.34);
+  background: rgba(34, 90, 234, 0.08);
+  border-radius: 999px;
+  padding: 8px 14px;
+  margin-bottom: 22px;
+}
+.nxfaq__eyebrow i {
+  width: 6px; height: 6px; border-radius: 99px; background: #225aea;
+  box-shadow: 0 0 0 4px rgba(34, 90, 234, 0.16);
+  display: block;
+}
+.nxfaq h2 {
+  margin: 0 0 16px;
+  font-family: "Plus Jakarta Sans", Inter, Arial, sans-serif;
+  font-weight: 700;
+  font-size: clamp(30px, 4vw, 48px);
+  line-height: 1.12;
+  letter-spacing: -0.028em;
+  color: #0b0b0b;
+}
+.nxfaq h2 em { font-style: normal; color: #225aea; }
+.nxfaq__sub {
+  margin: 0 auto;
+  max-width: 44rem;
+  font-family: Inter, Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #5b6472;
+}
+
+/* ------------------------------------------------------------------ list */
+.nxfaq__list {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  max-width: 56rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.nxfaq__item {
+  position: relative;
+  width: 100%;
+  border-bottom: 1px solid #e4e9f2;
+  transition: border-color 0.3s ease-in;
+}
+.nxfaq__item:last-child { border-bottom: 0; }
+.nxfaq__item.is-open { border-bottom-color: #d7dff0; }
+
+.nxfaq__q {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 66px;
+  margin: 0;
+  padding: 18px 56px 18px 62px;
+  text-align: left;
+  outline: none;
+  font-family: "Plus Jakarta Sans", Inter, Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.012em;
+  color: #1b2230;
+  border-left: 3px solid #d7dded;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.nxfaq__q:hover {
+  border-left-color: #225aea;
+  background: rgba(34, 90, 234, 0.035);
+  color: #0b0b0b;
+}
+.nxfaq__q:focus-visible {
+  border-left-color: #225aea;
+  box-shadow: inset 0 0 0 2px rgba(34, 90, 234, 0.25);
+}
+.nxfaq__item.is-open .nxfaq__q {
+  border-left-color: #225aea;
+  background: rgba(34, 90, 234, 0.055);
+  color: #0b0b0b;
+  font-weight: 700;
+}
+
+/* plus / minus */
+.nxfaq__sign {
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: Inter, Arial, sans-serif;
+  font-weight: 400;
+  font-size: 26px;
+  line-height: 1;
+  color: #9aa3b4;
+  transition: color 0.2s ease, font-size 0.2s ease;
+  user-select: none;
+  pointer-events: none;
+}
+.nxfaq__q:hover .nxfaq__sign { color: #225aea; }
+.nxfaq__item.is-open .nxfaq__sign { color: #225aea; font-size: 32px; }
+
+/* chevron */
+.nxfaq__chev {
+  position: absolute;
+  right: 22px;
+  top: 50%;
+  margin-top: -5px;
+  width: 9px;
+  height: 9px;
+  border-top: 2px solid #9aa3b4;
+  border-right: 2px solid #9aa3b4;
+  transform: rotate(133deg);
+  transition: transform 0.2s ease-in-out, border-color 0.2s ease;
+  pointer-events: none;
+}
+.nxfaq__q:hover .nxfaq__chev { border-color: #225aea; }
+.nxfaq__item.is-open .nxfaq__chev {
+  transform: rotate(-44deg);
+  border-color: #225aea;
+}
+
+/* ----------------------------------------------------------------- panel */
+.nxfaq__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  width: 100%;
+  border-left: 3px solid #d7dded;
+  transition: grid-template-rows 0.3s ease-in-out, border-color 0.3s ease, background-color 0.3s ease;
+}
+.nxfaq__item.is-open .nxfaq__panel {
+  grid-template-rows: 1fr;
+  border-left-color: #225aea;
+  background: rgba(34, 90, 234, 0.035);
+}
+.nxfaq__panel > div { overflow: hidden; }
+.nxfaq__a {
+  display: block;
+  width: 100%;
+  padding: 8px 56px 26px 62px;
+  font-family: Inter, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.65;
+  color: #4a5262;
+}
+
+/* ----------------------------------------------------------------- notes */
+.nxfaq__note {
+  max-width: 56rem;
+  margin: 30px auto 0;
+  padding: 0 24px;
+  font-family: Inter, Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #8a93a4;
+  text-align: center;
+}
+.nxfaq__note b { color: #5b6472; font-weight: 600; }
+.nxfaq__note a { color: #225aea; text-decoration: none; }
+.nxfaq__note a:hover { text-decoration: underline; }
+
+/* ------------------------------------------------------------- responsive */
+@media (max-width: 768px) {
+  .nxfaq { padding: 72px 0 80px; }
+  .nxfaq__sub { font-size: 16px; }
+  .nxfaq__q {
+    min-height: 60px;
+    padding: 16px 40px 16px 48px;
+    font-size: 15.5px;
+    border-left-width: 2px;
+  }
+  .nxfaq__sign { left: 15px; font-size: 22px; }
+  .nxfaq__item.is-open .nxfaq__sign { font-size: 27px; }
+  .nxfaq__chev { right: 16px; }
+  .nxfaq__panel { border-left-width: 2px; }
+  .nxfaq__a { padding: 6px 40px 22px 48px; font-size: 15px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nxfaq__q, .nxfaq__sign, .nxfaq__chev, .nxfaq__panel, .nxfaq__item { transition: none; }
+}

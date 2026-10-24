@@ -1,0 +1,287 @@
+/* ==========================================================================
+   NEXUS — team reveal grid
+   Static port of the VengeanceUI `team-reveal-grid` registry component
+   (Ashutoshx7/VengeanceUI → public/r/team-reveal-grid.json → components/ui/
+   team-reveal-grid.tsx) to static HTML/CSS/JS.
+
+   The class-for-class source is:
+     section  @container relative h-full min-h-[620px] w-full overflow-x-hidden
+              overflow-y-auto bg-white px-4 py-10 text-neutral-950
+              sm:px-7 sm:py-12
+     grid     grid-cols-2 gap-x-3 gap-y-6 @min-[560px]:grid-cols-3
+              @min-[560px]:gap-x-5 @min-[560px]:gap-y-5
+     cell     relative min-h-52 min-w-0
+     card     relative overflow-hidden rounded-[1.35rem] border bg-white p-1.5
+              shadow-[0_10px_35px_-24px_rgba(0,0,0,0.42)]
+     portrait relative h-full overflow-hidden rounded-[1.05rem] bg-neutral-100
+     image    absolute inset-0 h-full w-full object-cover grayscale
+     details  absolute inset-x-5 bottom-4 z-10
+
+   Upstream behaviour preserved:
+     · portraits de-saturate until the member is active
+     · the active card grows, lifts and takes the accent border + glow
+     · the expertise line fades up over the lower third of the portrait
+     · the rotation pauses while the pointer or keyboard focus is inside
+     · the title carries an animated hand-drawn underline
+   ========================================================================== */
+
+.nxteam {
+  position: relative;
+  width: 100%;
+  min-height: 620px;
+  padding: 40px 16px;
+  overflow: hidden;
+  background: #ffffff;
+  color: #0a0a0a;
+  font-family: Inter, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.nxteam::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: radial-gradient(circle at center, currentColor 0.7px, transparent 0.8px);
+  background-size: 12px 12px;
+}
+.nxteam > * { position: relative; }
+
+/* Switch off the page's inline Webflow "line height trim" inside the grid so
+   the title underline and the description keep their intended spacing. */
+.nxteam p, .nxteam h2, .nxteam h3, .nxteam blockquote { display: block; }
+.nxteam p::before, .nxteam p::after,
+.nxteam h2::before, .nxteam h2::after,
+.nxteam h3::before, .nxteam h3::after,
+.nxteam blockquote::before, .nxteam blockquote::after { content: none; }
+
+@media (min-width: 640px) { .nxteam { padding: 48px 28px; } }
+
+.nxteam__inner { max-width: 64rem; margin: 0 auto; width: 100%; }
+
+/* ----------------------------------------------------------------- header */
+.nxteam__head { max-width: 42rem; margin: 0 auto 32px; text-align: center; }
+.nxteam__eyebrow {
+  margin: 0 0 12px;
+  font: 600 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #737373;
+}
+.nxteam__title {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", Inter, sans-serif;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+  color: #0a0a0a;
+}
+@media (min-width: 640px) { .nxteam__title { font-size: 36px; } }
+.nxteam__title .u { position: relative; display: inline-block; }
+.nxteam__title .u > span { position: relative; z-index: 10; }
+.nxteam__title svg {
+  position: absolute;
+  left: 0;
+  bottom: -12px;
+  width: 100%;
+  height: 12px;
+  color: #fb4f43;
+}
+@media (min-width: 640px) {
+  .nxteam__title svg { bottom: -16px; height: 16px; }
+}
+.nxteam__desc {
+  max-width: 36rem;
+  margin: 24px auto 0;
+  font-size: 14px;
+  line-height: 24px;
+  color: #525252;
+  text-wrap: pretty;
+}
+
+/* ------------------------------------------------------------------- grid */
+.nxteam__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 12px;
+  row-gap: 24px;
+}
+@media (min-width: 560px) {
+  .nxteam__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 20px;
+    row-gap: 20px;
+  }
+}
+.nxteam__cell { position: relative; min-width: 0; min-height: 208px; }
+
+.nxteam__btn {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  width: 100%;
+  display: block;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  outline: none;
+  border-radius: 1.35rem;
+}
+
+/* ------------------------------------------------------------------- card */
+.nxteam__card {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.35rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: #fff;
+  padding: 6px;
+  box-shadow: 0 10px 35px -24px rgba(0, 0, 0, 0.42);
+  transition: border-color 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.nxteam__btn:hover .nxteam__card { transform: translateY(-4px); }
+.nxteam__btn:focus-visible .nxteam__card {
+  box-shadow: 0 0 0 2px var(--team-accent, #fb4f43), 0 0 0 4px #ffffff;
+}
+.nxteam__cell.is-active .nxteam__card {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--team-accent) 55%, transparent);
+  box-shadow: 0 22px 48px -28px color-mix(in srgb, var(--team-accent) 55%, transparent);
+}
+
+/* --------------------------------------------------------------- portrait */
+.nxteam__portrait {
+  display: block;
+  height: 112px;
+  transition: height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (min-width: 560px) { .nxteam__portrait { height: 128px; } }
+.nxteam__cell.is-active .nxteam__portrait { height: 160px; }
+@media (min-width: 560px) { .nxteam__cell.is-active .nxteam__portrait { height: 176px; } }
+
+.nxteam__frame {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 1.05rem;
+  background: #f5f5f5;
+  transition: background-color 0.5s ease;
+}
+.nxteam__cell.is-active .nxteam__frame {
+  background: color-mix(in srgb, var(--team-accent) 10%, white);
+}
+
+.nxteam__glow {
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  transition: opacity 0.5s ease;
+  background:
+    radial-gradient(circle at 68% 20%, color-mix(in srgb, var(--team-accent) 36%, transparent) 0%, transparent 36%),
+    radial-gradient(circle at 22% 82%, color-mix(in srgb, var(--team-accent) 16%, transparent) 0%, transparent 42%);
+}
+.nxteam__cell.is-active .nxteam__glow { opacity: 1; }
+
+.nxteam__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1);
+  transform: scale(1);
+  transition: filter 0.5s ease-out, transform 0.5s ease-out, opacity 0.5s ease-out;
+}
+.nxteam__cell.is-active .nxteam__img { filter: grayscale(0); transform: scale(1.02); }
+
+.nxteam__scrim {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 66.6667%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 45%, rgba(0, 0, 0, 0.8) 100%);
+}
+.nxteam__cell.is-active .nxteam__scrim { opacity: 1; }
+
+/* the expertise line - upstream renders it over the lower third of the card */
+.nxteam__expertise {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 16px;
+  z-index: 10;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  pointer-events: none;
+}
+.nxteam__cell.is-active .nxteam__expertise { opacity: 1; transform: translateY(0); }
+.nxteam__expertise p {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 11px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.78);
+}
+@media (min-width: 560px) { .nxteam__expertise p { font-size: 12px; } }
+
+/* ------------------------------------------------------------------ meta */
+.nxteam__meta { display: block; padding: 12px 6px 0; text-align: center; }
+.nxteam__name {
+  display: block;
+  margin: 0;
+  font-family: "Plus Jakarta Sans", Inter, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: #0a0a0a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (min-width: 560px) { .nxteam__name { font-size: 16px; } }
+.nxteam__role {
+  display: block;
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #737373;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nxteam__cell.is-active .nxteam__role { color: var(--team-accent, #fb4f43); }
+
+/* ------------------------------------------------------- title underline */
+.nxteam__title .u path {
+  stroke-dasharray: 0 1;
+  animation: nxteam-draw 700ms ease forwards;
+}
+.nxteam__title .u path:nth-child(2) { animation-delay: 120ms; }
+@keyframes nxteam-draw { to { stroke-dasharray: 1 0; } }
+
+/* ------------------------------------------------------------ responsive */
+@media (prefers-reduced-motion: reduce) {
+  .nxteam__title .u path { animation: none; stroke-dasharray: 1 0; }
+  .nxteam__cell, .nxteam__card, .nxteam__portrait, .nxteam__frame,
+  .nxteam__img, .nxteam__scrim, .nxteam__expertise, .nxteam__role { transition: none; }
+}

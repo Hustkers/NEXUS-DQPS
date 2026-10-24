@@ -1,0 +1,99 @@
+/* ==========================================================================
+   NEXUS — the blue "Ready to begin?" band that sits above the team grid and
+   the animated footer. Restored after the footer was rebuilt to match the
+   NEXUS-DQPS reference; it carries the brand mark, the call to action and
+   the legal links that used to live in the old footer bar.
+   ========================================================================== */
+
+.nxcta {
+  position: relative;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+/* the brand mark straddles the seam: its top sits on the white field and its
+   lower two thirds overlap the blue band, exactly like the original */
+.nxcta__mark {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+.nxcta__mark svg {
+  display: block;
+  width: 168px;
+  height: 168px;
+  margin: 0 auto -62px;
+  filter: drop-shadow(0 18px 34px rgba(10, 30, 90, 0.28));
+}
+
+.nxcta__band {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(180deg, #3d83f7 0%, #2f6fe6 100%);
+  padding: 140px 20px 86px;
+  text-align: center;
+}
+.nxcta__heading {
+  margin: 0;
+  font-family: Ranade, "Plus Jakarta Sans", Inter, sans-serif;
+  font-size: clamp(34px, 5.2vw, 74px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+.nxcta__meta {
+  margin: 30px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px 34px;
+}
+
+/* language switcher */
+.nxcta__lang { display: flex; align-items: center; gap: 6px; }
+.nxcta__lang a {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: rgba(255, 255, 255, 0.76);
+  font-family: Inter, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.nxcta__lang a:hover { color: #ffffff; background: rgba(255, 255, 255, 0.16); }
+.nxcta__lang a[aria-current="page"] { background: #ffffff; color: #225aea; }
+
+/* social links */
+.nxcta__social { display: flex; align-items: center; gap: 14px; }
+.nxcta__social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  color: #ffffff;
+  opacity: 0.8;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.nxcta__social a:hover { opacity: 1; transform: translateY(-2px); }
+.nxcta__social svg { display: block; width: 100%; height: 100%; }
+
+@media (max-width: 680px) {
+  .nxcta__mark svg { width: 108px; height: 108px; margin: 0 auto -40px; }
+  .nxcta__band { padding: 96px 16px 60px; }
+  .nxcta__meta { margin-top: 26px; gap: 14px 20px; }
+  .nxcta__lang a { min-width: 28px; height: 28px; font-size: 11px; }
+  .nxcta__social a { width: 24px; height: 24px; }
+}

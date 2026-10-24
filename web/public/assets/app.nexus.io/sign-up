@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+  <head>
+
+    <meta charset="utf-8" />
+    <link rel="icon" href="/favicon.svg" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="description" content="" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Dropship</title>
+    <script src="https://js.chargebee.com/v2/chargebee.js" async defer></script>
+    <!-- TikTok Pixel Code Start -->
+    <script>
+      !(function (w, d, t) {
+        w.TiktokAnalyticsObject = t;
+        var ttq = (w[t] = w[t] || []);
+        ((ttq.methods = [
+          'page',
+          'track',
+          'identify',
+          'instances',
+          'debug',
+          'on',
+          'off',
+          'once',
+          'ready',
+          'alias',
+          'group',
+          'enableCookie',
+          'disableCookie',
+          'holdConsent',
+          'revokeConsent',
+          'grantConsent',
+        ]),
+          (ttq.setAndDefer = function (t, e) {
+            t[e] = function () {
+              t.push([e].concat(Array.prototype.slice.call(arguments, 0)));
+            };
+          }));
+        for (var i = 0; i < ttq.methods.length; i++) ttq.setAndDefer(ttq, ttq.methods[i]);
+        ((ttq.instance = function (t) {
+          for (var e = ttq._i[t] || [], n = 0; n < ttq.methods.length; n++)
+            ttq.setAndDefer(e, ttq.methods[n]);
+          return e;
+        }),
+          (ttq.load = function (e, n) {
+            var r = 'https://analytics.tiktok.com/i18n/pixel/events.js',
+              o = n && n.partner;
+            ((ttq._i = ttq._i || {}),
+              (ttq._i[e] = []),
+              (ttq._i[e]._u = r),
+              (ttq._t = ttq._t || {}),
+              (ttq._t[e] = +new Date()),
+              (ttq._o = ttq._o || {}),
+              (ttq._o[e] = n || {}));
+            n = document.createElement('script');
+            ((n.type = 'text/javascript'),
+              (n.async = !0),
+              (n.src = r + '?sdkid=' + e + '&lib=' + t));
+            e = document.getElementsByTagName('script')[0];
+            e.parentNode.insertBefore(n, e);
+          }));
+
+        ttq.load('D8KVFH3C77UEVDV3KO60');
+        ttq.page();
+      })(window, document, 'ttq');
+    </script>
+    <!-- TikTok Pixel Code End -->
+    <!-- Google Tag Manager -->
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({
+          'gtm.start': new Date().getTime(),
+          event: 'gtm.js',
+        });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, 'script', 'dataLayer', 'GTM-K3JW5Q4');
+    </script>
+    <!-- End Google Tag Manager -->
+
+    <!--    FIRSTPROMOTER-->
+    <script>
+      (function (w) {
+        w.fpr =
+          w.fpr ||
+          function () {
+            w.fpr.q = w.fpr.q || [];
+            w.fpr.q[arguments[0] == 'set' ? 'unshift' : 'push'](arguments);
+          };
+      })(window);
+      fpr('init', { cid: '1tg9zylp' });
+      fpr('click');
+    </script>
+    <script src="https://cdn.firstpromoter.com/fpr.js" async></script>
+    <!--    FIRSTPROMOTER-->
+
+    <!-- ADD INTERCOM CHAT: BEGIN -->
+    <script>
+      // We pre-filled your app ID in the widget URL: 'https://widget.intercom.io/widget/app_id'
+      (function () {
+        var w = window;
+        var ic = w.Intercom;
+        if (typeof ic === 'function') {
+          ic('reattach_activator');
+          ic('update', w.intercomSettings);
+        } else {
+          var d = document;
+          var i = function () {
+            i.c(arguments);
+          };
+          i.q = [];
+          i.c = function (args) {
+            i.q.push(args);
+          };
+          w.Intercom = i;
+          var l = function () {
+            var s = d.createElement('script');
+            s.type = 'text/javascript';
+            s.async = true;
+            s.src = 'https://widget.intercom.io/widget/sqccv4we';
+            var x = d.getElementsByTagName('script')[0];
+            x.parentNode.insertBefore(s, x);
+          };
+          if (document.readyState === 'complete') {
+            l();
+          } else if (w.attachEvent) {
+            w.attachEvent('onload', l);
+          } else {
+            w.addEventListener('load', l, false);
+          }
+        }
+      })();
+    </script>
+    <!-- ADD INTERCOM CHAT: END -->
+    <script type="module" crossorigin src="/assets/index-XRA7jCok.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-COnpUsM8.js">
+    <link rel="modulepreload" crossorigin href="/assets/antd-BjaflUEs.js">
+    <link rel="modulepreload" crossorigin href="/assets/app-components-WOiuIYaJ.js">
+    <link rel="modulepreload" crossorigin href="/assets/app-core-DdkCnWmN.js">
+    <link rel="stylesheet" crossorigin href="/assets/app-components-BeNRKM6D.css">
+    <link rel="stylesheet" crossorigin href="/assets/app-core-DggR1zpw.css">
+  </head>
+
+  <body>
+    <!-- Google Tag Manager (noscript) -->
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+      <iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-K3JW5Q4"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      >
+      </iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <!-- End Google Tag Manager (noscript) -->
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <!-- Facebook Pixel Code -->
+    <script>
+      !(function (f, b, e, v, n, t, s) {
+        if (f.fbq) return;
+        n = f.fbq = function () {
+          n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+        };
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = !0;
+        n.version = '2.0';
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = !0;
+        t.src = v;
+        s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s);
+      })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '3002446250070324');
+      fbq('track', 'PageView');
+    </script>
+    <script>
+      // Broadcast that you're opening a page.
+      localStorage.openpages = Date.now();
+      window.addEventListener(
+        'storage',
+        function (e) {
+          if (e.key == 'openpages') {
+            // Listen if anybody else is opening the same page!
+            localStorage.page_available = Date.now();
+            localStorage.setItem('CR_Opened', 'null');
+          } else if (e.key == 'page_available') {
+            localStorage.setItem('CR_Opened', 'true');
+          }
+        },
+        false,
+      );
+    </script>
+    <script>
+      window.addEventListener('unload', () => {
+        localStorage.setItem('CR_Opened', 'null');
+      });
+    </script>
+    <noscript
+      ><img
+        height="1"
+        width="1"
+        style="display: none"
+        src="https://www.facebook.com/tr?id=3002446250070324&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Facebook Pixel Code -->
+  </body>
+</html>
